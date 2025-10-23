@@ -1,0 +1,47 @@
+<?php
+
+use yii\helpers\Html;
+use yii\widgets\ActiveForm;
+
+/** @var yii\web\View $this */
+/** @var common\models\Filme $model */
+/** @var yii\widgets\ActiveForm $form */
+?>
+
+<div class="filme-form">
+
+    <?php $form = ActiveForm::begin([
+        'options' => ['enctype' => 'multipart/form-data']
+    ]); ?>
+
+    <?= $form->field($model, 'titulo')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'sinopse')->textarea(['rows' => 6]) ?>
+
+    <?= $form->field($model, 'duracao')->textInput() ?>
+
+    <?= $form->field($model, 'estreia')->input('date') ?>
+
+    <?= $form->field($model, 'idioma')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'realizacao')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'trailer_url')->textInput(['maxlength' => true]) ?>
+
+    <?php if ($model->poster_path): ?>
+        <div class="mb-2">
+            <?= Html::img($model->getPosterUrl(), ['style' => 'max-width:150px; border-radius:8px']) ?>
+        </div>
+    <?php endif; ?>
+
+    <?= $form->field($model, 'posterFile')->fileInput() ?>
+
+    <?= $form->field($model, 'estado')->dropDownList([ 'brevemente' => 'Brevemente', 'em_exibicao' => 'Em exibicao', 'terminado' => 'Terminado', ], ['prompt' => '']) ?>
+
+    <div class="form-group">
+        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+    </div>
+
+    <?php ActiveForm::end(); ?>
+
+</div>

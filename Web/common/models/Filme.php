@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\web\UploadedFile;
 
 /**
  * This is the model class for table "filme".
@@ -23,6 +24,8 @@ use Yii;
  */
 class Filme extends \yii\db\ActiveRecord
 {
+    /** @var UploadedFile|null */
+    public $posterFile;
 
     /**
      * ENUM field values
@@ -45,7 +48,7 @@ class Filme extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['titulo', 'sinopse', 'duracao', 'estreia', 'idioma', 'realizacao', 'trailer_url', 'poster_path', 'estado'], 'required'],
+            [['titulo', 'sinopse', 'duracao', 'estreia', 'idioma', 'realizacao', 'trailer_url', 'estado'], 'required'],
             [['sinopse', 'estado'], 'string'],
             [['duracao'], 'integer'],
             [['estreia'], 'safe'],
@@ -53,6 +56,10 @@ class Filme extends \yii\db\ActiveRecord
             [['idioma'], 'string', 'max' => 50],
             [['realizacao'], 'string', 'max' => 80],
             ['estado', 'in', 'range' => array_keys(self::optsEstado())],
+            ['posterFile', 'file', 'skipOnEmpty' => true,
+                'extensions' => ['png','jpg','jpeg','webp'],
+                'maxSize' => 5 * 1024 * 1024, // 5MB
+            ],
         ];
     }
 
@@ -63,15 +70,16 @@ class Filme extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'titulo' => 'Titulo',
+            'titulo' => 'Título',
             'sinopse' => 'Sinopse',
-            'duracao' => 'Duracao',
+            'duracao' => 'Duração',
             'estreia' => 'Estreia',
             'idioma' => 'Idioma',
-            'realizacao' => 'Realizacao',
-            'trailer_url' => 'Trailer Url',
-            'poster_path' => 'Poster Path',
+            'realizacao' => 'Realização',
+            'trailer_url' => 'Trailer',
+            'poster_path' => 'Poster',
             'estado' => 'Estado',
+            'posterFile' => 'Carregar Poster',
         ];
     }
 
@@ -155,4 +163,15 @@ class Filme extends \yii\db\ActiveRecord
     {
         $this->estado = self::ESTADO_TERMINADO;
     }
+
+    public function getPosterUrl(): string
+    {
+        // Devolver caminho do poster
+        if ($this->poster_path) {
+            return Yii::$app->params['posterUrl'] . '/' . ltrim($this->poster_path, '/');
+        }
+        // Fallback (placeholder se não tiver imagem do poster)
+        return '/images/placeholders/poster-placeholder.jpg';
+    }
+
 }

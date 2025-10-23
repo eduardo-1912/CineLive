@@ -30,7 +30,8 @@ class SiteController extends Controller
                     [
                         'actions' => ['logout', 'index'],
                         'allow' => true,
-                        'roles' => ['@'],
+                        // APENAS PERMITIR ACESSO AO BACK-OFFICE PARA ESTES ROLES
+                        'roles' => ['admin', 'gerente', 'funcionario'],
                     ],
                 ],
             ],
