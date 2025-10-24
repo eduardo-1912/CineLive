@@ -13,6 +13,13 @@ return [
     'bootstrap' => ['log'],
     'modules' => [],
     'components' => [
+        'view' => [
+            'theme' => [
+                'pathMap' => [
+                    '@vendor/hail812/yii2-adminlte3/src/views' => '@app/views',
+                ],
+            ],
+        ],
         'request' => [
             'csrfParam' => '_csrf-backend',
         ],
