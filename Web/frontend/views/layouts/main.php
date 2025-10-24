@@ -77,22 +77,21 @@ AppAsset::register($this);
                 'options' => [
                     'class' => 'search-form d-none d-lg-flex align-items-center ms-4 me-3',
                     'role' => 'search',
+                    'onsubmit' => 'return this.querySelector(\'input[name="q"]\').value.trim().length > 0;',
                 ],
             ]); ?>
+            <div class="input-group nav-search" style="overflow: hidden;">
+                <?= Html::input('search', 'q', Yii::$app->request->get('q'), [
+                    'class' => 'form-control border-0 bg-light',
+                    'placeholder' => 'Pesquisar filmes...',
+                    'aria-label' => 'Pesquisar filmes',
+                    'style' => 'box-shadow:none;',
+                ]) ?>
 
-                <div class="input-group nav-search" style="overflow: hidden;">
-                    <?= Html::input('search', 'q', Yii::$app->request->get('q'), [
-                        'class' => 'form-control border-0 bg-light',
-                        'placeholder' => 'Pesquisar filmes...',
-                        'aria-label' => 'Pesquisar filmes',
-                        'style' => 'box-shadow:none;',
-                    ]) ?>
-
-                    <button class="btn bg-light border-0 d-inline-flex" type="submit">
-                        <?= file_get_contents(Yii::getAlias('@webroot/icons/search.svg')) ?>
-                    </button>
-                </div>
-
+                <button class="btn bg-light border-0 d-inline-flex" type="submit">
+                    <?= file_get_contents(Yii::getAlias('@webroot/icons/search.svg')) ?>
+                </button>
+            </div>
             <?php ActiveForm::end(); ?>
 
             <!-- LOGIN/USER-->
@@ -129,34 +128,27 @@ AppAsset::register($this);
 
 
 
-<main role="main" class="flex-shrink-0">
-    <div class="container">
-        <?= Breadcrumbs::widget([
-            'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
-        ]) ?>
-        <?= Alert::widget() ?>
-        <?= $content ?>
-    </div>
+<main role="main" class="flex-shrink-0" style="margin-top: 63px">
+<!--    <div class="container">-->
+<!--        --><?php //= Breadcrumbs::widget([
+//            'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
+//        ]) ?>
+<!--        --><?php //= Alert::widget() ?>
+<!--    </div>-->
+
+    <?= $content ?>
+
 </main>
 
 <footer class="footer mt-auto py-3">
     <div class="container d-flex justify-content-between">
-
         <p class="mb-0 fw-medium text-muted">
             &copy;<?= date('Y') ?> <?= Html::encode(Yii::$app->name) ?>
         </p>
 
-
-            <?php
-                if (!Yii::$app->user->isGuest) {
-                echo Html::beginForm(['/site/logout'], 'post', ['class' => 'd-flex'])
-                . Html::submitButton(
-                'Logout',
-                ['class' => 'text-decoration-none']
-                )
-                . Html::endForm();
-            } ?>
-       
+        <p class="mb-0 d-flex gap-3">
+            <?= Html::a('Administração', ['../../backend/web'], ['class' => 'text-muted text-decoration-none']) ?>
+        </p>
     </div>
 </footer>
 
