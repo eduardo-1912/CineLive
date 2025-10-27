@@ -29,10 +29,14 @@ $this->params['breadcrumbs'][] = $this->title;
                     If you forgot your password you can <?= Html::a('reset it', ['site/request-password-reset']) ?>.
                     <br>
                     Need new verification email? <?= Html::a('Resend', ['site/resend-verification-email']) ?>
+                    <br>
+                    Are You not Sign in Yet?
+                    <?= Html::a('Sign Up', ['site/signup']) ?>
                 </div>
 
                 <div class="form-group">
                     <?= Html::submitButton('Login', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+
                 </div>
 
             <?php ActiveForm::end(); ?>

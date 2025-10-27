@@ -2,9 +2,12 @@
 
 namespace frontend\models;
 
+use common\models\UserProfile;
 use Yii;
 use yii\base\Model;
 use common\models\User;
+use yii\debug\models\search\Profile;
+
 
 /**
  * Signup form
@@ -12,8 +15,10 @@ use common\models\User;
 class SignupForm extends Model
 {
     public $username;
+    public $nome;
     public $email;
     public $password;
+    public $telemovel;
 
 
     /**
@@ -35,6 +40,12 @@ class SignupForm extends Model
 
             ['password', 'required'],
             ['password', 'string', 'min' => Yii::$app->params['user.passwordMinLength']],
+
+            ['telemovel', 'required'],
+            ['telemovel', 'string', 'max' => 9],
+
+            ['nome', 'required'],
+
         ];
     }
 
@@ -63,6 +74,15 @@ class SignupForm extends Model
             if ($role) {
                 $auth->assign($role, $user->id);
             }
+            $profile = new UserProfile();
+            $profile->user_id = $user->id;
+            $profile->nome = $this->nome;
+            $profile->telemovel = $this->telemovel;
+            if (!$profile->save()) {
+                Yii::error($profile->errors, __METHOD__);
+            }
+
+
 
             $this->sendEmail($user);
             return true;
