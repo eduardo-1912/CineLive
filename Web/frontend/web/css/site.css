@@ -9,9 +9,13 @@
 
 .fw-medium { font-weight: 500 }
 
-.ls-10 { letter-spacing: -0.01em; }
+.text-50 { color: rgb(190, 190, 190) }
 
-h1 { font-weight: 700; }
+.text-100 { color: rgb(140, 140, 140) }
+
+a:hover { color: rgb(0, 0, 0) }
+
+h1 { font-weight: bold; }
 
 h2, h3, h4, h5 { font-weight: 600; }
 
@@ -20,14 +24,9 @@ h1, h2, h3, h4, h5 {
     letter-spacing: -0.01em;
 }
 
-body {
+body, p, span, a, button {
     font-size: 16px;
-    letter-spacing: -0.015em;
-}
-
-.icon {
-    width: 24px;
-    aspect-ratio: 1/1;
+    letter-spacing: -0.02em;
 }
 
 .container {
@@ -41,27 +40,47 @@ body {
     border-bottom: 1px solid rgba(0,0,0,0.08);
     backdrop-filter: blur(8px);
     font-size: 15px !important;
-}
 
-.nav-search {
-    border-radius: 12px;
-    background-color: rgba(0,0,0,0.05);
-    border: 1px solid rgba(0,0,0,0.05);
-
-    > .form-control {
-        font-size: 15px;
-    }
-
-    > button {
+    .nav-search {
+        border-radius: 12px;
         background-color: rgba(0,0,0,0.05);
+        border: 1px solid rgba(0,0,0,0.05);
+
+        > .form-control {
+            font-size: 15px;
+        }
+
+        > button {
+            background-color: rgba(0,0,0,0.05);
+        }
     }
 }
 
+.dropdown-menu {
+    border-radius: 16px !important;
+    background-color: rgb(255, 255, 255);
+    border: 1px solid rgba(0,0,0,0.1);
+    backdrop-filter: blur(12px);
+    box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.2);
+    overflow: hidden !important;
 
+    :active {
+        > svg {
+            filter: invert(1);
+        }
+    }
+}
 
-main > .container, main > .container-fluid
-{
-    padding: 70px 16px 20px;
+main {
+    margin-top: 63px;
+
+    @media (width < 992px) {
+        margin-top: 57px;
+    }
+
+    > .container, .container-fluid {
+        padding: 70px 16px 20px;
+    }
 }
 
 .footer {
@@ -69,7 +88,7 @@ main > .container, main > .container-fluid
     border-top: 1px solid rgba(0,0,0,0.08);
 
     > .container {
-        padding-block: 8px;
+        padding-block: 2.5rem 3rem;
     }
 }
 

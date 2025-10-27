@@ -10,7 +10,8 @@ use Yii;
  * @property int $id
  * @property int $user_id
  * @property int|null $cinema_id
- * @property int $telemovel
+ * @property string|null $nome
+ * @property string|null $telemovel
  *
  * @property Cinema $cinema
  * @property User $user
@@ -33,12 +34,14 @@ class UserProfile extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['cinema_id'], 'default', 'value' => null],
-            [['user_id', 'telemovel'], 'required'],
-            [['user_id', 'cinema_id', 'telemovel'], 'integer'],
+            [['cinema_id', 'nome', 'telemovel'], 'default', 'value' => null],
+            [['user_id'], 'required'],
+            [['user_id', 'cinema_id'], 'integer'],
+            [['nome'], 'string', 'max' => 100],
+            [['telemovel'], 'string', 'max' => 9],
             [['user_id'], 'unique'],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
             [['cinema_id'], 'exist', 'skipOnError' => true, 'targetClass' => Cinema::class, 'targetAttribute' => ['cinema_id' => 'id']],
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
 
@@ -51,6 +54,7 @@ class UserProfile extends \yii\db\ActiveRecord
             'id' => 'ID',
             'user_id' => 'User ID',
             'cinema_id' => 'Cinema ID',
+            'nome' => 'Nome',
             'telemovel' => 'Telemovel',
         ];
     }

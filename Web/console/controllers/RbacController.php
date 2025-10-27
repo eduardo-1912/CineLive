@@ -75,7 +75,7 @@ class RbacController extends Controller
         else {
             $adminUser = new $userClass();
             $adminUser->username = 'admin';
-            $adminUser->email = 'admin@email.com';
+            $adminUser->email = 'admin@cinelive.pt';
             $adminUser->setPassword('admin123');
             $adminUser->generateAuthKey();
             $adminUser->status = 10;

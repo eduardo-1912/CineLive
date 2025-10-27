@@ -9,7 +9,7 @@ use yii\helpers\Html;
 
 $this->title = $name;
 ?>
-<div class="site-error">
+<div class="site-error container">
 
     <h1><?= Html::encode($this->title) ?></h1>
 
@@ -18,10 +18,10 @@ $this->title = $name;
     </div>
 
     <p>
-        The above error occurred while the Web server was processing your request.
+        O erro acima ocorreu enquanto o servidor Web processava o seu pedido.
     </p>
     <p>
-        Please contact us if you think this is a server error. Thank you.
+        Por favor, contacte-nos se acha que isto é um erro do servidor. Obrigado.
     </p>
 
 </div>

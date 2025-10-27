@@ -21,9 +21,17 @@ $this->registerJsFile($publishedRes[1].'/control_sidebar.js', ['depends' => '\ha
     <meta charset="<?= Yii::$app->charset ?>">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="../web/favicon.ico">
     <?php $this->registerCsrfMetaTags() ?>
-    <title><?= Html::encode($this->title) ?></title>
+    <title>CineLive | <?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
+
+    <!-- FAVICON (LIGHT-MODE) -->
+    <link rel="icon" type="image/svg+xml" href="<?= Yii::getAlias('@web') ?>/favicon-light.svg" media="(prefers-color-scheme: light)">
+
+    <!-- FAVICON (DARK-MODE) -->
+    <link rel="icon" type="image/svg+xml" href="<?= Yii::getAlias('@web') ?>/favicon-dark.svg" media="(prefers-color-scheme: dark)">
+
 </head>
 <body class="hold-transition sidebar-mini">
 <?php $this->beginBody() ?>
