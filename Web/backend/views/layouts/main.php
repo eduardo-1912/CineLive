@@ -4,9 +4,13 @@
 /* @var $content string */
 
 use yii\helpers\Html;
+use backend\assets\AppAsset;
+use hail812\adminlte3\assets\FontAwesomeAsset;
+use hail812\adminlte3\assets\AdminLteAsset;
 
-\hail812\adminlte3\assets\FontAwesomeAsset::register($this);
-\hail812\adminlte3\assets\AdminLteAsset::register($this);
+AppAsset::register($this);
+FontAwesomeAsset::register($this);
+AdminLteAsset::register($this);
 $this->registerCssFile('https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback');
 
 $assetDir = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed2010/adminlte/dist');
@@ -21,9 +25,17 @@ $this->registerJsFile($publishedRes[1].'/control_sidebar.js', ['depends' => '\ha
     <meta charset="<?= Yii::$app->charset ?>">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="../web/favicon.ico">
     <?php $this->registerCsrfMetaTags() ?>
-    <title><?= Html::encode($this->title) ?></title>
+    <title>CineLive | <?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
+
+    <!-- FAVICON (LIGHT-MODE) -->
+    <link rel="icon" type="image/svg+xml" href="<?= Yii::getAlias('@web') ?>/favicon-light.svg" media="(prefers-color-scheme: light)">
+
+    <!-- FAVICON (DARK-MODE) -->
+    <link rel="icon" type="image/svg+xml" href="<?= Yii::getAlias('@web') ?>/favicon-dark.svg" media="(prefers-color-scheme: dark)">
+
 </head>
 <body class="hold-transition sidebar-mini">
 <?php $this->beginBody() ?>

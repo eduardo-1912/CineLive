@@ -30,7 +30,6 @@ class SiteController extends Controller
                     [
                         'actions' => ['logout', 'index'],
                         'allow' => true,
-                        // APENAS PERMITIR ACESSO AO BACK-OFFICE PARA ESTES ROLES
                         'roles' => ['admin', 'gerente', 'funcionario'],
                     ],
                 ],
@@ -77,10 +76,20 @@ class SiteController extends Controller
             return $this->goHome();
         }
 
-        $this->layout = 'blank';
+        $this->layout = 'main-login';
 
         $model = new LoginForm();
+
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
+
+            $user = Yii::$app->user->identity;
+            $roles = Yii::$app->authManager->getRolesByUser($user->id);
+
+            if (Yii::$app->user->can('cliente')) {
+                Yii::$app->user->logout();
+                return Yii::$app->response->redirect('../../../frontend/web');
+            }
+
             return $this->goBack();
         }
 

@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">CineLive</string>
+
+    <!-- menu_bottom_nav-->
+    <string name="nav_filmes">Filmes</string>
+    <string name="nav_cinemas">Cinemas</string>
+    <string name="nav_bilhetes">Bilhetes</string>
+    <string name="nav_perfil">Perfil</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

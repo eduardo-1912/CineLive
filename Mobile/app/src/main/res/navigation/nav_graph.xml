@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/nav_filmes">
+
+    <fragment
+        android:id="@+id/nav_filmes"
+        android:name="pt.ipleiria.estg.dei.amsi.cinelive.FilmesFragment"
+        android:label="Filmes" />
+
+    <fragment
+        android:id="@+id/nav_cinemas"
+        android:name="pt.ipleiria.estg.dei.amsi.cinelive.CinemasFragment"
+        android:label="Cinemas" />
+
+    <fragment
+        android:id="@+id/nav_bilhetes"
+        android:name="pt.ipleiria.estg.dei.amsi.cinelive.BilhetesFragment"
+        android:label="Bilhetes" />
+
+    <fragment
+        android:id="@+id/nav_perfil"
+        android:name="pt.ipleiria.estg.dei.amsi.cinelive.PerfilFragment"
+        android:label="Perfil" />
+
+</navigation>
