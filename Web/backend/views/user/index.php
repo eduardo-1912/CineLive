@@ -52,6 +52,12 @@ $this->params['breadcrumbs'][] = $this->title;
                                     return $model->profile->telemovel ?? '-';
                                 },
                             ],
+                            [
+                                'label' => 'Cinema',
+                                'value' => function($model) {
+                                    return $model->profile->cinema->nome ?? '-';
+                                },
+                            ],
                             ['class' => 'hail812\adminlte3\yii\grid\ActionColumn'],
                         ],
                         'summaryOptions' => ['class' => 'summary mb-2'],

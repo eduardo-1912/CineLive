@@ -1,3 +1,25 @@
+.main-sidebar .brand-link {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+.sidebar-mini.sidebar-collapse .brand-text {
+    display: none !important;
+}
+
+.sidebar-mini.sidebar-collapse .main-sidebar:hover .brand-text {
+    display: inline !important;
+    margin-left: 0.5rem;
+}
+
+.sidebar-mini.sidebar-collapse .brand-link {
+    justify-content: center !important;
+}
+
+
 main > .container {
     padding: 70px 15px 20px;
 }

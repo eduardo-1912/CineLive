@@ -17,22 +17,11 @@ class UserExtension extends User
             [['username', 'email'], 'trim'],
             [['username', 'email'], 'required'],
             ['username', 'string', 'min' => 3, 'max' => 255],
+            ['password', 'string', 'min' => 8],
             ['email', 'string', 'max' => 255],
             ['email', 'email'],
-            ['username', 'unique'],
-            ['email', 'unique'],
-
-            // Campos extra
+            [['username', 'email'], 'unique'],
             ['role', 'safe'],
-            ['password', 'string', 'min' => 8],
-        ]);
-    }
-
-
-    public function attributeLabels()
-    {
-        return array_merge(parent::attributeLabels(), [
-            'password' => 'Palavra-passe',
         ]);
     }
 
@@ -53,7 +42,6 @@ class UserExtension extends User
 
         return parent::beforeSave($insert);
     }
-
 
     public function getProfile()
     {

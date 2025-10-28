@@ -63,7 +63,6 @@ class UserController extends Controller
         ]);
     }
 
-
     /**
      * Creates a new User model.
      * If creation is successful, the browser will be redirected to the 'view' page.
@@ -100,7 +99,6 @@ class UserController extends Controller
         ]);
     }
 
-
     /**
      * Updates an existing User model.
      * If update is successful, the browser will be redirected to the 'view' page.
@@ -111,7 +109,7 @@ class UserController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        $profile = $model->profile ?? new \common\models\UserProfile(['user_id' => $model->id]);
+        $profile = $model->profile ?? new UserProfile(['user_id' => $model->id]);
 
         if ($model->load(Yii::$app->request->post()) && $profile->load(Yii::$app->request->post())) {
             if ($model->save()) {
@@ -136,7 +134,19 @@ class UserController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $user = $this->findModel($id);
+
+        // Retirar Role do User
+        $auth = Yii::$app->authManager;
+        $auth->revokeAll($user->id);
+
+        // Apagar o Profile (caso exista)
+        if ($user->profile) {
+            $user->profile->delete();
+        }
+
+        // Apagar o User
+        $user->delete();
 
         return $this->redirect(['index']);
     }

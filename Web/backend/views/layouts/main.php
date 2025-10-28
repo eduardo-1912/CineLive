@@ -4,9 +4,13 @@
 /* @var $content string */
 
 use yii\helpers\Html;
+use backend\assets\AppAsset;
+use hail812\adminlte3\assets\FontAwesomeAsset;
+use hail812\adminlte3\assets\AdminLteAsset;
 
-\hail812\adminlte3\assets\FontAwesomeAsset::register($this);
-\hail812\adminlte3\assets\AdminLteAsset::register($this);
+AppAsset::register($this);
+FontAwesomeAsset::register($this);
+AdminLteAsset::register($this);
 $this->registerCssFile('https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback');
 
 $assetDir = Yii::$app->assetManager->getPublishedUrl('@vendor/almasaeed2010/adminlte/dist');
