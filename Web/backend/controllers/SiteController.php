@@ -24,11 +24,11 @@ class SiteController extends Controller
                 'class' => AccessControl::class,
                 'rules' => [
                     [
-                        'actions' => ['login', 'error'],
+                        'actions' => ['login'],
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index'],
+                        'actions' => ['logout', 'index', 'error'],
                         'allow' => true,
                         'roles' => ['admin', 'gerente', 'funcionario'],
                     ],
@@ -90,7 +90,7 @@ class SiteController extends Controller
                 return Yii::$app->response->redirect('../../../frontend/web');
             }
 
-            return $this->goBack();
+            return $this->goHome();
         }
 
         $model->password = '';

@@ -7,6 +7,7 @@ use common\models\User;
 use common\models\UserExtension;
 use common\models\UserProfile;
 use backend\models\UserSearch;
+use common\models\Cinema;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -76,19 +77,49 @@ class UserController extends Controller
         if ($model->load(Yii::$app->request->post()) && $profile->load(Yii::$app->request->post())) {
 
             if ($model->save()) {
+
+                // Associar perfil ao utilizador
                 $profile->user_id = $model->id;
                 $profile->save(false);
 
-                // Atribuir o papel RBAC
+                // Atribuir papel RBAC
                 $auth = Yii::$app->authManager;
                 $role = $auth->getRole($model->role);
                 if ($role) {
                     $auth->assign($role, $model->id);
                 }
 
+                // Se for gerente, associar ao cinema correspondente
+                if ($model->role === 'gerente' && $profile->cinema_id) {
+                    $cinema = Cinema::findOne($profile->cinema_id);
+                    if ($cinema) {
+                        // Libertar qualquer cinema que este user já gerisse
+                        Cinema::updateAll(['gerente_id' => null], ['gerente_id' => $model->id]);
+
+                        // Obter IDs dos utilizadores que são gerentes
+                        $gerentesIds = Yii::$app->authManager->getUserIdsByRole('gerente');
+
+                        // Remover o cinema_id apenas de outros GERENTES com este cinema
+                        if (!empty($gerentesIds)) {
+                            UserProfile::updateAll(
+                                ['cinema_id' => null],
+                                [
+                                    'and',
+                                    ['cinema_id' => $cinema->id],
+                                    ['in', 'user_id', $gerentesIds],
+                                    ['!=', 'user_id', $model->id],
+                                ]
+                            );
+                        }
+
+                        // Associar o novo gerente ao cinema
+                        $cinema->gerente_id = $model->id;
+                        $cinema->save(false);
+                    }
+                }
+
                 return $this->redirect(['view', 'id' => $model->id]);
             } else {
-                // Debug temporário se algo falhar
                 Yii::debug($model->getErrors(), __METHOD__);
             }
         }
@@ -98,6 +129,7 @@ class UserController extends Controller
             'profile' => $profile,
         ]);
     }
+
 
     /**
      * Updates an existing User model.
@@ -111,10 +143,57 @@ class UserController extends Controller
         $model = $this->findModel($id);
         $profile = $model->profile ?? new UserProfile(['user_id' => $model->id]);
 
+        // Preenche o papel atual via RBAC
+        $roles = Yii::$app->authManager->getRolesByUser($model->id);
+        if (!empty($roles)) {
+            $model->role = array_key_first($roles);
+        }
+
         if ($model->load(Yii::$app->request->post()) && $profile->load(Yii::$app->request->post())) {
             if ($model->save()) {
                 $profile->user_id = $model->id;
                 $profile->save(false);
+
+                // Atualizar papel RBAC (remover antigo e adicionar o novo)
+                $auth = Yii::$app->authManager;
+                $auth->revokeAll($model->id);
+                $newRole = $auth->getRole($model->role);
+                if ($newRole) {
+                    $auth->assign($newRole, $model->id);
+                }
+
+                // Se for gerente, associar ao cinema correspondente
+                if ($model->role === 'gerente' && $profile->cinema_id) {
+                    $cinema = Cinema::findOne($profile->cinema_id);
+                    if ($cinema) {
+                        // Libertar qualquer cinema que este user já gerisse
+                        Cinema::updateAll(['gerente_id' => null], ['gerente_id' => $model->id]);
+
+                        // Obter IDs dos utilizadores que são gerentes
+                        $gerentesIds = Yii::$app->authManager->getUserIdsByRole('gerente');
+
+                        // Remover o cinema_id apenas de outros GERENTES com este cinema
+                        if (!empty($gerentesIds)) {
+                            UserProfile::updateAll(
+                                ['cinema_id' => null],
+                                [
+                                    'and',
+                                    ['cinema_id' => $cinema->id],
+                                    ['in', 'user_id', $gerentesIds],
+                                    ['!=', 'user_id', $model->id],
+                                ]
+                            );
+                        }
+
+                        // Associar o novo gerente ao cinema
+                        $cinema->gerente_id = $model->id;
+                        $cinema->save(false);
+                    }
+                } else {
+                    // Deixou de ser gerente → libertar cinemas antigos
+                    Cinema::updateAll(['gerente_id' => null], ['gerente_id' => $model->id]);
+                }
+
                 return $this->redirect(['view', 'id' => $model->id]);
             }
         }
@@ -124,6 +203,8 @@ class UserController extends Controller
             'profile' => $profile,
         ]);
     }
+
+
 
     /**
      * Deletes an existing User model.
@@ -135,6 +216,8 @@ class UserController extends Controller
     public function actionDelete($id)
     {
         $user = $this->findModel($id);
+
+        Cinema::updateAll(['gerente_id' => null], ['gerente_id' => $user->id]);
 
         // Retirar Role do User
         $auth = Yii::$app->authManager;

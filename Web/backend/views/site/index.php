@@ -2,52 +2,57 @@
 
 /** @var yii\web\View $this */
 
+use yii\helpers\Url;
+
 $this->title = 'Dashboard';
 ?>
-<div class="site-index">
-
-    <div class="jumbotron text-center bg-transparent">
-        <h1 class="display-4">Congratulations!</h1>
-
-        <p class="lead">You have successfully created your Yii-powered application.</p>
-
-        <p><a class="btn btn-lg btn-success" href="https://www.yiiframework.com">Get started with Yii</a></p>
-    </div>
-
-    <div class="body-content">
-
-        <div class="row">
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-outline-secondary" href="https://www.yiiframework.com/doc/">Yii Documentation &raquo;</a></p>
-            </div>
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-outline-secondary" href="https://www.yiiframework.com/forum/">Yii Forum &raquo;</a></p>
-            </div>
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-outline-secondary" href="https://www.yiiframework.com/extensions/">Yii Extensions &raquo;</a></p>
+<div class="site-index container-fluid">
+    <div class="row row-cols-1 row-cols-sm-3 g-3 text-start">
+        
+        <div class="col">
+            <div class="small-box bg-info p-0 mb-0">
+                <div class="inner d-flex flex-column align-items-start">
+                    <h3>150</h3>
+                    <p>Bilhetes vendidos este mês</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-ticket-alt"></i>
+                </div>
+                <a href="<?= Url::to(['/compra/index']) ?>" class="small-box-footer">
+                    Ver Bilhetes <i class="fas fa-arrow-circle-right"></i>
+                </a>
             </div>
         </div>
 
+        <div class="col">
+            <div class="small-box bg-danger p-0 mb-0">
+                <div class="inner d-flex flex-column align-items-start">
+                    <h3>150</h3>
+                    <p>Filmes em Exibição</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-film"></i>
+                </div>
+                <a href="<?= Url::to(['/filme/index']) ?>" class="small-box-footer">
+                    Ver Filmes <i class="fas fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="small-box bg-success p-0 mb-0">
+                <div class="inner d-flex flex-column align-items-start">
+                    <h3>150</h3>
+                    <p>Sessões agendadas hoje</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <a href="<?= Url::to(['/sessao/index']) ?>" class="small-box-footer">
+                    Ver Sessões <i class="fas fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
     </div>
 </div>
+

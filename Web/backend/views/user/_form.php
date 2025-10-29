@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 use yii\bootstrap4\ActiveForm;
 use yii\helpers\ArrayHelper;
-use Yii;
+use common\models\Cinema;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\User */
@@ -51,20 +51,19 @@ JS; $this->registerJs($script); ?>
             'gerente' => 'Gerente',
             'admin' => 'Administrador',
         ],
-        ['prompt' => 'Selecione o Papel']
     ); ?>
 
     <div id="formFieldCinema" style="display: none;">
         <?= $form->field($profile, 'cinema_id')->label('Cinema')->dropDownList(
-            ArrayHelper::map(\common\models\Cinema::find()->all(), 'id', 'nome'),
+            ArrayHelper::map(Cinema::find()->all(), 'id', 'nome'),
             ['prompt' => 'Selecione o cinema'],
         ) ?>
     </div>
 
-    <?= $form->field($model, 'status')->dropDownList([
-        10 => 'Ativo',
-        9 => 'Inativo',
-        0 => 'Eliminado',
+    <?= $form->field($model, 'status')->label('Estado da Conta')->dropDownList([
+        10 => 'Ativa',
+        9 => 'Inativa',
+        0 => 'Eliminada',
     ]) ?>
 
     <div class="form-group mt-3">

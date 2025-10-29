@@ -13,8 +13,8 @@ class m251022_130422_init_cinelive extends Migration
             'rua' => $this->string(100)->notNull(),
             'codigo_postal' => $this->string(8)->notNull(),
             'cidade' => $this->string(50)->notNull(),
-            'latitude' => $this->decimal(10, 0),
-            'longitude' => $this->decimal(10, 0),
+            'latitude' => $this->decimal(10, 6),
+            'longitude' => $this->decimal(10, 6),
             'email' => $this->string(255)->notNull(),
             'telefone' => $this->integer()->notNull(),
             'horario_abertura' => $this->time()->notNull(),
@@ -30,6 +30,7 @@ class m251022_130422_init_cinelive extends Migration
             'id' => $this->primaryKey(),
             'user_id' => $this->integer()->notNull(),
             'cinema_id' => $this->integer(),
+            'nome' => $this->string(100),
             'telemovel' => $this->integer()->notNull(),
         ]);
 

@@ -40,10 +40,39 @@ class UserProfile extends \yii\db\ActiveRecord
             [['nome'], 'string', 'max' => 100],
             [['telemovel'], 'string', 'max' => 9],
             [['user_id'], 'unique'],
-            [['cinema_id'], 'exist', 'skipOnError' => true, 'targetClass' => Cinema::class, 'targetAttribute' => ['cinema_id' => 'id']],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
+            [
+                ['cinema_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => Cinema::class,
+                'targetAttribute' => ['cinema_id' => 'id']
+            ],
+            [
+                ['user_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => User::class,
+                'targetAttribute' => ['user_id' => 'id']
+            ],
+
+            // Campo cinema_id obrigatório para gerente ou funcionário
+            [
+                'cinema_id',
+                'required',
+                'when' => function ($model) {
+                    if (!$model->user_id) return false; // ainda não associado
+                    $roles = Yii::$app->authManager->getRolesByUser($model->user_id);
+                    return isset($roles['gerente']) || isset($roles['funcionario']);
+                },
+                'whenClient' => "function (attribute, value) {
+                let role = $('#userextension-role').val();
+                return role === 'gerente' || role === 'funcionario';
+            }",
+                'message' => 'O campo Cinema é obrigatório para gerentes e funcionários.',
+            ],
         ];
     }
+
 
     /**
      * {@inheritdoc}

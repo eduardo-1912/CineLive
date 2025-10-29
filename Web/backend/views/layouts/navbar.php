@@ -11,100 +11,52 @@ use yii\helpers\Url;
         <li class="nav-item">
             <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
         </li>
-        <li class="nav-item d-none d-sm-inline-block">
-            <a href="<?=\yii\helpers\Url::home()?>" class="nav-link">Home</a>
-        </li>
-        <li class="nav-item d-none d-sm-inline-block">
-            <a href="<?= Url::to(['/user/index']) ?>" class="nav-link">Users</a>
-        </li>
-        <li class="nav-item d-none d-sm-inline-block">
-            <a href="<?= Url::to(['/filme/index']) ?>" class="nav-link">Filmes</a>
-        </li>
-        <li class="nav-item dropdown">
-            <a id="dropdownSubMenu1" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Dropdown</a>
-            <ul aria-labelledby="dropdownSubMenu1" class="dropdown-menu border-0 shadow">
-                <li><a href="#" class="dropdown-item">Some action </a></li>
-                <li><a href="#" class="dropdown-item">Some other action</a></li>
-                <li><?= Html::a('Sign out', ['site/logout'], ['data-method' => 'post', 'class' => 'dropdown-item']) ?></li>
-
-                <li class="dropdown-divider"></li>
-
-                <!-- Level two dropdown-->
-                <li class="dropdown-submenu dropdown-hover">
-                    <a id="dropdownSubMenu2" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle">Hover for action</a>
-                    <ul aria-labelledby="dropdownSubMenu2" class="dropdown-menu border-0 shadow">
-                        <li>
-                            <a tabindex="-1" href="#" class="dropdown-item">level 2</a>
-                        </li>
-
-                        <!-- Level three dropdown-->
-                        <li class="dropdown-submenu">
-                            <a id="dropdownSubMenu3" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle">level 2</a>
-                            <ul aria-labelledby="dropdownSubMenu3" class="dropdown-menu border-0 shadow">
-                                <li><a href="#" class="dropdown-item">3rd level</a></li>
-                                <li><a href="#" class="dropdown-item">3rd level</a></li>
-                            </ul>
-                        </li>
-                        <!-- End Level three -->
-
-                        <li><a href="#" class="dropdown-item">level 2</a></li>
-                        <li><a href="#" class="dropdown-item">level 2</a></li>
-                    </ul>
-                </li>
-                <!-- End Level two -->
-            </ul>
+        <li class="nav-item d-flex align-items-center">
+            <!-- SEARCH FORM -->
+            <form class="d-none d-md-flex form-inline">
+                <div class="input-group input-group-md">
+                    <input class="form-control form-control-navbar" type="search" placeholder="Pesquisar Filmes..." aria-label="Search">
+                    <div class="input-group-append">
+                        <button class="btn btn-navbar" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
         </li>
     </ul>
 
-    <!-- SEARCH FORM -->
-<!--    <form class="form-inline ml-3">-->
-<!--        <div class="input-group input-group-sm">-->
-<!--            <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">-->
-<!--            <div class="input-group-append">-->
-<!--                <button class="btn btn-navbar" type="submit">-->
-<!--                    <i class="fas fa-search"></i>-->
-<!--                </button>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </form>-->
+
 
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
-        <!-- Notifications Dropdown Menu -->
         <li class="nav-item dropdown">
-            <a class="nav-link" data-toggle="dropdown" href="#">
-                <i class="far fa-bell"></i>
-                <span class="badge badge-warning navbar-badge">15</span>
-            </a>
-            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                <span class="dropdown-header">15 Notifications</span>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item">
-                    <i class="fas fa-envelope mr-2"></i> 4 new messages
-                    <span class="float-right text-muted text-sm">3 mins</span>
-                </a>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item">
-                    <i class="fas fa-users mr-2"></i> 8 friend requests
-                    <span class="float-right text-muted text-sm">12 hours</span>
-                </a>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item">
-                    <i class="fas fa-file mr-2"></i> 3 new reports
-                    <span class="float-right text-muted text-sm">2 days</span>
-                </a>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
-            </div>
+            <button class="btn btn-link nav-link dropdown-toggle d-inline-flex align-items-center" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-user-circle fa-md mr-1"></i>
+                <?= Html::encode(Yii::$app->user->identity->profile->nome ?? Yii::$app->user->identity->username) ?>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end border-0 shadow">
+                <li>
+                    <a class="dropdown-item" href="<?= Url::to(['/profile/index']) ?>">
+                        <i class="fas fa-user fa-sm mr-1"></i>
+                        Perfil
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="<?= Url::to(['/site/logout']) ?>" data-method="post">
+                        <i class="fas fa-sign-out-alt fa-sm mr-1"></i>
+                        Logout
+                    </a>
+                </li>
+                <li class="dropdown-divider"></li>
+                <li>
+                    <a class="dropdown-item" href="<?= Url::to(['../../frontend/web']) ?>">
+                        <i class="fas fa-globe fa-sm mr-1"></i>
+                        Público
+                    </a>
+                </li>
+            </ul>
         </li>
-        <li class="nav-item">
-            <?= Html::a('<i class="fas fa-sign-out-alt"></i>', ['/site/logout'], ['data-method' => 'post', 'class' => 'nav-link']) ?>
-        </li>
-<!--        <li class="nav-item">-->
-<!--            <a class="nav-link" data-widget="fullscreen" href="#" role="button">-->
-<!--                <i class="fas fa-expand-arrows-alt"></i>-->
-<!--            </a>-->
-<!--        </li>-->
     </ul>
 </nav>
 <!-- /.navbar -->

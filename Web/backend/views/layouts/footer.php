@@ -1,6 +1,14 @@
+<?php
+
+use yii\helpers\Html;
+
+?>
 <footer class="main-footer">
-    <a href="https://adminlte.io">CineLive</a>
+    <span class="fw-normal">&copy;<?= date('Y') ?> <?= Html::encode(Yii::$app->name) ?></span>
     <div class="float-right d-none d-sm-inline-block">
-        <b>Version</b> 3.1.0
+        <a href="mailto:admin@cinelive.pt">
+            <i class="fas fa-exclamation-triangle fa-sm"></i>
+            Reportar Problema
+        </a>
     </div>
 </footer>
