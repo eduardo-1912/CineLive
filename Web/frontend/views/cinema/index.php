@@ -13,35 +13,38 @@ $this->title = 'Cinemas';
 
     <div class="row row-cols-1 row-cols-md-3 g-4">
         <?php foreach ($cinemas as $cinema): ?>
-            <div class="col">
-                <div class=" col-6 color-blue ">
-
+            <div class="row bg-light rounded-3 overflow-hidden mb-4 shadow-sm">
+                <!-- Mapa gerado por latitude/longitude -->
+                <div class="col-md-6 p-0">
+                    <iframe
+                            width="100%"
+                            height="300"
+                            style="border:0;"
+                            loading="lazy"
+                            allowfullscreen
+                            referrerpolicy="no-referrer-when-downgrade"
+                            src="https://www.google.com/maps?q=<?= Html::encode($cinemas->latitude) ?>,<?= Html::encode($cinemas->longitude) ?>&hl=pt&z=15&output=embed">
+                    </iframe>
                 </div>
-                <div class="col-6 color-red">
-                    <div>
-                        <h3><strong><?= html::encode($cinemas->nome) ?></strong></h3>
-                        <p>Gerenciado por: <?= html::encode($cinemas->gerente->nome) ?></p>
-                    </div>
-                    <div class="align-content-start">
-                        <h3><strong>Morada</strong></h3>
-                        <p><?= html::encode($cinemas->rua . ", " . $cinema->codigo_postal . ", " . $cinema->cidade) ?></p>
-                    </div>
-                    <div class="align-content-start">
-                        <h3><strong>Telemovel</strong></h3>
+                <div class="col-md-6 p-4 d-flex flex-column justify-content-center">
+
+                        <h4 class="fw-bold mb-1"><strong><?= html::encode($cinemas->nome) ?></strong></h4><br>
+                        <p class="text-muted mb-3">Gerenciado por: <?= html::encode($cinemas->gerente->nome) ?></p>
+
+                        <h4 class="mb-2"><strong>Morada</strong></h4><br>
+                        <p class="mb-2"><?= html::encode($cinemas->rua . ", " . $cinemas->codigo_postal . ", " . $cinemas->cidade) ?></p>
+
+                        <h4><strong>Telemovel</strong></h4><br>
                         <p><?= html::encode($cinemas->telefone) ?></p>
-                    </div>
-                    <div class="">
-                        <h3><strong>Email</strong></h3>
+
+                        <h4><strong>Email</strong></h4><br>
                         <p><?= html::encode($cinemas->email) ?></p>
-                    </div>
-                    <div class="">
-                        <h3><strong>Horario</strong></h3>
+
+                        <h4><strong>Horario</strong></h4><br>
                         <p><?= html::encode($cinemas->horario_abertura . " - " . $cinemas->horario_fecho) ?></p>
-                    </div>
-                    <div class="">
-                        <h3><strong>Capacidade</strong></h3>
+
+                        <h4><strong>Capacidade</strong></h4><br>
                         <p><?= html::encode($cinemas->count(\common\models\Sala::$cinema_id) . " salas - ") ?></p>
-                    </div>
                 </div>
             </div>
         <?php endforeach; ?>
