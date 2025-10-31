@@ -35,6 +35,16 @@ main > .container {
     padding-left: 15px;
 }
 
+.pagination {
+    margin-bottom: 0;
+ }
+
+.card-footer::after {
+    display: none !important;
+    content: none !important;
+}
+
+
 .not-set {
     color: #c55;
     font-style: italic;
@@ -65,6 +75,11 @@ a.desc:after {
 .grid-view th,
 .grid-view td:last-child {
     white-space: nowrap;
+}
+
+.grid-view thead a {
+    color: #000 !important;
+    text-decoration: none;
 }
 
 .grid-view .filters input,

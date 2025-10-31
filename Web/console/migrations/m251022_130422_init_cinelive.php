@@ -30,7 +30,7 @@ class m251022_130422_init_cinelive extends Migration
             'id' => $this->primaryKey(),
             'user_id' => $this->integer()->notNull(),
             'cinema_id' => $this->integer(),
-            'nome' => $this->string(100),
+            'nome' => $this->string(100)->notNull(),
             'telemovel' => $this->integer()->notNull(),
         ]);
 
@@ -51,6 +51,7 @@ class m251022_130422_init_cinelive extends Migration
             'titulo' => $this->string(255)->notNull(),
             'sinopse' => $this->text()->notNull(),
             'duracao' => $this->integer()->notNull(),
+            'rating' => "ENUM('Todos','M3','M6','M12','M14','M16','M18') NOT NULL",
             'estreia' => $this->date()->notNull(),
             'idioma' => $this->string(50)->notNull(),
             'realizacao' => $this->string(80)->notNull(),

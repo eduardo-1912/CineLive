@@ -33,11 +33,11 @@ use yii\helpers\Url;
         <li class="nav-item dropdown">
             <button class="btn btn-link nav-link dropdown-toggle d-inline-flex align-items-center" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="fas fa-user-circle fa-md mr-1"></i>
-                <?= Html::encode(Yii::$app->user->identity->profile->nome ?? Yii::$app->user->identity->username) ?>
+                <?= Html::encode(Yii::$app->user->identity->profile->nome ?? Yii::$app->user->identity->username)?>
             </button>
             <ul class="dropdown-menu dropdown-menu-end border-0 shadow">
                 <li>
-                    <a class="dropdown-item" href="<?= Url::to(['/profile/index']) ?>">
+                    <a class="dropdown-item" href="<?= Url::to(['/user/view?id=' . Yii::$app->user->id]) ?>">
                         <i class="fas fa-user fa-sm mr-1"></i>
                         Perfil
                     </a>

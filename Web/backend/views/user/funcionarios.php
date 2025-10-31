@@ -1,8 +1,5 @@
 <?php
 
-use backend\assets\AppAsset;
-use common\models\Cinema;
-use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\grid\GridView;
 use backend\components\AppGridView;
@@ -11,7 +8,7 @@ use backend\components\AppGridView;
 /* @var $searchModel backend\models\UserSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Utilizadores';
+$this->title = 'Funcionários';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
@@ -20,14 +17,12 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
+
                     <div class="row mb-3">
                         <div class="col-md-12">
-                            <?= Html::a('Criar Utilizador', ['create'], ['class' => 'btn btn-success']) ?>
+                            <?= Html::a('Criar Funcionário', ['create'], ['class' => 'btn btn-success']) ?>
                         </div>
                     </div>
-
-
-                    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
                     <?= AppGridView::widget([
                         'dataProvider' => $dataProvider,
@@ -47,24 +42,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'value' => 'profile.nome',
                             ],
                             [
-                                'attribute' => 'role',
-                                'label' => 'Função',
-                                'value' => 'roleFormatted',
-                                'filter' => [
-                                    'admin' => 'Administrador',
-                                    'gerente' => 'Gerente',
-                                    'funcionario' => 'Funcionário',
-                                    'cliente' => 'Cliente',
-                                ],
-                                'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
-                            ],
-                            [
-                                'attribute' => 'cinema_id',
-                                'label' => 'Cinema',
-                                'value' => 'cinema.nome',
-                                'filter' => ArrayHelper::map(Cinema::find()->orderBy('nome')->asArray()->all(), 'id', 'nome'
-                                ),
-                                'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
+                                'attribute' => 'telemovel',
+                                'label' => 'Telemóvel',
+                                'value' => 'profile.telemovel',
                             ],
                             [
                                 'attribute' => 'status',
@@ -90,16 +70,12 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                             [
                                 'class' => 'backend\components\AppActionColumn',
-                                'template' => '{view} {update} {activate} {deactivate} {delete}',
+                                'template' => '{view} {activate} {deactivate}',
                             ],
                         ],
                     ]); ?>
                 </div>
-                <!--.card-body-->
             </div>
-            <!--.card-->
         </div>
-        <!--.col-md-12-->
     </div>
-    <!--.row-->
 </div>

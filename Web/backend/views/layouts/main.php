@@ -3,6 +3,7 @@
 /* @var $this \yii\web\View */
 /* @var $content string */
 
+use backend\components\ToastWidget;
 use yii\helpers\Html;
 use backend\assets\AppAsset;
 use hail812\adminlte3\assets\FontAwesomeAsset;
@@ -30,6 +31,7 @@ $this->registerJsFile($publishedRes[1].'/control_sidebar.js', ['depends' => '\ha
     <?php $this->registerCsrfMetaTags() ?>
     <title>CineLive | <?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
+
 
     <!-- FAVICON (LIGHT-MODE) -->
     <link rel="icon" type="image/svg+xml" href="<?= Yii::getAlias('@web') ?>/favicon-light.svg" media="(prefers-color-scheme: light)">
@@ -60,6 +62,8 @@ $this->registerJsFile($publishedRes[1].'/control_sidebar.js', ['depends' => '\ha
     <!-- Main Footer -->
     <?= $this->render('footer') ?>
 </div>
+
+<?= ToastWidget::widget() ?>
 
 <?php $this->endBody() ?>
 </body>

@@ -12,6 +12,7 @@ use yii\web\UploadedFile;
  * @property string $titulo
  * @property string $sinopse
  * @property int $duracao
+ * @property string $rating
  * @property string $estreia
  * @property string $idioma
  * @property string $realizacao
@@ -30,6 +31,13 @@ class Filme extends \yii\db\ActiveRecord
     /**
      * ENUM field values
      */
+    const RATING_TODOS = 'Todos';
+    const RATING_M3 = 'M3';
+    const RATING_M6 = 'M6';
+    const RATING_M12 = 'M12';
+    const RATING_M14 = 'M14';
+    const RATING_M16 = 'M16';
+    const RATING_M18 = 'M18';
     const ESTADO_BREVEMENTE = 'brevemente';
     const ESTADO_EM_EXIBICAO = 'em_exibicao';
     const ESTADO_TERMINADO = 'terminado';
@@ -48,13 +56,14 @@ class Filme extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['titulo', 'sinopse', 'duracao', 'estreia', 'idioma', 'realizacao', 'trailer_url', 'estado'], 'required'],
+            [['titulo', 'sinopse', 'duracao', 'rating', 'estreia', 'idioma', 'realizacao', 'trailer_url', 'estado'], 'required'],
             [['sinopse', 'estado'], 'string'],
             [['duracao'], 'integer'],
             [['estreia'], 'safe'],
             [['titulo', 'trailer_url', 'poster_path'], 'string', 'max' => 255],
             [['idioma'], 'string', 'max' => 50],
             [['realizacao'], 'string', 'max' => 80],
+            ['rating', 'in', 'range' => array_keys(self::optsRating())],
             ['estado', 'in', 'range' => array_keys(self::optsEstado())],
             ['posterFile', 'file', 'skipOnEmpty' => true,
                 'extensions' => ['png','jpg','jpeg','webp'],
@@ -73,6 +82,7 @@ class Filme extends \yii\db\ActiveRecord
             'titulo' => 'Título',
             'sinopse' => 'Sinopse',
             'duracao' => 'Duração',
+            'rating' => 'Rating',
             'estreia' => 'Estreia',
             'idioma' => 'Idioma',
             'realizacao' => 'Realização',
@@ -103,6 +113,22 @@ class Filme extends \yii\db\ActiveRecord
         return $this->hasMany(Sessao::class, ['filme_id' => 'id']);
     }
 
+    /**
+     * column rating ENUM value labels
+     * @return string[]
+     */
+    public static function optsRating()
+    {
+        return [
+            self::RATING_TODOS => 'Todos',
+            self::RATING_M3 => 'M3',
+            self::RATING_M6 => 'M6',
+            self::RATING_M12 => 'M12',
+            self::RATING_M14 => 'M14',
+            self::RATING_M16 => 'M16',
+            self::RATING_M18 => 'M18',
+        ];
+    }
 
     /**
      * column estado ENUM value labels
@@ -115,6 +141,105 @@ class Filme extends \yii\db\ActiveRecord
             self::ESTADO_EM_EXIBICAO => 'em_exibicao',
             self::ESTADO_TERMINADO => 'terminado',
         ];
+    }
+
+    /**
+     * @return string
+     */
+    public function displayRating()
+    {
+        return self::optsRating()[$this->rating];
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRatingTodos()
+    {
+        return $this->rating === self::RATING_TODOS;
+    }
+
+    public function setRatingToTodos()
+    {
+        $this->rating = self::RATING_TODOS;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRatingM3()
+    {
+        return $this->rating === self::RATING_M3;
+    }
+
+    public function setRatingToM3()
+    {
+        $this->rating = self::RATING_M3;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRatingM6()
+    {
+        return $this->rating === self::RATING_M6;
+    }
+
+    public function setRatingToM6()
+    {
+        $this->rating = self::RATING_M6;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRatingM12()
+    {
+        return $this->rating === self::RATING_M12;
+    }
+
+    public function setRatingToM12()
+    {
+        $this->rating = self::RATING_M12;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRatingM14()
+    {
+        return $this->rating === self::RATING_M14;
+    }
+
+    public function setRatingToM14()
+    {
+        $this->rating = self::RATING_M14;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRatingM16()
+    {
+        return $this->rating === self::RATING_M16;
+    }
+
+    public function setRatingToM16()
+    {
+        $this->rating = self::RATING_M16;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRatingM18()
+    {
+        return $this->rating === self::RATING_M18;
+    }
+
+    public function setRatingToM18()
+    {
+        $this->rating = self::RATING_M18;
     }
 
     /**

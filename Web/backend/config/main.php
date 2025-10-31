@@ -13,6 +13,14 @@ return [
     'bootstrap' => ['log'],
     'modules' => [],
     'components' => [
+        'user' => [
+            'identityClass' => 'common\models\UserExtension',
+            'enableAutoLogin' => true,
+        ],
+        'formatter' => [
+            'class' => 'yii\i18n\Formatter',
+            'nullDisplay' => '-',
+        ],
         'view' => [
             'theme' => [
                 'pathMap' => [

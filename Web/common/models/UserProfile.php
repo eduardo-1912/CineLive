@@ -18,28 +18,20 @@ use Yii;
  */
 class UserProfile extends \yii\db\ActiveRecord
 {
-
-
-    /**
-     * {@inheritdoc}
-     */
     public static function tableName()
     {
         return 'user_profile';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function rules()
     {
         return [
-            [['cinema_id', 'nome', 'telemovel'], 'default', 'value' => null],
-            [['user_id'], 'required'],
+            [['user_id', 'nome', 'telemovel'], 'required'],
             [['user_id', 'cinema_id'], 'integer'],
             [['nome'], 'string', 'max' => 100],
             [['telemovel'], 'string', 'max' => 9],
             [['user_id'], 'unique'],
+            [['cinema_id'], 'default', 'value' => null],
             [
                 ['cinema_id'],
                 'exist',
@@ -55,57 +47,45 @@ class UserProfile extends \yii\db\ActiveRecord
                 'targetAttribute' => ['user_id' => 'id']
             ],
 
-            // Campo cinema_id obrigatório para gerente ou funcionário
+            // Cinema obrigatório para gerente/funcionário
             [
                 'cinema_id',
                 'required',
-                'when' => function ($model) {
-                    if (!$model->user_id) return false; // ainda não associado
-                    $roles = Yii::$app->authManager->getRolesByUser($model->user_id);
-                    return isset($roles['gerente']) || isset($roles['funcionario']);
-                },
-                'whenClient' => "function (attribute, value) {
-                let role = $('#userextension-role').val();
-                return role === 'gerente' || role === 'funcionario';
-            }",
-                'message' => 'O campo Cinema é obrigatório para gerentes e funcionários.',
+                'when' => fn($model) => $model->isStaff(),
+                'whenClient' => "function() {
+                    const role = $('#userextension-role').val();
+                    return role === 'gerente' || role === 'funcionario';
+                }",
+                'message' => 'O campo Cinema é obrigatório para Gerentes e Funcionários.',
             ],
         ];
     }
 
-
-    /**
-     * {@inheritdoc}
-     */
     public function attributeLabels()
     {
         return [
             'id' => 'ID',
             'user_id' => 'User ID',
-            'cinema_id' => 'Cinema ID',
+            'cinema_id' => 'Cinema',
             'nome' => 'Nome',
-            'telemovel' => 'Telemovel',
+            'telemovel' => 'Telemóvel',
         ];
     }
 
-    /**
-     * Gets query for [[Cinema]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
     public function getCinema()
     {
         return $this->hasOne(Cinema::class, ['id' => 'cinema_id']);
     }
 
-    /**
-     * Gets query for [[User]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
     public function getUser()
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
 
+    // Verifica se o utilizador é gerente ou funcionário
+    public function isStaff()
+    {
+        $roles = Yii::$app->authManager->getRolesByUser($this->id);
+        return isset($roles['gerente']) || isset($roles['funcionario']);
+    }
 }

@@ -33,6 +33,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'titulo',
             'sinopse:ntext',
             'duracao',
+            'rating',
             'estreia',
             'idioma',
             'realizacao',

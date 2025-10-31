@@ -3,6 +3,7 @@
 namespace backend\controllers;
 
 use common\models\LoginForm;
+use common\models\UserProfile;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
@@ -90,6 +91,21 @@ class SiteController extends Controller
                 return Yii::$app->response->redirect('../../../frontend/web');
             }
 
+            if (!Yii::$app->user->can('gerente')) {
+                $userId = Yii::$app->user->id;
+
+                // Buscar diretamente da tabela user_profile (está a dar erro através do identity)
+                $cinemaId = UserProfile::find()
+                    ->select('cinema_id')
+                    ->where(['user_id' => $userId])
+                    ->scalar();
+
+                if ($cinemaId === null) {
+                    Yii::$app->user->logout();
+                    Yii::$app->session->setFlash('error', 'A sua conta de funcionário não está associada a nenhum cinema.');
+                    return $this->redirect(['login']);
+                }
+            }
             return $this->goHome();
         }
 

@@ -5,8 +5,12 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model common\models\User */
 
-$this->title = 'Create User';
-$this->params['breadcrumbs'][] = ['label' => 'Users', 'url' => ['index']];
+$keyword = Yii::$app->user->can('gerirUtilizadores') ? 'Utilizador' : 'Funcionário';
+$breadcrumb = $keyword == 'Utilizador' ? 'Utilizadores' : 'Funcionários';
+$return_path = $keyword == 'Utilizador' ? 'index' : 'funcionarios';
+
+$this->title = 'Criar ' . $keyword;
+$this->params['breadcrumbs'][] = ['label' => $breadcrumb, 'url' => [$return_path]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 

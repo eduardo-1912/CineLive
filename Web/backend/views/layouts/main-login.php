@@ -4,6 +4,7 @@
 /* @var $content string */
 
 use backend\assets\AppAsset;
+use backend\components\ToastWidget;
 use yii\helpers\Html;
 
 \hail812\adminlte3\assets\AdminLteAsset::register($this);
@@ -26,6 +27,7 @@ AppAsset::register($this);
     <?php $this->head() ?>
 </head>
 <body class="hold-transition login-page">
+
 <?php  $this->beginBody() ?>
 <div class="login-box">
     <div class="login-logo">
@@ -39,6 +41,8 @@ AppAsset::register($this);
     <?= $content ?>
 </div>
 <!-- /.login-box -->
+
+<?= ToastWidget::widget() ?>
 
 <?php $this->endBody() ?>
 </body>

@@ -8,7 +8,6 @@ $this->title = 'Dashboard';
 ?>
 <div class="site-index container-fluid">
     <div class="row row-cols-1 row-cols-sm-3 g-3 text-start">
-        
         <div class="col">
             <div class="small-box bg-info p-0 mb-0">
                 <div class="inner d-flex flex-column align-items-start">
@@ -40,7 +39,7 @@ $this->title = 'Dashboard';
         </div>
 
         <div class="col">
-            <div class="small-box bg-success p-0 mb-0">
+            <div class="small-box bg-warning p-0 mb-0">
                 <div class="inner d-flex flex-column align-items-start">
                     <h3>150</h3>
                     <p>Sessões agendadas hoje</p>

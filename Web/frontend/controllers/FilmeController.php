@@ -18,9 +18,6 @@ class FilmeController extends Controller
             $query->andWhere(['like', 'titulo', $q]);
         }
 
-        // TODO: RETIRAR ISTO!!!
-        $query->andWhere(['estado' => Filme::ESTADO_EM_EXIBICAO]);
-
         $filmes = $query->all();
 
         return $this->render('index', [

@@ -1,5 +1,6 @@
 <?php
 
+use common\models\Filme;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -20,6 +21,8 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'duracao')->textInput() ?>
 
+    <?= $form->field($model, 'rating')->dropDownList(Filme::optsRating()) ?>
+
     <?= $form->field($model, 'estreia')->input('date') ?>
 
     <?= $form->field($model, 'idioma')->textInput(['maxlength' => true]) ?>
@@ -36,7 +39,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'posterFile')->fileInput() ?>
 
-    <?= $form->field($model, 'estado')->dropDownList([ 'brevemente' => 'Brevemente', 'em_exibicao' => 'Em exibicao', 'terminado' => 'Terminado', ], ['prompt' => '']) ?>
+    <?= $form->field($model, 'estado')->dropDownList([ 'brevemente' => 'Brevemente', 'em_exibicao' => 'Em exibição', 'terminado' => 'Terminado', ]) ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

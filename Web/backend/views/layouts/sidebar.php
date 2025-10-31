@@ -16,7 +16,7 @@
 
                     ['label' => 'Gestão', 'header' => true, 'visible' => Yii::$app->user->can('gerente'),],
                     ['label' => 'Utilizadores',  'icon' => 'users', 'url' => ['/user/index'], 'visible' => Yii::$app->user->can('admin'),],
-                    ['label' => 'Funcionários',  'icon' => 'user-tie', 'url' => ['/funcionario/index'], 'visible' => Yii::$app->user->can('gerente'),],
+                    ['label' => 'Funcionários',  'icon' => 'user-tie', 'url' => ['/user/funcionarios'], 'visible' => Yii::$app->user->identity->roleName == 'gerente',],
 
                     ['label' => 'Espaços', 'header' => true],
                     ['label' => 'Cinemas',  'icon' => 'building', 'url' => ['/cinema/index']],
