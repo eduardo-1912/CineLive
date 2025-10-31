@@ -17,7 +17,6 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-
                     <div class="row mb-3">
                         <div class="col-md-12">
                             <?= Html::a('Criar Funcionário', ['create'], ['class' => 'btn btn-success']) ?>
@@ -70,7 +69,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                             [
                                 'class' => 'backend\components\AppActionColumn',
-                                'template' => '{view} {activate} {deactivate}',
+                                'template' => '{view} {activate} {deactivate} {delete}',
                             ],
                         ],
                     ]); ?>

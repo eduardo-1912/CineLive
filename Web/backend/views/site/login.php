@@ -10,7 +10,7 @@ use yii\bootstrap5\Html;
 $this->title = 'Login';
 ?>
 <div class="site-login">
-    <div class="mt-5 offset-lg-3 col-lg-6">
+    <div class="mt-5">
 
         <?php $form = ActiveForm::begin(['id' => 'login-form']); ?>
 

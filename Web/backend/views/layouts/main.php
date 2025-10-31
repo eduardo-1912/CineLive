@@ -3,7 +3,7 @@
 /* @var $this \yii\web\View */
 /* @var $content string */
 
-use backend\components\ToastWidget;
+use common\components\ToastWidget;
 use yii\helpers\Html;
 use backend\assets\AppAsset;
 use hail812\adminlte3\assets\FontAwesomeAsset;

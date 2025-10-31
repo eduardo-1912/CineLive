@@ -3,6 +3,7 @@
 namespace backend\controllers;
 
 use common\models\LoginForm;
+use common\models\UserExtension;
 use common\models\UserProfile;
 use Yii;
 use yii\filters\VerbFilter;
@@ -81,31 +82,39 @@ class SiteController extends Controller
 
         $model = new LoginForm();
 
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
-
+        if ($model->load(Yii::$app->request->post()) && $model->login())
+        {
+            // OBTER USER ATUAL
             $user = Yii::$app->user->identity;
+
+            // OBTER ROLE RBAC DO USER
             $roles = Yii::$app->authManager->getRolesByUser($user->id);
 
+            // SE USER ATUAL É CLIENTE --> SEM ACESSO
             if (Yii::$app->user->can('cliente')) {
                 Yii::$app->user->logout();
                 return Yii::$app->response->redirect('../../../frontend/web');
             }
 
-            if (!Yii::$app->user->can('gerente')) {
+            // SE USER NÃO É ADMIN --> OBTER CINEMA DELE
+            if (!Yii::$app->user->can('admin')) {
+
+                // OBTER USER ATUAL
                 $userId = Yii::$app->user->id;
+                $user = UserExtension::findOne(['id' => $userId]);
 
-                // Buscar diretamente da tabela user_profile (está a dar erro através do identity)
-                $cinemaId = UserProfile::find()
-                    ->select('cinema_id')
-                    ->where(['user_id' => $userId])
-                    ->scalar();
+                // OBTER O CINEMA DO USER ATUAL
+                $cinemaId = $user->profile->cinema_id;
 
+                // SE NÃO TIVER ASSOCIADO A NENHUM CINEMA --> SEM ACESSO
                 if ($cinemaId === null) {
                     Yii::$app->user->logout();
-                    Yii::$app->session->setFlash('error', 'A sua conta de funcionário não está associada a nenhum cinema.');
+                    Yii::$app->session->setFlash('error', 'Não está associado a nenhum cinema!');
                     return $this->redirect(['login']);
                 }
             }
+
+            // SE TUDO BEM --> IR PARA SITE/INDEX
             return $this->goHome();
         }
 
@@ -124,7 +133,6 @@ class SiteController extends Controller
     public function actionLogout()
     {
         Yii::$app->user->logout();
-
         return $this->goHome();
     }
 }

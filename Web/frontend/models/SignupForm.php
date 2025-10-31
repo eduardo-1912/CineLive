@@ -27,53 +27,43 @@ class SignupForm extends Model
     public function rules()
     {
         return [
-            ['username', 'trim'],
-            ['username', 'required'],
-            ['username', 'unique', 'targetClass' => '\common\models\User', 'message' => 'This username has already been taken.'],
+            [['username', 'email', 'password', 'telemovel', 'nome'], 'required'],
+            [['username', 'email'], 'trim'],
             ['username', 'string', 'min' => 2, 'max' => 255],
-
-            ['email', 'trim'],
-            ['email', 'required'],
+            ['username', 'unique', 'targetClass' => '\common\models\User', 'message' => 'Este nome de utilizador já está registado.'],
             ['email', 'email'],
             ['email', 'string', 'max' => 255],
-            ['email', 'unique', 'targetClass' => '\common\models\User', 'message' => 'This email address has already been taken.'],
-
-            ['password', 'required'],
+            ['email', 'unique', 'targetClass' => '\common\models\User', 'message' => 'Este email já está registado.'],
             ['password', 'string', 'min' => Yii::$app->params['user.passwordMinLength']],
-
-            ['telemovel', 'required'],
-            ['telemovel', 'string', 'max' => 9],
-
-            ['nome', 'required'],
-
+            ['telemovel', 'match', 'pattern' => '/^[0-9]{9}$/', 'message' => 'O telemóvel deve conter exatamente 9 dígitos.'],
         ];
     }
 
-    /**
-     * Signs user up.
-     *
-     * @return bool whether the creating new account was successful and email was sent
-     */
+    // CRIAR CONTA
     public function signup()
     {
         if (!$this->validate()) {
             return null;
         }
-        
+
+        // CRIAR UTILIZADOR
         $user = new User();
         $user->username = $this->username;
         $user->email = $this->email;
         $user->setPassword($this->password);
         $user->generateAuthKey();
-        $user->generateEmailVerificationToken();
+        $user->status = User::STATUS_ACTIVE; // CONTA ATIVA POR DEFAULT
 
-        // DAR ASSIGN DE ROLE 'CLIENTE'
         if ($user->save()) {
+
+            // DAR ASSIGN DE ROLE 'CLIENTE'
             $auth = Yii::$app->authManager;
             $role = $auth->getRole('cliente');
             if ($role) {
                 $auth->assign($role, $user->id);
             }
+
+            // CRIAR USER_PROFILE
             $profile = new UserProfile();
             $profile->user_id = $user->id;
             $profile->nome = $this->nome;
@@ -82,13 +72,10 @@ class SignupForm extends Model
                 Yii::error($profile->errors, __METHOD__);
             }
 
-
-
-            $this->sendEmail($user);
-            return true;
+            return $user;
         }
 
-        return false;
+        return null;
     }
 
     /**

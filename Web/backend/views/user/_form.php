@@ -13,24 +13,36 @@ use common\models\Cinema;
 ?>
 
 <?php
-
-// Script JS para mostrar o campo cinema (gerentes/funcionários)
 $script = <<<JS
-function toggleCinemaField() {
-    var role = $('#userextension-role').val();
-    if (role === 'gerente' || role === 'funcionario') {
-        $('#formFieldCinema').show();
-        $('#formFieldCinema select').prop('disabled', false);
-    } else {
-        $('#formFieldCinema').hide();
-        $('#formFieldCinema select').prop('disabled', true);
-    }
-}
 
-$(document).ready(function() {
-    toggleCinemaField();
-    $('#userextension-role').on('change', toggleCinemaField);
-});
+    // FUNÇÃO PARA MOSTRAR/ESCONDER CAMPO DE CINEMA CONSOANTE O ROLE SELECIONADO
+    function toggleCinemaField() {
+    
+        // OBTER VALOR DO CAMPO DE ROLE
+        var role = $('#userextension-role').val();
+        
+        // SE O ROLE SELECIONADO FOR GERENTE/FUNCIONÁRIO --> MOSTRAR CAMPO CINEMA
+        if (role === 'gerente' || role === 'funcionario') {
+            $('#formFieldCinema').show();
+            $('#formFieldCinema select').prop('disabled', false);
+        }
+        
+        // CASO CONTRÁRIO --> ESCONDER CAMPO CINEMA
+        else {
+            $('#formFieldCinema').hide();
+            $('#formFieldCinema select').prop('disabled', true);
+        }
+    }
+    
+    $(document).ready(function() {
+
+        // QUANDO O DOM ESTÁ PRONTO --> CHAMAR A FUNÇÃO
+        toggleCinemaField();
+        
+        // SEMPRE QUE O USER MUDA O VALOR DO CAMPO 'ROLE' --> CHAMAR A FUNÇÃO
+        $('#userextension-role').on('change', toggleCinemaField);
+    });
+
 JS;
 $this->registerJs($script);
 ?>
@@ -39,8 +51,6 @@ $this->registerJs($script);
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <h4 class="mb-3">Dados do Utilizador</h4>
-
     <?= $form->field($model, 'id')->hiddenInput()->label(false) ?>
     <?= $form->field($model, 'username')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'password')->passwordInput(['maxlength' => true]) ?>
@@ -48,9 +58,10 @@ $this->registerJs($script);
     <?= $form->field($profile, 'telemovel')->label('Telemóvel')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'email')->input('email') ?>
 
+    <!-- SE USER ATUAL FOR ADMIN PODE EDITAR TUDO -->
     <?php if (Yii::$app->user->can('admin')): ?>
 
-        <!-- ADMIN pode editar tudo -->
+        <!-- DROPDOWN DOS ROLES-->
         <?= $form->field($model, 'role')->label('Função')->dropDownList([
             'cliente' => 'Cliente',
             'funcionario' => 'Funcionário',
@@ -58,42 +69,38 @@ $this->registerJs($script);
             'admin' => 'Administrador',
         ]) ?>
 
+        <!-- DROPDOWN DOS CINEMAS-->
         <div id="formFieldCinema" style="display:none;">
-            <?= $form->field($profile, 'cinema_id')
-                ->label('Cinema')
-                ->dropDownList(
+            <?= $form->field($profile, 'cinema_id')->label('Cinema')->dropDownList(
                     ArrayHelper::map(Cinema::find()->all(), 'id', 'nome'),
                     ['prompt' => 'Selecione o cinema']
                 ) ?>
         </div>
 
+        <!-- DROPDOWN DE ESTADO DA CONTA -->
         <?= $form->field($model, 'status')->label('Estado')->dropDownList([
             10 => 'Ativa',
             9 => 'Inativa',
             0 => 'Eliminada',
         ]) ?>
 
+    <!-- SE FOR GERENTE NÃO PODE ALTERAR ROLE NEM CINEMA, SÓ PODE CRIAR FUNCIONÁRIO PARA O SEU CINEMA -->
     <?php elseif (Yii::$app->user->can('gerente')): ?>
 
-        <!-- GERENTE: cria funcionário, role/cinema são automáticos -->
+        <!-- ROLE 'FUNCIONÁRIO', CINEMA DO GERENTE E ESTADO DA CONTA 'ATIVVA' -->
         <?= Html::activeHiddenInput($model, 'role', ['value' => 'funcionario']) ?>
         <?= Html::activeHiddenInput($profile, 'cinema_id', ['value' => Yii::$app->user->identity->profile->cinema_id]) ?>
         <?= Html::activeHiddenInput($model, 'status', ['value' => 10]) ?>
 
     <?php else: ?>
 
-        <!-- OUTROS (funcionário/cliente): apenas leitura -->
-        <?= $form->field($model, 'role')->textInput([
-            'value' => $model->role ? ucfirst($model->role) : '',
-            'readonly' => true,
-        ])->label('Função') ?>
-
-        <?= $form->field($profile, 'cinema_id')
-            ->label('Cinema')
-            ->dropDownList(
+        <!-- ROLE E CINEMA EM MODO READ-ONLY PARA FUNCIONÁRIOS -->
+        <?= $form->field($model, 'role')->textInput(['value' => $model->role ? ucfirst($model->role) : '', 'readonly' => true,])->label('Função') ?>
+        <?= $form->field($profile, 'cinema_id')->label('Cinema')->dropDownList(
                 ArrayHelper::map(Cinema::find()->all(), 'id', 'nome'),
                 ['disabled' => true]
             ) ?>
+
     <?php endif; ?>
 
     <div class="form-group mt-3">

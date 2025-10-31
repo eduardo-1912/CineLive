@@ -14,8 +14,8 @@
                 'items' => [
                     ['label' => 'Dashboard',  'icon' => 'columns', 'url' => ['/site/index']],
 
-                    ['label' => 'Gestão', 'header' => true, 'visible' => Yii::$app->user->can('gerente'),],
-                    ['label' => 'Utilizadores',  'icon' => 'users', 'url' => ['/user/index'], 'visible' => Yii::$app->user->can('admin'),],
+                    ['label' => 'Gestão', 'header' => true, 'visible' => Yii::$app->user->can('gerirFuncionarios'),],
+                    ['label' => 'Utilizadores',  'icon' => 'users', 'url' => ['/user/index'], 'visible' => Yii::$app->user->can('gerirUtilizadores'),],
                     ['label' => 'Funcionários',  'icon' => 'user-tie', 'url' => ['/user/funcionarios'], 'visible' => Yii::$app->user->identity->roleName == 'gerente',],
 
                     ['label' => 'Espaços', 'header' => true],

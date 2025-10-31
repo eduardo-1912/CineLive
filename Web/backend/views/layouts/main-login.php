@@ -4,7 +4,7 @@
 /* @var $content string */
 
 use backend\assets\AppAsset;
-use backend\components\ToastWidget;
+use common\components\ToastWidget;
 use yii\helpers\Html;
 
 \hail812\adminlte3\assets\AdminLteAsset::register($this);

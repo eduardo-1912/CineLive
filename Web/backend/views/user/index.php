@@ -26,9 +26,6 @@ $this->params['breadcrumbs'][] = $this->title;
                         </div>
                     </div>
 
-
-                    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
-
                     <?= AppGridView::widget([
                         'dataProvider' => $dataProvider,
                         'filterModel' => $searchModel,

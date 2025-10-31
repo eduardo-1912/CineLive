@@ -4,11 +4,16 @@ namespace common\models;
 
 use Yii;
 
+// O modelo UserExtension foi criado porque não foi gerado o modelo User outra vez
+// Com o objetivo de não alterar nada no modelo User (não é upgrade-safe)
+// Existe para fazer a ligação entre User e UserProfile com regras para Roles e Cinema
+// Foi definido como modelo default do Yii::$app->user
+
 class UserExtension extends User
 {
-    // Campos virtuais
-    public $role;
+    // CAMPOS TEMPORÁRIOS
     public $password;
+    public $role;
     public $cinema_id;
 
     /**
@@ -17,7 +22,7 @@ class UserExtension extends User
     public function rules()
     {
         return array_merge(parent::rules(), [
-            // Campos de conta
+            // CAMPOS DA CONTA
             [['username', 'email'], 'trim'],
             [['username', 'email'], 'required'],
             ['username', 'string', 'min' => 3, 'max' => 255],
@@ -26,20 +31,24 @@ class UserExtension extends User
             [['username', 'email'], 'unique'],
             ['role', 'safe'],
 
-            // Password obrigatória apenas no create
+            // PASSWORD OBRIGATÓRIA (APENAS NO CREATE)
             ['password', 'string', 'min' => 8],
             [
                 'password',
                 'required',
                 'when' => fn($model) => $model->isNewRecord,
                 'whenClient' => "function() {
+                
+                    // DEVOLVER TRUE QUANDO NÃO HÁ ID (OU SEJA, QUANDO O UTILIZADOR AINDA NÃO EXISTE)
                     return !$('#userextension-id').val();
+                    
                 }",
                 'message' => 'Password cannot be blank.',
             ],
         ]);
     }
 
+    // GUARDAR A PASSWORD E AUTH_KEY/TOKEN
     public function beforeSave($insert)
     {
         if ($this->password) {
@@ -58,16 +67,19 @@ class UserExtension extends User
         return parent::beforeSave($insert);
     }
 
+    // OBTER USER_PROFILE DO USER
     public function getProfile()
     {
         return $this->hasOne(UserProfile::class, ['user_id' => 'id']);
     }
 
+    // OBTER CINEMA DO USER
     public function getCinema()
     {
         return $this->hasOne(Cinema::class, ['id' => 'cinema_id'])->via('profile');
     }
 
+    // OBTER ROLE DO USER
     public function getRoleName()
     {
         $roles = Yii::$app->authManager->getRolesByUser($this->id);
@@ -76,6 +88,7 @@ class UserExtension extends User
         return array_key_first($roles);
     }
 
+    // OBTER ROLE DO USER (FORMATADO)
     public function getRoleFormatted()
     {
         $roles = Yii::$app->authManager->getRolesByUser($this->id);
