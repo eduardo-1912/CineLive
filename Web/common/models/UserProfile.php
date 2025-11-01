@@ -59,7 +59,7 @@ class UserProfile extends \yii\db\ActiveRecord
                 'whenClient' => "function() {
                 
                     // OBTER VALOR DO DROPDOWN ROLE
-                    const role = $('#userextension-role').val();
+                    const role = $('#user-role').val();
                     
                     // DEVOLVER QUANDO VALOR É GERENTE/FUNCIONÁRIO
                     return role === 'gerente' || role === 'funcionario';

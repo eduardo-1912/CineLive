@@ -4,7 +4,6 @@ namespace backend\controllers;
 
 use Yii;
 use common\models\User;
-use common\models\UserExtension;
 use common\models\UserProfile;
 use backend\models\UserSearch;
 use common\models\Cinema;
@@ -176,7 +175,7 @@ class UserController extends Controller
         $currentUser = Yii::$app->user;
 
         // CRIAR USER E USER_PROFILE
-        $model = new UserExtension();
+        $model = new User();
         $profile = new UserProfile();
 
         // SE NÃO FOR ADMIN NEM GERENTE --> SEM ACESSO
@@ -554,7 +553,7 @@ class UserController extends Controller
      */
     protected function findModel($id)
     {
-        if (($model = UserExtension::findOne($id)) !== null) {
+        if (($model = User::findOne($id)) !== null) {
             return $model;
         }
 

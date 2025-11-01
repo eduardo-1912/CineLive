@@ -7,7 +7,7 @@ use yii\helpers\ArrayHelper;
 use common\models\Cinema;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\UserExtension */
+/* @var $model common\models\User */
 /* @var $profile common\models\UserProfile */
 /* @var $form yii\bootstrap4\ActiveForm */
 
@@ -20,7 +20,7 @@ $script = <<<JS
     function toggleCinemaField() {
     
         // OBTER VALOR DO CAMPO DE ROLE
-        var role = $('#userextension-role').val();
+        var role = $('#user-role').val();
         
         // SE O ROLE SELECIONADO FOR GERENTE/FUNCIONÁRIO --> MOSTRAR CAMPO CINEMA
         if (role === 'gerente' || role === 'funcionario') {
@@ -41,7 +41,7 @@ $script = <<<JS
         toggleCinemaField();
         
         // SEMPRE QUE O USER MUDA O VALOR DO CAMPO 'ROLE' --> CHAMAR A FUNÇÃO
-        $('#userextension-role').on('change', toggleCinemaField);
+        $('#user-role').on('change', toggleCinemaField);
     });
 
 JS;

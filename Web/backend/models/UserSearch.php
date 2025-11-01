@@ -5,9 +5,9 @@ namespace backend\models;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use common\models\UserExtension;
+use common\models\User;
 
-class UserSearch extends UserExtension
+class UserSearch extends User
 {
     public $nome;
     public $telemovel;
@@ -29,7 +29,7 @@ class UserSearch extends UserExtension
 
     public function search($params)
     {
-        $query = UserExtension::find()
+        $query = User::find()
             ->joinWith(['profile', 'cinema']); // Faz join com user_profile e cinema
 
         $dataProvider = new ActiveDataProvider([

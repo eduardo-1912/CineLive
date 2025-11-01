@@ -3,7 +3,7 @@
 namespace backend\controllers;
 
 use common\models\LoginForm;
-use common\models\UserExtension;
+use common\models\User;
 use common\models\UserProfile;
 use Yii;
 use yii\filters\VerbFilter;
@@ -101,7 +101,7 @@ class SiteController extends Controller
 
                 // OBTER USER ATUAL
                 $userId = Yii::$app->user->id;
-                $user = UserExtension::findOne(['id' => $userId]);
+                $user = User::findOne(['id' => $userId]);
 
                 // OBTER O CINEMA DO USER ATUAL
                 $cinemaId = $user->profile->cinema_id;

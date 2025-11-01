@@ -2,7 +2,7 @@
 
 /** @var yii\web\View $this */
 
-use common\models\UserExtension;
+use common\models\User;
 use yii\helpers\Url;
 
 $this->title = 'Dashboard';

@@ -25,6 +25,11 @@ use yii\web\IdentityInterface;
  */
 class User extends ActiveRecord implements IdentityInterface
 {
+    // CAMPOS TEMPORÁRIOS
+    public $password;
+    public $role;
+    public $cinema_id;
+
     const STATUS_DELETED = 0;
     const STATUS_INACTIVE = 9;
     const STATUS_ACTIVE = 10;
@@ -56,8 +61,23 @@ class User extends ActiveRecord implements IdentityInterface
         return [
             ['status', 'default', 'value' => self::STATUS_INACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_INACTIVE, self::STATUS_DELETED]],
+            [['username', 'email'], 'trim'],
+            [['username', 'email'], 'required'],
+            ['username', 'string', 'min' => 3, 'max' => 255],
+            ['email', 'string', 'max' => 255],
+            ['email', 'email'],
+            [['username', 'email'], 'unique'],
+            ['role', 'safe'],
+            ['password', 'string', 'min' => 8],
+            [
+                'password', 'required',
+                'when' => fn($model) => $model->isNewRecord,
+                'whenClient' => "function() { return !$('#user-id').val(); }",
+                'message' => 'Password cannot be blank.'
+            ],
         ];
     }
+
 
     /**
      * {@inheritdoc}
@@ -66,6 +86,61 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return static::findOne(['id' => $id, 'status' => self::STATUS_ACTIVE]);
     }
+
+    // GUARDAR A PASSWORD E AUTH_KEY/TOKEN
+    public function beforeSave($insert)
+    {
+        if ($this->password) {
+            $this->setPassword($this->password);
+        }
+
+        if ($insert) {
+            if (empty($this->auth_key)) {
+                $this->generateAuthKey();
+            }
+            if (empty($this->verification_token)) {
+                $this->generateEmailVerificationToken();
+            }
+        }
+
+        return parent::beforeSave($insert);
+    }
+
+    // OBTER USER_PROFILE DO USER
+    public function getProfile()
+    {
+        return $this->hasOne(UserProfile::class, ['user_id' => 'id']);
+    }
+
+    // OBTER CINEMA DO USER
+    public function getCinema()
+    {
+        return $this->hasOne(Cinema::class, ['id' => 'cinema_id'])->via('profile');
+    }
+
+    // OBTER ROLE DO USER
+    public function getRoleName()
+    {
+        $roles = Yii::$app->authManager->getRolesByUser($this->id);
+        return empty($roles) ? null : array_key_first($roles);
+    }
+
+    // OBTER ROLE DO USER FORMATO (PARA MOSTRAR NAS VIEWS)
+    public function getRoleFormatted()
+    {
+        $roles = Yii::$app->authManager->getRolesByUser($this->id);
+        if (empty($roles)) return '-';
+        $labels = [
+            'admin' => 'Administrador',
+            'gerente' => 'Gerente',
+            'funcionario' => 'Funcionário',
+            'cliente' => 'Cliente',
+        ];
+        $key = array_key_first($roles);
+        return $labels[$key] ?? ucfirst($key);
+    }
+
+
 
     /**
      * {@inheritdoc}
