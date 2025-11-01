@@ -67,10 +67,40 @@ class Filme extends \yii\db\ActiveRecord
             ['estado', 'in', 'range' => array_keys(self::optsEstado())],
             ['posterFile', 'file', 'skipOnEmpty' => true,
                 'extensions' => ['png','jpg','jpeg','webp'],
-                'maxSize' => 5 * 1024 * 1024, // 5MB
+                'maxSize' => 2 * 1024 * 1024, // 2MB
             ],
         ];
     }
+
+    public function getPosterUrl(): string
+    {
+        // Caminhos definidos em common/config/params.php
+        $posterDir = Yii::getAlias(Yii::$app->params['posterPath']); // caminho físico absoluto
+        $posterUrlBase = Yii::$app->params['posterUrl']; // URL público acessível via browser
+
+        // Caminho absoluto completo (ficheiro físico no servidor)
+        $posterFile = rtrim($posterDir, '/') . '/' . ltrim($this->poster_path, '/');
+
+        // Caminho público (para o <img src="...">)
+        $posterUrl = rtrim($posterUrlBase, '/') . '/' . ltrim($this->poster_path, '/');
+
+        // Placeholder público (dentro da mesma pasta 'uploads')
+        $placeholderUrl = rtrim($posterUrlBase, '/') . '/../placeholders/poster-placeholder.jpg';
+
+        // Se não tiver poster_path definido → devolve placeholder
+        if (empty($this->poster_path)) {
+            return $placeholderUrl;
+        }
+
+        // Se o ficheiro não existir fisicamente → devolve placeholder
+        if (!file_exists($posterFile)) {
+            return $placeholderUrl;
+        }
+
+        // Caso contrário → devolve URL do poster
+        return $posterUrl;
+    }
+
 
     /**
      * {@inheritdoc}
@@ -89,7 +119,7 @@ class Filme extends \yii\db\ActiveRecord
             'trailer_url' => 'Trailer',
             'poster_path' => 'Poster',
             'estado' => 'Estado',
-            'posterFile' => 'Carregar Poster',
+            'posterFile' => 'Poster',
         ];
     }
 
@@ -288,15 +318,4 @@ class Filme extends \yii\db\ActiveRecord
     {
         $this->estado = self::ESTADO_TERMINADO;
     }
-
-    public function getPosterUrl(): string
-    {
-        // Devolver caminho do poster
-        if ($this->poster_path) {
-            return Yii::$app->params['posterUrl'] . '/' . ltrim($this->poster_path, '/');
-        }
-        // Fallback (placeholder se não tiver imagem do poster)
-        return '/images/placeholders/poster-placeholder.jpg';
-    }
-
 }

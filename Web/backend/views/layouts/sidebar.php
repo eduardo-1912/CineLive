@@ -10,21 +10,26 @@
         <!-- Sidebar Menu -->
         <nav class="mt-2">
             <?php
+
+            $currentUser = Yii::$app->user;
+            $isAdmin = $currentUser->can('admin');
+
             echo \hail812\adminlte\widgets\Menu::widget([
                 'items' => [
                     ['label' => 'Dashboard',  'icon' => 'columns', 'url' => ['/site/index']],
 
-                    ['label' => 'Gestão', 'header' => true, 'visible' => Yii::$app->user->can('gerirFuncionarios'),],
-                    ['label' => 'Utilizadores',  'icon' => 'users', 'url' => ['/user/index'], 'visible' => Yii::$app->user->can('gerirUtilizadores'),],
-                    ['label' => 'Funcionários',  'icon' => 'user-tie', 'url' => ['/user/funcionarios'], 'visible' => Yii::$app->user->identity->roleName == 'gerente',],
+                    ['label' => 'Gestão', 'header' => true, 'visible' => $currentUser->can('gerirFuncionarios'),],
+                    ['label' => 'Utilizadores',  'icon' => 'users', 'url' => ['/user/index'], 'visible' => $currentUser->can('gerirUtilizadores')],
+                    ['label' => 'Funcionários',  'icon' => 'user-tie', 'url' => ['/user/funcionarios'], 'visible' => $currentUser->identity->roleName == 'gerente'],
 
                     ['label' => 'Espaços', 'header' => true],
-                    ['label' => 'Cinemas',  'icon' => 'building', 'url' => ['/cinema/index']],
-                    ['label' => 'Salas',  'icon' => 'chair', 'url' => ['/genero/index']],
+                    ['label' => 'Cinemas',  'icon' => 'building', 'url' => ['/cinema/index'], 'visible' => $currentUser->can('gerirCinemas')],
+                    ['label' => 'Cinema',  'icon' => 'building', 'url' => ['/cinema/view?id=' . $currentUser->identity->profile->cinema_id], 'visible' => !$isAdmin],
+                    ['label' => 'Salas',  'icon' => 'chair', 'url' => ['/sala/index']],
 
                     ['label' => 'Filmes', 'header' => true],
                     ['label' => 'Filmes',  'icon' => 'film', 'url' => ['/filme/index']],
-                    ['label' => 'Géneros',  'icon' => 'tags', 'url' => ['/genero/index']],
+                    ['label' => 'Géneros',  'icon' => 'tags', 'url' => ['/genero/index'], 'visible' => $currentUser->can('gerirFilmes')],
                     ['label' => 'Sessões',  'icon' => 'calendar-alt', 'url' => ['/sessao/index']],
 
                     ['label' => 'Reservas', 'header' => true],

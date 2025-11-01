@@ -13,8 +13,6 @@
 
 .text-100 { color: rgb(140, 140, 140) }
 
-a:hover { color: rgb(0, 0, 0) }
-
 h1 { font-weight: bold; }
 
 h2, h3, h4, h5 { font-weight: 600; }
@@ -103,13 +101,6 @@ main {
         color: var(--bs-link-color);
     }
 }
-
-
-
-
-
-
-
 
 
 

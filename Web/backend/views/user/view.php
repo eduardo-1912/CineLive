@@ -1,5 +1,6 @@
 <?php
 
+use common\models\User;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
@@ -37,16 +38,16 @@ $this->params['breadcrumbs'][] = $this->title;
 
                         // ATIVAR/DESATIVAR (ADMIN OU GERENTE DOS SEUS FUNCIONÁRIOS)
                         if ($isAdmin || ($isGerente && $mesmoCinema && !$isOwnAccount)) {
-                            if ($model->status == 9 || $model->status == 0) {
+                            if ($model->status == User::STATUS_INACTIVE || $model->status == User::STATUS_DELETED) {
                                 echo Html::a('Ativar', ['activate', 'id' => $model->id], ['class' => 'btn btn-success me-1', 'data' => ['method' => 'post'],]);
                             }
-                            elseif ($model->status == 10) {
+                            elseif ($model->status == User::STATUS_ACTIVE) {
                                 echo Html::a('Desativar', ['deactivate', 'id' => $model->id], ['class' => 'btn btn-secondary me-1', 'data' => ['method' => 'post'],]);
                             }
                         }
 
                         // ELIMINAR (ADMIN / GERENTES PARA FUNCIONÁRIOS DO SEU CINEMA / PRÓPRIO UTILIZADOR)
-                        if ($isAdmin || $isGerente && $mesmoCinema || $isOwnAccount) {
+                        if ($isAdmin || $isGerente && $mesmoCinema) {
                             echo Html::a('Eliminar', ['delete', 'id' => $model->id], ['class' => 'btn btn-danger', 'data' => ['method' => 'post'],]);
                         }
                     ?> </p>
@@ -54,7 +55,11 @@ $this->params['breadcrumbs'][] = $this->title;
                     <?= DetailView::widget([
                         'model' => $model,
                         'attributes' => [
-                            'id',
+                            [
+                                'attribute' => 'id',
+                                'label' => 'ID',
+                                'headerOptions' => ['style' => 'width: 3rem;'],
+                            ],
                             'username',
                             'email',
                             [

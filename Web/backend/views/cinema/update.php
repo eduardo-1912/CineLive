@@ -1,12 +1,10 @@
 <?php
 
-use yii\helpers\Html;
+/* @var $this yii\web\View */
+/* @var $model common\models\Cinema */
 
-/** @var yii\web\View $this */
-/** @var common\models\Filme $model */
-
-$this->title = 'Update Filme: ' . $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Filmes', 'url' => ['index']];
+$this->title = 'Update Cinema: ' . $model->id;
+$this->params['breadcrumbs'][] = ['label' => 'Cinemas', 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = 'Update';
 ?>
@@ -16,8 +14,8 @@ $this->params['breadcrumbs'][] = 'Update';
         <div class="card-body">
             <div class="row">
                 <div class="col-md-12">
-                    <?= $this->render('_form', [
-                        'model' => $model,
+                    <?=$this->render('_form', [
+                        'model' => $model
                     ]) ?>
                 </div>
             </div>

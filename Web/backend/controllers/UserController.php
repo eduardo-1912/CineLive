@@ -325,7 +325,7 @@ class UserController extends Controller
      * @throws NotFoundHttpException if the model cannot be found
      */
 
-    // ELIMINAR UTILIZADOR (ADMIN DÁ HARD-DELETE A TODOS, GERENTE DÁ HARD-DELETE A TODOS OS SEUS FUNCIONÁRIOS, ADMIN/GERENTE/FUNCIONÁRIO SÓ PODEM DAR SOFT-DELETE A SI MESMO)
+    // ELIMINAR UTILIZADOR (ADMIN DÁ HARD-DELETE A TODOS, GERENTE DÁ HARD-DELETE A TODOS OS SEUS FUNCIONÁRIOS, ADMIN/GERENTE SÓ PODEM DAR SOFT-DELETE A SI MESMO)
     public function actionDelete($id)
     {
         // OBTER USER ATUAL
@@ -363,11 +363,11 @@ class UserController extends Controller
             return $this->redirect(['index']);
         }
 
-        // SE ADMIN/GERENTE/FUNCIONÁRIO TENTAR SE ELIMINAR --> SOFT-DELETE
-        if ($isOwnAccount && ($isAdmin || $isGerente || $isFuncionario)) {
+        // SE ADMIN/GERENTE TENTAR SE ELIMINAR --> SOFT-DELETE
+        if ($isOwnAccount && ($isAdmin || $isGerente)) {
 
             // DAR SOFT-DELETE
-            $user->status = 0;
+            $user->status = User::STATUS_DELETED;
 
             // MENSAGENS DE SUCESSO/ERRO
             if ($user->save(false, ['status'])) {
@@ -450,7 +450,7 @@ class UserController extends Controller
         }
 
         // ATUALIZAR STATUS DA CONTA PARA 'INATIVA'
-        $model->status = 9;
+        $model->status = User::STATUS_INACTIVE;
 
         // GUARDAR
         if ($model->save(false, ['status'])) {
@@ -492,7 +492,7 @@ class UserController extends Controller
         }
 
         // ATUALIZAR STATUS DA CONTA PARA 'ATIVA'
-        $model->status = 10;
+        $model->status = User::STATUS_ACTIVE;
 
         // GUARDAR
         if ($model->save(false, ['status'])) {

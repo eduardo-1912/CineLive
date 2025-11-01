@@ -4,10 +4,12 @@ namespace common\models;
 
 use Yii;
 
-// O modelo UserExtension foi criado porque não foi gerado o modelo User outra vez
-// Com o objetivo de não alterar nada no modelo User (não é upgrade-safe)
-// Existe para fazer a ligação entre User e UserProfile com regras para Roles e Cinema
-// Foi definido como modelo default do Yii::$app->user
+/*
+ * O modelo UserExtension foi criado porque não foi gerado o modelo User outra vez.
+ * Objetivo de não alterar nada no User (não é upgrade-safe).
+ * Existe para fazer a ligação entre User e UserProfile com regras para Roles e Cinema.
+ * Foi definido como modelo default do 'Yii::$app->user' para poder aceder facilmente ao Role e Cinema.
+*/
 
 class UserExtension extends User
 {

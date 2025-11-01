@@ -2,6 +2,7 @@
 
 use backend\assets\AppAsset;
 use common\models\Cinema;
+use common\models\User;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\grid\GridView;
@@ -35,6 +36,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'columns' => [
                             [
                                 'attribute' => 'id',
+                                'label' => 'ID',
                                 'headerOptions' => ['style' => 'width: 3rem;'],
                             ],
                             'username',
@@ -68,17 +70,17 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'label' => 'Estado da Conta',
                                 'value' => function ($model) {
                                     switch ($model->status) {
-                                        case 10: return '<span>Ativa</span>';
-                                        case 9: return '<span class="text-danger">Inativa</span>';
-                                        case 0: return '<span class="text-danger">Eliminada</span>';
+                                        case User::STATUS_ACTIVE: return '<span>Ativa</span>';
+                                        case User::STATUS_INACTIVE: return '<span class="text-danger">Inativa</span>';
+                                        case User::STATUS_DELETED: return '<span class="text-danger">Eliminada</span>';
                                         default: return '<span class="text-secondary">Desconhecido</span>';
                                     }
                                 },
                                 'format' => 'raw',
                                 'filter' => [
-                                    10 => 'Ativa',
-                                    9 => 'Inativa',
-                                    0 => 'Eliminada',
+                                    User::STATUS_ACTIVE => 'Ativa',
+                                    User::STATUS_INACTIVE => 'Inativa',
+                                    User::STATUS_DELETED => 'Eliminada',
                                 ],
                                 'filterInputOptions' => [
                                     'class' => 'form-control',

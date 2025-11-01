@@ -2,6 +2,7 @@
 
 namespace console\controllers;
 
+use common\models\User;
 use Yii;
 use yii\console\Controller;
 
@@ -53,21 +54,20 @@ class RbacController extends Controller
         $gerente = $auth->createRole('gerente');
         $auth->add($gerente);
         $auth->addChild($gerente, $gerirSessoes);
-        $auth->addChild($gerente, $gerirFilmes);
         $auth->addChild($gerente, $gerirFuncionarios);
         $auth->addChild($gerente, $gerirCompras);
         $auth->addChild($gerente, $gerirAlugueres);
         $auth->addChild($gerente, $funcionario);
-        $auth->addChild($funcionario, $verRelatorios);
 
         $admin = $auth->createRole('admin');
         $auth->add($admin);
         $auth->addChild($admin, $gerirUtilizadores);
         $auth->addChild($admin, $gerirCinemas);
+        $auth->addChild($admin, $gerirFilmes);
         $auth->addChild($admin, $gerente);
 
         //CRIAR UTILIZADOR ADMIN
-        $userClass = \common\models\User::class;
+        $userClass = User::class;
 
         if ($userClass::find()->where(['username' => 'admin'])->exists()) {
             echo "O utilizador admin já existe... a saltar criação.\n";

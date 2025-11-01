@@ -72,9 +72,9 @@ class SignupForm extends Model
                 Yii::error($profile->errors, __METHOD__);
             }
 
+            // DEVOLVE O USER EM VEZ DE TRUE/FALSE (DÁ PARA FAZER LOGIN AUTOMÁTICO)
             return $user;
         }
-
         return null;
     }
 

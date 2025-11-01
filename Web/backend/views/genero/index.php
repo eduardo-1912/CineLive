@@ -1,32 +1,33 @@
 <?php
 
-use backend\assets\AppAsset;
-use common\models\Cinema;
-use yii\helpers\ArrayHelper;
+use backend\components\AppGridView;
+use backend\components\AppActionColumn;
+use yii\bootstrap4\ActiveForm;
 use yii\helpers\Html;
 use yii\grid\GridView;
-use backend\components\AppGridView;
-use yii\helpers\Url;
 
 /* @var $this yii\web\View */
-/* @var $searchModel backend\models\UserSearch */
+/* @var $searchModel backend\models\GeneroSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Filmes';
+$this->params['breadcrumbs'][] = ['label' => 'Filmes', 'url' => ['filme/index']];
+$this->title = 'Géneros';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <div class="row mb-3">
-                        <div class="col-md-12">
-                            <?php if (Yii::$app->user->can('gerirFilmes')): ?>
-                                <?= Html::a('Criar Filme', ['create'], ['class' => 'btn btn-success']) ?>
-                                <?= Html::a('Géneros', ['genero/index'], ['class' => 'btn btn-primary']) ?>
-                            <?php endif; ?>
+                    <div class="row mb-1">
+                        <div class="col-lg">
+                            <?php $form = ActiveForm::begin(['action' => ['index'], 'method' => 'post']); ?>
+                            <div class="d-flex align-items-start gap-1">
+                                <?= $form->field($model, 'nome')->textInput(['maxlength' => true, 'placeholder' => 'Ex: Ação, Comédia...'])->label(false) ?>
+                                <?= Html::submitButton('Adicionar', ['class' => 'btn btn-success']) ?>
+                            </div>
+
+                            <?php ActiveForm::end(); ?>
                         </div>
                     </div>
 
@@ -38,20 +39,13 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         'columns' => [
                             'id',
-                            'titulo',
-                            'duracao',
-                            'rating',
-                            'estreia',
-                            'realizacao',
-                            'estado',
+                            'nome',
                             [
                                 'class' => 'backend\components\AppActionColumn',
-                                'template' => '{view} {update} {delete}',
+                                'template' => '{update} {delete}',
                             ],
                         ]
                     ]); ?>
-
-
 
                 </div>
                 <!--.card-body-->

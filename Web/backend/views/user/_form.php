@@ -1,5 +1,6 @@
 <?php
 
+use common\models\User;
 use yii\helpers\Html;
 use yii\bootstrap4\ActiveForm;
 use yii\helpers\ArrayHelper;
@@ -79,9 +80,9 @@ $this->registerJs($script);
 
         <!-- DROPDOWN DE ESTADO DA CONTA -->
         <?= $form->field($model, 'status')->label('Estado')->dropDownList([
-            10 => 'Ativa',
-            9 => 'Inativa',
-            0 => 'Eliminada',
+            User::STATUS_ACTIVE => 'Ativa',
+            User::STATUS_INACTIVE => 'Inativa',
+            User::STATUS_DELETED => 'Eliminada',
         ]) ?>
 
     <!-- SE FOR GERENTE NÃO PODE ALTERAR ROLE NEM CINEMA, SÓ PODE CRIAR FUNCIONÁRIO PARA O SEU CINEMA -->

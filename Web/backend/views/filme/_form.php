@@ -2,11 +2,14 @@
 
 use common\models\Filme;
 use yii\helpers\Html;
-use yii\widgets\ActiveForm;
+use yii\bootstrap5\ActiveForm;
+use yii\helpers\ArrayHelper;
+
 
 /** @var yii\web\View $this */
 /** @var common\models\Filme $model */
 /** @var yii\widgets\ActiveForm $form */
+/* @var $form yii\bootstrap4\ActiveForm */
 ?>
 
 <div class="filme-form">
@@ -17,9 +20,9 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'titulo')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'sinopse')->textarea(['rows' => 6]) ?>
+    <?= $form->field($model, 'sinopse')->textarea(['rows' => 3]) ?>
 
-    <?= $form->field($model, 'duracao')->textInput() ?>
+    <?= $form->field($model, 'duracao')->textInput()->label('Duração (em minutos)') ?>
 
     <?= $form->field($model, 'rating')->dropDownList(Filme::optsRating()) ?>
 
@@ -31,18 +34,18 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'trailer_url')->textInput(['maxlength' => true]) ?>
 
+    <?= $form->field($model, 'posterFile')->fileInput() ?>
+
     <?php if ($model->poster_path): ?>
         <div class="mb-2">
             <?= Html::img($model->getPosterUrl(), ['style' => 'max-width:150px; border-radius:8px']) ?>
         </div>
     <?php endif; ?>
 
-    <?= $form->field($model, 'posterFile')->fileInput() ?>
-
     <?= $form->field($model, 'estado')->dropDownList([ 'brevemente' => 'Brevemente', 'em_exibicao' => 'Em exibição', 'terminado' => 'Terminado', ]) ?>
 
     <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+        <?= Html::submitButton('Guardar', ['class' => 'btn btn-success']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

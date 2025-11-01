@@ -37,7 +37,6 @@ class UserSearch extends UserExtension
             'pagination' => [
                 'pageSize' => 20,
             ],
-
             'sort' => [
                 'attributes' => [
                     'id',
