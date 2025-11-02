@@ -7,10 +7,20 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model common\models\User */
 
-$breadcrumb = Yii::$app->user->can('gerirUtilizadores') ? 'Utilizadores' : 'Funcionários';
-$return_path = $breadcrumb == 'Utilizadores' ? 'index' : 'funcionarios';
-if (!Yii::$app->user->can('gerirFuncionarios')) {
-    $return_path = '';
+$currentUser = Yii::$app->user;
+$isOwnAccount = ($currentUser->id == $model->id);
+$canGerirUtilizadores = $currentUser->can('gerirUtilizadores');
+$canGerirFuncionarios = $currentUser->can('gerirFuncionarios');
+
+$breadcrumb = $canGerirUtilizadores ? 'Utilizadores' : 'Funcionários';
+$return_path = $breadcrumb == $canGerirUtilizadores ? 'index' : 'funcionarios';
+if (!$canGerirFuncionarios) {
+    $return_path = 'view?id=' . $currentUser->id;
+}
+
+if ($canGerirFuncionarios && $isOwnAccount) {
+    $breadcrumb = 'Gerentes';
+    $return_path = 'view?id=' . $currentUser->id;
 }
 
 $this->title = $model->profile->nome ?? $model->username;
@@ -25,11 +35,9 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="row">
                 <div class="col-md-12">
                     <p> <?php
-                        $user = Yii::$app->user;
-                        $isAdmin = $user->can('admin');
-                        $isGerente = $user->can('gerente');
-                        $isOwnAccount = ($user->id == $model->id);
-                        $mesmoCinema = $isGerente && $user->identity->profile->cinema_id == $model->profile->cinema_id;
+                        $isAdmin = $currentUser->can('admin');
+                        $isGerente = $currentUser->can('gerente');
+                        $mesmoCinema = $isGerente && $currentUser->identity->profile->cinema_id == $model->profile->cinema_id;
 
                         // EDITAR (ADMIN / PRÓPRIO UTILIZADOR)
                         if ($isAdmin || $isOwnAccount) {
@@ -46,8 +54,8 @@ $this->params['breadcrumbs'][] = $this->title;
                             }
                         }
 
-                        // ELIMINAR (ADMIN / GERENTES PARA FUNCIONÁRIOS DO SEU CINEMA / PRÓPRIO UTILIZADOR)
-                        if ($isAdmin || $isGerente && $mesmoCinema) {
+                        // ELIMINAR (ADMIN/GERENTES PARA FUNCIONÁRIOS DO SEU CINEMA)
+                        if ($isAdmin || ($isGerente && $mesmoCinema && !$isOwnAccount)) {
                             echo Html::a('Eliminar', ['delete', 'id' => $model->id], ['class' => 'btn btn-danger', 'data' => ['method' => 'post'],]);
                         }
                     ?> </p>
@@ -86,16 +94,17 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'format' => 'raw',
                                 'value' => function ($model) {
                                     switch ($model->status) {
-                                        case 10:
+                                        case User::STATUS_ACTIVE:
                                             return '<span>Ativa</span>';
-                                        case 9:
+                                        case User::STATUS_INACTIVE:
                                             return '<span class="text-danger">Inativa</span>';
-                                        case 0:
+                                        case User::STATUS_DELETED:
                                             return '<span class="text-danger">Eliminada</span>';
                                         default:
                                             return '<span class="text-secondary">Desconhecido</span>';
                                     }
                                 },
+                                'visible' => $canGerirFuncionarios && !$isOwnAccount,
                             ],
                         ],
                     ]) ?>

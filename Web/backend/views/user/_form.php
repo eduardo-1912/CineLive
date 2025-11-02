@@ -36,7 +36,7 @@ $script = <<<JS
     }
     
     $(document).ready(function() {
-
+        
         // QUANDO O DOM ESTÁ PRONTO --> CHAMAR A FUNÇÃO
         toggleCinemaField();
         
@@ -70,12 +70,23 @@ $this->registerJs($script);
             'admin' => 'Administrador',
         ]) ?>
 
+        <!-- LISTA DE CINEMAS-->
+        <?php
+            // OBTER CINEMAS ATIVOS
+            $cinemasQuery = Cinema::find()->where(['estado' => Cinema::ESTADO_ATIVO]);
+
+            // SE O UTILIZADOR A SER EDITADO PERTENÇA A UM CINEMA ENCERRADO --> INCLUIR TAMBÉM ESSE
+            if ($profile->cinema_id) {
+                $cinemasQuery->orWhere(['id' => $profile->cinema_id]);
+            }
+
+            // GERAR LISTA DE CINEMAS
+            $cinemas = ArrayHelper::map($cinemasQuery->orderBy('nome')->all(), 'id', 'nome');
+        ?>
+
         <!-- DROPDOWN DOS CINEMAS-->
         <div id="formFieldCinema" style="display:none;">
-            <?= $form->field($profile, 'cinema_id')->label('Cinema')->dropDownList(
-                    ArrayHelper::map(Cinema::find()->all(), 'id', 'nome'),
-                    ['prompt' => 'Selecione o cinema']
-                ) ?>
+            <?= $form->field($profile, 'cinema_id')->label('Cinema')->dropDownList($cinemas, ['prompt' => 'Selecione o cinema']) ?>
         </div>
 
         <!-- DROPDOWN DE ESTADO DA CONTA -->

@@ -35,7 +35,7 @@ class UserSearch extends User
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-                'pageSize' => 20,
+                'pageSize' => Yii::$app->params['pageSize'],
             ],
             'sort' => [
                 'attributes' => [
@@ -61,10 +61,6 @@ class UserSearch extends User
         ]);
 
         $this->load($params);
-
-        if (!$this->validate()) {
-            return $dataProvider;
-        }
 
         $query->andFilterWhere(['user.id' => $this->id])
             ->andFilterWhere(['user.status' => $this->status])

@@ -59,7 +59,7 @@ class User extends ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
-            ['status', 'default', 'value' => self::STATUS_INACTIVE],
+            ['status', 'default', 'value' => self::STATUS_ACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_INACTIVE, self::STATUS_DELETED]],
             [['username', 'email'], 'trim'],
             [['username', 'email'], 'required'],
@@ -140,7 +140,12 @@ class User extends ActiveRecord implements IdentityInterface
         return $labels[$key] ?? ucfirst($key);
     }
 
-
+    // VERIFICAR SE É GERENTE OU FUNCIONÁRIO
+    public function isStaff()
+    {
+        $roles = Yii::$app->authManager->getRolesByUser($this->id);
+        return (isset($roles['gerente']) || isset($roles['funcionario'])) && !isset($roles['admin']);
+    }
 
     /**
      * {@inheritdoc}

@@ -13,6 +13,7 @@ use Yii;
  * @property int $num_filas
  * @property int $num_colunas
  * @property float $preco_bilhete
+ * @property string $estado
  *
  * @property AluguerSala[] $aluguerSalas
  * @property Cinema $cinema
@@ -21,6 +22,11 @@ use Yii;
 class Sala extends \yii\db\ActiveRecord
 {
 
+    /**
+     * ENUM field values
+     */
+    const ESTADO_ATIVA = 'ativa';
+    const ESTADO_ENCERRADA = 'encerrada';
 
     /**
      * {@inheritdoc}
@@ -36,9 +42,11 @@ class Sala extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['cinema_id', 'numero', 'num_filas', 'num_colunas', 'preco_bilhete'], 'required'],
+            [['cinema_id', 'numero', 'num_filas', 'num_colunas', 'preco_bilhete', 'estado'], 'required'],
             [['cinema_id', 'numero', 'num_filas', 'num_colunas'], 'integer'],
             [['preco_bilhete'], 'number'],
+            [['estado'], 'string'],
+            ['estado', 'in', 'range' => array_keys(self::optsEstado())],
             [['cinema_id'], 'exist', 'skipOnError' => true, 'targetClass' => Cinema::class, 'targetAttribute' => ['cinema_id' => 'id']],
         ];
     }
@@ -55,6 +63,7 @@ class Sala extends \yii\db\ActiveRecord
             'num_filas' => 'Num Filas',
             'num_colunas' => 'Num Colunas',
             'preco_bilhete' => 'Preco Bilhete',
+            'estado' => 'Estado',
         ];
     }
 
@@ -88,4 +97,50 @@ class Sala extends \yii\db\ActiveRecord
         return $this->hasMany(Sessao::class, ['sala_id' => 'id']);
     }
 
+
+    /**
+     * column estado ENUM value labels
+     * @return string[]
+     */
+    public static function optsEstado()
+    {
+        return [
+            self::ESTADO_ATIVA => 'ativa',
+            self::ESTADO_ENCERRADA => 'encerrada',
+        ];
+    }
+
+    /**
+     * @return string
+     */
+    public function displayEstado()
+    {
+        return self::optsEstado()[$this->estado];
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEstadoAtiva()
+    {
+        return $this->estado === self::ESTADO_ATIVA;
+    }
+
+    public function setEstadoToAtiva()
+    {
+        $this->estado = self::ESTADO_ATIVA;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEstadoEncerrada()
+    {
+        return $this->estado === self::ESTADO_ENCERRADA;
+    }
+
+    public function setEstadoToEncerrada()
+    {
+        $this->estado = self::ESTADO_ENCERRADA;
+    }
 }

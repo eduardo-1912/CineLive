@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use common\models\Cinema;
 use common\models\LoginForm;
 use common\models\User;
 use common\models\UserProfile;
@@ -110,6 +111,15 @@ class SiteController extends Controller
                 if ($cinemaId === null) {
                     Yii::$app->user->logout();
                     Yii::$app->session->setFlash('error', 'Não está associado a nenhum cinema!');
+                    return $this->redirect(['login']);
+                }
+
+                // OBTER CINEMA DO USER
+                $cinema = Cinema::findOne($cinemaId);
+
+                if ($cinema->estado == $cinema::ESTADO_ENCERRADO) {
+                    Yii::$app->user->logout();
+                    Yii::$app->session->setFlash('error', 'O seu cinema foi encerrado!');
                     return $this->redirect(['login']);
                 }
             }

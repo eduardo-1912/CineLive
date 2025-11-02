@@ -2,6 +2,7 @@
 
 namespace backend\components;
 
+use common\models\User;
 use yii\grid\ActionColumn;
 use yii\helpers\Html;
 
@@ -16,7 +17,7 @@ class AppActionColumn extends ActionColumn
     {
         parent::init();
 
-        $this->buttons = [
+        $this->buttons = array_merge($this->buttons, [
 
             // VER DETALHES
             'view' => function ($url, $model, $key) {
@@ -48,64 +49,7 @@ class AppActionColumn extends ActionColumn
                     'data-toggle' => 'tooltip',
                 ]);
             },
-
-            // ATIVAR UTILIZADOR
-            'activate' => function ($url, $model, $key) {
-                if ($model->status == 9 || $model->status == 0) {
-                    return Html::a('<i class="fas fa-user-plus"></i>', $url, [
-                        'class' => 'btn btn-sm btn-success',
-                        'title' => 'Ativar',
-                        'data' => [
-                            'confirm' => 'Tem a certeza que quer ativar este utilizador?',
-                            'method' => 'post',
-                        ],
-                        'data-toggle' => 'tooltip',
-                    ]);
-                }
-                return ''; // se ativo, não mostra
-            },
-
-            // DESATIVAR UTILIZADOR
-            'deactivate' => function ($url, $model, $key) {
-                if ($model->status == 10) { // apenas mostra se ativo
-                    return Html::a('<i class="fas fa-user-minus"></i>', $url, [
-                        'class' => 'btn btn-sm btn-secondary',
-                        'title' => 'Desativar',
-                        'data' => [
-                            'confirm' => 'Tem a certeza que quer desativar este utilizador?',
-                            'method' => 'post',
-                        ],
-                        'data-toggle' => 'tooltip',
-                    ]);
-                }
-                return ''; // se inativo, não mostra
-            },
-
-            // ARQUIVAR
-            'archive' => function ($url, $model, $key) {
-                return Html::a('<i class="fas fa-archive"></i>', $url, [
-                    'class' => 'btn btn-sm btn-danger',
-                    'title' => 'Arquivar',
-                    'data' => [
-                        'confirm' => 'Tem a certeza que quer arquivar este registo?',
-                        'method' => 'post',
-                    ],
-                    'data-toggle' => 'tooltip',
-                ]);
-            },
-
-            // DESARQUIVAR
-            'unarchive' => function ($url, $model, $key) {
-                return Html::a('<i class="fas fa-archive"></i>', $url, [
-                    'class' => 'btn btn-sm btn-success',
-                    'title' => 'Desarquivar',
-                    'data' => [
-                        'confirm' => 'Tem a certeza que quer desarquivar este registo?',
-                        'method' => 'post',
-                    ],
-                    'data-toggle' => 'tooltip',
-                ]);
-            },
-        ];
+        ]);
     }
+
 }

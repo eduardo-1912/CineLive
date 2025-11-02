@@ -13,12 +13,13 @@ class m251022_130422_init_cinelive extends Migration
             'rua' => $this->string(100)->notNull(),
             'codigo_postal' => $this->string(8)->notNull(),
             'cidade' => $this->string(50)->notNull(),
-            'latitude' => $this->decimal(10, 6),
-            'longitude' => $this->decimal(10, 6),
+            'latitude' => $this->decimal(10, 6)->notNull(),
+            'longitude' => $this->decimal(10, 6)->notNull(),
             'email' => $this->string(255)->notNull(),
             'telefone' => $this->integer()->notNull(),
             'horario_abertura' => $this->time()->notNull(),
             'horario_fecho' => $this->time()->notNull(),
+            'estado' => "ENUM('ativo','encerrado') NOT NULL",
             'gerente_id' => $this->integer(),
         ]);
 
@@ -31,12 +32,12 @@ class m251022_130422_init_cinelive extends Migration
             'user_id' => $this->integer()->notNull(),
             'cinema_id' => $this->integer(),
             'nome' => $this->string(100)->notNull(),
-            'telemovel' => $this->integer()->notNull(),
+            'telemovel' => $this->string(9)->notNull(),
         ]);
 
         $this->createIndex('idx-user_profile-user_id', 'user_profile', 'user_id', true);
         $this->createIndex('idx-user_profile-cinema_id', 'user_profile', 'cinema_id');
-        $this->addForeignKey('fk-user_profile-user_id', 'user_profile', 'user_id', 'user', 'id', 'RESTRICT', 'RESTRICT');
+        $this->addForeignKey('fk-user_profile-user_id', 'user_profile', 'user_id', 'user', 'id', 'CASCADE', 'RESTRICT');
         $this->addForeignKey('fk-user_profile-cinema_id', 'user_profile', 'cinema_id', 'cinema', 'id', 'RESTRICT', 'RESTRICT');
 
         // ====== TABELA GENERO ======
@@ -68,8 +69,8 @@ class m251022_130422_init_cinelive extends Migration
 
         $this->createIndex('idx-filme_genero-filme_id', 'filme_genero', 'filme_id');
         $this->createIndex('idx-filme_genero-genero_id', 'filme_genero', 'genero_id');
-        $this->addForeignKey('fk-filme_genero-filme_id', 'filme_genero', 'filme_id', 'filme', 'id', 'RESTRICT', 'RESTRICT');
-        $this->addForeignKey('fk-filme_genero-genero_id', 'filme_genero', 'genero_id', 'genero', 'id', 'RESTRICT', 'RESTRICT');
+        $this->addForeignKey('fk-filme_genero-filme_id', 'filme_genero', 'filme_id', 'filme', 'id', 'CASCADE', 'RESTRICT');
+        $this->addForeignKey('fk-filme_genero-genero_id', 'filme_genero', 'genero_id', 'genero', 'id', 'CASCADE', 'RESTRICT');
 
         // ====== TABELA SALA ======
         $this->createTable('sala', [
@@ -78,7 +79,8 @@ class m251022_130422_init_cinelive extends Migration
             'numero' => $this->integer()->notNull(),
             'num_filas' => $this->integer()->notNull(),
             'num_colunas' => $this->integer()->notNull(),
-            'preco_bilhete' => $this->decimal(10, 0)->notNull(),
+            'preco_bilhete' => $this->decimal(5, 2)->notNull(),
+            'estado' => "ENUM('ativa','encerrada') NOT NULL",
         ]);
 
         $this->createIndex('idx-sala-cinema_id', 'sala', 'cinema_id');
@@ -98,7 +100,7 @@ class m251022_130422_init_cinelive extends Migration
         $this->createIndex('idx-sessao-filme_id', 'sessao', 'filme_id');
         $this->createIndex('idx-sessao-sala_id', 'sessao', 'sala_id');
         $this->createIndex('idx-sessao-cinema_id', 'sessao', 'cinema_id');
-        $this->addForeignKey('fk-sessao-filme_id', 'sessao', 'filme_id', 'filme', 'id', 'RESTRICT', 'RESTRICT');
+        $this->addForeignKey('fk-sessao-filme_id', 'sessao', 'filme_id', 'filme', 'id', 'CASCADE', 'RESTRICT');
         $this->addForeignKey('fk-sessao-sala_id', 'sessao', 'sala_id', 'sala', 'id', 'RESTRICT', 'RESTRICT');
         $this->addForeignKey('fk-sessao-cinema_id', 'sessao', 'cinema_id', 'cinema', 'id', 'RESTRICT', 'RESTRICT');
 
@@ -111,7 +113,7 @@ class m251022_130422_init_cinelive extends Migration
         ]);
 
         $this->createIndex('idx-compra-cliente_id', 'compra', 'cliente_id');
-        $this->addForeignKey('fk-compra-cliente_id', 'compra', 'cliente_id', 'user', 'id', 'RESTRICT', 'RESTRICT');
+        $this->addForeignKey('fk-compra-cliente_id', 'compra', 'cliente_id', 'user', 'id', 'CASCADE', 'RESTRICT');
 
         // ====== TABELA BILHETE ======
         $this->createTable('bilhete', [
@@ -119,15 +121,15 @@ class m251022_130422_init_cinelive extends Migration
             'compra_id' => $this->integer()->notNull(),
             'sessao_id' => $this->integer()->notNull(),
             'lugar' => $this->integer()->notNull(),
-            'preco' => $this->integer()->notNull(),
-            'pagamento' => $this->integer()->notNull(),
+            'preco' => $this->decimal(5,2)->notNull(),
+            'pagamento' => $this->decimal(5,2)->notNull(),
             'codigo' => $this->string(45)->notNull()->unique(),
-            'estado' => "ENUM('pendente','confirmado','cancelado','') NOT NULL",
+            'estado' => "ENUM('pendente','confirmado','cancelado') NOT NULL",
         ]);
 
         $this->createIndex('idx-bilhete-compra_id', 'bilhete', 'compra_id');
         $this->createIndex('idx-bilhete-sessao_id', 'bilhete', 'sessao_id');
-        $this->addForeignKey('fk-bilhete-compra_id', 'bilhete', 'compra_id', 'compra', 'id', 'RESTRICT', 'RESTRICT');
+        $this->addForeignKey('fk-bilhete-compra_id', 'bilhete', 'compra_id', 'compra', 'id', 'CASCADE', 'RESTRICT');
         $this->addForeignKey('fk-bilhete-sessao_id', 'bilhete', 'sessao_id', 'sessao', 'id', 'RESTRICT', 'RESTRICT');
 
         // ====== TABELA ALUGUER_SALA ======
@@ -145,7 +147,7 @@ class m251022_130422_init_cinelive extends Migration
 
         $this->createIndex('idx-aluguer_sala-cliente_id', 'aluguer_sala', 'cliente_id');
         $this->createIndex('idx-aluguer_sala-sala_id', 'aluguer_sala', 'sala_id');
-        $this->addForeignKey('fk-aluguer_sala-cliente_id', 'aluguer_sala', 'cliente_id', 'user', 'id', 'RESTRICT', 'RESTRICT');
+        $this->addForeignKey('fk-aluguer_sala-cliente_id', 'aluguer_sala', 'cliente_id', 'user', 'id', 'CASCADE', 'RESTRICT');
         $this->addForeignKey('fk-aluguer_sala-sala_id', 'aluguer_sala', 'sala_id', 'sala', 'id', 'RESTRICT', 'RESTRICT');
     }
 
@@ -161,6 +163,5 @@ class m251022_130422_init_cinelive extends Migration
         $this->dropTable('genero');
         $this->dropTable('user_profile');
         $this->dropTable('cinema');
-        $this->dropTable('user');
     }
 }

@@ -1,15 +1,11 @@
 <?php
 
 /* @var $this yii\web\View */
-/* @var $model common\models\Cinema */
+/* @var $model common\models\Sala */
 
-$currentUser = Yii::$app->user;
-$isAdmin = $currentUser->can('admin');
-$return_path = $isAdmin ? 'index' : 'view?id=' . $currentUser->identity->profile->cinema_id;
-
-$this->title = 'Editar: ' . $model->nome;
-$this->params['breadcrumbs'][] = ['label' => 'Cinemas', 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->nome, 'url' => ['view', 'id' => $model->id]];
+$this->title = 'Update Sala: ' . $model->id;
+$this->params['breadcrumbs'][] = ['label' => 'Salas', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = 'Update';
 ?>
 

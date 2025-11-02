@@ -2,15 +2,14 @@
 
 namespace backend\models;
 
-use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use common\models\Genero;
+use common\models\Sala;
 
 /**
- * GeneroSearch represents the model behind the search form of `common\models\Genero`.
+ * SalaSearch represents the model behind the search form of `common\models\Sala`.
  */
-class GeneroSearch extends Genero
+class SalaSearch extends Sala
 {
     /**
      * {@inheritdoc}
@@ -18,8 +17,9 @@ class GeneroSearch extends Genero
     public function rules()
     {
         return [
-            [['id'], 'integer'],
-            [['nome'], 'safe'],
+            [['id', 'cinema_id', 'numero', 'num_filas', 'num_colunas'], 'integer'],
+            [['preco_bilhete'], 'number'],
+            [['estado'], 'safe'],
         ];
     }
 
@@ -41,15 +41,12 @@ class GeneroSearch extends Genero
      */
     public function search($params)
     {
-        $query = Genero::find();
+        $query = Sala::find();
 
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'pagination' => [
-                'pageSize' => Yii::$app->params['pageSize'],
-            ],
         ]);
 
         $this->load($params);
@@ -63,9 +60,14 @@ class GeneroSearch extends Genero
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
+            'cinema_id' => $this->cinema_id,
+            'numero' => $this->numero,
+            'num_filas' => $this->num_filas,
+            'num_colunas' => $this->num_colunas,
+            'preco_bilhete' => $this->preco_bilhete,
         ]);
 
-        $query->andFilterWhere(['like', 'nome', $this->nome]);
+        $query->andFilterWhere(['like', 'estado', $this->estado]);
 
         return $dataProvider;
     }

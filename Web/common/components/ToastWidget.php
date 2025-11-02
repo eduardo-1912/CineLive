@@ -54,7 +54,7 @@ class ToastWidget extends Widget
         // Script JS para mostrar automaticamente todos os toasts
         $js = <<<JS
             document.querySelectorAll('.toast').forEach(toastEl => {
-              const toast = new bootstrap.Toast(toastEl, { delay: 4000 });
+              const toast = new bootstrap.Toast(toastEl, { delay: 6000 });
               toast.show();
             });
             JS;

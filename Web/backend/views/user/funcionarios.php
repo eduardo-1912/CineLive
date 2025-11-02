@@ -1,5 +1,6 @@
 <?php
 
+use backend\components\ActionColumnButtonHelper;
 use common\models\User;
 use yii\helpers\Html;
 use yii\grid\GridView;
@@ -37,7 +38,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'headerOptions' => ['style' => 'width: 3rem;'],
                             ],
                             'username',
-                            'email',
+                            'email:email',
                             [
                                 'attribute' => 'nome',
                                 'value' => 'profile.nome',
@@ -52,9 +53,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'label' => 'Estado da Conta',
                                 'value' => function ($model) {
                                     switch ($model->status) {
-                                        case User::STATUS_ACTIVE: return '<span>Ativa</span>';
-                                        case User::STATUS_INACTIVE: return '<span class="text-danger">Inativa</span>';
-                                        case User::STATUS_DELETED: return '<span class="text-danger">Eliminada</span>';
+                                        case $model::STATUS_ACTIVE: return '<span>Ativa</span>';
+                                        case $model::STATUS_INACTIVE: return '<span class="text-danger">Inativa</span>';
+                                        case $model::STATUS_DELETED: return '<span class="text-danger">Eliminada</span>';
                                         default: return '<span class="text-secondary">Desconhecido</span>';
                                     }
                                 },
@@ -62,7 +63,6 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'filter' => [
                                     User::STATUS_ACTIVE => 'Ativa',
                                     User::STATUS_INACTIVE => 'Inativa',
-                                    User::STATUS_DELETED => 'Eliminada',
                                 ],
                                 'filterInputOptions' => [
                                     'class' => 'form-control',
@@ -72,6 +72,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             [
                                 'class' => 'backend\components\AppActionColumn',
                                 'template' => '{view} {activate} {deactivate} {delete}',
+                                'buttons' => ActionColumnButtonHelper::userButtons(),
                             ],
                         ],
                     ]); ?>

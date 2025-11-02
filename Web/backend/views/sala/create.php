@@ -3,10 +3,10 @@
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\Cinema */
+/* @var $model common\models\Sala */
 
-$this->title = 'Criar Cinema';
-$this->params['breadcrumbs'][] = ['label' => 'Cinemas', 'url' => ['index']];
+$this->title = 'Create Sala';
+$this->params['breadcrumbs'][] = ['label' => 'Salas', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 

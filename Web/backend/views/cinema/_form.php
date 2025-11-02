@@ -28,14 +28,16 @@ use yii\bootstrap4\ActiveForm;
 
     <?= $form->field($model, 'telefone')->textInput() ?>
 
-    <?= $form->field($model, 'horario_abertura')->textInput() ?>
+    <?= $form->field($model, 'horario_abertura')->input('time') ?>
 
-    <?= $form->field($model, 'horario_fecho')->textInput() ?>
+    <?= $form->field($model, 'horario_fecho')->input('time') ?>
 
-    <?= $form->field($model, 'gerente_id')->textInput() ?>
+    <?php if (Yii::$app->user->can('admin')): ?>
+        <?= $form->field($model, 'estado')->dropDownList(['ativo' => 'Ativo', 'encerrado' => 'Encerrado']) ?>
+    <?php endif; ?>
 
     <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+        <?= Html::submitButton('Guardar', ['class' => 'btn btn-success']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

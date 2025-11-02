@@ -2,6 +2,7 @@
 
 namespace backend\models;
 
+use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\models\Cinema;
@@ -11,6 +12,9 @@ use common\models\Cinema;
  */
 class CinemaSearch extends Cinema
 {
+    // ATRIBUTO VIRTUAL (PARA FILTRAR NO GRIDVIEW DO CINEMA/INDEX)
+    public $morada;
+
     /**
      * {@inheritdoc}
      */
@@ -18,8 +22,9 @@ class CinemaSearch extends Cinema
     {
         return [
             [['id', 'telefone', 'gerente_id'], 'integer'],
-            [['nome', 'rua', 'codigo_postal', 'cidade', 'email', 'horario_abertura', 'horario_fecho'], 'safe'],
+            [['nome', 'rua', 'codigo_postal', 'cidade', 'email', 'horario_abertura', 'horario_fecho', 'estado'], 'safe'],
             [['latitude', 'longitude'], 'number'],
+            [['morada'], 'safe'],
         ];
     }
 
@@ -47,6 +52,9 @@ class CinemaSearch extends Cinema
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination' => [
+                'pageSize' => Yii::$app->params['pageSize'],
+            ],
         ]);
 
         $this->load($params);
@@ -65,14 +73,18 @@ class CinemaSearch extends Cinema
             'telefone' => $this->telefone,
             'horario_abertura' => $this->horario_abertura,
             'horario_fecho' => $this->horario_fecho,
+            'estado' => $this->estado,
             'gerente_id' => $this->gerente_id,
         ]);
 
         $query->andFilterWhere(['like', 'nome', $this->nome])
-            ->andFilterWhere(['like', 'rua', $this->rua])
-            ->andFilterWhere(['like', 'codigo_postal', $this->codigo_postal])
-            ->andFilterWhere(['like', 'cidade', $this->cidade])
-            ->andFilterWhere(['like', 'email', $this->email]);
+            ->andFilterWhere(['like', 'email', $this->email])
+            ->andFilterWhere(['or',
+                ['like', 'rua', $this->morada],
+                ['like', 'codigo_postal', $this->morada],
+                ['like', 'cidade', $this->morada],
+            ]);
+
 
         return $dataProvider;
     }
