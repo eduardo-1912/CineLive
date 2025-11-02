@@ -63,7 +63,7 @@ $this->registerJs($script);
     <?php if (Yii::$app->user->can('admin')): ?>
 
         <!-- DROPDOWN DOS ROLES-->
-        <?= $form->field($model, 'role')->label('Função')->dropDownList([
+        <?= $form->field($model, 'role')->dropDownList([
             'cliente' => 'Cliente',
             'funcionario' => 'Funcionário',
             'gerente' => 'Gerente',
@@ -86,14 +86,14 @@ $this->registerJs($script);
 
         <!-- DROPDOWN DOS CINEMAS-->
         <div id="formFieldCinema" style="display:none;">
-            <?= $form->field($profile, 'cinema_id')->label('Cinema')->dropDownList($cinemas, ['prompt' => 'Selecione o cinema']) ?>
+            <?= $form->field($profile, 'cinema_id')->dropDownList($cinemas, ['prompt' => 'Selecione o cinema']) ?>
         </div>
 
         <!-- DROPDOWN DE ESTADO DA CONTA -->
-        <?= $form->field($model, 'status')->label('Estado')->dropDownList([
-            User::STATUS_ACTIVE => 'Ativa',
-            User::STATUS_INACTIVE => 'Inativa',
-            User::STATUS_DELETED => 'Eliminada',
+        <?= $form->field($model, 'status')->dropDownList([
+            User::STATUS_ACTIVE => 'Ativo',
+            User::STATUS_INACTIVE => 'Inativo',
+            User::STATUS_DELETED => 'Eliminado',
         ]) ?>
 
     <!-- SE FOR GERENTE NÃO PODE ALTERAR ROLE NEM CINEMA, SÓ PODE CRIAR FUNCIONÁRIO PARA O SEU CINEMA -->
@@ -108,10 +108,8 @@ $this->registerJs($script);
 
         <!-- ROLE E CINEMA EM MODO READ-ONLY PARA FUNCIONÁRIOS -->
         <?= $form->field($model, 'role')->textInput(['value' => $model->role ? ucfirst($model->role) : '', 'readonly' => true,])->label('Função') ?>
-        <?= $form->field($profile, 'cinema_id')->label('Cinema')->dropDownList(
-                ArrayHelper::map(Cinema::find()->all(), 'id', 'nome'),
-                ['disabled' => true]
-            ) ?>
+        <?= $form->field($profile, 'cinema_id')->dropDownList(
+            ArrayHelper::map(Cinema::find()->all(), 'id', 'nome'), ['disabled' => true]) ?>
 
     <?php endif; ?>
 

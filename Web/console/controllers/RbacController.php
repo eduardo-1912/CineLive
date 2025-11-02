@@ -16,7 +16,8 @@ class RbacController extends Controller
         //PERMISSÕES
         $permissoes = [
             'gerirUtilizadores' => 'Gerir utilizadores e perfis',
-            'gerirCinemas' => 'Gerir cinemas e salas',
+            'gerirCinemas' => 'Gerir cinemas',
+            'gerirSalas' => 'Gerir salas de cinema',
             'gerirFilmes' => 'Gerir filmes e géneros',
             'gerirSessoes' => 'Gerir sessões de filmes',
             'gerirCompras' => 'Gerir bilhetes vendidos e cancelados',
@@ -58,6 +59,8 @@ class RbacController extends Controller
         $auth->addChild($gerente, $gerirCompras);
         $auth->addChild($gerente, $gerirAlugueres);
         $auth->addChild($gerente, $funcionario);
+        $auth->addChild($gerente, $gerirSalas);
+        $auth->addChild($gerente, $verRelatorios);
 
         $admin = $auth->createRole('admin');
         $auth->add($admin);

@@ -10,7 +10,7 @@ $return_path = $isAdmin ? 'index' : 'view?id=' . $currentUser->identity->profile
 $this->title = 'Editar: ' . $model->nome;
 $this->params['breadcrumbs'][] = ['label' => 'Cinemas', 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->nome, 'url' => ['view', 'id' => $model->id]];
-$this->params['breadcrumbs'][] = 'Update';
+$this->params['breadcrumbs'][] = 'Editar';
 ?>
 
 <div class="container-fluid">

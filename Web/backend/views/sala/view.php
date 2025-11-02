@@ -1,14 +1,20 @@
 <?php
 
+use common\models\Sala;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Sala */
 
-$this->title = $model->id;
+$currentUser = Yii::$app->user;
+$isAdmin = $currentUser->can('admin');
+$gerirSalas = $currentUser->can('gerirSalas');
+
+$this->title = 'Sala ' . $model->numero;
+$this->params['breadcrumbs'][] = ['label' => $model->cinema->nome, 'url' => ['cinema/view?id=' . $model->cinema_id]];
 $this->params['breadcrumbs'][] = ['label' => 'Salas', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+$this->params['breadcrumbs'][] = $model->numero;
 \yii\web\YiiAsset::register($this);
 ?>
 
@@ -18,25 +24,76 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="row">
                 <div class="col-md-12">
                     <p>
-                        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-                        <?= Html::a('Delete', ['delete', 'id' => $model->id], [
-                            'class' => 'btn btn-danger',
-                            'data' => [
-                                'confirm' => 'Are you sure you want to delete this item?',
-                                'method' => 'post',
-                            ],
-                        ]) ?>
+                        <?php if($gerirSalas): ?>
+                            <?= Html::a('Editar', ['update', 'id' => $model->id], ['class' => 'btn btn-warning']) ?>
+
+                            <?php if($model->estado == $model::ESTADO_ATIVA): ?>
+                                <?= Html::a('Encerrar', ['deactivate', 'id' => $model->id], [
+                                    'class' => 'btn btn-danger',
+                                    'data' => [
+                                        'confirm' => 'Tem a certeza que quer encerrar esta sala?',
+                                        'method' => 'post',
+                                    ],
+                                ]) ?>
+                            <?php elseif($model->estado == $model::ESTADO_ENCERRADA): ?>
+                                <?= Html::a('Ativar', ['activate', 'id' => $model->id], [
+                                    'class' => 'btn btn-success',
+                                    'data' => [
+                                        'confirm' => 'Tem a certeza que quer ativar esta sala?',
+                                        'method' => 'post',
+                                    ],
+                                ]) ?>
+                            <?php endif; ?>
+
+                        <?php endif; ?>
                     </p>
                     <?= DetailView::widget([
                         'model' => $model,
                         'attributes' => [
                             'id',
-                            'cinema_id',
-                            'numero',
+                            [
+                                'label' => 'Nome',
+                                'attribute' => 'numero',
+                                'value' => function ($model) {
+                                    return 'Sala ' . $model->numero;
+                                },
+                            ],
                             'num_filas',
                             'num_colunas',
-                            'preco_bilhete',
-                            'estado',
+                            [
+                                'attribute' => 'lugares',
+                                'value' => function ($model) {
+                                    return $model->num_filas * $model->num_colunas;
+                                },
+                            ],
+                            [
+                                'attribute' => 'preco_bilhete',
+                                'value' => function ($model) {
+                                    return $model->preco_bilhete . '€';
+                                },
+                            ],
+                            [
+                                'attribute' => 'cinema_id',
+                                'value' => function ($model) {
+                                    return $model->cinema->nome;
+                                },
+                                'visible' => $isAdmin,
+                            ],
+                            [
+                                'attribute' => 'estado',
+                                'format' => 'raw',
+                                'value' => function ($model) {
+                                    switch ($model->estado) {
+                                        case Sala::ESTADO_ATIVA:
+                                            return '<span>Ativa</span>';
+                                        case Sala::ESTADO_ENCERRADA:
+                                            return '<span class="text-danger">Encerrada</span>';
+                                        default:
+                                            return '<span class="text-secondary">Desconhecido</span>';
+                                    }
+                                },
+                                'visible' => $gerirSalas,
+                            ],
                         ],
                     ]) ?>
                 </div>

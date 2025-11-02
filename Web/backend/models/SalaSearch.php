@@ -2,6 +2,7 @@
 
 namespace backend\models;
 
+use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\models\Sala;
@@ -11,13 +12,16 @@ use common\models\Sala;
  */
 class SalaSearch extends Sala
 {
+    // ATRIBUTO VIRTUAL (PARA FILTRAR NO GRIDVIEW)
+    public $lugares;
+
     /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['id', 'cinema_id', 'numero', 'num_filas', 'num_colunas'], 'integer'],
+            [['id', 'cinema_id', 'numero', 'num_filas', 'num_colunas', 'lugares'], 'integer'],
             [['preco_bilhete'], 'number'],
             [['estado'], 'safe'],
         ];
@@ -47,6 +51,9 @@ class SalaSearch extends Sala
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination' => [
+                'pageSize' => Yii::$app->params['pageSize'],
+            ],
         ]);
 
         $this->load($params);
@@ -68,6 +75,10 @@ class SalaSearch extends Sala
         ]);
 
         $query->andFilterWhere(['like', 'estado', $this->estado]);
+
+        if (!empty($this->lugares)) {
+            $query->andWhere('(num_filas * num_colunas) = :lugares', [':lugares' => $this->lugares]);
+        }
 
         return $dataProvider;
     }

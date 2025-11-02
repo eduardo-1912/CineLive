@@ -1,13 +1,27 @@
 <?php
 
+use common\models\Cinema;
+use common\models\Sala;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
-use yii\grid\GridView;
+use backend\components\AppGridView;
+use backend\components\AppActionColumn;
+use backend\components\ActionColumnButtonHelper;
 
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\SalaSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
+$currentUser = Yii::$app->user;
+$userCinema = $currentUser->identity->profile->cinema;
+
+$isAdmin = $currentUser->can('admin');
+$gerirSalas = $currentUser->can('gerirSalas');
+
+$actionColumnButtons = $gerirSalas ? '{view} {update} {activate} {deactivate}' : '{view}';
+
 $this->title = 'Salas';
+$this->params['breadcrumbs'][] = ['label' => $isAdmin ? 'Cinemas' : $userCinema->nome, 'url' => [$isAdmin ? 'cinema/index' : ('cinema/view?id=' . $userCinema->id)]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="container-fluid">
@@ -17,33 +31,76 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="card-body">
                     <div class="row mb-2">
                         <div class="col-md-12">
-                            <?= Html::a('Create Sala', ['create'], ['class' => 'btn btn-success']) ?>
+                            <?php if($isAdmin || $gerirSalas): ?>
+                                <?= Html::a('Criar Sala', ['create'], ['class' => 'btn btn-success']) ?>
+                            <?php endif; ?>
                         </div>
                     </div>
 
-
-                    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
-
-                    <?= GridView::widget([
+                    <?= AppGridView::widget([
                         'dataProvider' => $dataProvider,
                         'filterModel' => $searchModel,
                         'columns' => [
-                            ['class' => 'yii\grid\SerialColumn'],
-
-                            'id',
-                            'cinema_id',
-                            'numero',
+                            [
+                                'attribute' => 'id',
+                                'headerOptions' => ['style' => 'width: 3rem;'],
+                            ],
+                            [
+                                'label' => 'Nome',
+                                'attribute' => 'numero',
+                                'value' => function ($model) {
+                                    return 'Sala ' . $model->numero;
+                                },
+                            ],
                             'num_filas',
                             'num_colunas',
-                            //'preco_bilhete',
-                            //'estado',
-
-                            ['class' => 'hail812\adminlte3\yii\grid\ActionColumn'],
+                            [
+                                'attribute' => 'lugares',
+                                'value' => function ($model) {
+                                    return $model->num_filas * $model->num_colunas;
+                                },
+                            ],
+                            [
+                                'attribute' => 'preco_bilhete',
+                                'value' => function ($model) {
+                                    return $model->preco_bilhete . '€';
+                                },
+                            ],
+                            [
+                                'attribute' => 'cinema_id',
+                                'label' => 'Cinema',
+                                'value' => 'cinema.nome',
+                                'filter' => ArrayHelper::map(Cinema::find()->orderBy('nome')->asArray()->all(), 'id', 'nome'),
+                                'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
+                                'headerOptions' => ['style' => 'width: 12rem;'],
+                                'visible' => $isAdmin,
+                            ],
+                            [
+                                'attribute' => 'estado',
+                                'value' => function ($model) {
+                                    switch ($model->estado) {
+                                        case $model::ESTADO_ATIVA: return '<span>Ativa</span>';
+                                        case $model::ESTADO_ENCERRADA: return '<span class="text-danger">Encerrada</span>';
+                                        default: return '<span class="text-secondary">Desconhecido</span>';
+                                    }
+                                },
+                                'format' => 'raw',
+                                'filter' => [
+                                    Sala::ESTADO_ATIVA => 'Ativa',
+                                    Sala::ESTADO_ENCERRADA => 'Encerrada',
+                                ],
+                                'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos',],
+                                'headerOptions' => ['style' => 'width: 9rem;'],
+                            ],
+                            [
+                                'class' => 'backend\components\AppActionColumn',
+                                'template' => $actionColumnButtons,
+                                'buttons' => ActionColumnButtonHelper::salaButtons(),
+                            ],
                         ],
-                        'summaryOptions' => ['class' => 'summary mb-2'],
                         'pager' => [
                             'class' => 'yii\bootstrap4\LinkPager',
-                        ]
+                        ],
                     ]); ?>
 
 

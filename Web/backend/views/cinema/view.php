@@ -11,11 +11,10 @@ $currentUser = Yii::$app->user;
 $isAdmin = $currentUser->can('admin');
 $isGerente = $currentUser->identity->roleName == 'gerente';
 $isOwnCinema = $currentUser->id == $model->gerente_id;
-$return_path = $isAdmin ? 'index' : 'view?id=' . $currentUser->identity->profile->cinema_id;
 
 $this->title = $model->nome;
-$this->params['breadcrumbs'][] = ['label' => 'Cinemas', 'url' => [$return_path]];
-$this->params['breadcrumbs'][] = $this->title;
+$this->params['breadcrumbs'][] = ['label' => 'Cinemas', 'url' => [$isAdmin ? 'index' : ('view?id=' . $currentUser->identity->profile->cinema_id)]];
+$this->params['breadcrumbs'][] = $model->nome;
 \yii\web\YiiAsset::register($this);
 ?>
 
@@ -26,7 +25,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="col-md-12">
                     <p>
                         <?php if ($isAdmin || $isGerente && $isOwnCinema): ?>
-                            <?= Html::a('Editar', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+                            <?= Html::a('Editar', ['update', 'id' => $model->id], ['class' => 'btn btn-warning']) ?>
 
                             <?php if ($isAdmin): ?>
                                 <?php if ($model->estado === $model::ESTADO_ATIVO): ?>

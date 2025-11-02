@@ -5,12 +5,12 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model common\models\User */
 
-$keyword = Yii::$app->user->can('gerirUtilizadores') ? 'Utilizador' : 'Funcionário';
-$breadcrumb = $keyword == 'Utilizador' ? 'Utilizadores' : 'Funcionários';
-$return_path = $keyword == 'Utilizador' ? 'index' : 'funcionarios';
+$currentUser = Yii::$app->user;
+$gerirUtilizadores = $currentUser->can('gerirUtilizadores');
+$gerirFuncionarios = $currentUser->can('gerirFuncionarios') && !$currentUser->can('gerirUtilizadores');
 
-$this->title = 'Criar ' . $keyword;
-$this->params['breadcrumbs'][] = ['label' => $breadcrumb, 'url' => [$return_path]];
+$this->title = 'Criar ' . ($gerirUtilizadores ? 'Utilizador' : 'Funcionário');
+$this->params['breadcrumbs'][] = ['label' => $gerirUtilizadores ? 'Utilizadores' : 'Funcionários', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 

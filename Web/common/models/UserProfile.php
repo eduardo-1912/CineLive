@@ -56,8 +56,8 @@ class UserProfile extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'Id',
-            'user_id' => 'User Id',
+            'id' => 'ID',
+            'user_id' => 'User ID',
             'cinema_id' => 'Cinema',
             'nome' => 'Nome',
             'telemovel' => 'Telemóvel',

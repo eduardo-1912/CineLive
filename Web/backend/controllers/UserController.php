@@ -33,7 +33,7 @@ class UserController extends Controller
                     ],
                     [
                         'allow' => true,
-                        'actions' => ['create', 'funcionarios', 'deactivate', 'activate', 'delete'],
+                        'actions' => ['create', 'index', 'deactivate', 'activate', 'delete'],
                         'roles' => ['gerente'],
                     ],
                     [
@@ -51,59 +51,44 @@ class UserController extends Controller
      * @return mixed
      */
 
-    // TABELA COM CRUD DE TODOS OS UTILIZADORES (APENAS PARA ADMIN)
+    // CRUD DE UTILIZADORES PARA ADMIN / CRUD DE FUNCIONÁRIOS PARA GERENTE
     public function actionIndex()
     {
-        $searchModel = new UserSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
-        // CARREGAR A VIEW COM OS UTILIZADORES
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
-    }
-
-    // VIEW COM CRUD DE FUNCIONÁRIOS DO CINEMA DO GERENTE (APENAS PARA GERENTE)
-    public function actionFuncionarios()
-    {
-        // OBTER USER ATUAL
         $user = Yii::$app->user;
 
-        // SE É ADMIN --> VAI PARA USER/INDEX
-        if ($user->can('admin')) {
-            return $this->redirect(['index']);
-        }
-
-        // SE O USER ATUAL NAO FOR GERENTE --> NÃO TEM PERMISSÃO
-        if (!$user->can('gerente')) {
+        // VERIFICAR PERMISSÕES
+        if (!$user->can('admin') && !$user->can('gerente')) {
             throw new ForbiddenHttpException('Não tem permissão para aceder a esta página.');
         }
 
-        // É GERENTE --> OBTER CINEMA DO GERENTE
-        $gerenteProfile = $user->identity->profile;
-
-        // SE O GERENTE NÃO TIVER CINEMA ASSOCIADO
-        if (!$gerenteProfile || !$gerenteProfile->cinema_id) {
-            throw new ForbiddenHttpException('Não está associado a nenhum cinema.');
-        }
-
-        // CRIAR SEARCH MODEL E FILTROS
+        // CRIAR SEARCH MODEL E QUERY NA DB
         $searchModel = new UserSearch();
         $params = Yii::$app->request->queryParams;
 
-        // FORÇAR FILTRO POR CINEMA DO GERENTE E ROLE 'FUNCIONÁRIO'
-        $params['UserSearch']['cinema_id'] = $gerenteProfile->cinema_id;
-        $params['UserSearch']['role'] = 'funcionario';
+        // SE FOR ADMIN --> VÊ TODOS OS UTILIZADORES
+        if ($user->can('admin')) {
+            $dataProvider = $searchModel->search($params);
+        }
 
-        // BUSCAR DADOS
-        $dataProvider = $searchModel->search($params);
+        // SE FOR GERENTE --> APENAS VÊ OS FUNCIONÁRIOS DO SEU CINEMA
+        else {
+            $gerenteProfile = $user->identity->profile;
 
-        // NÃO MOSTRA FUNCIONÁRIOS ELIMINADOS (SOFT-DELETED)
-        $dataProvider->query->andWhere(['IN', 'user.status', [User::STATUS_ACTIVE, User::STATUS_INACTIVE]]);
+            if (!$gerenteProfile || !$gerenteProfile->cinema_id) {
+                throw new ForbiddenHttpException('Não está associado a nenhum cinema.');
+            }
 
-        // CARREGAR A VIEW COM OS FUNCIONÁRIOS
-        return $this->render('funcionarios', [
+            // APLICAR FILTROS
+            $params['UserSearch']['cinema_id'] = $gerenteProfile->cinema_id;
+            $params['UserSearch']['role'] = 'funcionario';
+
+            $dataProvider = $searchModel->search($params);
+
+            // EXCLUIR UTILIZADORES ELIMINADOS (SOFT-DELETED)
+            $dataProvider->query->andWhere(['IN', 'user.status', [User::STATUS_ACTIVE, User::STATUS_INACTIVE]]);
+        }
+
+        return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
@@ -419,7 +404,7 @@ class UserController extends Controller
             // SE NÃO FOR SEU FUNCIONÁRIO --> SEM PERMISSÃO
             if (!$gerenteProfile || !$user->profile || $user->profile->cinema_id != $gerenteProfile->cinema_id) {
                 Yii::$app->session->setFlash('warning', 'Só pode eliminar funcionários do seu cinema.');
-                return $this->redirect(['funcionarios']);
+                return $this->redirect(['index']);
             }
 
             // DAR SOFT-DELETE
@@ -432,7 +417,7 @@ class UserController extends Controller
                 Yii::$app->session->setFlash('error', 'Ocorreu um erro ao eliminar o utilizador.');
             }
 
-            return $this->redirect(['funcionarios']);
+            return $this->redirect(['index']);
         }
 
         // CASO CONTRÁRIO --> SEM PERMISSÃO
@@ -470,7 +455,7 @@ class UserController extends Controller
             // SE O CINEMA DO GERENTE NÃO FOR IGUAL AO DO FUNCIONÁRIO PARA DESATIVAR --> SEM PERMISSÃO
             if (!$gerenteProfile || !$model->profile || $model->profile->cinema_id != $gerenteProfile->cinema_id) {
                 Yii::$app->session->setFlash('warning', 'Só pode desativar funcionários do seu cinema.');
-                return $this->redirect(['funcionarios']);
+                return $this->redirect(['index']);
             }
         }
 
@@ -485,7 +470,7 @@ class UserController extends Controller
         }
 
         // VOLTAR
-        return $currentUser->can('admin') ? $this->redirect(['index']) : $this->redirect(['funcionarios']);
+        return $this->redirect(['index']);
     }
 
     // ATIVAR UTILIZADOR (ADMIN PODE TODOS, GERENTE PODE ATIVAR OS SEUS FUNCIONÁRIOS)
@@ -512,12 +497,12 @@ class UserController extends Controller
             // SE O CINEMA DO GERENTE NÃO FOR IGUAL AO DO FUNCIONÁRIO PARA ATIVAR --> SEM PERMISSÃO
             if (!$gerenteProfile || !$model->profile || $model->profile->cinema_id != $gerenteProfile->cinema_id) {
                 Yii::$app->session->setFlash('warning', 'Só pode ativar funcionários do seu cinema.');
-                return $this->redirect(['funcionarios']);
+                return $this->redirect(['index']);
             }
 
             if ($model->status == User::STATUS_DELETED) {
                 Yii::$app->session->setFlash('warning', 'Não pode ativar funcionários eliminados.');
-                return $this->redirect(['funcionarios']);
+                return $this->redirect(['index']);
             }
 
         }
@@ -533,7 +518,7 @@ class UserController extends Controller
         }
 
         // VOLTAR
-        return $currentUser->can('admin') ? $this->redirect(['index']) : $this->redirect(['funcionarios']);
+        return $this->redirect(['index']);
     }
 
     // ATUALIZAR O CAMPO 'gerente_id' DE UM CINEMA

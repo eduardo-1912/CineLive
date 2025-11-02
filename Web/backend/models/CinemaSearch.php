@@ -12,7 +12,7 @@ use common\models\Cinema;
  */
 class CinemaSearch extends Cinema
 {
-    // ATRIBUTO VIRTUAL (PARA FILTRAR NO GRIDVIEW DO CINEMA/INDEX)
+    // ATRIBUTO VIRTUAL (PARA FILTRAR NO GRIDVIEW)
     public $morada;
 
     /**

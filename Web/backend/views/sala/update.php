@@ -3,10 +3,11 @@
 /* @var $this yii\web\View */
 /* @var $model common\models\Sala */
 
-$this->title = 'Update Sala: ' . $model->id;
+$this->title = 'Editar: Sala ' . $model->numero;
+$this->params['breadcrumbs'][] = ['label' => $model->cinema->nome, 'url' => ['cinema/view?id=' . $model->cinema_id]];
 $this->params['breadcrumbs'][] = ['label' => 'Salas', 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
-$this->params['breadcrumbs'][] = 'Update';
+$this->params['breadcrumbs'][] = ['label' => $model->numero, 'url' => ['view', 'id' => $model->id]];
+$this->params['breadcrumbs'][] = 'Editar';
 ?>
 
 <div class="container-fluid">

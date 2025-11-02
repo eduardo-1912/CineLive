@@ -29,7 +29,7 @@ $this->registerJsFile($publishedRes[1].'/control_sidebar.js', ['depends' => '\ha
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/x-icon" href="../web/favicon.ico">
     <?php $this->registerCsrfMetaTags() ?>
-    <title>CineLive | <?= Html::encode($this->title) ?></title>
+    <title><?= Yii::$app->user->identity->profile->cinema->nome ?? Yii::$app->name ?> | <?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
 
 
@@ -40,7 +40,7 @@ $this->registerJsFile($publishedRes[1].'/control_sidebar.js', ['depends' => '\ha
     <link rel="icon" type="image/svg+xml" href="<?= Yii::getAlias('@web') ?>/favicon-dark.svg" media="(prefers-color-scheme: dark)">
 
 </head>
-<body class="hold-transition sidebar-mini">
+<body class="hold-transition sidebar-mini layout-fixed">
 <?php $this->beginBody() ?>
 
 <div class="wrapper">

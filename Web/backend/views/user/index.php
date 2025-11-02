@@ -13,7 +13,17 @@ use backend\components\AppGridView;
 /* @var $searchModel backend\models\UserSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Utilizadores';
+$currentUser = Yii::$app->user;
+$gerirUtilizadores = $currentUser->can('gerirUtilizadores');
+$gerirFuncionarios = $currentUser->can('gerirFuncionarios') && !$currentUser->can('gerirUtilizadores');
+
+$actionColumnButtons = $gerirUtilizadores
+    ? '{view} {update} {activate} {deactivate} {delete}'
+    : '{view} {activate} {deactivate} {softDelete}';
+
+$title = $gerirUtilizadores ? 'Utilizadores' : 'Funcionários';
+
+$this->title = $title;
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
@@ -24,7 +34,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="card-body">
                     <div class="row mb-3">
                         <div class="col-md-12">
-                            <?= Html::a('Criar Utilizador', ['create'], ['class' => 'btn btn-success']) ?>
+                            <?php if($gerirUtilizadores || $gerirFuncionarios): ?>
+                                <?= Html::a('Criar ' . ($gerirUtilizadores ? 'Utilizador' : 'Funcionário'), ['create'], ['class' => 'btn btn-success']) ?>
+                            <?php endif; ?>
                         </div>
                     </div>
 
@@ -37,7 +49,6 @@ $this->params['breadcrumbs'][] = $this->title;
                         'columns' => [
                             [
                                 'attribute' => 'id',
-                                'label' => 'ID',
                                 'headerOptions' => ['style' => 'width: 3rem;'],
                             ],
                             'username',
@@ -47,8 +58,13 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'value' => 'profile.nome',
                             ],
                             [
+                                'label' => 'Telemóvel',
+                                'attribute' => 'telemovel',
+                                'value' => 'profile.telemovel',
+                                'visible' => $gerirFuncionarios,
+                            ],
+                            [
                                 'attribute' => 'role',
-                                'label' => 'Função',
                                 'value' => 'roleFormatted',
                                 'filter' => [
                                     'admin' => 'Administrador',
@@ -57,37 +73,43 @@ $this->params['breadcrumbs'][] = $this->title;
                                     'cliente' => 'Cliente',
                                 ],
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
+                                'visible' => $gerirUtilizadores,
                             ],
                             [
                                 'attribute' => 'cinema_id',
-                                'label' => 'Cinema',
                                 'value' => 'cinema.nome',
-                                'filter' => ArrayHelper::map(Cinema::find()->orderBy('nome')->asArray()->all(), 'id', 'nome'
-                                ),
+                                'filter' => ArrayHelper::map(Cinema::find()->orderBy('nome')->asArray()->all(), 'id', 'nome'),
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
+                                'visible' => $gerirUtilizadores,
                             ],
                             [
                                 'attribute' => 'status',
-                                'label' => 'Estado da Conta',
                                 'value' => function ($model) {
                                     switch ($model->status) {
-                                        case $model::STATUS_ACTIVE: return '<span>Ativa</span>';
-                                        case $model::STATUS_INACTIVE: return '<span class="text-danger">Inativa</span>';
-                                        case $model::STATUS_DELETED: return '<span class="text-danger">Eliminada</span>';
+                                        case $model::STATUS_ACTIVE: return '<span>Ativo</span>';
+                                        case $model::STATUS_INACTIVE: return '<span class="text-danger">Inativo</span>';
+                                        case $model::STATUS_DELETED: return '<span class="text-danger">Eliminado</span>';
                                         default: return '<span class="text-secondary">Desconhecido</span>';
                                     }
                                 },
                                 'format' => 'raw',
-                                'filter' => [
-                                    User::STATUS_ACTIVE => 'Ativa',
-                                    User::STATUS_INACTIVE => 'Inativa',
-                                    User::STATUS_DELETED => 'Eliminada',
+                                'filter' => $gerirUtilizadores
+                                ? // SE FOR ADMIN --> COM ACESSO A UTILIZADORES ELIMINADOS (SOFT-DELETED)
+                                [
+                                    User::STATUS_ACTIVE => 'Ativo',
+                                    User::STATUS_INACTIVE => 'Inativo',
+                                    User::STATUS_DELETED => 'Eliminado',
+                                ]
+                                : // SE FOR GERENTE --> SEM ACESSO A UTILIZADORES ELIMINADOS (SOFT-DELETED)
+                                [
+                                    User::STATUS_ACTIVE => 'Ativo',
+                                    User::STATUS_INACTIVE => 'Inativo',
                                 ],
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos',],
                             ],
                             [
                                 'class' => 'backend\components\AppActionColumn',
-                                'template' => '{view} {update} {activate} {deactivate} {delete}',
+                                'template' => $actionColumnButtons,
                                 'buttons' => ActionColumnButtonHelper::userButtons(),
                             ],
                         ],

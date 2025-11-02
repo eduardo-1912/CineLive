@@ -58,11 +58,11 @@ class Sala extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'cinema_id' => 'Cinema ID',
-            'numero' => 'Numero',
-            'num_filas' => 'Num Filas',
-            'num_colunas' => 'Num Colunas',
-            'preco_bilhete' => 'Preco Bilhete',
+            'cinema_id' => 'Cinema',
+            'numero' => 'Número',
+            'num_filas' => 'Número de Filas',
+            'num_colunas' => 'Número de Colunas',
+            'preco_bilhete' => 'Preço Bilhete',
             'estado' => 'Estado',
         ];
     }
