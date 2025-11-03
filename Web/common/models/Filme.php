@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\web\UploadedFile;
 
 /**
@@ -27,6 +28,9 @@ class Filme extends \yii\db\ActiveRecord
 {
     /** @var UploadedFile|null */
     public $posterFile;
+
+    /** @var array|null IDs dos géneros selecionados (campo virtual) */
+    public $generosSelecionados;
 
     /**
      * ENUM field values
@@ -59,7 +63,7 @@ class Filme extends \yii\db\ActiveRecord
             [['titulo', 'sinopse', 'duracao', 'rating', 'estreia', 'idioma', 'realizacao', 'trailer_url', 'estado'], 'required'],
             [['sinopse', 'estado'], 'string'],
             [['duracao'], 'integer'],
-            [['estreia'], 'safe'],
+            [['estreia', 'generosSelecionados'], 'safe'],
             [['titulo', 'trailer_url', 'poster_path'], 'string', 'max' => 255],
             [['idioma'], 'string', 'max' => 50],
             [['realizacao'], 'string', 'max' => 80],
@@ -69,6 +73,7 @@ class Filme extends \yii\db\ActiveRecord
                 'extensions' => ['png','jpg','jpeg','webp'],
                 'maxSize' => 2 * 1024 * 1024, // 2MB
             ],
+
         ];
     }
 
@@ -120,6 +125,7 @@ class Filme extends \yii\db\ActiveRecord
             'poster_path' => 'Poster',
             'estado' => 'Estado',
             'posterFile' => 'Poster',
+            'generosSelecionados' => 'Géneros',
         ];
     }
 
@@ -131,6 +137,69 @@ class Filme extends \yii\db\ActiveRecord
     public function getFilmeGeneros()
     {
         return $this->hasMany(FilmeGenero::class, ['filme_id' => 'id']);
+    }
+
+    public function getGeneros()
+    {
+        return $this->hasMany(Genero::class, ['id' => 'genero_id'])
+            ->via('filmeGeneros');
+    }
+
+    // PREENCHER ARRAY COM IDs DOS GÉNEROS DO FILME
+    public function afterFind()
+    {
+        parent::afterFind();
+        $this->generosSelecionados = ArrayHelper::getColumn($this->generos, 'id');
+    }
+
+    // GUARDAR GÉNEROS NA TABLE FILME_GÉNERO
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+
+        // REMOVER GÉNEROS ANTIGOS
+        FilmeGenero::deleteAll(['filme_id' => $this->id]);
+
+        // ADICIONAR GÉNEROS NOVOS
+        if (is_array($this->generosSelecionados)) {
+            foreach ($this->generosSelecionados as $generoId) {
+                $fg = new FilmeGenero();
+                $fg->filme_id = $this->id;
+                $fg->genero_id = $generoId;
+                $fg->save();
+            }
+        }
+    }
+
+    // OBTER ESTREIA FORMATADA (DD/MM/AAAA)
+    public function getEstreiaFormatada(): string
+    {
+        if (empty($this->estreia)) {
+            return '-';
+        }
+
+        try {
+            return Yii::$app->formatter->asDate($this->estreia, 'php:d/m/Y');
+        } catch (\Exception $e) {
+            return $this->estreia; // FALLBACK
+        }
+    }
+
+
+    // OBTER ESTADO FORMATADO
+    public function getEstadoFormatado(): string
+    {
+        $labels = self::optsEstado();
+        $label = $labels[$this->estado] ?? 'Desconhecida';
+
+        $colors = [
+            self::ESTADO_BREVEMENTE => '',
+            self::ESTADO_EM_EXIBICAO => 'text-primary',
+            self::ESTADO_TERMINADO => 'text-danger',
+        ];
+
+        $class = $colors[$this->estado] ?? 'text-secondary';
+        return "<span class='{$class}'>{$label}</span>";
     }
 
     /**
@@ -167,9 +236,9 @@ class Filme extends \yii\db\ActiveRecord
     public static function optsEstado()
     {
         return [
-            self::ESTADO_BREVEMENTE => 'brevemente',
-            self::ESTADO_EM_EXIBICAO => 'em_exibicao',
-            self::ESTADO_TERMINADO => 'terminado',
+            self::ESTADO_BREVEMENTE => 'Brevemente',
+            self::ESTADO_EM_EXIBICAO => 'Em exibição',
+            self::ESTADO_TERMINADO => 'Terminado',
         ];
     }
 
@@ -296,12 +365,12 @@ class Filme extends \yii\db\ActiveRecord
     /**
      * @return bool
      */
-    public function isEstadoEmexibicao()
+    public function isEstadoEmExibicao()
     {
         return $this->estado === self::ESTADO_EM_EXIBICAO;
     }
 
-    public function setEstadoToEmexibicao()
+    public function setEstadoToEmExibicao()
     {
         $this->estado = self::ESTADO_EM_EXIBICAO;
     }

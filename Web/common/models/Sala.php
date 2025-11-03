@@ -105,9 +105,24 @@ class Sala extends \yii\db\ActiveRecord
     public static function optsEstado()
     {
         return [
-            self::ESTADO_ATIVA => 'ativa',
-            self::ESTADO_ENCERRADA => 'encerrada',
+            self::ESTADO_ATIVA => 'Ativa',
+            self::ESTADO_ENCERRADA => 'Encerrada',
         ];
+    }
+
+    // OBTER ESTADO FORMATADO (PARA /INDEX E /VIEW)
+    public function getEstadoFormatado(): string
+    {
+        $labels = self::optsEstado();
+        $label = $labels[$this->estado] ?? 'Desconhecida';
+
+        $colors = [
+            self::ESTADO_ATIVA => '',
+            self::ESTADO_ENCERRADA => 'text-danger',
+        ];
+
+        $class = $colors[$this->estado] ?? 'text-secondary';
+        return "<span class='{$class}'>{$label}</span>";
     }
 
     /**

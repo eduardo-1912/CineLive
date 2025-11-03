@@ -26,15 +26,13 @@ $userCinemaId = $currentUser->identity->profile->cinema_id ?? null;
     <?= $form->field($model, 'preco_bilhete')->textInput(['maxlength' => true]) ?>
 
     <?php if ($isAdmin): ?>
-        <?= $form->field($model, 'cinema_id')->dropDownList(ArrayHelper::map(Cinema::find()->all(), 'id', 'nome')) ?>
+        <?= $form->field($model, 'cinema_id')->dropDownList(ArrayHelper::map(
+            Cinema::find()->all(), 'id', 'nome')) ?>
     <?php elseif ($isGerente): ?>
         <?= Html::activeHiddenInput($model, 'cinema_id', ['value' => $userCinemaId]) ?>
     <?php endif; ?>
 
-    <?= $form->field($model, 'estado')->dropDownList([
-        'ativa' => 'Ativa',
-        'encerrada' => 'Encerrada'
-    ]) ?>
+    <?= $form->field($model, 'estado')->dropDownList($model::optsEstado()) ?>
 
     <div class="form-group mt-3">
         <?= Html::submitButton('Guardar', ['class' => 'btn btn-success']) ?>

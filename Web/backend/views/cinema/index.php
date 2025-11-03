@@ -53,18 +53,9 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                             [
                                 'attribute' => 'estado',
-                                'value' => function ($model) {
-                                    switch ($model->estado) {
-                                        case $model::ESTADO_ATIVO: return '<span>Ativo</span>';
-                                        case $model::ESTADO_ENCERRADO: return '<span class="text-danger">Encerrado</span>';
-                                        default: return '<span class="text-secondary">Desconhecido</span>';
-                                    }
-                                },
+                                'value' => fn($model) => $model->estadoFormatado,
                                 'format' => 'raw',
-                                'filter' => [
-                                    Cinema::ESTADO_ATIVO => 'Ativo',
-                                    Cinema::ESTADO_ENCERRADO => 'Encerrado',
-                                ],
+                                'filter' => Cinema::optsEstado(),
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos',],
                             ],
                             [

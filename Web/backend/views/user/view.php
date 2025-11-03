@@ -37,16 +37,28 @@ $this->params['breadcrumbs'][] = $this->title;
 
                         <!-- ATIVAR/DESATIVAR (ADMIN OU GERENTE DOS SEUS FUNCIONÁRIOS) -->
                         <?php if ($gerirUtilizadores || $gerirFuncionarios && $mesmoCinema && !$isOwnAccount): ?>
-                            <?php if ($model->status == User::STATUS_INACTIVE || $model->status == User::STATUS_DELETED): ?>
-                                <?= Html::a('Ativar', ['activate', 'id' => $model->id], ['class' => 'btn btn-success', 'data' => ['method' => 'post']]); ?>
-                            <?php elseif ($model->status == User::STATUS_ACTIVE): ?>
+                            <?php if ($model->status == $model::STATUS_INACTIVE || $model->status == $model::STATUS_DELETED): ?>
+                                <?php $btnColor = $model->isStatusInactive() ? 'btn-success' : 'btn-primary'; ?>
+                                <?= Html::a('Ativar', ['activate', 'id' => $model->id], ['class' => 'btn ' . $btnColor, 'data' => ['method' => 'post']]); ?>
+                            <?php elseif ($model->status == $model::STATUS_ACTIVE): ?>
                                 <?= Html::a('Desativar', ['deactivate', 'id' => $model->id], ['class' => 'btn btn-secondary', 'data' => ['method' => 'post']]); ?>
                             <?php endif; ?>
                         <?php endif; ?>
 
                         <!-- ELIMINAR (ADMIN/GERENTES PARA FUNCIONÁRIOS DO SEU CINEMA) -->
-                        <?php if ($gerirUtilizadores || $gerirFuncionarios && $mesmoCinema && !$isOwnAccount): ?>
+                        <?php if ($gerirFuncionarios && $mesmoCinema && !$isOwnAccount): ?>
                             <?= Html::a('Eliminar', ['delete', 'id' => $model->id], ['class' => 'btn btn-danger', 'data' => ['method' => 'post']]); ?>
+                        <?php elseif ($gerirUtilizadores): ?>
+                            <?= Html::a('<i class="fas fa-skull mr-1"></i> Eliminar', ['delete', 'id' => $model->id],
+                                [
+                                    'class' => 'btn btn-danger',
+                                    'title' => 'Eliminar permanentemente',
+                                    'data' => [
+                                        'confirm' => 'Tem a certeza que quer eliminar este utilizador permanentemente? Esta ação não pode ser desfeita!',
+                                        'method' => 'post',
+                                    ],
+                                ]
+                            ); ?>
                         <?php endif; ?>
                     </p>
 
@@ -78,18 +90,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             [
                                 'attribute' => 'status',
                                 'format' => 'raw',
-                                'value' => function ($model) {
-                                    switch ($model->status) {
-                                        case User::STATUS_ACTIVE:
-                                            return '<span>Ativo</span>';
-                                        case User::STATUS_INACTIVE:
-                                            return '<span class="text-danger">Inativo</span>';
-                                        case User::STATUS_DELETED:
-                                            return '<span class="text-danger">Eliminado</span>';
-                                        default:
-                                            return '<span class="text-secondary">Desconhecido</span>';
-                                    }
-                                },
+                                'value' => fn($model) => $model->statusFormatado,
                                 'visible' => $gerirUtilizadores || $gerirFuncionarios && !$isOwnAccount,
                             ],
                         ],

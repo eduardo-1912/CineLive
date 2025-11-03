@@ -12,8 +12,9 @@ class ActionColumnButtonHelper
         return [
             'activate' => function ($url, $model) {
                 if ($model->status == $model::STATUS_INACTIVE || $model->status == $model::STATUS_DELETED) {
+                    $btnColor = $model->isStatusInactive() ? 'btn-success' : 'btn-primary';
                     return Html::a('<i class="fas fa-user-plus"></i>', ['activate', 'id' => $model->id], [
-                        'class' => 'btn btn-success btn-sm',
+                        'class' => 'btn btn-sm ' . $btnColor,
                         'title' => 'Ativar Utilizador',
                         'data-confirm' => 'Tem a certeza que quer ativar este utilizador?',
                         'data-method' => 'post',
@@ -32,12 +33,23 @@ class ActionColumnButtonHelper
                 }
                 return '';
             },
-            'softDelete' => function ($url, $model, $key) {
-                return Html::a('<i class="fas fa-ban"></i>', ['delete', 'id' => $model->id], [
+            'softDelete' => function ($url, $model) {
+                return Html::a('<i class="fas fa-trash"></i>', ['delete', 'id' => $model->id], [
                     'class' => 'btn btn-sm btn-danger',
                     'title' => 'Eliminar',
                     'data' => [
                         'confirm' => 'Tem a certeza que quer eliminar este utilizador?',
+                        'method' => 'post',
+                    ],
+                    'data-toggle' => 'tooltip',
+                ]);
+            },
+            'hardDelete' => function ($url, $model) {
+                return Html::a('<i class="fas fa-skull"></i>', ['delete', 'id' => $model->id], [
+                    'class' => 'btn btn-sm btn-danger',
+                    'title' => 'Eliminar',
+                    'data' => [
+                        'confirm' => 'Tem a certeza que quer eliminar este utilizador permanentemente? Esta ação não pode ser desfeita!',
                         'method' => 'post',
                     ],
                     'data-toggle' => 'tooltip',

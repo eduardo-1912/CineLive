@@ -82,16 +82,7 @@ $this->params['breadcrumbs'][] = $model->numero;
                             [
                                 'attribute' => 'estado',
                                 'format' => 'raw',
-                                'value' => function ($model) {
-                                    switch ($model->estado) {
-                                        case Sala::ESTADO_ATIVA:
-                                            return '<span>Ativa</span>';
-                                        case Sala::ESTADO_ENCERRADA:
-                                            return '<span class="text-danger">Encerrada</span>';
-                                        default:
-                                            return '<span class="text-secondary">Desconhecido</span>';
-                                    }
-                                },
+                                'value' => fn($model) => $model->estadoFormatado,
                                 'visible' => $gerirSalas,
                             ],
                         ],

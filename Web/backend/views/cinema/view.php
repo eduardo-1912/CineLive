@@ -85,16 +85,7 @@ $this->params['breadcrumbs'][] = $model->nome;
                                 'attribute' => 'estado',
                                 'label' => 'Estado',
                                 'format' => 'raw',
-                                'value' => function ($model) {
-                                    switch ($model->estado) {
-                                        case Cinema::ESTADO_ATIVO:
-                                            return '<span>Ativo</span>';
-                                        case Cinema::ESTADO_ENCERRADO:
-                                            return '<span class="text-danger">Encerrado</span>';
-                                        default:
-                                            return '<span class="text-secondary">Desconhecido</span>';
-                                    }
-                                },
+                                'value' => fn($model) => $model->estadoFormatado,
                                 'visible' => Yii::$app->user->can('gerirCinemas'),
                             ],
                             [
@@ -111,12 +102,8 @@ $this->params['breadcrumbs'][] = $model->nome;
                                             </div>";
                                 },
                             ],
-
-
                         ],
                     ]) ?>
-
-
 
                 </div>
                 <!--.col-md-12-->

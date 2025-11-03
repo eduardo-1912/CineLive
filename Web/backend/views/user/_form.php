@@ -56,19 +56,14 @@ $this->registerJs($script);
     <?= $form->field($model, 'username')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'password')->passwordInput(['maxlength' => true]) ?>
     <?= $form->field($profile, 'nome')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($profile, 'telemovel')->label('Telemóvel')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($profile, 'telemovel')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'email')->input('email') ?>
 
     <!-- SE USER ATUAL FOR ADMIN PODE EDITAR TUDO -->
     <?php if (Yii::$app->user->can('admin')): ?>
 
         <!-- DROPDOWN DOS ROLES-->
-        <?= $form->field($model, 'role')->dropDownList([
-            'cliente' => 'Cliente',
-            'funcionario' => 'Funcionário',
-            'gerente' => 'Gerente',
-            'admin' => 'Administrador',
-        ]) ?>
+        <?= $form->field($model, 'role')->dropDownList(User::optsRoles()) ?>
 
         <!-- LISTA DE CINEMAS-->
         <?php
@@ -90,11 +85,7 @@ $this->registerJs($script);
         </div>
 
         <!-- DROPDOWN DE ESTADO DA CONTA -->
-        <?= $form->field($model, 'status')->dropDownList([
-            User::STATUS_ACTIVE => 'Ativo',
-            User::STATUS_INACTIVE => 'Inativo',
-            User::STATUS_DELETED => 'Eliminado',
-        ]) ?>
+        <?= $form->field($model, 'status')->dropDownList(User::optsStatus()) ?>
 
     <!-- SE FOR GERENTE NÃO PODE ALTERAR ROLE NEM CINEMA, SÓ PODE CRIAR FUNCIONÁRIO PARA O SEU CINEMA -->
     <?php elseif (Yii::$app->user->can('gerente')): ?>
@@ -102,14 +93,13 @@ $this->registerJs($script);
         <!-- ROLE 'FUNCIONÁRIO', CINEMA DO GERENTE E ESTADO DA CONTA 'ATIVVA' -->
         <?= Html::activeHiddenInput($model, 'role', ['value' => 'funcionario']) ?>
         <?= Html::activeHiddenInput($profile, 'cinema_id', ['value' => Yii::$app->user->identity->profile->cinema_id]) ?>
-        <?= Html::activeHiddenInput($model, 'status', ['value' => 10]) ?>
+        <?= Html::activeHiddenInput($model, 'status', ['value' => User::STATUS_ACTIVE]) ?>
 
     <?php else: ?>
 
         <!-- ROLE E CINEMA EM MODO READ-ONLY PARA FUNCIONÁRIOS -->
-        <?= $form->field($model, 'role')->textInput(['value' => $model->role ? ucfirst($model->role) : '', 'readonly' => true,])->label('Função') ?>
-        <?= $form->field($profile, 'cinema_id')->dropDownList(
-            ArrayHelper::map(Cinema::find()->all(), 'id', 'nome'), ['disabled' => true]) ?>
+        <?= $form->field($model, 'role')->textInput(['value' => $model->role ? ucfirst($model->role) : '', 'readonly' => true,]) ?>
+        <?= $form->field($profile, 'cinema_id')->dropDownList(ArrayHelper::map(Cinema::find()->all(), 'id', 'nome'), ['disabled' => true]) ?>
 
     <?php endif; ?>
 

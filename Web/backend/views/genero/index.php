@@ -19,7 +19,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <div class="row mb-1">
+                    <div class="row">
                         <div class="col-lg">
                             <?php $form = ActiveForm::begin(['action' => ['index'], 'method' => 'post']); ?>
                             <div class="d-flex align-items-start gap-1">

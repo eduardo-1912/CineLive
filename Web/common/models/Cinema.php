@@ -136,9 +136,24 @@ class Cinema extends \yii\db\ActiveRecord
     public static function optsEstado()
     {
         return [
-            self::ESTADO_ATIVO => 'ativo',
-            self::ESTADO_ENCERRADO => 'encerrado',
+            self::ESTADO_ATIVO => 'Ativo',
+            self::ESTADO_ENCERRADO => 'Encerrado',
         ];
+    }
+
+    // OBTER ESTADO FORMATADO (PARA /INDEX E /VIEW)
+    public function getEstadoFormatado(): string
+    {
+        $labels = self::optsEstado();
+        $label = $labels[$this->estado] ?? 'Desconhecido';
+
+        $colors = [
+            self::ESTADO_ATIVO => '',
+            self::ESTADO_ENCERRADO => 'text-danger',
+        ];
+
+        $class = $colors[$this->estado] ?? 'text-secondary';
+        return "<span class='{$class}'>{$label}</span>";
     }
 
     /**

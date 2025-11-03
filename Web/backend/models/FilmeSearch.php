@@ -19,7 +19,7 @@ class FilmeSearch extends Filme
     {
         return [
             [['id', 'duracao'], 'integer'],
-            [['titulo', 'sinopse', 'estreia', 'idioma', 'realizacao', 'trailer_url', 'poster_path', 'estado'], 'safe'],
+            [['titulo', 'sinopse', 'rating', 'estreia', 'idioma', 'realizacao', 'trailer_url', 'poster_path', 'estado'], 'safe'],
         ];
     }
 
@@ -74,7 +74,8 @@ class FilmeSearch extends Filme
             ->andFilterWhere(['like', 'realizacao', $this->realizacao])
             ->andFilterWhere(['like', 'trailer_url', $this->trailer_url])
             ->andFilterWhere(['like', 'poster_path', $this->poster_path])
-            ->andFilterWhere(['like', 'estado', $this->estado]);
+            ->andFilterWhere(['like', 'estado', $this->estado])
+            ->andFilterWhere(['rating' => $this->rating]);
 
         return $dataProvider;
     }

@@ -163,6 +163,96 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
+     * column status ENUM value labels
+     * @return string[]
+     */
+    public static function optsRoles()
+    {
+        return [
+            'cliente' => 'Cliente',
+            'funcionario' => 'Funcionário',
+            'gerente' => 'Gerente',
+            'admin' => 'Administrador',
+        ];
+    }
+
+    /**
+     * column status ENUM value labels
+     * @return string[]
+     */
+    public static function optsStatus()
+    {
+        return [
+            self::STATUS_ACTIVE => 'Ativo',
+            self::STATUS_INACTIVE => 'Inativo',
+            self::STATUS_DELETED => 'Eliminado',
+        ];
+    }
+
+    // OBTER ESTADO FORMATADO (PARA /INDEX E /VIEW)
+    public function getStatusFormatado(): string
+    {
+        $labels = self::optsStatus();
+        $label = $labels[$this->status] ?? 'Desconhecida';
+
+        $colors = [
+            self::STATUS_ACTIVE => '',
+            self::STATUS_INACTIVE => 'text-danger',
+            self::STATUS_DELETED => 'text-danger',
+        ];
+
+        $class = $colors[$this->status] ?? 'text-secondary';
+        return "<span class='{$class}'>{$label}</span>";
+    }
+
+    /**
+     * @return string
+     */
+    public function displayStatus()
+    {
+        return self::optsStatus()[$this->status];
+    }
+
+    /**
+     * @return bool
+     */
+    public function isStatusActive()
+    {
+        return $this->status === self::STATUS_ACTIVE;
+    }
+
+    public function setStatusToActive()
+    {
+        $this->status = self::STATUS_ACTIVE;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isStatusInactive()
+    {
+        return $this->status === self::STATUS_INACTIVE;
+    }
+
+    public function setStatusToInactive()
+    {
+        $this->status = self::STATUS_INACTIVE;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isStatusDeleted()
+    {
+        return $this->status === self::STATUS_DELETED;
+    }
+
+    public function setStatusToDeleted()
+    {
+        $this->status = self::STATUS_DELETED;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public static function findIdentityByAccessToken($token, $type = null)

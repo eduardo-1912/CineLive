@@ -18,7 +18,7 @@ $gerirUtilizadores = $currentUser->can('gerirUtilizadores');
 $gerirFuncionarios = $currentUser->can('gerirFuncionarios') && !$currentUser->can('gerirUtilizadores');
 
 $actionColumnButtons = $gerirUtilizadores
-    ? '{view} {update} {activate} {deactivate} {delete}'
+    ? '{view} {update} {activate} {deactivate} {hardDelete}'
     : '{view} {activate} {deactivate} {softDelete}';
 
 $title = $gerirUtilizadores ? 'Utilizadores' : 'Funcionários';
@@ -32,7 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <div class="row mb-3">
+                    <div class="row mb-2">
                         <div class="col-md-12">
                             <?php if($gerirUtilizadores || $gerirFuncionarios): ?>
                                 <?= Html::a('Criar ' . ($gerirUtilizadores ? 'Utilizador' : 'Funcionário'), ['create'], ['class' => 'btn btn-success']) ?>
@@ -66,12 +66,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             [
                                 'attribute' => 'role',
                                 'value' => 'roleFormatted',
-                                'filter' => [
-                                    'admin' => 'Administrador',
-                                    'gerente' => 'Gerente',
-                                    'funcionario' => 'Funcionário',
-                                    'cliente' => 'Cliente',
-                                ],
+                                'filter' => array_reverse(User::optsRoles(), true),
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
                                 'visible' => $gerirUtilizadores,
                             ],
@@ -84,27 +79,10 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                             [
                                 'attribute' => 'status',
-                                'value' => function ($model) {
-                                    switch ($model->status) {
-                                        case $model::STATUS_ACTIVE: return '<span>Ativo</span>';
-                                        case $model::STATUS_INACTIVE: return '<span class="text-danger">Inativo</span>';
-                                        case $model::STATUS_DELETED: return '<span class="text-danger">Eliminado</span>';
-                                        default: return '<span class="text-secondary">Desconhecido</span>';
-                                    }
-                                },
+                                'value' => fn($model) => $model->statusFormatado,
                                 'format' => 'raw',
-                                'filter' => $gerirUtilizadores
-                                ? // SE FOR ADMIN --> COM ACESSO A UTILIZADORES ELIMINADOS (SOFT-DELETED)
-                                [
-                                    User::STATUS_ACTIVE => 'Ativo',
-                                    User::STATUS_INACTIVE => 'Inativo',
-                                    User::STATUS_DELETED => 'Eliminado',
-                                ]
-                                : // SE FOR GERENTE --> SEM ACESSO A UTILIZADORES ELIMINADOS (SOFT-DELETED)
-                                [
-                                    User::STATUS_ACTIVE => 'Ativo',
-                                    User::STATUS_INACTIVE => 'Inativo',
-                                ],
+                                // ADMINS TÊM ACESSO A SOFT-DELETED
+                                'filter' => $gerirUtilizadores ? User::optsStatus() : array_slice(User::optsStatus(), 0, 2, true),
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos',],
                             ],
                             [

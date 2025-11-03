@@ -39,11 +39,11 @@ class AppActionColumn extends ActionColumn
 
             // ELIMINAR
             'delete' => function ($url, $model, $key) {
-                return Html::a('<i class="fas fa-trash"></i>', $url, [
+                return Html::a('<i class="fas fa-trash"></i>', ['delete', 'id' => $model->id], [
                     'class' => 'btn btn-sm btn-danger',
                     'title' => 'Eliminar',
                     'data' => [
-                        'confirm' => 'Tem a certeza que quer eliminar permanentemente este registo?',
+                        'confirm' => 'Tem a certeza que quer eliminar este registo?',
                         'method' => 'post',
                     ],
                     'data-toggle' => 'tooltip',
