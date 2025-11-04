@@ -59,13 +59,25 @@ class Sala extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'cinema_id' => 'Cinema',
+            'nome' => 'Nome',
             'numero' => 'Número',
-            'num_filas' => 'Número de Filas',
-            'num_colunas' => 'Número de Colunas',
+            'num_filas' => 'Número Filas',
+            'num_colunas' => 'Número Colunas',
             'preco_bilhete' => 'Preço Bilhete',
+            'precoEmEuros' => 'Preço Bilhete',
             'estado' => 'Estado',
+            'estadoFormatado' => 'Estado',
         ];
     }
+
+    // NOME DA SALA
+    public function getNome(){ return 'Sala ' . $this->numero; }
+
+    // NÚMERO DE LUGARES
+    public function getLugares() { return $this->num_filas * $this->num_colunas; }
+
+    // PREÇO DO BILHETE EM EUROS
+    public function getPrecoEmEuros() { return $this->preco_bilhete . '€'; }
 
     /**
      * Gets query for [[AluguerSalas]].

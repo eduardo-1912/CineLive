@@ -4,27 +4,23 @@ namespace backend\models;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use common\models\Sessao;
+use common\models\Compra;
 
 /**
- * SessaoSearch represents the model behind the search form of `common\models\Sessao`.
+ * CompraSearch represents the model behind the search form of `common\models\Compra`.
  */
-class SessaoSearch extends Sessao
+class CompraSearch extends Compra
 {
-    public $tituloFilme;
-    public $numeroSala;
-
     /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['id', 'filme_id', 'sala_id', 'cinema_id'], 'integer'],
-            [['data', 'hora_inicio', 'hora_fim', 'tituloFilme', 'numeroSala'], 'safe'],
+            [['id', 'cliente_id'], 'integer'],
+            [['data', 'pagamento', 'estado'], 'safe'],
         ];
     }
-
 
     /**
      * {@inheritdoc}
@@ -44,7 +40,7 @@ class SessaoSearch extends Sessao
      */
     public function search($params)
     {
-        $query = Sessao::find()->joinWith(['filme', 'sala', 'cinema']);
+        $query = Compra::find();
 
         // add conditions that should always apply here
 
@@ -63,17 +59,12 @@ class SessaoSearch extends Sessao
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
+            'cliente_id' => $this->cliente_id,
             'data' => $this->data,
-            'hora_inicio' => $this->hora_inicio,
-            'hora_fim' => $this->hora_fim,
-            'filme_id' => $this->filme_id,
-            'sala_id' => $this->sala,
-            'cinema_id' => $this->cinema_id,
         ]);
 
-        $query->andFilterWhere(['like', 'filme.titulo', $this->tituloFilme]);
-        $query->andFilterWhere(['like', 'sala.numero', $this->numeroSala]);
-
+        $query->andFilterWhere(['like', 'pagamento', $this->pagamento])
+            ->andFilterWhere(['like', 'estado', $this->estado]);
 
         return $dataProvider;
     }

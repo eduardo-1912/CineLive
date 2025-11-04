@@ -205,7 +205,7 @@ class SalaController extends Controller
         if ($model->load(Yii::$app->request->post())) {
 
             // FORÇAR CINEMA_ID SE FOR GERENTE
-            if ($user->can('gerente')) {
+            if ($user->can('gerente') && !$user->can('admin')) {
                 $model->cinema_id = $user->identity->profile->cinema_id;
             }
 

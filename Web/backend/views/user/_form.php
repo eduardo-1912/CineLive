@@ -13,41 +13,6 @@ use common\models\Cinema;
 
 ?>
 
-<?php
-$script = <<<JS
-
-    // FUNÇÃO PARA MOSTRAR/ESCONDER CAMPO DE CINEMA CONSOANTE O ROLE SELECIONADO
-    function toggleCinemaField() {
-    
-        // OBTER VALOR DO CAMPO DE ROLE
-        var role = $('#user-role').val();
-        
-        // SE O ROLE SELECIONADO FOR GERENTE/FUNCIONÁRIO --> MOSTRAR CAMPO CINEMA
-        if (role === 'gerente' || role === 'funcionario') {
-            $('#formFieldCinema').show();
-            $('#formFieldCinema select').prop('disabled', false);
-        }
-        
-        // CASO CONTRÁRIO --> ESCONDER CAMPO CINEMA
-        else {
-            $('#formFieldCinema').hide();
-            $('#formFieldCinema select').prop('disabled', true);
-        }
-    }
-    
-    $(document).ready(function() {
-        
-        // QUANDO O DOM ESTÁ PRONTO --> CHAMAR A FUNÇÃO
-        toggleCinemaField();
-        
-        // SEMPRE QUE O USER MUDA O VALOR DO CAMPO 'ROLE' --> CHAMAR A FUNÇÃO
-        $('#user-role').on('change', toggleCinemaField);
-    });
-
-JS;
-$this->registerJs($script);
-?>
-
 <div class="user-form">
 
     <?php $form = ActiveForm::begin(); ?>
@@ -109,3 +74,36 @@ $this->registerJs($script);
 
     <?php ActiveForm::end(); ?>
 </div>
+
+<?php
+$script = <<<JS
+
+    // FUNÇÃO PARA MOSTRAR/ESCONDER CAMPO DE CINEMA CONSOANTE O ROLE SELECIONADO
+    function toggleCinemaField() {
+        // OBTER VALOR DO CAMPO DE ROLE
+        var role = $('#user-role').val();
+        
+        // SE O ROLE SELECIONADO FOR GERENTE/FUNCIONÁRIO --> MOSTRAR CAMPO CINEMA
+        if (role === 'gerente' || role === 'funcionario') {
+            $('#formFieldCinema').show();
+            $('#formFieldCinema select').prop('disabled', false);
+        }
+        
+        // CASO CONTRÁRIO --> ESCONDER CAMPO CINEMA
+        else {
+            $('#formFieldCinema').hide();
+            $('#formFieldCinema select').prop('disabled', true);
+        }
+    }
+    
+    $(document).ready(function() {
+        // QUANDO O DOM ESTÁ PRONTO --> CHAMAR A FUNÇÃO
+        toggleCinemaField();
+        
+        // SEMPRE QUE O USER MUDA O VALOR DO CAMPO 'ROLE' --> CHAMAR A FUNÇÃO
+        $('#user-role').on('change', toggleCinemaField);
+    });
+
+JS;
+$this->registerJs($script);
+?>

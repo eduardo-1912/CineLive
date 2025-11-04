@@ -36,7 +36,7 @@
                     ['label' => 'Sessões',  'icon' => 'calendar-alt', 'url' => ['/sessao/index']],
 
                     ['label' => 'Reservas', 'header' => true],
-                    ['label' => 'Bilhetes',  'icon' => 'ticket-alt', 'url' => ['/compra/index']],
+                    ['label' => 'Compras',  'icon' => 'ticket-alt', 'url' => ['/compra/index']],
                     ['label' => 'Alugueres',  'icon' => 'clock', 'url' => ['/aluguer/index']],
                 ],
             ]);

@@ -4,27 +4,24 @@ namespace backend\models;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use common\models\Sessao;
+use common\models\Bilhete;
 
 /**
- * SessaoSearch represents the model behind the search form of `common\models\Sessao`.
+ * BilheteSearch represents the model behind the search form of `common\models\Bilhete`.
  */
-class SessaoSearch extends Sessao
+class BilheteSearch extends Bilhete
 {
-    public $tituloFilme;
-    public $numeroSala;
-
     /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['id', 'filme_id', 'sala_id', 'cinema_id'], 'integer'],
-            [['data', 'hora_inicio', 'hora_fim', 'tituloFilme', 'numeroSala'], 'safe'],
+            [['id', 'compra_id', 'sessao_id'], 'integer'],
+            [['lugar', 'codigo', 'estado'], 'safe'],
+            [['preco'], 'number'],
         ];
     }
-
 
     /**
      * {@inheritdoc}
@@ -44,7 +41,7 @@ class SessaoSearch extends Sessao
      */
     public function search($params)
     {
-        $query = Sessao::find()->joinWith(['filme', 'sala', 'cinema']);
+        $query = Bilhete::find();
 
         // add conditions that should always apply here
 
@@ -63,17 +60,14 @@ class SessaoSearch extends Sessao
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'data' => $this->data,
-            'hora_inicio' => $this->hora_inicio,
-            'hora_fim' => $this->hora_fim,
-            'filme_id' => $this->filme_id,
-            'sala_id' => $this->sala,
-            'cinema_id' => $this->cinema_id,
+            'compra_id' => $this->compra_id,
+            'sessao_id' => $this->sessao_id,
+            'preco' => $this->preco,
         ]);
 
-        $query->andFilterWhere(['like', 'filme.titulo', $this->tituloFilme]);
-        $query->andFilterWhere(['like', 'sala.numero', $this->numeroSala]);
-
+        $query->andFilterWhere(['like', 'lugar', $this->lugar])
+            ->andFilterWhere(['like', 'codigo', $this->codigo])
+            ->andFilterWhere(['like', 'estado', $this->estado]);
 
         return $dataProvider;
     }

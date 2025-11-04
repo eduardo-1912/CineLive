@@ -3,6 +3,8 @@
 use backend\components\ActionColumnButtonHelper;
 use backend\components\AppGridView;
 use common\models\Cinema;
+use common\models\Filme;
+use common\models\Sala;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\grid\GridView;
@@ -31,7 +33,6 @@ $this->params['breadcrumbs'][] = $this->title;
                         </div>
                     </div>
 
-
                     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
                     <?= AppGridView::widget([
@@ -43,40 +44,71 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'headerOptions' => ['style' => 'width: 3rem;'],
                             ],
                             [
+                                'attribute' => 'tituloFilme',
                                 'label' => 'Filme',
-                                'attribute' => 'filme.titulo',
-                            ],
-                            [
-                                'attribute' => 'data',
-                                'label' => 'Data',
-                                'value' => fn($model) => Yii::$app->formatter->asDate($model->data, 'php:d/m/Y'),
+                                'value' => 'filme.titulo',
+                                'filter' => ArrayHelper::map(Filme::find()->where(['estado' => Filme::ESTADO_EM_EXIBICAO])
+                                            ->orderBy('titulo')->all(), 'titulo', 'titulo'),
                                 'filterInputOptions' => [
                                     'class' => 'form-control',
-                                    'type' => 'date',
+                                    'prompt' => 'Todos',
                                 ],
                             ],
-                            'hora_inicio',
-                            'hora_fim',
-
                             [
                                 'attribute' => 'cinema_id',
-                                'label' => 'Cinema',
                                 'value' => 'cinema.nome',
                                 'filter' => ArrayHelper::map(Cinema::find()->orderBy('nome')->asArray()->all(), 'id', 'nome'),
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
                                 'visible' => $isAdmin,
                             ],
                             [
+                                'attribute' => 'data',
+                                'value' => 'dataFormatada',
+                                'filterInputOptions' => [
+                                    'class' => 'form-control',
+                                    'type' => 'date',
+                                ],
+                            ],
+
+                            [
+                                'attribute' => 'hora_inicio',
+                                'value' => 'horaInicioFormatada',
+                                'filterInputOptions' => [
+                                    'class' => 'form-control',
+                                    'type' => 'time',
+                                ],
+                            ],
+                            [
+                                'attribute' => 'hora_fim',
+                                'value' => 'horaFimFormatada',
+                                'filterInputOptions' => [
+                                    'class' => 'form-control',
+                                    'type' => 'time',
+                                ],
+                            ],
+                            [
+                                'attribute' => 'numeroSala',
                                 'label' => 'Sala',
-                                'attribute' => 'sala.numero',
                                 'value' => function ($model) {
                                     return 'Sala ' . $model->sala->numero;
                                 },
                             ],
                             [
+                                'label' => 'Lugares Ocupados',
+                                'value' => function ($model) {
+                                    return count($model->lugaresOcupados);
+                                },
+                            ],
+                            [
+                                'label' => 'Lugares Totais',
+                                'value' => function ($model) {
+                                    return $model->sala->lugares;
+                                },
+                            ],
+                            [
                                 'class' => 'backend\components\AppActionColumn',
-                                'template' => '{view} {update}',
-                                //'buttons' => ActionColumnButtonHelper::sessaoButtons(),
+                                'template' => '{view} {update} {hardDelete}',
+                                'buttons' => ActionColumnButtonHelper::sessaoButtons(),
                             ],
                         ],
                         'summaryOptions' => ['class' => 'summary mb-2'],

@@ -63,6 +63,38 @@ class Sessao extends \yii\db\ActiveRecord
         ];
     }
 
+    // OBTER ARRAY DE LUGARES OCUPADOS (Ex.: [A1, A2, A3])
+    public function getLugaresOcupados()
+    {
+        return $this->getBilhetes()->select('lugar')->column();
+    }
+
+    // OBTER DATA FORMATADA (DD/MM/AAAA)
+    public function getDataFormatada()
+    {
+        return Yii::$app->formatter->asDate($this->data, 'php:d/m/Y');
+    }
+
+    // HORA INÍCIO FORMATADA (HH:mm)
+    public function getHoraInicioFormatada()
+    {
+        return Yii::$app->formatter->asTime($this->hora_inicio, 'php:H:i');
+    }
+
+    // HORA FIM FORMATADA (HH:mm)
+    public function getHoraFimFormatada()
+    {
+        return Yii::$app->formatter->asTime($this->hora_fim, 'php:H:i');
+    }
+
+    // OBTER HORA JUNTA
+    public function getHora()
+    {
+        return Yii::$app->formatter->asTime($this->hora_inicio, 'php:H:i')
+            . ' - ' .
+            Yii::$app->formatter->asTime($this->hora_fim, 'php:H:i');
+    }
+
     /**
      * Gets query for [[Bilhetes]].
      *

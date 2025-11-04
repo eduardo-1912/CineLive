@@ -51,38 +51,18 @@ $this->params['breadcrumbs'][] = $model->numero;
                         'model' => $model,
                         'attributes' => [
                             'id',
-                            [
-                                'label' => 'Nome',
-                                'attribute' => 'numero',
-                                'value' => function ($model) {
-                                    return 'Sala ' . $model->numero;
-                                },
-                            ],
+                            'nome',
                             'num_filas',
                             'num_colunas',
+                            'lugares',
+                            'precoEmEuros',
                             [
-                                'attribute' => 'lugares',
-                                'value' => function ($model) {
-                                    return $model->num_filas * $model->num_colunas;
-                                },
-                            ],
-                            [
-                                'attribute' => 'preco_bilhete',
-                                'value' => function ($model) {
-                                    return $model->preco_bilhete . '€';
-                                },
-                            ],
-                            [
-                                'attribute' => 'cinema_id',
-                                'value' => function ($model) {
-                                    return $model->cinema->nome;
-                                },
+                                'attribute' => 'cinema.nome',
                                 'visible' => $isAdmin,
                             ],
                             [
-                                'attribute' => 'estado',
+                                'attribute' => 'estadoFormatado',
                                 'format' => 'raw',
-                                'value' => fn($model) => $model->estadoFormatado,
                                 'visible' => $gerirSalas,
                             ],
                         ],

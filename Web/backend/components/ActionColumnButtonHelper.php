@@ -6,7 +6,7 @@ use yii\helpers\Html;
 
 class ActionColumnButtonHelper
 {
-    // ATIVAR/DESATIVAR UTILIZADOR
+    // USERS
     public static function userButtons()
     {
         return [
@@ -58,7 +58,7 @@ class ActionColumnButtonHelper
         ];
     }
 
-    // ATIVAR/ENCERRAR CINEMA
+    // CINEMAS
     public static function cinemaButtons()
     {
         return [
@@ -87,7 +87,7 @@ class ActionColumnButtonHelper
         ];
     }
 
-    // ATIVAR/ENCERRAR SALA DE CINEMA
+    // SALAS
     public static function salaButtons()
     {
         return [
@@ -116,4 +116,25 @@ class ActionColumnButtonHelper
         ];
     }
 
+    public static function sessaoButtons()
+    {
+        return [
+            'hardDelete' => function ($url, $model) {
+                if (count($model->lugaresOcupados) == 0) {
+                    return Html::a('<i class="fas fa-skull"></i>', ['delete', 'id' => $model->id], [
+                        'class' => 'btn btn-danger btn-sm',
+                        'title' => 'Eliminar',
+                        'data-confirm' => 'Tem a certeza que quer ativar esta sala?',
+                        'data-method' => 'post',
+                    ]);
+                }
+                return Html::button('<i class="fas fa-skull"></i>', [
+                    'class' => 'btn btn-secondary btn-sm opacity-50',
+                    'title' => 'Não pode eliminar sessões com lugares ocupados',
+                    'style' => 'cursor: not-allowed;',
+                ]);
+            },
+        ];
+
+    }
 }

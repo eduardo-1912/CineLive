@@ -48,27 +48,17 @@ $this->params['breadcrumbs'][] = $this->title;
                             [
                                 'label' => 'Nome',
                                 'attribute' => 'numero',
-                                'value' => function ($model) {
-                                    return 'Sala ' . $model->numero;
-                                },
+                                'value' => 'nome'
                             ],
                             'num_filas',
                             'num_colunas',
-                            [
-                                'attribute' => 'lugares',
-                                'value' => function ($model) {
-                                    return $model->num_filas * $model->num_colunas;
-                                },
-                            ],
+                            'lugares',
                             [
                                 'attribute' => 'preco_bilhete',
-                                'value' => function ($model) {
-                                    return $model->preco_bilhete . '€';
-                                },
+                                'value' => 'precoEmEuros'
                             ],
                             [
                                 'attribute' => 'cinema_id',
-                                'label' => 'Cinema',
                                 'value' => 'cinema.nome',
                                 'filter' => ArrayHelper::map(Cinema::find()->orderBy('nome')->asArray()->all(), 'id', 'nome'),
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
@@ -77,10 +67,10 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                             [
                                 'attribute' => 'estado',
-                                'value' => fn($model) => $model->estadoFormatado,
+                                'value' => 'estadoFormatado',
                                 'format' => 'raw',
                                 'filter' => Sala::optsEstado(),
-                                'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos',],
+                                'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
                                 'headerOptions' => ['style' => 'width: 9rem;'],
                             ],
                             [
@@ -93,7 +83,6 @@ $this->params['breadcrumbs'][] = $this->title;
                             'class' => 'yii\bootstrap4\LinkPager',
                         ],
                     ]); ?>
-
 
                 </div>
                 <!--.card-body-->

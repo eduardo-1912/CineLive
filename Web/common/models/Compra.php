@@ -1,0 +1,210 @@
+<?php
+
+namespace common\models;
+
+use Yii;
+
+/**
+ * This is the model class for table "compra".
+ *
+ * @property int $id
+ * @property int $cliente_id
+ * @property string $data
+ * @property string $pagamento
+ * @property string $estado
+ *
+ * @property Bilhete[] $bilhetes
+ * @property User $cliente
+ */
+class Compra extends \yii\db\ActiveRecord
+{
+
+    /**
+     * ENUM field values
+     */
+    const PAGAMENTO_MBWAY = 'mbway';
+    const PAGAMENTO_CARTAO = 'cartao';
+    const PAGAMENTO_MULTIBANCO = 'multibanco';
+    const ESTADO_PENDENTE = 'pendente';
+    const ESTADO_CONFIRMADA = 'confirmada';
+    const ESTADO_CANCELADA = 'cancelada';
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function tableName()
+    {
+        return 'compra';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rules()
+    {
+        return [
+            [['cliente_id', 'pagamento', 'estado'], 'required'],
+            [['cliente_id'], 'integer'],
+            [['data'], 'safe'],
+            [['pagamento', 'estado'], 'string'],
+            ['pagamento', 'in', 'range' => array_keys(self::optsPagamento())],
+            ['estado', 'in', 'range' => array_keys(self::optsEstado())],
+            [['cliente_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['cliente_id' => 'id']],
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id' => 'ID',
+            'cliente_id' => 'Cliente ID',
+            'data' => 'Data',
+            'pagamento' => 'Pagamento',
+            'estado' => 'Estado',
+        ];
+    }
+
+    /**
+     * Gets query for [[Bilhetes]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBilhetes()
+    {
+        return $this->hasMany(Bilhete::class, ['compra_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[Cliente]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCliente()
+    {
+        return $this->hasOne(User::class, ['id' => 'cliente_id']);
+    }
+
+
+    /**
+     * column pagamento ENUM value labels
+     * @return string[]
+     */
+    public static function optsPagamento()
+    {
+        return [
+            self::PAGAMENTO_MBWAY => 'mbway',
+            self::PAGAMENTO_CARTAO => 'cartao',
+            self::PAGAMENTO_MULTIBANCO => 'multibanco',
+        ];
+    }
+
+    /**
+     * column estado ENUM value labels
+     * @return string[]
+     */
+    public static function optsEstado()
+    {
+        return [
+            self::ESTADO_PENDENTE => 'pendente',
+            self::ESTADO_CONFIRMADA => 'confirmada',
+            self::ESTADO_CANCELADA => 'cancelada',
+        ];
+    }
+
+    /**
+     * @return string
+     */
+    public function displayPagamento()
+    {
+        return self::optsPagamento()[$this->pagamento];
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPagamentoMbway()
+    {
+        return $this->pagamento === self::PAGAMENTO_MBWAY;
+    }
+
+    public function setPagamentoToMbway()
+    {
+        $this->pagamento = self::PAGAMENTO_MBWAY;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPagamentoCartao()
+    {
+        return $this->pagamento === self::PAGAMENTO_CARTAO;
+    }
+
+    public function setPagamentoToCartao()
+    {
+        $this->pagamento = self::PAGAMENTO_CARTAO;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPagamentoMultibanco()
+    {
+        return $this->pagamento === self::PAGAMENTO_MULTIBANCO;
+    }
+
+    public function setPagamentoToMultibanco()
+    {
+        $this->pagamento = self::PAGAMENTO_MULTIBANCO;
+    }
+
+    /**
+     * @return string
+     */
+    public function displayEstado()
+    {
+        return self::optsEstado()[$this->estado];
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEstadoPendente()
+    {
+        return $this->estado === self::ESTADO_PENDENTE;
+    }
+
+    public function setEstadoToPendente()
+    {
+        $this->estado = self::ESTADO_PENDENTE;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEstadoConfirmada()
+    {
+        return $this->estado === self::ESTADO_CONFIRMADA;
+    }
+
+    public function setEstadoToConfirmada()
+    {
+        $this->estado = self::ESTADO_CONFIRMADA;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEstadoCancelada()
+    {
+        return $this->estado === self::ESTADO_CANCELADA;
+    }
+
+    public function setEstadoToCancelada()
+    {
+        $this->estado = self::ESTADO_CANCELADA;
+    }
+}

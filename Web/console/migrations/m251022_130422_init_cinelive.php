@@ -109,7 +109,8 @@ class m251022_130422_init_cinelive extends Migration
             'id' => $this->primaryKey(),
             'cliente_id' => $this->integer()->notNull(),
             'data' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
-            'estado_pagamento' => "ENUM('pendente','confirmado','cancelado') NOT NULL",
+            'pagamento' => "ENUM('mbway','cartao','multibanco') NOT NULL",
+            'estado' => "ENUM('pendente','confirmada','cancelada') NOT NULL",
         ]);
 
         $this->createIndex('idx-compra-cliente_id', 'compra', 'cliente_id');
@@ -120,9 +121,8 @@ class m251022_130422_init_cinelive extends Migration
             'id' => $this->primaryKey(),
             'compra_id' => $this->integer()->notNull(),
             'sessao_id' => $this->integer()->notNull(),
-            'lugar' => $this->integer()->notNull(),
+            'lugar' => $this->string(3)->notNull(),
             'preco' => $this->decimal(5,2)->notNull(),
-            'pagamento' => $this->decimal(5,2)->notNull(),
             'codigo' => $this->string(45)->notNull()->unique(),
             'estado' => "ENUM('pendente','confirmado','cancelado') NOT NULL",
         ]);
