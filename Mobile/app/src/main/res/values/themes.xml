@@ -3,6 +3,8 @@
     <style name="Base.Theme.CineLive" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="android:statusBarColor">?attr/colorSurfaceVariant</item>
+        <item name="android:windowLightStatusBar">?attr/isLightTheme</item>
     </style>
 
     <style name="Theme.CineLive" parent="Base.Theme.CineLive" />

@@ -10,6 +10,7 @@ import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
+import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -20,6 +21,8 @@ public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
     private NavController navController;
+    private AppBarConfiguration appBarConfiguration;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,8 +36,15 @@ public class MainActivity extends AppCompatActivity {
                 .findFragmentById(R.id.nav_host_fragment);
         navController = navHostFragment.getNavController();
 
-        BottomNavigationView bottomNav = binding.bottomNav;
-        NavigationUI.setupWithNavController(bottomNav, navController);
+        appBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.nav_filmes, R.id.nav_cinemas, R.id.nav_bilhetes, R.id.nav_perfil).build();
+
+        // Toolbar + NavController
+        setSupportActionBar(binding.topAppBar);
+        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+
+        // BottomNavigation + NavController
+        NavigationUI.setupWithNavController(binding.bottomNav, navController);
     }
 
     @Override

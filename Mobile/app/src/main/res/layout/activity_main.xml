@@ -6,6 +6,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/topAppBar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorSurface"
+        android:elevation="4dp"
+        android:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge"
+        app:titleCentered="false" />
+
     <!-- Content (NavHost) -->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment"
