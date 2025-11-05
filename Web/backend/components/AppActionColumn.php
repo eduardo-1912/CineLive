@@ -18,8 +18,6 @@ class AppActionColumn extends ActionColumn
         parent::init();
 
         $this->buttons = array_merge($this->buttons, [
-
-            // VER DETALHES
             'view' => function ($url, $model, $key) {
                 return Html::a('<i class="fas fa-eye"></i>', $url, [
                     'class' => 'btn btn-sm btn-info',
@@ -27,23 +25,18 @@ class AppActionColumn extends ActionColumn
                     'data-toggle' => 'tooltip',
                 ]);
             },
-
-            // EDITAR/ATUALIZAR
-            'update' => function ($url, $model, $key) {
-                return Html::a('<i class="fas fa-edit"></i>', $url, [
-                    'class' => 'btn btn-sm btn-warning',
+            'update' => function ($url, $model) {
+                return Html::a('<i class="fas fa-edit"></i>', ['update', 'id' => $model->id], [
+                    'class' => 'btn btn-sm ' . ($model->isEditable() ? 'btn-warning' : ' btn-secondary disabled'),
                     'title' => 'Editar',
-                    'data-toggle' => 'tooltip',
                 ]);
             },
-
-            // ELIMINAR
             'delete' => function ($url, $model, $key) {
                 return Html::a('<i class="fas fa-trash"></i>', ['delete', 'id' => $model->id], [
-                    'class' => 'btn btn-sm btn-danger',
+                    'class' => 'btn btn-sm ' . ($model->isDeletable() ? 'btn-danger' : ' btn-secondary disabled'),
                     'title' => 'Eliminar',
                     'data' => [
-                        'confirm' => 'Tem a certeza que quer eliminar este registo?',
+                        'confirm' => 'Tem a certeza que quer eliminar permanentemente este registo?',
                         'method' => 'post',
                     ],
                     'data-toggle' => 'tooltip',

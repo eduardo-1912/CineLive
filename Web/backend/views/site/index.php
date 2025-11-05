@@ -7,6 +7,7 @@ use yii\helpers\Url;
 
 $this->title = 'Dashboard';
 ?>
+
 <div class="site-index container-fluid">
     <div class="row row-cols-1 row-cols-sm-3 g-3 text-start">
         <div class="col">

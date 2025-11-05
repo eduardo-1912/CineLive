@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use Exception;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\web\UploadedFile;
@@ -134,6 +135,17 @@ class Filme extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
+
+    // VERIFICAR SE PODE SER EDITADO
+    public function isEditable(): bool { return true; }
+
+    // VERIFICAR SE PODE SER ELIMINADO
+    public function isDeletable(): bool
+    {
+        // se existirem sessões associadas, não é deletável
+        return !$this->getSessaos()->exists();
+    }
+
     public function getFilmeGeneros()
     {
         return $this->hasMany(FilmeGenero::class, ['filme_id' => 'id']);
@@ -180,11 +192,11 @@ class Filme extends \yii\db\ActiveRecord
 
         try {
             return Yii::$app->formatter->asDate($this->estreia, 'php:d/m/Y');
-        } catch (\Exception $e) {
+        }
+        catch (Exception $e) {
             return $this->estreia; // FALLBACK
         }
     }
-
 
     // OBTER ESTADO FORMATADO
     public function getEstadoFormatado(): string

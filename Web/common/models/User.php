@@ -102,6 +102,16 @@ class User extends ActiveRecord implements IdentityInterface
         return static::findOne(['id' => $id, 'status' => self::STATUS_ACTIVE]);
     }
 
+    public function isEditable(): bool
+    {
+        return true;
+    }
+
+    public function isDeletable(): bool
+    {
+        return true;
+    }
+
     // GUARDAR A PASSWORD E AUTH_KEY/TOKEN
     public function beforeSave($insert)
     {

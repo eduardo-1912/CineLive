@@ -52,10 +52,19 @@ class CompraController extends Controller
      */
     public function actionView($id)
     {
+        $model = $this->findModel($id);
+
+        $bilhetesDataProvider = new \yii\data\ActiveDataProvider([
+            'query' => $model->getBilhetes()->joinWith(['sessao.filme', 'sessao.cinema']),
+            'pagination' => false, // opcional: mostra todos
+        ]);
+
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
+            'bilhetesDataProvider' => $bilhetesDataProvider,
         ]);
     }
+
 
     /**
      * Creates a new Compra model.

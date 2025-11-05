@@ -4,7 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model backend\models\BilheteSearch */
+/* @var $model backend\models\AluguerSalaSearch */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
@@ -18,17 +18,21 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'id') ?>
 
-    <?= $form->field($model, 'compra_id') ?>
+    <?= $form->field($model, 'cliente_id') ?>
 
-    <?= $form->field($model, 'sessao_id') ?>
+    <?= $form->field($model, 'sala_id') ?>
 
-    <?= $form->field($model, 'lugar') ?>
+    <?= $form->field($model, 'data') ?>
 
-    <?= $form->field($model, 'preco') ?>
+    <?= $form->field($model, 'hora_inicio') ?>
 
-    <?php // echo $form->field($model, 'codigo') ?>
+    <?php // echo $form->field($model, 'hora_fim') ?>
 
     <?php // echo $form->field($model, 'estado') ?>
+
+    <?php // echo $form->field($model, 'tipo_evento') ?>
+
+    <?php // echo $form->field($model, 'observacoes') ?>
 
     <div class="form-group">
         <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>

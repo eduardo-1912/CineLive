@@ -6,10 +6,15 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model common\models\Sessao */
 
-$this->title =  $model->data . $model->hora_inicio . $model->filme->titulo;
+$this->title = 'Sessão de ' . $model->filme->titulo;
 $this->params['breadcrumbs'][] = ['label' => 'Sessões', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+$this->params['breadcrumbs'][] = $model->filme->titulo;
 \yii\web\YiiAsset::register($this);
+
+$currentUser = Yii::$app->user;
+$isAdmin = $currentUser->can('admin');
+$gerirSessoes = $currentUser->can('gerirSessoes');
+
 ?>
 
 <div class="container-fluid">
@@ -18,39 +23,75 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="row">
                 <div class="col-md-12">
                     <p>
-                        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-                        <?= Html::a('Delete', ['delete', 'id' => $model->id], [
-                            'class' => 'btn btn-danger',
-                            'data' => [
-                                'confirm' => 'Are you sure you want to delete this item?',
-                                'method' => 'post',
-                            ],
-                        ]) ?>
+                        <?php if($gerirSessoes): ?>
+                            <?php if($model->isEditable()): ?>
+                                <?= Html::a('Editar', ['update', 'id' => $model->id], ['class' => 'btn btn-warning']) ?>
+                            <?php endif; ?>
+                            <?php if($model->isDeletable()): ?>
+                                <?= Html::a('Eliminar', ['delete', 'id' => $model->id], [
+                                    'class' => 'btn btn-danger',
+                                    'data' => [
+                                        'confirm' => 'Tem a certeza que deseja eliminar esta sessão?',
+                                        'method' => 'post',
+                                    ],
+                                ]) ?>
+                            <?php endif; ?>
+                        <?php endif; ?>
                     </p>
                     <?= DetailView::widget([
                         'model' => $model,
                         'attributes' => [
                             'id',
-                            'data',
                             [
-                                'label' => 'Hora',
-                                'value' => function ($model) {
-                                    $inicio = Yii::$app->formatter->asTime($model->hora_inicio, 'HH:mm');
-                                    $fim = Yii::$app->formatter->asTime($model->hora_fim, 'HH:mm');
-                                    return "{$inicio} - {$fim}";
-                                },
-                            ],
-                            [
+                                'attribute' => 'tituloFilme',
                                 'label' => 'Filme',
-                                'attribute' => 'filme.titulo',
-                            ],
-                            [
-                                'label' => 'Sala',
-                                'attribute' => 'sala.numero',
+                                'format' => 'raw',
+                                'value' => function ($model) {
+                                    return Html::a(Html::encode($model->filme->titulo),
+                                        ['filme/view', 'id' => $model->filme_id],
+                                        ['class' => 'text-decoration-none text-primary']);
+                                },
                             ],
                             [
                                 'label' => 'Cinema',
                                 'attribute' => 'cinema.nome',
+                                'format' => 'raw',
+                                'value' => function ($model) {
+                                    return Html::a(
+                                        Html::encode($model->cinema->nome),
+                                        ['cinema/view', 'id' => $model->cinema_id],
+                                        ['class' => 'text-decoration-none text-primary']
+                                    );
+                                },
+                                'visible' => $isAdmin,
+                            ],
+                            [
+                                'label' => 'Sala',
+                                'format' => 'raw',
+                                'value' => function ($model) {
+                                    return Html::a(
+                                        Html::encode($model->sala->nome),
+                                        ['sala/view', 'id' => $model->sala_id],
+                                        ['class' => 'text-decoration-none text-primary']
+                                    );
+                                },
+                            ],
+                            [
+                                'label' => 'Data',
+                                'attribute' => 'dataFormatada',
+                            ],
+                            'hora',
+                            [
+                                'label' => 'Lugares Disponíveis',
+                                'attribute' => 'lugaresDisponiveis',
+                                'value' => function ($model) {
+                                    return $model->numeroLugaresDisponiveis . '/' . $model->sala->lugares;
+                                },
+                            ],
+                            [
+                                'label' => 'Estado',
+                                'attribute' => 'estadoFormatado',
+                                'format' => 'raw',
                             ],
                         ],
                     ]) ?>
@@ -58,6 +99,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 <!--.col-md-12-->
             </div>
             <!--.row-->
+
+            <?= $this->render('_mapaLugares', ['model' => $model]) ?>
+
+
         </div>
         <!--.card-body-->
     </div>

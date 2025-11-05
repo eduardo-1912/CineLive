@@ -50,6 +50,9 @@ class GeneroSearch extends Genero
             'pagination' => [
                 'pageSize' => Yii::$app->params['pageSize'],
             ],
+            'sort' => [
+                'defaultOrder' => ['nome' => SORT_ASC],
+            ],
         ]);
 
         $this->load($params);

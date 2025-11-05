@@ -2,6 +2,7 @@
 
 namespace backend\models;
 
+use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\models\Sessao;
@@ -13,6 +14,9 @@ class SessaoSearch extends Sessao
 {
     public $tituloFilme;
     public $numeroSala;
+    public $estado;
+    public $lugaresDisponiveis;
+
 
     /**
      * {@inheritdoc}
@@ -21,7 +25,7 @@ class SessaoSearch extends Sessao
     {
         return [
             [['id', 'filme_id', 'sala_id', 'cinema_id'], 'integer'],
-            [['data', 'hora_inicio', 'hora_fim', 'tituloFilme', 'numeroSala'], 'safe'],
+            [['data', 'hora_inicio', 'hora_fim', 'tituloFilme', 'numeroSala', 'lugaresDisponiveis', 'estado'], 'safe'],
         ];
     }
 
@@ -50,6 +54,9 @@ class SessaoSearch extends Sessao
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination' => [
+                'pageSize' => Yii::$app->params['pageSize'],
+            ],
         ]);
 
         $this->load($params);
@@ -68,12 +75,44 @@ class SessaoSearch extends Sessao
             'hora_fim' => $this->hora_fim,
             'filme_id' => $this->filme_id,
             'sala_id' => $this->sala,
-            'cinema_id' => $this->cinema_id,
+            'sessao.cinema_id' => $this->cinema_id,
         ]);
 
         $query->andFilterWhere(['like', 'filme.titulo', $this->tituloFilme]);
         $query->andFilterWhere(['like', 'sala.numero', $this->numeroSala]);
 
+        // OBTER TODAS AS SESSÕES
+        $sessoes = $query->all();
+
+        // FILTRO POR ESTADO
+        if (!empty($this->estado)) {
+            $sessoes = array_filter($sessoes, function ($sessao) {
+                return $sessao->estado === $this->estado;
+            });
+        }
+
+        // FILTRO POR LUGARES DISPONÍVEIS
+        if (!empty($this->lugaresDisponiveis)) {
+            $sessoes = array_filter($sessoes, function ($sessao) {
+                return $sessao->numeroLugaresDisponiveis == $this->lugaresDisponiveis;
+            });
+        }
+
+        // ORDENAR POR ESTADO
+        $ordemEstados = [
+            Sessao::ESTADO_A_DECORRER => 1,
+            Sessao::ESTADO_ATIVA => 2,
+            Sessao::ESTADO_ESGOTADA => 3,
+            Sessao::ESTADO_TERMINADA => 4,
+        ];
+
+        usort($sessoes, function ($a, $b) use ($ordemEstados) {
+            return $ordemEstados[$a->estado] <=> $ordemEstados[$b->estado];
+        });
+
+        // Atualizar o DataProvider
+        $dataProvider->setModels($sessoes);
+        $dataProvider->setTotalCount(count($sessoes));
 
         return $dataProvider;
     }

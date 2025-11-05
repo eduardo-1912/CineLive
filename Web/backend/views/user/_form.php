@@ -33,15 +33,15 @@ use common\models\Cinema;
         <!-- LISTA DE CINEMAS-->
         <?php
             // OBTER CINEMAS ATIVOS
-            $cinemasQuery = Cinema::find()->where(['estado' => Cinema::ESTADO_ATIVO]);
+            $queryCinemas = Cinema::find()->where(['estado' => Cinema::ESTADO_ATIVO]);
 
-            // SE O UTILIZADOR A SER EDITADO PERTENÇA A UM CINEMA ENCERRADO --> INCLUIR TAMBÉM ESSE
+            // SE O UTILIZADOR A SER EDITADO PERTENÇA A UM CINEMA ENCERRADO --> INCLUIR ESSE CINEMA
             if ($profile->cinema_id) {
-                $cinemasQuery->orWhere(['id' => $profile->cinema_id]);
+                $queryCinemas->orWhere(['id' => $profile->cinema_id]);
             }
 
             // GERAR LISTA DE CINEMAS
-            $cinemas = ArrayHelper::map($cinemasQuery->orderBy('nome')->all(), 'id', 'nome');
+            $cinemas = ArrayHelper::map($queryCinemas->orderBy('nome')->all(), 'id', 'nome');
         ?>
 
         <!-- DROPDOWN DOS CINEMAS-->
@@ -79,8 +79,9 @@ use common\models\Cinema;
 $script = <<<JS
 
     // FUNÇÃO PARA MOSTRAR/ESCONDER CAMPO DE CINEMA CONSOANTE O ROLE SELECIONADO
-    function toggleCinemaField() {
-        // OBTER VALOR DO CAMPO DE ROLE
+    function toggleCinemaField()
+    {
+        // OBTER VALOR DO CAMPO ROLE
         var role = $('#user-role').val();
         
         // SE O ROLE SELECIONADO FOR GERENTE/FUNCIONÁRIO --> MOSTRAR CAMPO CINEMA
@@ -97,10 +98,7 @@ $script = <<<JS
     }
     
     $(document).ready(function() {
-        // QUANDO O DOM ESTÁ PRONTO --> CHAMAR A FUNÇÃO
         toggleCinemaField();
-        
-        // SEMPRE QUE O USER MUDA O VALOR DO CAMPO 'ROLE' --> CHAMAR A FUNÇÃO
         $('#user-role').on('change', toggleCinemaField);
     });
 

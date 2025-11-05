@@ -1,6 +1,7 @@
 <?php
 
 use backend\assets\AppAsset;
+use backend\components\ActionColumnButtonHelper;
 use common\models\Cinema;
 use common\models\Filme;
 use yii\helpers\ArrayHelper;
@@ -79,7 +80,8 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                             [
                                 'class' => 'backend\components\AppActionColumn',
-                                'template' => '{view} {update} {delete}',
+                                'template' => '{view} {createSessao} {update} {delete}',
+                                'buttons' => ActionColumnButtonHelper::filmeButtons(),
                             ],
                         ]
                     ]); ?>

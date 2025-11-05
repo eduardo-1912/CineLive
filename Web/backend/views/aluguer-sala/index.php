@@ -4,10 +4,10 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 
 /* @var $this yii\web\View */
-/* @var $searchModel backend\models\BilheteSearch */
+/* @var $searchModel backend\models\AluguerSalaSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Bilhetes';
+$this->title = 'Aluguer Salas';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="container-fluid">
@@ -17,7 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="card-body">
                     <div class="row mb-2">
                         <div class="col-md-12">
-                            <?= Html::a('Create Bilhete', ['create'], ['class' => 'btn btn-success']) ?>
+                            <?= Html::a('Create Aluguer Sala', ['create'], ['class' => 'btn btn-success']) ?>
                         </div>
                     </div>
 
@@ -31,12 +31,14 @@ $this->params['breadcrumbs'][] = $this->title;
                             ['class' => 'yii\grid\SerialColumn'],
 
                             'id',
-                            'compra_id',
-                            'sessao_id',
-                            'lugar',
-                            'preco',
-                            //'codigo',
+                            'cliente_id',
+                            'sala_id',
+                            'data',
+                            'hora_inicio',
+                            //'hora_fim',
                             //'estado',
+                            //'tipo_evento',
+                            //'observacoes:ntext',
 
                             ['class' => 'hail812\adminlte3\yii\grid\ActionColumn'],
                         ],

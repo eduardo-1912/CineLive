@@ -3,16 +3,16 @@
 namespace backend\controllers;
 
 use Yii;
-use common\models\Bilhete;
-use backend\models\BilheteSearch;
+use common\models\AluguerSala;
+use backend\models\AluguerSalaSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * BilheteController implements the CRUD actions for Bilhete model.
+ * AluguerSalaController implements the CRUD actions for AluguerSala model.
  */
-class BilheteController extends Controller
+class AluguerSalaController extends Controller
 {
     /**
      * {@inheritdoc}
@@ -30,12 +30,12 @@ class BilheteController extends Controller
     }
 
     /**
-     * Lists all Bilhete models.
+     * Lists all AluguerSala models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new BilheteSearch();
+        $searchModel = new AluguerSalaSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -45,7 +45,7 @@ class BilheteController extends Controller
     }
 
     /**
-     * Displays a single Bilhete model.
+     * Displays a single AluguerSala model.
      * @param int $id ID
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
@@ -58,13 +58,13 @@ class BilheteController extends Controller
     }
 
     /**
-     * Creates a new Bilhete model.
+     * Creates a new AluguerSala model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new Bilhete();
+        $model = new AluguerSala();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
@@ -76,7 +76,7 @@ class BilheteController extends Controller
     }
 
     /**
-     * Updates an existing Bilhete model.
+     * Updates an existing AluguerSala model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param int $id ID
      * @return mixed
@@ -96,7 +96,7 @@ class BilheteController extends Controller
     }
 
     /**
-     * Deletes an existing Bilhete model.
+     * Deletes an existing AluguerSala model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param int $id ID
      * @return mixed
@@ -110,15 +110,15 @@ class BilheteController extends Controller
     }
 
     /**
-     * Finds the Bilhete model based on its primary key value.
+     * Finds the AluguerSala model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param int $id ID
-     * @return Bilhete the loaded model
+     * @return AluguerSala the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Bilhete::findOne($id)) !== null) {
+        if (($model = AluguerSala::findOne($id)) !== null) {
             return $model;
         }
 

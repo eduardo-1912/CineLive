@@ -11,8 +11,14 @@ use common\models\Cinema;
 
 $currentUser = Yii::$app->user;
 $isAdmin = $currentUser->can('admin');
-$isGerente = $currentUser->can('gerente');
+$gerirSalas = $currentUser->can('gerirSalas');
 $userCinemaId = $currentUser->identity->profile->cinema_id ?? null;
+
+// VERIFICAR SE SALA TEM SESSÕES ATIVAS
+$temBilhetes = $model->hasSessoesAtivas();
+
+// ARRAY COM PRÓXIMO NÚMERO DA SALA PARA CADA CINEMA
+$arrayProximosNumeros = json_encode(Cinema::getProximoNumeroPorCinema());
 
 ?>
 
@@ -20,19 +26,36 @@ $userCinemaId = $currentUser->identity->profile->cinema_id ?? null;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'numero')->textInput() ?>
-    <?= $form->field($model, 'num_filas')->textInput() ?>
-    <?= $form->field($model, 'num_colunas')->textInput() ?>
-    <?= $form->field($model, 'preco_bilhete')->textInput(['maxlength' => true]) ?>
-
     <?php if ($isAdmin): ?>
-        <?= $form->field($model, 'cinema_id')->dropDownList(ArrayHelper::map(
-            Cinema::find()->all(), 'id', 'nome')) ?>
-    <?php elseif ($isGerente): ?>
+        <?php
+            // OBTER CINEMAS ATIVOS
+            $cinemasQuery = Cinema::find()->where(['estado' => Cinema::ESTADO_ATIVO]);
+
+            // SE A SALA A SER EDITADA PERTENÇE A UM CINEMA ENCERRADO --> INCLUIR ESSE CINEMA
+            if ($model->cinema_id) {
+                $cinemasQuery->orWhere(['id' => $model->cinema_id]);
+            }
+
+            // GERAR LISTA DE CINEMAS
+            $cinemas = ArrayHelper::map($cinemasQuery->orderBy('nome')->all(), 'id', 'nome');
+        ?>
+
+        <?= $form->field($model, 'cinema_id')->dropDownList(
+            $cinemas, ['prompt' => 'Selecione o cinema', 'disabled' => !$model->isNewRecord]) ?>
+
+    <?php elseif ($gerirSalas): ?>
         <?= Html::activeHiddenInput($model, 'cinema_id', ['value' => $userCinemaId]) ?>
     <?php endif; ?>
 
-    <?= $form->field($model, 'estado')->dropDownList($model::optsEstado()) ?>
+    <div id="formFieldNumero" style="display: none;">
+        <?= $form->field($model, 'numero')->textInput() ?>
+    </div>
+
+    <?= $form->field($model, 'num_filas')->textInput(['disabled' => $temBilhetes]) ?>
+    <?= $form->field($model, 'num_colunas')->textInput(['disabled' => $temBilhetes]) ?>
+    <?= $form->field($model, 'preco_bilhete')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'estado')->dropDownList($model::optsEstado(), ['disabled' => $temBilhetes]) ?>
 
     <div class="form-group mt-3">
         <?= Html::submitButton('Guardar', ['class' => 'btn btn-success']) ?>
@@ -41,3 +64,40 @@ $userCinemaId = $currentUser->identity->profile->cinema_id ?? null;
     <?php ActiveForm::end(); ?>
 
 </div>
+
+<?php
+
+$script = <<<JS
+
+    // OBTER ARRAY COM PRÓXIMOS NÚMEROS DE SALA
+    const proximosNumeros = $arrayProximosNumeros;
+
+    // FUNÇÃO PARA MOSTRAR O CAMPO NÚMERO SE ALGUM CINEMA ESTIVER SELECIONADO
+    function toggleNumeroField()
+    {
+        // OBTER O VALOR DO CAMPO CINEMA
+        var cinemaId = $('#sala-cinema_id').val();
+        
+        // SE NENHUM CINEMA ESTIVER SELECIONADO --> ESCONDER NÚMERO
+        if (!cinemaId)
+        {
+            $('#formFieldNumero').hide();
+            $('#sala-numero').val('');
+        }
+        else
+        {
+            $('#formFieldNumero').show();
+            var proximoNumero = proximosNumeros[cinemaId] || 1;
+            $('#sala-numero').val(proximoNumero);
+        }
+    }
+
+    $(document).ready(function() {
+        toggleNumeroField();
+        $('#sala-cinema_id').on('change', toggleNumeroField);
+    });
+    
+JS;
+
+$this->registerJs($script);
+?>

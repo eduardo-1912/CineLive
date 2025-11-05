@@ -32,6 +32,7 @@ class Genero extends \yii\db\ActiveRecord
         return [
             [['nome'], 'required'],
             [['nome'], 'string', 'max' => 80],
+            [['nome'], 'unique'],
         ];
     }
 
@@ -44,6 +45,11 @@ class Genero extends \yii\db\ActiveRecord
             'id' => 'ID',
             'nome' => 'Nome',
         ];
+    }
+
+    public function isDeletable(): bool
+    {
+        return true;
     }
 
     /**

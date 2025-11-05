@@ -18,7 +18,7 @@ $userCinema = $currentUser->identity->profile->cinema;
 $isAdmin = $currentUser->can('admin');
 $gerirSalas = $currentUser->can('gerirSalas');
 
-$actionColumnButtons = $gerirSalas ? '{view} {update} {activate} {deactivate}' : '{view}';
+$actionColumnButtons = $gerirSalas ? '{view} {update} {activate} {close}' : '{view}';
 
 $this->title = 'Salas';
 $this->params['breadcrumbs'][] = ['label' => $isAdmin ? 'Cinemas' : $userCinema->nome, 'url' => [$isAdmin ? 'cinema/index' : ('cinema/view?id=' . $userCinema->id)]];
@@ -76,7 +76,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             [
                                 'class' => 'backend\components\AppActionColumn',
                                 'template' => $actionColumnButtons,
-                                'buttons' => ActionColumnButtonHelper::salaButtons(),
+                                'buttons' => ActionColumnButtonHelper::toggleButtons(),
                             ],
                         ],
                         'pager' => [

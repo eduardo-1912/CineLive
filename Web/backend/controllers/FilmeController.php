@@ -7,6 +7,7 @@ use backend\models\FilmeSearch;
 use Yii;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
+use yii\web\ForbiddenHttpException;
 use yii\web\UploadedFile;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -171,48 +172,55 @@ class FilmeController extends Controller
      */
     public function actionDelete($id)
     {
+        // OBTER FILME
         $model = $this->findModel($id);
+
+        //
         $basePath = Yii::getAlias(Yii::$app->params['posterPath']);
+
+
         if ($model->poster_path && is_file($basePath . DIRECTORY_SEPARATOR . $model->poster_path)) {
             @unlink($basePath . DIRECTORY_SEPARATOR . $model->poster_path);
         }
+
+        // ELIMINAR FILME
         $model->delete();
 
         return $this->redirect(['index']);
     }
 
-    public function actionChangeState($id, $estado)
+    public function actionChangeStatus($id, $estado)
     {
+        // VERIFICAR PERMISSÕES
         if (!Yii::$app->user->can('gerirFilmes')) {
-            throw new \yii\web\ForbiddenHttpException('Não tem permissão para alterar o estado dos filmes.');
+            throw new ForbiddenHttpException('Não tem permissão para alterar o estado dos filmes.');
         }
 
         $model = $this->findModel($id);
 
-        // ⚠️ Verificar se o estado é válido
+        // VERIFICAR SE O ESTADO É VÁLIDO
         if (!array_key_exists($estado, Filme::optsEstado())) {
-            throw new \yii\web\BadRequestHttpException('Estado inválido.');
+            throw new BadRequestHttpException('Estado inválido.');
         }
 
-        // ⚙️ Verificar se o filme tem sessões futuras
-        $temSessoesFuturas = $model->getSessaos()
-            ->where(['>', 'data', date('Y-m-d H:i:s')])
-            ->exists();
+        // VERIFICAR SE TEM SESSÕES FUTURAS
+        $temSessoesFuturas = $model->getSessaos()->where(['>', 'data', date('Y-m-d H:i:s')])->exists();
 
-        // 💾 Atualizar estado
+        // ATUALIZAR ESTADO
         $model->estado = $estado;
         $model->save(false);
 
-        // 🧠 Mensagem dinâmica
+        // OBTER ESTADO NOVO
         $label = ucfirst(Filme::optsEstado()[$estado]);
+
         if ($estado === Filme::ESTADO_TERMINADO && $temSessoesFuturas) {
             Yii::$app->session->setFlash('warning',
-                "⚠️ O filme <strong>{$model->titulo}</strong> foi marcado como <strong>{$label}</strong>, 
-             mas ainda tem sessões agendadas. As sessões continuarão visíveis até ocorrerem."
+                "O filme foi marcado como {$label}, mas ainda tem sessões agendadas. As sessões continuarão visíveis até ocorrerem."
             );
-        } else {
+        }
+        else {
             Yii::$app->session->setFlash('success',
-                "O filme <strong>{$model->titulo}</strong> foi alterado para o estado <strong>{$label}</strong>."
+                "O filme foi alterado para o estado {$label}."
             );
         }
 

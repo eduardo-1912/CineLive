@@ -1,5 +1,6 @@
 <?php
 
+use backend\components\ActionColumnButtonHelper;
 use backend\components\AppGridView;
 use backend\components\AppActionColumn;
 use yii\bootstrap4\ActiveForm;
@@ -23,8 +24,9 @@ $this->params['breadcrumbs'][] = $this->title;
                         <div class="col-lg">
                             <?php $form = ActiveForm::begin(['action' => ['index'], 'method' => 'post']); ?>
                             <div class="d-flex align-items-start gap-1">
-                                <?= $form->field($model, 'nome')->textInput(['maxlength' => true, 'placeholder' => 'Ex: Ação, Comédia...'])->label(false) ?>
-                                <?= Html::submitButton('Adicionar', ['class' => 'btn btn-success', 'style' => 'height: 38px']) ?>
+                                <?= $form->field($model, 'nome')
+                                    ->textInput(['maxlength' => true, 'placeholder' => 'Ex.: Ação, Comédia'])->label(false) ?>
+                                <?= Html::submitButton('Criar Género', ['class' => 'btn btn-success', 'style' => 'height: 38px']) ?>
                             </div>
 
                             <?php ActiveForm::end(); ?>
@@ -38,11 +40,31 @@ $this->params['breadcrumbs'][] = $this->title;
                             'class' => 'yii\bootstrap4\LinkPager',
                         ],
                         'columns' => [
-                            'id',
+                            [
+                                'attribute' => 'id',
+                                'headerOptions' => ['style' => 'width: 3rem'],
+                            ],
                             'nome',
                             [
+                                'header' => 'Editar',
+                                'class' => 'yii\grid\DataColumn',
+                                'format' => 'raw',
+                                'value' => function ($model) { return
+                                    Html::beginForm(['genero/update', 'id' => $model->id], 'post',
+                                        ['class' => 'd-inline-flex gap-1',])
+                                    . Html::input('text', 'Genero[nome]', $model->nome,
+                                        ['class' => 'form-control form-control-sm', 'style' => 'width: 20rem'])
+                                    . Html::submitButton('<i class="fas fa-edit"></i>', [
+                                        'class' => 'btn btn-warning btn-sm'])
+                                    . Html::endForm();
+                                },
+                                'filter' => Html::activeTextInput($searchModel, 'nome', ['class' => 'form-control']),
+                                'headerOptions' => ['style' => 'width: 20rem'],
+                            ],
+                            [
                                 'class' => 'backend\components\AppActionColumn',
-                                'template' => '{update} {delete}',
+                                'template' => '{delete}',
+                                'headerOptions' => ['style' => 'width: 3rem'],
                             ],
                         ]
                     ]); ?>

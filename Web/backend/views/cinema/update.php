@@ -4,11 +4,11 @@
 /* @var $model common\models\Cinema */
 
 $currentUser = Yii::$app->user;
-$isAdmin = $currentUser->can('admin');
-$return_path = $isAdmin ? 'index' : 'view?id=' . $currentUser->identity->profile->cinema_id;
+$gerirCinemas = $currentUser->can('gerirCinemas');
+$return_path = $gerirCinemas ? 'index' : 'view?id=' . $currentUser->identity->profile->cinema_id;
 
 $this->title = 'Editar: ' . $model->nome;
-$this->params['breadcrumbs'][] = ['label' => 'Cinemas', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Cinemas', 'url' => [$return_path]];
 $this->params['breadcrumbs'][] = ['label' => $model->nome, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = 'Editar';
 ?>

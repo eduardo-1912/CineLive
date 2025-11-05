@@ -33,7 +33,7 @@ use yii\bootstrap4\ActiveForm;
     <?= $form->field($model, 'horario_fecho')->input('time') ?>
 
     <?php if (Yii::$app->user->can('admin')): ?>
-        <?= $form->field($model, 'estado')->dropDownList($model::optsEstado(),) ?>
+        <?= $form->field($model, 'estado')->dropDownList($model::optsEstado()) ?>
     <?php endif; ?>
 
     <div class="form-group">

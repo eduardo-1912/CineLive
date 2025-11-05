@@ -1,13 +1,12 @@
 <?php
 
 /* @var $this yii\web\View */
-/* @var $model common\models\Genero */
+/* @var $model common\models\AluguerSala */
 
-$this->title = 'Editar: ' . $model->nome;
-$this->params['breadcrumbs'][] = ['label' => 'Filmes', 'url' => ['filme/index']];
-$this->params['breadcrumbs'][] = ['label' => 'Géneros', 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->nome];
-$this->params['breadcrumbs'][] = 'Editar';
+$this->title = 'Update Aluguer Sala: ' . $model->id;
+$this->params['breadcrumbs'][] = ['label' => 'Aluguer Salas', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
+$this->params['breadcrumbs'][] = 'Update';
 ?>
 
 <div class="container-fluid">

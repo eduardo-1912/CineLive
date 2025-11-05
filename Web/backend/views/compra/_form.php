@@ -12,16 +12,21 @@ use yii\bootstrap4\ActiveForm;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'cliente_id')->textInput() ?>
+    <?= $form->field($model, 'cliente_id')->textInput([
+        'value' => $model->cliente->profile->nome,
+        'disabled' => true]) ?>
 
-    <?= $form->field($model, 'data')->textInput() ?>
 
-    <?= $form->field($model, 'pagamento')->dropDownList([ 'mbway' => 'Mbway', 'cartao' => 'Cartao', 'multibanco' => 'Multibanco', ], ['prompt' => '']) ?>
+    <?= $form->field($model, 'data')->textInput([
+        'value' => $model->dataFormatada,
+        'disabled' => 'true']) ?>
 
-    <?= $form->field($model, 'estado')->dropDownList([ 'pendente' => 'Pendente', 'confirmada' => 'Confirmada', 'cancelada' => 'Cancelada', ], ['prompt' => '']) ?>
+    <?= $form->field($model, 'pagamento')->dropDownList($model::optsPagamento(), ['disabled' => 'true']) ?>
+
+    <?= $form->field($model, 'estado')->dropDownList($model::optsEstado()) ?>
 
     <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+        <?= Html::submitButton('Guardar', ['class' => 'btn btn-success']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

@@ -12,58 +12,53 @@ $currentUser = Yii::$app->user;
 $isAdmin = $currentUser->can('admin');
 $userCinemaId = $currentUser->identity->profile->cinema_id ?? null;
 
+$temBilhetes = !$model->isNewRecord && count($model->lugaresOcupados) > 0;
+
 ?>
 
 <div class="sessao-form">
     <?php $form = ActiveForm::begin(); ?>
 
     <!-- DATA -->
-    <?= $form->field($model, 'data')->input('date') ?>
+    <?= $form->field($model, 'data')->input('date', ['value' => $model->data,
+        'min' => date('Y-m-d'), 'disabled' => $temBilhetes,]); ?>
 
-    <!-- LISTA DAS DURAÇÕES DE TODOS OS FILMES -->
+    <!-- LISTA DAS DURAÇÕES DE TODOS OS FILMES (CONVERTER PARA JSON PARA USAR COM JAVASCRIPT) -->
     <?php $duracoesFilmes = Json::encode(ArrayHelper::map(Filme::find()->where(['estado' => Filme::ESTADO_EM_EXIBICAO])->all(), 'id', 'duracao')); ?>
 
     <!-- DROPDOWN DOS FILMES -->
     <?= $form->field($model, 'filme_id')->dropDownList(
         ArrayHelper::map(Filme::find()->where(['estado' => Filme::ESTADO_EM_EXIBICAO])
-            ->orderBy('titulo')->all(), 'id', 'titulo'), ['prompt' => 'Selecione o filme']
-    ) ?>
+        ->orderBy('titulo')->all(), 'id', 'titulo'), ['prompt' => 'Selecione o filme', 'disabled' => $temBilhetes,]) ?>
 
     <!-- HORA INÍCIO -->
-    <?= $form->field($model, 'hora_inicio')->input('time') ?>
+    <?= $form->field($model, 'hora_inicio')->input('time', ['disabled' => $temBilhetes]) ?>
 
     <!-- HORA FIM (CALCULADA CONSOANTE O FILME SELECIONADO) -->
-    <?= $form->field($model, 'hora_fim')->input('time') ?>
+    <?= $form->field($model, 'hora_fim')->input('time', ['disabled' => $temBilhetes]) ?>
 
     <!-- SE É ADMIN PODE ESCOLHER O CINEMA -->
     <?php if ($isAdmin): ?>
-
         <!-- DROPDOWN DE CINEMAS -->
         <?= $form->field($model, 'cinema_id')->dropDownList(
             ArrayHelper::map(Cinema::find()->where(['estado' => Cinema::ESTADO_ATIVO])->orderBy('nome')->all(), 'id', 'nome'),
-            ['prompt' => 'Selecione o cinema',
-            // RECARREGAR O FORM AO MUDAR DE CINEMA PARA ATUALIZAR SALAS
-            'onchange' => 'this.form.submit()',]
-        ) ?>
+            ['prompt' => 'Selecione o cinema', 'onchange' => 'this.form.submit()', 'disabled' => !$model->isNewRecord]) ?>
 
         <!-- DROPDOWN DE SALAS -->
         <div id="formFieldSala" style="<?= $model->cinema_id ? '' : 'display: none;' ?>">
             <?= $form->field($model, 'sala_id')->dropDownList(
                 ArrayHelper::map(Sala::find()->where(['estado' => Sala::ESTADO_ATIVA, 'cinema_id' => $model->cinema_id ?: null,])
-                ->orderBy('numero')->all(), 'id', 'nome'),
-                ['prompt' => 'Selecione a sala']) ?>
+                ->orderBy('numero')->all(), 'id', 'nome'), ['prompt' => 'Selecione a sala']) ?>
         </div>
 
     <!-- SE É GERENTE APENAS MOSTRAR SALAS DO SEU CINEMA -->
     <?php else: ?>
-
         <?= Html::activeHiddenInput($model, 'cinema_id', ['value' => $userCinemaId]) ?>
 
         <!-- DROPDOWN DE SALAS -->
         <?= $form->field($model, 'sala_id')->dropDownList(
             ArrayHelper::map(Sala::find()->where(['cinema_id' => $userCinemaId, 'estado' => Sala::ESTADO_ATIVA])
             ->orderBy('numero')->all(), 'id', 'numero'), ['prompt' => 'Selecione a sala']) ?>
-
     <?php endif; ?>
 
     <div class="form-group mt-3">

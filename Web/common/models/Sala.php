@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "sala".
@@ -79,6 +80,54 @@ class Sala extends \yii\db\ActiveRecord
     // PREÇO DO BILHETE EM EUROS
     public function getPrecoEmEuros() { return $this->preco_bilhete . '€'; }
 
+    // OBTER ESTADO FORMATADO (PARA /INDEX E /VIEW)
+    public function getEstadoFormatado(): string
+    {
+        $labels = self::optsEstado();
+        $label = $labels[$this->estado] ?? 'Desconhecida';
+
+        $colors = [
+            self::ESTADO_ATIVA => '',
+            self::ESTADO_ENCERRADA => 'text-danger',
+        ];
+
+        $class = $colors[$this->estado] ?? 'text-secondary';
+        return "<span class='{$class}'>{$label}</span>";
+    }
+
+    // VERIFICAR SE TEM SESSÕES ATIVAS
+    public function hasSessoesAtivas(): bool
+    {
+        foreach ($this->sessaos as $sessao) {
+            // IGNORAR SESSÕES TERMINADAS
+            if ($sessao->isEstadoTerminada()) {
+                continue;
+            }
+
+            // SE A SESSÃO NÃO PODER SER ELIMINADA --> TEM SESSÕES ATIVAS
+            if (!$sessao->isDeletable()) {
+                return true;
+            }
+        }
+
+        // NENHUMA SESSÃO IMPEDE O ENCERRAMENTO DA SALA
+        return false;
+    }
+
+
+    // VERIFICAR SE É EDITÁVEL
+    public function isEditable(): bool { return true; }
+
+    public function isActivatable()
+    {
+        return $this->estado === self::ESTADO_ENCERRADA;
+    }
+
+    // VERIFICAR SE PODE SER ENCERRADA
+    public function isClosable(): bool {
+        return $this->estado === self::ESTADO_ATIVA && !$this->hasSessoesAtivas();
+    }
+
     /**
      * Gets query for [[AluguerSalas]].
      *
@@ -109,7 +158,6 @@ class Sala extends \yii\db\ActiveRecord
         return $this->hasMany(Sessao::class, ['sala_id' => 'id']);
     }
 
-
     /**
      * column estado ENUM value labels
      * @return string[]
@@ -120,21 +168,6 @@ class Sala extends \yii\db\ActiveRecord
             self::ESTADO_ATIVA => 'Ativa',
             self::ESTADO_ENCERRADA => 'Encerrada',
         ];
-    }
-
-    // OBTER ESTADO FORMATADO (PARA /INDEX E /VIEW)
-    public function getEstadoFormatado(): string
-    {
-        $labels = self::optsEstado();
-        $label = $labels[$this->estado] ?? 'Desconhecida';
-
-        $colors = [
-            self::ESTADO_ATIVA => '',
-            self::ESTADO_ENCERRADA => 'text-danger',
-        ];
-
-        $class = $colors[$this->estado] ?? 'text-secondary';
-        return "<span class='{$class}'>{$label}</span>";
     }
 
     /**

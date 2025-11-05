@@ -88,6 +88,42 @@ class Cinema extends \yii\db\ActiveRecord
         ];
     }
 
+    // OBTER ESTADO FORMATADO (/INDEX E /VIEW)
+    public function getEstadoFormatado(): string
+    {
+        $labels = self::optsEstado();
+        $label = $labels[$this->estado] ?? 'Desconhecido';
+
+        $colors = [
+            self::ESTADO_ATIVO => '',
+            self::ESTADO_ENCERRADO => 'text-danger',
+        ];
+
+        $class = $colors[$this->estado] ?? 'text-secondary';
+        return "<span class='{$class}'>{$label}</span>";
+    }
+
+    // OBTER O NÚMERO DA PRÓXIMA SALA A SER CRIADA (SALA/CREATE)
+    public static function getProximoNumeroPorCinema(): array
+    {
+        $array = [];
+
+        // OBTER CINEMAS
+        $cinemas = self::find()->all();
+
+        foreach ($cinemas as $cinema)
+        {
+            // PARA CADA CINEMA --> OBTER O MAIOR NÚMERO DE TODAS AS SUAS SALAS
+            $ultimoNumero = Sala::find()->where(['cinema_id' => $cinema->id])->max('numero');
+
+            // NÚMERO PARA SALA NOVA == ÚLTIMO NÚMERO + 1
+            $array[$cinema->id] = $ultimoNumero ? $ultimoNumero + 1 : 1; // :1 --> PARA PRIMEIRA SALA
+        }
+
+        return $array;
+    }
+
+
     /**
      * Gets query for [[Gerente]].
      *
@@ -139,21 +175,6 @@ class Cinema extends \yii\db\ActiveRecord
             self::ESTADO_ATIVO => 'Ativo',
             self::ESTADO_ENCERRADO => 'Encerrado',
         ];
-    }
-
-    // OBTER ESTADO FORMATADO (PARA /INDEX E /VIEW)
-    public function getEstadoFormatado(): string
-    {
-        $labels = self::optsEstado();
-        $label = $labels[$this->estado] ?? 'Desconhecido';
-
-        $colors = [
-            self::ESTADO_ATIVO => '',
-            self::ESTADO_ENCERRADO => 'text-danger',
-        ];
-
-        $class = $colors[$this->estado] ?? 'text-secondary';
-        return "<span class='{$class}'>{$label}</span>";
     }
 
     /**

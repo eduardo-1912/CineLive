@@ -4,10 +4,10 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\Bilhete */
+/* @var $model common\models\AluguerSala */
 
 $this->title = $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Bilhetes', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Aluguer Salas', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
@@ -31,12 +31,14 @@ $this->params['breadcrumbs'][] = $this->title;
                         'model' => $model,
                         'attributes' => [
                             'id',
-                            'compra_id',
-                            'sessao_id',
-                            'lugar',
-                            'preco',
-                            'codigo',
+                            'cliente_id',
+                            'sala_id',
+                            'data',
+                            'hora_inicio',
+                            'hora_fim',
                             'estado',
+                            'tipo_evento',
+                            'observacoes:ntext',
                         ],
                     ]) ?>
                 </div>

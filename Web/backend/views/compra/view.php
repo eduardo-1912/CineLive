@@ -1,5 +1,6 @@
 <?php
 
+use backend\components\ActionColumnButtonHelper;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
@@ -10,6 +11,11 @@ $this->title = $model->id;
 $this->params['breadcrumbs'][] = ['label' => 'Compras', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
+
+$currentUser = Yii::$app->user;
+$isAdmin = $currentUser->can('admin');
+$gerirCompras = $currentUser->can('gerirCompras');
+
 ?>
 
 <div class="container-fluid">
@@ -18,23 +24,46 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="row">
                 <div class="col-md-12">
                     <p>
-                        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-                        <?= Html::a('Delete', ['delete', 'id' => $model->id], [
-                            'class' => 'btn btn-danger',
-                            'data' => [
-                                'confirm' => 'Are you sure you want to delete this item?',
-                                'method' => 'post',
-                            ],
-                        ]) ?>
+                        <?php if ($gerirCompras): ?>
+                            <?= Html::a('Editar', ['update', 'id' => $model->id], ['class' => 'btn btn-warning']) ?>
+                        <?php endif; ?>
+                        <?= Html::a('Sessão', ['sessao/view', 'id' => $model->getBilhetes()->one()->sessao->id], ['class' => 'btn btn-success']) ?>
                     </p>
+
                     <?= DetailView::widget([
                         'model' => $model,
                         'attributes' => [
                             'id',
-                            'cliente_id',
-                            'data',
-                            'pagamento',
-                            'estado',
+                            [
+                                'attribute' => 'cliente',
+                                'value' => function ($model) {
+                                    return Html::a($model->cliente->profile->nome, ['user/view', 'id' => $model->cliente->id]);
+                                },
+                                'format' => 'raw',
+                            ],
+                            'dataFormatada',
+                            [
+                                'attribute' => 'total',
+                                'value' => fn($model) => $model->totalFormatado . '€',
+                            ],
+                            [
+                                'attribute' => 'pagamento',
+                                'value' => fn($model) => $model->displayPagamento(),
+                            ],
+                            [
+                                'attribute' => 'estado',
+                                'value' => fn($model) => $model->estadoFormatado,
+                                'format' => 'raw',
+                            ],
+                            [
+                                'attribute' => 'nomeCinema',
+                                'format' => 'raw',
+                                'value' => function ($model) {
+                                    return Html::a($model->cinema->nome, ['cinema/view', 'id' => $model->cinema->id],
+                                        ['class' => 'text-decoration-none text-primary']);
+                                },
+                                'visible' => $isAdmin,
+                            ],
                         ],
                     ]) ?>
                 </div>
@@ -45,4 +74,19 @@ $this->params['breadcrumbs'][] = $this->title;
         <!--.card-body-->
     </div>
     <!--.card-->
+
+    <?php if ($model->bilhetes): ?>
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <?= $this->render('_bilhetes', [
+                            'dataProvider' => $bilhetesDataProvider,
+                            'compra' => $model,
+                        ]) ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
 </div>

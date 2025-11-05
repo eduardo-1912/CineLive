@@ -2,6 +2,7 @@
 
 namespace backend\models;
 
+use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\models\Compra;
@@ -11,6 +12,12 @@ use common\models\Compra;
  */
 class CompraSearch extends Compra
 {
+    public $nomeCliente;
+    public $cinema_id;
+    public $nomeCinema;
+    public $total;
+
+
     /**
      * {@inheritdoc}
      */
@@ -18,7 +25,8 @@ class CompraSearch extends Compra
     {
         return [
             [['id', 'cliente_id'], 'integer'],
-            [['data', 'pagamento', 'estado'], 'safe'],
+            [['total'], 'number'],
+            [['data', 'pagamento', 'estado', 'nomeCliente', 'nomeCinema'], 'safe'],
         ];
     }
 
@@ -40,13 +48,21 @@ class CompraSearch extends Compra
      */
     public function search($params)
     {
-        $query = Compra::find();
-
-        // add conditions that should always apply here
+        $query = Compra::find()->joinWith(['cliente.profile', 'bilhetes.sessao.cinema']);
+        $query->groupBy('compra.id');
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination' => [
+                'pageSize' => Yii::$app->params['pageSize'],
+            ],
         ]);
+
+        // PERMITIR ORDENAR POR NOME DO CLIENTE
+        $dataProvider->sort->attributes['nomeCliente'] = [
+            'asc' => ['user.username' => SORT_ASC],
+            'desc' => ['user.username' => SORT_DESC],
+        ];
 
         $this->load($params);
 
@@ -64,7 +80,11 @@ class CompraSearch extends Compra
         ]);
 
         $query->andFilterWhere(['like', 'pagamento', $this->pagamento])
-            ->andFilterWhere(['like', 'estado', $this->estado]);
+            ->andFilterWhere(['like', 'compra.estado', $this->estado])
+            ->andFilterWhere(['like', 'user_profile.nome', $this->nomeCliente])
+            ->andFilterWhere(['cinema.id' => $this->nomeCinema]);
+
+        $query->andFilterHaving(['>=', 'SUM(bilhete.preco)', $this->total]);
 
         return $dataProvider;
     }

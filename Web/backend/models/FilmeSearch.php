@@ -51,6 +51,9 @@ class FilmeSearch extends Filme
             'pagination' => [
                 'pageSize' => Yii::$app->params['pageSize'],
             ],
+            'sort' => [
+                'defaultOrder' => ['estado' => SORT_ASC],
+            ],
         ]);
 
         $this->load($params, $formName);

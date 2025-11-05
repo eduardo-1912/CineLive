@@ -5,6 +5,7 @@ use backend\components\AppGridView;
 use common\models\Cinema;
 use common\models\Filme;
 use common\models\Sala;
+use common\models\Sessao;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\grid\GridView;
@@ -13,13 +14,15 @@ use yii\grid\GridView;
 /* @var $searchModel backend\models\SessaoSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
+$this->title = 'Sessões';
+$this->params['breadcrumbs'][] = $this->title;
+
 $currentUser = Yii::$app->user;
 $isAdmin = $currentUser->can('admin');
 $gerirSessoes = $currentUser->can('gerirSessoes');
 
-$this->title = 'Sessões';
-$this->params['breadcrumbs'][] = $this->title;
 ?>
+
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-12">
@@ -38,6 +41,9 @@ $this->params['breadcrumbs'][] = $this->title;
                     <?= AppGridView::widget([
                         'dataProvider' => $dataProvider,
                         'filterModel' => $searchModel,
+                        'pager' => [
+                            'class' => 'yii\bootstrap4\LinkPager',
+                        ],
                         'columns' => [
                             [
                                 'attribute' => 'id',
@@ -46,20 +52,45 @@ $this->params['breadcrumbs'][] = $this->title;
                             [
                                 'attribute' => 'tituloFilme',
                                 'label' => 'Filme',
-                                'value' => 'filme.titulo',
+                                'format' => 'raw',
+                                'value' => function ($model) {
+                                    return Html::a(Html::encode($model->filme->titulo),
+                                    ['filme/view', 'id' => $model->filme_id],
+                                    ['class' => 'text-decoration-none text-primary']);
+                                },
                                 'filter' => ArrayHelper::map(Filme::find()->where(['estado' => Filme::ESTADO_EM_EXIBICAO])
                                             ->orderBy('titulo')->all(), 'titulo', 'titulo'),
-                                'filterInputOptions' => [
-                                    'class' => 'form-control',
-                                    'prompt' => 'Todos',
-                                ],
+                                'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
+                                'headerOptions' => ['style' => 'width: 18rem;'],
+
                             ],
                             [
                                 'attribute' => 'cinema_id',
-                                'value' => 'cinema.nome',
-                                'filter' => ArrayHelper::map(Cinema::find()->orderBy('nome')->asArray()->all(), 'id', 'nome'),
+                                'format' => 'raw',
+                                'value' => function ($model) {
+                                    return Html::a(
+                                        Html::encode($model->cinema->nome),
+                                        ['cinema/view', 'id' => $model->cinema_id],
+                                        ['class' => 'text-decoration-none text-primary']
+                                    );
+                                },
+                                'filter' => ArrayHelper::map(Cinema::find()->asArray()->all(), 'id', 'nome'),
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
+                                'headerOptions' => ['style' => 'width: 28rem;'],
                                 'visible' => $isAdmin,
+                            ],
+                            [
+                                'attribute' => 'numeroSala',
+                                'label' => 'Sala',
+                                'format' => 'raw',
+                                'value' => function ($model) {
+                                    return Html::a(
+                                        Html::encode($model->sala->nome),
+                                        ['sala/view', 'id' => $model->sala_id],
+                                        ['class' => 'text-decoration-none text-primary']
+                                    );
+                                },
+                                'headerOptions' => ['style' => 'width: 8rem;'],
                             ],
                             [
                                 'attribute' => 'data',
@@ -69,7 +100,6 @@ $this->params['breadcrumbs'][] = $this->title;
                                     'type' => 'date',
                                 ],
                             ],
-
                             [
                                 'attribute' => 'hora_inicio',
                                 'value' => 'horaInicioFormatada',
@@ -87,34 +117,25 @@ $this->params['breadcrumbs'][] = $this->title;
                                 ],
                             ],
                             [
-                                'attribute' => 'numeroSala',
-                                'label' => 'Sala',
+                                'label' => 'Lugares Disponíveis',
+                                'attribute' => 'lugaresDisponiveis',
                                 'value' => function ($model) {
-                                    return 'Sala ' . $model->sala->numero;
+                                    return $model->numeroLugaresDisponiveis . '/' . $model->sala->lugares;
                                 },
                             ],
                             [
-                                'label' => 'Lugares Ocupados',
-                                'value' => function ($model) {
-                                    return count($model->lugaresOcupados);
-                                },
-                            ],
-                            [
-                                'label' => 'Lugares Totais',
-                                'value' => function ($model) {
-                                    return $model->sala->lugares;
-                                },
+                                'attribute' => 'estado',
+                                'value' => 'estadoFormatado',
+                                'format' => 'raw',
+                                'filter' => Sessao::optsEstado(),
+                                'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
+                                'headerOptions' => ['style' => 'width: 10rem;'],
                             ],
                             [
                                 'class' => 'backend\components\AppActionColumn',
-                                'template' => '{view} {update} {hardDelete}',
-                                'buttons' => ActionColumnButtonHelper::sessaoButtons(),
+                                'template' => '{view} {update} {delete}',
                             ],
                         ],
-                        'summaryOptions' => ['class' => 'summary mb-2'],
-                        'pager' => [
-                            'class' => 'yii\bootstrap4\LinkPager',
-                        ]
                     ]); ?>
 
 

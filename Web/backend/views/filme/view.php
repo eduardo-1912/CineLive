@@ -20,28 +20,25 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="col-md-12">
                     <div class="d-flex mb-3 gap-1">
                         <?php if (Yii::$app->user->can('admin')): ?>
-
                             <?= Html::a('Editar', ['update', 'id' => $model->id], ['class' => 'btn btn-warning']) ?>
-                            <?php if (!$model->getSessaos()->exists()): ?>
-                                <?= Html::a('<i class="fas fa-skull mr-1"></i> Eliminar', ['delete', 'id' => $model->id], [
-                                    'class' => 'btn btn-danger',
-                                    'title' => 'Eliminar',
-                                    'data' => [
-                                        'confirm' => 'Tem a certeza que quer eliminar este filme permanentemente? Esta ação não pode ser desfeita!',
-                                        'method' => 'post',
-                                    ],
-                                ]) ?>
+
+                            <?php if ($model->estado == $model::ESTADO_EM_EXIBICAO): ?>
+                                <?= Html::a('Criar Sessão', ['sessao/create', 'filme_id' => $model->id], [
+                                    'class' => 'btn btn-success',
+                                    'title' => 'Criar Sessão',
+                                    'data-method' => 'post',
+                                ]); ?>
                             <?php endif; ?>
 
                             <div class="btn-group">
                                 <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <?= ucfirst($model->estado) ?>
+                                    <?= $model->displayEstado() ?>
                                 </button>
                                 <ul class="dropdown-menu">
                                     <?php foreach (Filme::optsEstado() as $estado => $label): ?>
                                         <?php if ($estado !== $model->estado):?>
                                             <li>
-                                                <?= Html::a($label, ['change-state', 'id' => $model->id, 'estado' => $estado], [
+                                                <?= Html::a($label, ['change-status', 'id' => $model->id, 'estado' => $estado], [
                                                     'class' => 'dropdown-item',
                                                     'data' => [
                                                         'method' => 'post',
@@ -54,8 +51,16 @@ $this->params['breadcrumbs'][] = $this->title;
                                 </ul>
                             </div>
 
-
-
+                            <?php if (!$model->getSessaos()->exists()): ?>
+                                <?= Html::a('Eliminar', ['delete', 'id' => $model->id], [
+                                    'class' => 'btn btn-danger',
+                                    'title' => 'Eliminar',
+                                    'data' => [
+                                        'confirm' => 'Tem a certeza que quer eliminar este filme permanentemente? Esta ação não pode ser desfeita!',
+                                        'method' => 'post',
+                                    ],
+                                ]) ?>
+                            <?php endif; ?>
                         <?php endif; ?>
 
                     </div>
@@ -73,6 +78,11 @@ $this->params['breadcrumbs'][] = $this->title;
                             'realizacao',
                             'trailer_url:url',
                             [
+                                'attribute' => 'estado',
+                                'value' => fn($model) => $model->estadoFormatado,
+                                'format' => 'raw',
+                            ],
+                            [
                                 'attribute' => 'poster_path',
                                 'format' => 'raw',
                                 'value' => function ($model) {
@@ -84,11 +94,6 @@ $this->params['breadcrumbs'][] = $this->title;
                                     }
                                     return Html::tag('span', 'Sem poster', ['class' => 'text-muted']);
                                 },
-                            ],
-                            [
-                                'attribute' => 'estado',
-                                'value' => fn($model) => $model->estadoFormatado,
-                                'format' => 'raw',
                             ],
                         ],
                     ]) ?>

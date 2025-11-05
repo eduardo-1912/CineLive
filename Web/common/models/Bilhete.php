@@ -62,11 +62,11 @@ class Bilhete extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'compra_id' => 'Compra ID',
-            'sessao_id' => 'Sessao ID',
+            'compra_id' => 'Compra',
+            'sessao_id' => 'Sessào',
             'lugar' => 'Lugar',
-            'preco' => 'Preco',
-            'codigo' => 'Codigo',
+            'preco' => 'Preço',
+            'codigo' => 'Código',
             'estado' => 'Estado',
         ];
     }

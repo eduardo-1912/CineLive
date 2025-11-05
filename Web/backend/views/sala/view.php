@@ -27,7 +27,7 @@ $this->params['breadcrumbs'][] = $model->numero;
                         <?php if($gerirSalas): ?>
                             <?= Html::a('Editar', ['update', 'id' => $model->id], ['class' => 'btn btn-warning']) ?>
 
-                            <?php if($model->estado == $model::ESTADO_ATIVA): ?>
+                            <?php if($model->estado == $model::ESTADO_ATIVA && $model->isClosable()): ?>
                                 <?= Html::a('Encerrar', ['deactivate', 'id' => $model->id], [
                                     'class' => 'btn btn-danger',
                                     'data' => [

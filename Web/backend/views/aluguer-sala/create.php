@@ -1,12 +1,13 @@
 <?php
 
-/* @var $this yii\web\View */
-/* @var $model common\models\Bilhete */
+use yii\helpers\Html;
 
-$this->title = 'Update Bilhete: ' . $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Bilhetes', 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
-$this->params['breadcrumbs'][] = 'Update';
+/* @var $this yii\web\View */
+/* @var $model common\models\AluguerSala */
+
+$this->title = 'Create Aluguer Sala';
+$this->params['breadcrumbs'][] = ['label' => 'Aluguer Salas', 'url' => ['index']];
+$this->params['breadcrumbs'][] = $this->title;
 ?>
 
 <div class="container-fluid">

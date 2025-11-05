@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use Exception;
 use Yii;
 
 /**
@@ -60,11 +61,70 @@ class Compra extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'cliente_id' => 'Cliente ID',
+            'cliente_id' => 'Cliente',
             'data' => 'Data',
             'pagamento' => 'Pagamento',
             'estado' => 'Estado',
+            'dataFormatada' => 'Data',
+            'nomeCinema' => 'Cinema',
         ];
+    }
+
+    public function isEditable() { return true; }
+
+    public function getDataFormatada(): string
+    {
+        if (empty($this->data)) {
+            return '-';
+        }
+
+        try {
+            return Yii::$app->formatter->asDate($this->data, 'php:d/m/Y');
+        }
+        catch (Exception $e) {
+            return $this->data;
+        }
+    }
+
+    // OBTER SESSÕES
+    public function getSessoes()
+    {
+        return $this->hasMany(Sessao::class, ['id' => 'sessao_id'])->via('bilhetes');
+    }
+
+    // OBTER CINEMAS
+    public function getCinema()
+    {
+        return $this->hasOne(Cinema::class, ['id' => 'cinema_id'])
+            ->via('sessoes');
+    }
+
+    // OBTER TOTAL DA COMPRA
+    public function getTotal(): float
+    {
+        $total = $this->getBilhetes()->sum('preco') ?? 0;
+        return round((float) $total, 2);
+    }
+
+    public function getTotalFormatado(): string
+    {
+        return number_format($this->total, 2, '.', '');
+    }
+
+    // OBTER ESTADO FORMATADO
+    public function getEstadoFormatado(): string
+    {
+        $labels = self::optsEstado();
+        $label = $labels[$this->estado] ?? 'Desconhecida';
+
+        $colors = [
+            self::ESTADO_PENDENTE => 'text-secondary font-italic',
+            self::ESTADO_CONFIRMADA => '',
+            self::ESTADO_CANCELADA => 'text-danger',
+        ];
+
+        $class = $colors[$this->estado] ?? 'text-secondary';
+        return "<span class='{$class}'>{$label}</span>";
     }
 
     /**
@@ -87,7 +147,6 @@ class Compra extends \yii\db\ActiveRecord
         return $this->hasOne(User::class, ['id' => 'cliente_id']);
     }
 
-
     /**
      * column pagamento ENUM value labels
      * @return string[]
@@ -95,9 +154,9 @@ class Compra extends \yii\db\ActiveRecord
     public static function optsPagamento()
     {
         return [
-            self::PAGAMENTO_MBWAY => 'mbway',
-            self::PAGAMENTO_CARTAO => 'cartao',
-            self::PAGAMENTO_MULTIBANCO => 'multibanco',
+            self::PAGAMENTO_MBWAY => 'MBWAY',
+            self::PAGAMENTO_CARTAO => 'Cartão',
+            self::PAGAMENTO_MULTIBANCO => 'Multibanco',
         ];
     }
 
@@ -108,9 +167,9 @@ class Compra extends \yii\db\ActiveRecord
     public static function optsEstado()
     {
         return [
-            self::ESTADO_PENDENTE => 'pendente',
-            self::ESTADO_CONFIRMADA => 'confirmada',
-            self::ESTADO_CANCELADA => 'cancelada',
+            self::ESTADO_PENDENTE => 'Pendente',
+            self::ESTADO_CONFIRMADA => 'Confirmada',
+            self::ESTADO_CANCELADA => 'Cancelada',
         ];
     }
 
