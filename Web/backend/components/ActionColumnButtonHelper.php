@@ -133,19 +133,27 @@ class ActionColumnButtonHelper
     public static function compraButtons()
     {
         return [
-            'sessao' => function ($url, $model) {
-                $sessao = $model->getBilhetes()->one()->sessao;
-
-                if (!$sessao) { return ''; }
-
-                return Html::a(
-                    '<i class="fas fa-calendar-day"></i>',
-                    ['sessao/view', 'id' => $sessao->id],
-                    [
-                        'class' => 'btn btn-sm btn-secondary',
-                        'title' => 'Ver Sessão',
-                    ]
-                );
+            'cancel' => function ($url, $model) {
+                if (!$model->isEstadoCancelada()) {
+                    return Html::a('<i class="fas fa-ban"></i>', ['change-status', 'id' => $model->id, 'estado' => $model::ESTADO_CANCELADA], [
+                        'class' => 'btn btn-sm btn-danger',
+                        'title' => 'Cancelar Compra',
+                        'data-confirm' => 'Tem a certeza que quer cancelar esta compra?',
+                        'data-method' => 'post',
+                    ]);
+                }
+                return '';
+            },
+            'confirm' => function ($url, $model) {
+                if (!$model->isEstadoConfirmada()) {
+                    return Html::a('<i class="fas fa-check"></i>', ['change-status', 'id' => $model->id, 'estado' => $model::ESTADO_CONFIRMADA], [
+                        'class' => 'btn btn-sm ' . ($model->isEstadoPendente() ? 'btn-success' : ' btn-secondary disabled'),
+                        'title' => 'Confirmar Compra',
+                        'data-confirm' => 'Tem a certeza que quer confirmar esta compra?',
+                        'data-method' => 'post',
+                    ]);
+                }
+                return '';
             },
         ];
     }

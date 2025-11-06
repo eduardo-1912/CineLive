@@ -17,7 +17,7 @@ class BilheteSearch extends Bilhete
     public function rules()
     {
         return [
-            [['id', 'compra_id', 'sessao_id'], 'integer'],
+            [['id', 'compra_id'], 'integer'],
             [['lugar', 'codigo', 'estado'], 'safe'],
             [['preco'], 'number'],
         ];
@@ -61,7 +61,6 @@ class BilheteSearch extends Bilhete
         $query->andFilterWhere([
             'id' => $this->id,
             'compra_id' => $this->compra_id,
-            'sessao_id' => $this->sessao_id,
             'preco' => $this->preco,
         ]);
 

@@ -42,8 +42,8 @@ class Bilhete extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['compra_id', 'sessao_id', 'lugar', 'preco', 'codigo', 'estado'], 'required'],
-            [['compra_id', 'sessao_id'], 'integer'],
+            [['compra_id', 'lugar', 'preco', 'codigo', 'estado'], 'required'],
+            [['compra_id'], 'integer'],
             [['preco'], 'number'],
             [['estado'], 'string'],
             [['lugar'], 'string', 'max' => 3],
@@ -63,7 +63,6 @@ class Bilhete extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'compra_id' => 'Compra',
-            'sessao_id' => 'Sessào',
             'lugar' => 'Lugar',
             'preco' => 'Preço',
             'codigo' => 'Código',
@@ -80,17 +79,6 @@ class Bilhete extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Compra::class, ['id' => 'compra_id']);
     }
-
-    /**
-     * Gets query for [[Sessao]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getSessao()
-    {
-        return $this->hasOne(Sessao::class, ['id' => 'sessao_id']);
-    }
-
 
     /**
      * column estado ENUM value labels

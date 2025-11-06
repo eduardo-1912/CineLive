@@ -69,8 +69,8 @@ class CompraController extends Controller
         $model = $this->findModel($id);
 
         $bilhetesDataProvider = new \yii\data\ActiveDataProvider([
-            'query' => $model->getBilhetes()->joinWith(['sessao.filme', 'sessao.cinema']),
-            'pagination' => false, // opcional: mostra todos
+            'query' => $model->getBilhetes(),
+            'pagination' => false,
         ]);
 
         return $this->render('view', [

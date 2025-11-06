@@ -4,6 +4,7 @@ use backend\components\ActionColumnButtonHelper;
 use backend\components\AppGridView;
 use common\models\Cinema;
 use common\models\Compra;
+use common\models\Sessao;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\grid\GridView;
@@ -55,10 +56,16 @@ $isAdmin = $currentUser->can('admin');
                                 'filterInputOptions' => ['class' => 'form-control', 'type' => 'number',],
                             ],
                             [
-                                'attribute' => 'pagamento',
-                                'value' => fn($model) => $model->displayPagamento(),
-                                'filter' => Compra::optsPagamento(),
-                                'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos',],
+                                'attribute' => 'sessao_id',
+                                'format' => 'raw',
+                                'value' => function ($model) {
+                                    return Html::a(
+                                        Html::encode("Sessão #{$model->sessao->id}"),
+                                        ['sessao/view', 'id' => $model->sessao->id],
+                                        ['class' => 'text-decoration-none text-primary']
+                                    );
+                                },
+
                             ],
                             [
                                 'attribute' => 'nomeCinema',
@@ -81,13 +88,13 @@ $isAdmin = $currentUser->can('admin');
                                 'format' => 'raw',
                                 'filter' => Compra::optsEstado(),
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
-                                'value' => fn($model) => \backend\components\ActionColumnButtonHelper::compraEstadoDropdown($model),
-                                'headerOptions' => ['style' => 'width: 100px;'],
+                                'value' => fn($model) => $model->estadoFormatado,
+                                'headerOptions' => ['style' => 'width: 9rem'],
                             ],
 
                             [
                                 'class' => 'backend\components\AppActionColumn',
-                                'template' => '{view} {sessao}',
+                                'template' => '{view} {cancel} {confirm}',
                                 'buttons' => ActionColumnButtonHelper::compraButtons(),
                                 'headerOptions' => ['style' => 'width: 3rem'],
                             ],

@@ -44,8 +44,8 @@ class Compra extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['cliente_id', 'pagamento', 'estado'], 'required'],
-            [['cliente_id'], 'integer'],
+            [['cliente_id', 'sessao_id', 'pagamento', 'estado'], 'required'],
+            [['cliente_id', 'sessao_id'], 'integer'],
             [['data'], 'safe'],
             [['pagamento', 'estado'], 'string'],
             ['pagamento', 'in', 'range' => array_keys(self::optsPagamento())],
@@ -62,6 +62,7 @@ class Compra extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'cliente_id' => 'Cliente',
+            'sessao_id' => 'Sessão',
             'data' => 'Data de Compra',
             'pagamento' => 'Pagamento',
             'estado' => 'Estado',
@@ -87,16 +88,16 @@ class Compra extends \yii\db\ActiveRecord
     }
 
     // OBTER SESSÕES
-    public function getSessoes()
+    public function getSessao()
     {
-        return $this->hasMany(Sessao::class, ['id' => 'sessao_id'])->via('bilhetes');
+        return $this->hasOne(Sessao::class, ['id' => 'sessao_id']);
     }
+
 
     // OBTER CINEMAS
     public function getCinema()
     {
-        return $this->hasOne(Cinema::class, ['id' => 'cinema_id'])
-            ->via('sessoes');
+        return $this->hasOne(Cinema::class, ['id' => 'cinema_id'])->via('sessao');
     }
 
     // OBTER TOTAL DA COMPRA

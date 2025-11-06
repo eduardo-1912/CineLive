@@ -77,22 +77,15 @@ $gerirCompras = $currentUser->can('gerirCompras');
                                 },
                                 'format' => 'raw',
                             ],
-
                             [
                                 'attribute' => 'sessao_id',
                                 'label' => 'Sessão',
                                 'format' => 'raw',
-                                'value' => function ($model) {
-                                    $bilhete = $model->getBilhetes()->one();
-                                    if ($bilhete && $bilhete->sessao) {
-                                        return Html::a(
-                                            $bilhete->sessao->nome,
-                                            ['sessao/view', 'id' => $bilhete->sessao->id],
-                                            ['class' => 'text-decoration-none text-primary']
-                                        );
-                                    }
-                                    return '-';
-                                },
+                                'value' => fn($model) => Html::a(
+                                    $model->sessao->nome,
+                                    ['sessao/view', 'id' => $model->sessao->id],
+                                    ['class' => 'text-decoration-none text-primary']
+                                ),
                             ],
                             'dataFormatada',
                             [

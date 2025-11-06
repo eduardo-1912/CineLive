@@ -24,7 +24,7 @@ class CompraSearch extends Compra
     public function rules()
     {
         return [
-            [['id', 'cliente_id'], 'integer'],
+            [['id', 'cliente_id', 'sessao_id'], 'integer'],
             [['total'], 'number'],
             [['data', 'pagamento', 'estado', 'nomeCliente', 'nomeCinema'], 'safe'],
         ];
@@ -48,7 +48,7 @@ class CompraSearch extends Compra
      */
     public function search($params)
     {
-        $query = Compra::find()->joinWith(['cliente.profile', 'bilhetes.sessao.cinema']);
+        $query = Compra::find()->joinWith(['cliente.profile', 'sessao.cinema']);
         $query->groupBy('compra.id');
 
         $dataProvider = new ActiveDataProvider([
@@ -76,6 +76,7 @@ class CompraSearch extends Compra
         $query->andFilterWhere([
             'id' => $this->id,
             'cliente_id' => $this->cliente_id,
+            'compra.sessao_id' => $this->sessao_id,
             'data' => $this->data,
         ]);
 
