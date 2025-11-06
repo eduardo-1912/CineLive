@@ -3,9 +3,9 @@
 /* @var $this yii\web\View */
 /* @var $model common\models\Sessao */
 
-$this->title = 'Sessão de ' . $model->filme->titulo;
+$this->title = 'Editar: ' . $model->nome;
 $this->params['breadcrumbs'][] = ['label' => 'Sessões', 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->filme->titulo, 'url' => ['view', 'id' => $model->id]];
+$this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = 'Editar';
 ?>
 

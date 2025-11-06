@@ -17,6 +17,8 @@ $userCinemaId = $currentUser->identity->profile->cinema_id ?? null;
 // VERIFICAR SE SALA TEM SESSÕES ATIVAS
 $temBilhetes = $model->hasSessoesAtivas();
 
+$isNewRecord = $model->isNewRecord ? 'true' : 'false';
+
 // ARRAY COM PRÓXIMO NÚMERO DA SALA PARA CADA CINEMA
 $arrayProximosNumeros = json_encode(Cinema::getProximoNumeroPorCinema());
 
@@ -71,6 +73,7 @@ $script = <<<JS
 
     // OBTER ARRAY COM PRÓXIMOS NÚMEROS DE SALA
     const proximosNumeros = $arrayProximosNumeros;
+    const isNewRecord = $isNewRecord;
 
     // FUNÇÃO PARA MOSTRAR O CAMPO NÚMERO SE ALGUM CINEMA ESTIVER SELECIONADO
     function toggleNumeroField()
@@ -84,9 +87,11 @@ $script = <<<JS
             $('#formFieldNumero').hide();
             $('#sala-numero').val('');
         }
-        else
+        
+        $('#formFieldNumero').show();
+        
+        if (isNewRecord)
         {
-            $('#formFieldNumero').show();
             var proximoNumero = proximosNumeros[cinemaId] || 1;
             $('#sala-numero').val(proximoNumero);
         }

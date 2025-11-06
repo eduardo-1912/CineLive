@@ -32,7 +32,6 @@ $this->registerJsFile($publishedRes[1].'/control_sidebar.js', ['depends' => '\ha
     <title><?= Yii::$app->user->identity->profile->cinema->nome ?? Yii::$app->name ?> | <?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
 
-
     <!-- FAVICON (LIGHT-MODE) -->
     <link rel="icon" type="image/svg+xml" href="<?= Yii::getAlias('@web') ?>/favicon-light.svg" media="(prefers-color-scheme: light)">
 

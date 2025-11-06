@@ -205,9 +205,9 @@ class Filme extends \yii\db\ActiveRecord
         $label = $labels[$this->estado] ?? 'Desconhecida';
 
         $colors = [
-            self::ESTADO_BREVEMENTE => '',
-            self::ESTADO_EM_EXIBICAO => 'text-primary',
-            self::ESTADO_TERMINADO => 'text-danger',
+            self::ESTADO_BREVEMENTE => 'text-secondary',
+            self::ESTADO_EM_EXIBICAO => '',
+            self::ESTADO_TERMINADO => 'text-secondary font-italic',
         ];
 
         $class = $colors[$this->estado] ?? 'text-secondary';

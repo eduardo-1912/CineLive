@@ -54,7 +54,7 @@ class SessaoController extends Controller
      * Lists all Sessao models.
      * @return mixed
      */
-    public function actionIndex()
+    public function actionIndex($cinema_id = null)
     {
         // OBTER O USER ATUAL
         $user = Yii::$app->user;
@@ -71,6 +71,9 @@ class SessaoController extends Controller
 
         // SE FOR ADMIN --> VÊ TODOS OS UTILIZADORES
         if ($user->can('admin')) {
+            if ($cinema_id !== null) {
+                $params['SessaoSearch']['cinema_id'] = $cinema_id;
+            }
             $dataProvider = $searchModel->search($params);
         }
 
@@ -84,6 +87,10 @@ class SessaoController extends Controller
                 throw new ForbiddenHttpException('Não está associado a nenhum cinema.');
             }
 
+            if ($cinema_id !== null) {
+                $this->redirect(['index']);
+            }
+
             // APLICAR FILTRO DE CINEMA
             $params['SessaoSearch']['cinema_id'] = $userProfile->cinema_id;
             $dataProvider = $searchModel->search($params);
@@ -92,6 +99,7 @@ class SessaoController extends Controller
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'cinemaId' => $cinema_id,
         ]);
     }
 

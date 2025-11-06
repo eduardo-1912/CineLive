@@ -22,6 +22,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     <div class="row mb-2">
                         <div class="col-md-12">
                             <?= Html::a('Criar Cinema', ['create'], ['class' => 'btn btn-success']) ?>
+                            <?= Html::a('Salas', ['sala/index'], ['class' => 'btn btn-primary']) ?>
+                            <?= Html::a('Sessões', ['sessao/index'], ['class' => 'btn btn-secondary']) ?>
                         </div>
                     </div>
 
@@ -60,7 +62,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                             [
                                 'class' => 'backend\components\AppActionColumn',
-                                'template' => '{view} {update} {activate} {deactivate}',
+                                'template' => '{view} {update} {activate} {close}',
                                 'buttons' => ActionColumnButtonHelper::cinemaButtons(),
                             ],
                         ],

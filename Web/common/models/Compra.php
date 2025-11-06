@@ -62,10 +62,10 @@ class Compra extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'cliente_id' => 'Cliente',
-            'data' => 'Data',
+            'data' => 'Data de Compra',
             'pagamento' => 'Pagamento',
             'estado' => 'Estado',
-            'dataFormatada' => 'Data',
+            'dataFormatada' => 'Data de Compra',
             'nomeCinema' => 'Cinema',
         ];
     }

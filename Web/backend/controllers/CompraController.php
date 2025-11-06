@@ -20,6 +20,20 @@ class CompraController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => \yii\filters\AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['admin', 'gerente'],
+                    ],
+                    [
+                        'allow' => true,
+                        'roles' => ['funcionario'],
+                        'actions' => ['index', 'view'],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
@@ -66,57 +80,71 @@ class CompraController extends Controller
     }
 
 
-    /**
-     * Creates a new Compra model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    public function actionCreate()
-    {
-        $model = new Compra();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-
-        return $this->render('create', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * Updates an existing Compra model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param int $id ID
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionUpdate($id)
+    // MUDAR O ESTADO DA COMPRA
+    public function actionChangeStatus($id, $estado)
     {
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        // 🔒 Permissões
+        if (!Yii::$app->user->can('admin') && !Yii::$app->user->can('gerirCompras')) {
+            Yii::$app->session->setFlash('error', 'Não tem permissão para alterar o estado das compras.');
+            return $this->redirect(['index']);
         }
 
-        return $this->render('update', [
-            'model' => $model,
-        ]);
-    }
+        // ⚠️ Estados válidos
+        $estadosValidos = array_keys(\common\models\Compra::optsEstado());
+        if (!in_array($estado, $estadosValidos)) {
+            Yii::$app->session->setFlash('error', 'Estado inválido.');
+            return $this->redirect(['index']);
+        }
 
-    /**
-     * Deletes an existing Compra model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param int $id ID
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionDelete($id)
-    {
-        $this->findModel($id)->delete();
+        // 🚫 Se já estiver no estado pretendido
+        if ($model->estado === $estado) {
+            Yii::$app->session->setFlash('info', 'A compra já se encontra neste estado.');
+            return $this->redirect(['index']);
+        }
+
+        // 🚫 Impedir voltar a "pendente" se já estiver confirmada ou cancelada
+        if ($estado === \common\models\Compra::ESTADO_PENDENTE &&
+            in_array($model->estado, [\common\models\Compra::ESTADO_CONFIRMADA, \common\models\Compra::ESTADO_CANCELADA])) {
+            Yii::$app->session->setFlash('warning', 'Não é possível alterar uma compra confirmada ou cancelada para pendente.');
+            return $this->redirect(['index']);
+        }
+
+        // 🧾 Atualizar estado da compra
+        $model->estado = $estado;
+
+        if ($model->save(false, ['estado'])) {
+            // 🔄 Atualizar bilhetes associados
+            foreach ($model->bilhetes as $bilhete) {
+                if ($estado === \common\models\Compra::ESTADO_CANCELADA) {
+                    $bilhete->estado = \common\models\Bilhete::ESTADO_CANCELADO;
+                    $bilhete->save(false, ['estado']);
+                } elseif ($estado === \common\models\Compra::ESTADO_CONFIRMADA) {
+                    // Só confirmar bilhetes que estavam pendentes
+                    if ($bilhete->estado === \common\models\Bilhete::ESTADO_PENDENTE) {
+                        $bilhete->estado = \common\models\Bilhete::ESTADO_CONFIRMADO;
+                        $bilhete->save(false, ['estado']);
+                    }
+                }
+            }
+
+            // ✅ Mensagem de sucesso personalizada
+            $mensagem = match ($estado) {
+                \common\models\Compra::ESTADO_CONFIRMADA => 'Compra confirmada e bilhetes ativados com sucesso.',
+                \common\models\Compra::ESTADO_CANCELADA => 'Compra cancelada e bilhetes anulados.',
+                default => 'Estado da compra atualizado com sucesso.',
+            };
+            Yii::$app->session->setFlash('success', $mensagem);
+
+        } else {
+            Yii::$app->session->setFlash('error', 'Erro ao atualizar o estado da compra.');
+        }
 
         return $this->redirect(['index']);
     }
+
+
 
     /**
      * Finds the Compra model based on its primary key value.

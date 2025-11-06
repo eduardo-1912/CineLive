@@ -61,13 +61,6 @@ $isAdmin = $currentUser->can('admin');
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos',],
                             ],
                             [
-                                'attribute' => 'estado',
-                                'value' => fn($model) => $model->estadoFormatado,
-                                'format' => 'raw',
-                                'filter' => Compra::optsEstado(),
-                                'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos',],
-                            ],
-                            [
                                 'attribute' => 'nomeCinema',
                                 'label' => 'Cinema',
                                 'format' => 'raw',
@@ -83,9 +76,20 @@ $isAdmin = $currentUser->can('admin');
                                 'visible' => $isAdmin,
                             ],
                             [
+                                'attribute' => 'estado',
+                                'label' => 'Estado',
+                                'format' => 'raw',
+                                'filter' => Compra::optsEstado(),
+                                'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
+                                'value' => fn($model) => \backend\components\ActionColumnButtonHelper::compraEstadoDropdown($model),
+                                'headerOptions' => ['style' => 'width: 100px;'],
+                            ],
+
+                            [
                                 'class' => 'backend\components\AppActionColumn',
-                                'template' => '{view} {update} {sessao}',
+                                'template' => '{view} {sessao}',
                                 'buttons' => ActionColumnButtonHelper::compraButtons(),
+                                'headerOptions' => ['style' => 'width: 3rem'],
                             ],
                         ],
                     ]); ?>

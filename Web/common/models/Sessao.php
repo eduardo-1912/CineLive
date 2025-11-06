@@ -66,6 +66,12 @@ class Sessao extends \yii\db\ActiveRecord
             'cinema_id' => 'Cinema',
         ];
     }
+
+    // OBTER O NOME
+    public function getNome()
+    {
+        return 'Sessão #' . $this->id;
+    }
     
     // OBTER O ESTADO DA SESSÃO
     public function getEstado()
@@ -108,7 +114,7 @@ class Sessao extends \yii\db\ActiveRecord
         return "<span class='{$class}'>{$label}</span>";
     }
 
-    // OBTER ARRAY DE LUGARES OCUPADOS (Ex.: [A1, A2, A3])
+    // OBTER ARRAY DE LUGARES OCUPADOS
     public function getLugaresOcupados()
     {
         return $this->getBilhetes()
@@ -117,7 +123,7 @@ class Sessao extends \yii\db\ActiveRecord
             ->column();
     }
 
-    // OBTER ARRAY DE LUGARES CONFIRMADOS (Ex.: [A1, A2, A3])
+    // OBTER ARRAY DE LUGARES CONFIRMADOS
     public function getLugaresConfirmados()
     {
         return $this->getBilhetes()->select('lugar')
@@ -201,20 +207,18 @@ class Sessao extends \yii\db\ActiveRecord
             $abertura = new DateTime("{$this->data} {$cinema->horario_abertura}");
             $fecho = new DateTime("{$this->data} {$cinema->horario_fecho}");
 
-            // SE SESSÃO COMEÇA ANTES DA ABERTURA DO CINEMA --> MENSAGEM DE ERRO
             if ($dataHoraInicio < $abertura) {
                 Yii::$app->session->setFlash('error', "O cinema ainda não está aberto às {$cinema->horarioAberturaFormatado}.");
                 return false;
             }
 
-            // SE SESSÃO TERMINA DEPOIS DO FECHO DO CINEMA --> MENSAGEM DE ERRO
             if ($dataHoraFim > $fecho) {
                 Yii::$app->session->setFlash('error', "O cinema encerra às {$cinema->horarioFechoFormatado}. A sessão não pode ultrapassar esse horário.");
                 return false;
             }
         }
 
-        // OBTER SESSÕES QUE COINCIDAM NO MESMO HORÁRIO
+        // VERIFICAR CONFLITOS COM OUTRAS SESSÕES
         $sessoes = self::find()
             ->where(['sala_id' => $this->sala_id])
             ->andWhere(['data' => $this->data])
@@ -222,17 +226,36 @@ class Sessao extends \yii\db\ActiveRecord
                 ['<', 'hora_inicio', $this->hora_fim],
                 ['>', 'hora_fim', $this->hora_inicio]
             ])
-            ->andWhere(['!=', 'id', $this->id ?? 0]) // EVITAR CONFLITO COM A PRÓPRIA SESSÃO NO UPDATE
+            ->andWhere(['!=', 'id', $this->id ?? 0])
             ->exists();
 
-        // SE EXISTIREM SESSÕES SOBREPOSTAS --> MENSAGEM DE ERRO
         if ($sessoes) {
             Yii::$app->session->setFlash('error', 'Já existe uma sessão nesta sala que se sobrepõe a este horário.');
             return false;
         }
 
+        // VERIFICAR CONFLITOS COM ALUGUERES DE SALA
+        $aluguerExiste = AluguerSala::find()
+            ->where(['sala_id' => $this->sala_id])
+            ->andWhere(['data' => $this->data])
+            ->andWhere(['estado' => [
+                AluguerSala::ESTADO_CONFIRMADO,
+                AluguerSala::ESTADO_A_DECORRER,
+            ]])
+            ->andWhere(['and',
+                ['<', 'hora_inicio', $this->hora_fim],
+                ['>', 'hora_fim', $this->hora_inicio]
+            ])
+            ->exists();
+
+        if ($aluguerExiste) {
+            Yii::$app->session->setFlash('error', 'Esta sala encontra-se alugada neste horário.');
+            return false;
+        }
+
         return true;
     }
+
 
     public static function optsEstado()
     {
@@ -268,12 +291,12 @@ class Sessao extends \yii\db\ActiveRecord
     /**
      * @return bool
      */
-    public function isEstadoAdecorrer()
+    public function isEstadoADecorrer()
     {
         return $this->estado === self::ESTADO_A_DECORRER;
     }
 
-    public function setEstadoToAdecorrer()
+    public function setEstadoToADecorrer()
     {
         $this->estado = self::ESTADO_A_DECORRER;
     }

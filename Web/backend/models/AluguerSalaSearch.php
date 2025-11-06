@@ -2,6 +2,7 @@
 
 namespace backend\models;
 
+use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\models\AluguerSala;
@@ -11,14 +12,18 @@ use common\models\AluguerSala;
  */
 class AluguerSalaSearch extends AluguerSala
 {
+    public $nomeCliente;
+    public $nomeCinema;
+    public $numeroSala;
+
     /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['id', 'cliente_id', 'sala_id'], 'integer'],
-            [['data', 'hora_inicio', 'hora_fim', 'estado', 'tipo_evento', 'observacoes'], 'safe'],
+            [['id', 'cliente_id', 'cinema_id', 'sala_id', 'numeroSala'], 'integer'],
+            [['data', 'hora_inicio', 'hora_fim', 'estado', 'tipo_evento', 'observacoes', 'nomeCliente', 'nomeCinema'], 'safe'],
         ];
     }
 
@@ -40,13 +45,22 @@ class AluguerSalaSearch extends AluguerSala
      */
     public function search($params)
     {
-        $query = AluguerSala::find();
+        $query = AluguerSala::find()->joinWith(['cliente.profile', 'cinema', 'sala']);
 
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination' => [
+                'pageSize' => Yii::$app->params['pageSize'],
+            ],
         ]);
+
+        // PERMITIR ORDENAR POR NOME DO CLIENTE
+        $dataProvider->sort->attributes['nomeCliente'] = [
+            'asc' => ['user.username' => SORT_ASC],
+            'desc' => ['user.username' => SORT_DESC],
+        ];
 
         $this->load($params);
 
@@ -59,16 +73,18 @@ class AluguerSalaSearch extends AluguerSala
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'cliente_id' => $this->cliente_id,
             'sala_id' => $this->sala_id,
             'data' => $this->data,
             'hora_inicio' => $this->hora_inicio,
             'hora_fim' => $this->hora_fim,
         ]);
 
-        $query->andFilterWhere(['like', 'estado', $this->estado])
+        $query->andFilterWhere(['like', 'aluguer_sala.estado', $this->estado])
             ->andFilterWhere(['like', 'tipo_evento', $this->tipo_evento])
-            ->andFilterWhere(['like', 'observacoes', $this->observacoes]);
+            ->andFilterWhere(['like', 'observacoes', $this->observacoes])
+            ->andFilterWhere(['like', 'user_profile.nome', $this->nomeCliente])
+            ->andFilterWhere(['cinema.id' => $this->nomeCinema])
+            ->andFilterWhere(['sala.id' => $this->numeroSala]);
 
         return $dataProvider;
     }

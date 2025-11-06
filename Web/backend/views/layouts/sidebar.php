@@ -13,11 +13,16 @@
 
             $currentUser = Yii::$app->user;
             $profile = $currentUser->identity->profile;
+            $userCinemaId = $profile->cinema_id;
 
             $gerirUtilizadores = $currentUser->can('gerirUtilizadores');
             $gerirFuncionarios = $currentUser->can('gerirFuncionarios');
             $gerirCinemas = $currentUser->can('gerirCinemas');
             $gerirFilmes = $currentUser->can('gerirFilmes');
+
+            use common\models\AluguerSala;
+            $alugueresPendentes = AluguerSala::find()->where(
+            ['estado' => AluguerSala::ESTADO_PENDENTE, 'cinema_id' => $userCinemaId])->exists();
 
             echo \hail812\adminlte\widgets\Menu::widget([
                 'items' => [
@@ -37,7 +42,13 @@
 
                     ['label' => 'Reservas', 'header' => true],
                     ['label' => 'Compras',  'icon' => 'ticket-alt', 'url' => ['/compra/index']],
-                    ['label' => 'Alugueres',  'icon' => 'clock', 'url' => ['/aluguer/index']],
+                    [
+                        'label' => 'Alugueres' . ($alugueresPendentes ? '<i class="fas fa-exclamation text-danger ms-2"></i>' : ''),
+                        'icon' => 'clock',
+                        'url' => ['/aluguer-sala/index'],
+                        'encode' => false,
+                    ],
+
                 ],
             ]);
             ?>

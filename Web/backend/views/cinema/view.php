@@ -24,12 +24,15 @@ $this->params['breadcrumbs'][] = $model->nome;
             <div class="row">
                 <div class="col-md-12">
                     <p>
+                        <?= Html::a('Salas', ['sala/index', 'cinema_id' => $model->id], ['class' => 'btn btn-primary']) ?>
+                        <?= Html::a('Sessões', ['sessao/index', 'cinema_id' => $model->id], ['class' => 'btn btn-secondary']) ?>
+
                         <?php if ($isAdmin || $isGerente && $isOwnCinema): ?>
                             <?= Html::a('Editar', ['update', 'id' => $model->id], ['class' => 'btn btn-warning']) ?>
 
                             <?php if ($isAdmin): ?>
                                 <?php if ($model->estado === $model::ESTADO_ATIVO): ?>
-                                    <?= Html::a('Encerrar', ['deactivate', 'id' => $model->id], [
+                                    <?= Html::a('Encerrar', ['change-status', 'id' => $model->id, 'estado' => $model::ESTADO_ENCERRADO], [
                                         'class' => 'btn btn-danger',
                                         'data' => [
                                             'confirm' => 'Tem a certeza que quer encerrar este cinema?',
@@ -37,7 +40,7 @@ $this->params['breadcrumbs'][] = $model->nome;
                                         ],
                                     ]) ?>
                                 <?php elseif ($model->estado === $model::ESTADO_ENCERRADO): ?>
-                                    <?= Html::a('Ativar', ['activate', 'id' => $model->id], [
+                                    <?= Html::a('Ativar', ['change-status', 'id' => $model->id, 'estado' => $model::ESTADO_ATIVO], [
                                         'class' => 'btn btn-success',
                                         'data' => [
                                             'confirm' => 'Tem a certeza que quer ativar este cinema?',
@@ -59,10 +62,22 @@ $this->params['breadcrumbs'][] = $model->nome;
                                 'attribute' => 'gerente_id',
                                 'label' => 'Gerente',
                                 'value' => function ($model) {
-                                    return $model->gerente
-                                        ? $model->gerente->profile->nome
-                                        : '-';
+                                    return $model->gerente->profile->nome;
                                 },
+                                'visible' => !$isAdmin && !$isGerente,
+                            ],
+                            [
+                                'attribute' => 'gerente_id',
+                                'label' => 'Gerente',
+                                'format' => 'raw',
+                                'value' => function ($model) {
+                                    return Html::a(
+                                        Html::encode($model->gerente->profile->nome),
+                                        ['user/view', 'id' => $model->gerente->id],
+                                        ['class' => 'text-decoration-none text-primary']
+                                    );
+                                },
+                                'visible' => $isAdmin || $isGerente,
                             ],
                             'email:email',
                             'telefone',

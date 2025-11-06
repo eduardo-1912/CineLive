@@ -74,7 +74,7 @@ class SessaoSearch extends Sessao
             'hora_inicio' => $this->hora_inicio,
             'hora_fim' => $this->hora_fim,
             'filme_id' => $this->filme_id,
-            'sala_id' => $this->sala,
+            'sessao.sala_id' => $this->sala,
             'sessao.cinema_id' => $this->cinema_id,
         ]);
 

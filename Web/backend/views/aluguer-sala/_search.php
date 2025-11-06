@@ -20,11 +20,13 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'cliente_id') ?>
 
+    <?= $form->field($model, 'cinema_id') ?>
+
     <?= $form->field($model, 'sala_id') ?>
 
     <?= $form->field($model, 'data') ?>
 
-    <?= $form->field($model, 'hora_inicio') ?>
+    <?php // echo $form->field($model, 'hora_inicio') ?>
 
     <?php // echo $form->field($model, 'hora_fim') ?>
 

@@ -6,9 +6,9 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model common\models\Sessao */
 
-$this->title = 'Sessão de ' . $model->filme->titulo;
+$this->title = $model->nome;
 $this->params['breadcrumbs'][] = ['label' => 'Sessões', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $model->filme->titulo;
+$this->params['breadcrumbs'][] = $model->id;
 \yii\web\YiiAsset::register($this);
 
 $currentUser = Yii::$app->user;
@@ -100,11 +100,24 @@ $gerirSessoes = $currentUser->can('gerirSessoes');
             </div>
             <!--.row-->
 
-            <?= $this->render('_mapaLugares', ['model' => $model]) ?>
+
 
 
         </div>
         <!--.card-body-->
     </div>
     <!--.card-->
+
+
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+
+                <div class="col-md-12">
+                    <?= $this->render('_mapaLugares', ['model' => $model]) ?>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>

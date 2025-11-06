@@ -99,9 +99,9 @@ class Bilhete extends \yii\db\ActiveRecord
     public static function optsEstado()
     {
         return [
-            self::ESTADO_PENDENTE => 'pendente',
-            self::ESTADO_CONFIRMADO => 'confirmado',
-            self::ESTADO_CANCELADO => 'cancelado',
+            self::ESTADO_PENDENTE => 'Pendente',
+            self::ESTADO_CONFIRMADO => 'Confirmado',
+            self::ESTADO_CANCELADO => 'Cancelado',
         ];
     }
 

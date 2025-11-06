@@ -13,9 +13,10 @@ $gerirSalas = $currentUser->can('gerirSalas');
 
 $this->title = 'Sala ' . $model->numero;
 $this->params['breadcrumbs'][] = ['label' => $model->cinema->nome, 'url' => ['cinema/view?id=' . $model->cinema_id]];
-$this->params['breadcrumbs'][] = ['label' => 'Salas', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Salas', 'url' => ['index', 'cinema_id' => $model->cinema_id]];
 $this->params['breadcrumbs'][] = $model->numero;
 \yii\web\YiiAsset::register($this);
+
 ?>
 
 <div class="container-fluid">
@@ -27,16 +28,16 @@ $this->params['breadcrumbs'][] = $model->numero;
                         <?php if($gerirSalas): ?>
                             <?= Html::a('Editar', ['update', 'id' => $model->id], ['class' => 'btn btn-warning']) ?>
 
-                            <?php if($model->estado == $model::ESTADO_ATIVA && $model->isClosable()): ?>
-                                <?= Html::a('Encerrar', ['deactivate', 'id' => $model->id], [
+                            <?php if ($model->estado === $model::ESTADO_ATIVA): ?>
+                                <?= Html::a('Encerrar', ['change-status', 'id' => $model->id, 'estado' => $model::ESTADO_ENCERRADA], [
                                     'class' => 'btn btn-danger',
                                     'data' => [
                                         'confirm' => 'Tem a certeza que quer encerrar esta sala?',
                                         'method' => 'post',
                                     ],
                                 ]) ?>
-                            <?php elseif($model->estado == $model::ESTADO_ENCERRADA): ?>
-                                <?= Html::a('Ativar', ['activate', 'id' => $model->id], [
+                            <?php elseif ($model->estado === $model::ESTADO_ENCERRADA): ?>
+                                <?= Html::a('Ativar', ['change-status', 'id' => $model->id, 'estado' => $model::ESTADO_ATIVA], [
                                     'class' => 'btn btn-success',
                                     'data' => [
                                         'confirm' => 'Tem a certeza que quer ativar esta sala?',

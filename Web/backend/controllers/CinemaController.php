@@ -145,7 +145,8 @@ class CinemaController extends Controller
         $userCinemaId = $user->profile->cinema_id ?? null;
 
         // ADMIN --> PODE EDITAR QUALQUER CINEMA
-        if ($currentUser->can('admin')) {
+        if ($currentUser->can('admin'))
+        {
             $model = $this->findModel($id);
         }
 
@@ -167,7 +168,8 @@ class CinemaController extends Controller
         }
 
         // CASO CONTRÁRIO --> SEM PERMISSÃO
-        else {
+        else
+        {
             throw new ForbiddenHttpException('Não tem permissão para editar este cinema.');
         }
 
@@ -176,20 +178,35 @@ class CinemaController extends Controller
 
 
         // ATUALIZAÇÃO DO CINEMA
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post()) && $model->save())
+        {
 
             // SE O ESTADO MUDOU --> ATUALIZAR O STAFF
-            if ($estadoAntigo !== $model->estado) {
-                $this->atualizarEstadoUtilizadores($model);
+            if ($estadoAntigo !== $model->estado)
+            {
+                if ($model->isEstadoEncerrado())
+                {
+                    if ($model->hasSessoesAtivas() && $model->hasAlugueresAtivos())
+                    {
+                        Yii::$app->session->setFlash('error', 'Não é possível encerrar este cinema pois existem sessões ou alugueres ativos.');
+                        // REPOR ESTADO ANTERIOR
+                        $model->estado = $estadoAntigo;
+                        $model->save(false, ['estado']);
+                        return $this->redirect(['update', 'id' => $model->id]);
+                    }
 
-                if ($model->estado === Cinema::ESTADO_ATIVO) {
-                    Yii::$app->session->setFlash('success', 'Cinema reativado. Gerente e funcionários inativos voltaram a estar ativos.');
+                    $this->atualizarEstadoUtilizadores($model);
+                    Yii::$app->session->setFlash('success', 'Cinema encerrado. Gerente e funcionários foram desativados.');
                 }
-                else {
-                    Yii::$app->session->setFlash('warning', 'Cinema encerrado. Gerente e funcionários foram desativados.');
+                elseif ($model->isEstadoAtivo())
+                {
+                    $this->atualizarEstadoUtilizadores($model);
+                    Yii::$app->session->setFlash('success', 'Cinema reativado com sucesso. Gerente e funcionários voltaram a estar ativos.');
                 }
+
             }
-            else {
+            else
+            {
                 Yii::$app->session->setFlash('success', 'Cinema atualizado com sucesso.');
             }
 
@@ -201,58 +218,84 @@ class CinemaController extends Controller
         ]);
     }
 
-
-    // ENCERRAR CINEMA (APENAS ADMIN)
-    public function actionDeactivate($id)
+    // MUDAR O ESTADO DO CINEMA
+    public function actionChangeStatus($id, $estado)
     {
-        $model = $this->findModel($id);
+        // OBTER USER ATUAL
+        $user = Yii::$app->user;
 
-        // SE NÃO É ADMIN --> SEM PERMISSÃO
-        if (!Yii::$app->user->can('admin')) {
-            throw new ForbiddenHttpException('Não tem permissão para encerrar cinemas.');
-        }
-
-        // SE O CINEMA JÁ ESTÁ ENCERRADO --> VOLTAR
-        if ($model->estado === Cinema::ESTADO_ENCERRADO) {
-            Yii::$app->session->setFlash('info', 'Este cinema já se encontra encerrado.');
+        // VERIFICAR PERMISSÕES
+        if (!$user->can('admin'))
+        {
+            Yii::$app->session->setFlash('error', 'Não tem permissão para alterar o estado dos cinemas.');
             return $this->redirect(['index']);
         }
 
-        // ENCERRAR O CINEMA
-        $model->estado = Cinema::ESTADO_ENCERRADO;
-        $model->save(false, ['estado']);
-
-        // DESATIVAR GERENTE E FUNCIONÁRIOS
-        $this->atualizarEstadoUtilizadores($model);
-
-        Yii::$app->session->setFlash('success', 'Cinema encerrado. Gerente e funcionários foram desativados.');
-        return $this->redirect(['index']);
-    }
-
-    // ATIVAR CINEMA (APENAS ADMIN)
-    public function actionActivate($id)
-    {
+        // OBTER CINEMA
         $model = $this->findModel($id);
 
-        // SE NÃO É ADMIN --> SEM PERMISSÃO
-        if (!Yii::$app->user->can('admin')) {
-            throw new ForbiddenHttpException('Não tem permissão para ativar cinemas.');
-        }
+        // OBTER ESTADOS VÁLIDOS
+        $estadosValidos = array_keys(Cinema::optsEstado());
 
-        // SE O CINEMA JÁ ESTÁ ENCERRADO --> VOLTAR
-        if ($model->estado === Cinema::ESTADO_ATIVO) {
-            Yii::$app->session->setFlash('info', 'Este cinema já se encontra ativo.');
+        // SE ESTADO NÃO FOR VÁLIDO --> MENSAGEM DE ERRO
+        if (!in_array($estado, $estadosValidos))
+        {
+            Yii::$app->session->setFlash('error', 'Estado inválido.');
             return $this->redirect(['index']);
         }
 
-        // ENCERRAR O CINEMA
-        $model->estado = Cinema::ESTADO_ATIVO;
-        $model->save(false, ['estado']);
+        // SE JÁ ESTIVER NO ESTADO PRETENDIDO
+        if ($model->estado === $estado)
+        {
+            Yii::$app->session->setFlash('info', "O cinema já se encontra no estado selecionado.");
+            return $this->redirect(['index']);
+        }
 
-        // REATIVAR GERENTE E FUNCIONÁRIOS
-        $this->atualizarEstadoUtilizadores($model);
+        // SE TENTAR ENCERRAR
+        if ($estado === Cinema::ESTADO_ENCERRADO)
+        {
+            // VERIFICAR SE TEM SESSÕES ATIVAS
+            if (!$model->isClosable())
+            {
+                Yii::$app->session->setFlash('error', 'Não é possível encerrar este cinema pois existem sessões ou alugueres ativos.');
+                return $this->redirect(['index']);
+            }
 
-        Yii::$app->session->setFlash('success', 'Cinema reativado. Gerente e funcionários inativos voltaram a estar ativos.');
+            // ALTERAR ESTADO PARA ENCERRADO
+            $model->estado = Cinema::ESTADO_ENCERRADO;
+            if ($model->save(false, ['estado']))
+            {
+                // DESATIVAR GERENTE E FUNCIONÁRIOS
+                $this->atualizarEstadoUtilizadores($model);
+                Yii::$app->session->setFlash('success', 'Cinema encerrado. Gerente e funcionários foram desativados.');
+            }
+            else
+            {
+                Yii::$app->session->setFlash('error', 'Erro ao encerrar o cinema.');
+            }
+
+            return $this->redirect(['index']);
+        }
+
+        // SE TENTAR ATIVAR
+        if ($estado === Cinema::ESTADO_ATIVO)
+        {
+            $model->estado = Cinema::ESTADO_ATIVO;
+
+            if ($model->save(false, ['estado']))
+            {
+                // REATIVAR GERENTE E FUNCIONÁRIOS
+                $this->atualizarEstadoUtilizadores($model);
+                Yii::$app->session->setFlash('success', 'Cinema reativado. Gerente e funcionários voltaram a estar ativos.');
+            }
+            else
+            {
+                Yii::$app->session->setFlash('error', 'Erro ao ativar o cinema.');
+            }
+
+            return $this->redirect(['index']);
+        }
+
         return $this->redirect(['index']);
     }
 

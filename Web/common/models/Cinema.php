@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use DateTime;
 use Yii;
 
 /**
@@ -123,6 +124,52 @@ class Cinema extends \yii\db\ActiveRecord
         return $array;
     }
 
+    // VERIFICAR SE TEM SESSÕES ATIVAS
+    public function hasSessoesAtivas(): bool
+    {
+        foreach ($this->sessaos as $sessao) {
+            // IGNORAR SESSÕES TERMINADAS
+            if ($sessao->isEstadoTerminada()) {
+                continue;
+            }
+
+            // SE TEM SESSÕES ATIVAS --> ESTÁ ATIVA
+            if (!$sessao->isDeletable()) {
+                return true;
+            }
+        }
+
+        // NENHUMA SESSÃO ATIVA
+        return false;
+    }
+
+    // VERIFICAR SE TEM ALUGUERES ATIVOS
+    public function hasAlugueresAtivos(): bool
+    {
+        return $this->getAluguerSalas()
+            ->where(['estado' => [
+                AluguerSala::ESTADO_A_DECORRER,
+                AluguerSala::ESTADO_CONFIRMADO,
+            ]])->exists();
+    }
+
+    // VERIFICAR SE PODE SER EDITADO
+    public function isEditable(): bool
+    {
+        return true;
+    }
+
+    // VERIFICAR SE PODE SER ATIVADO
+    public function isActivatable(): bool
+    {
+        return $this->estado === self::ESTADO_ENCERRADO;
+    }
+
+    // VERIFICAR SE PODE SER ENCERRADO
+    public function isClosable(): bool
+    {
+        return $this->estado === self::ESTADO_ATIVO && !$this->hasSessoesAtivas() && !$this->hasAlugueresAtivos();
+    }
 
     /**
      * Gets query for [[Gerente]].
@@ -164,6 +211,15 @@ class Cinema extends \yii\db\ActiveRecord
         return $this->hasMany(UserProfile::class, ['cinema_id' => 'id']);
     }
 
+    /**
+     * Gets query for [[AluguerSalas]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAluguerSalas()
+    {
+        return $this->hasMany(AluguerSala::class, ['cinema_id' => 'id']);
+    }
 
     /**
      * column estado ENUM value labels

@@ -14,16 +14,35 @@ use backend\components\ActionColumnButtonHelper;
 
 $currentUser = Yii::$app->user;
 $userCinema = $currentUser->identity->profile->cinema;
-
 $isAdmin = $currentUser->can('admin');
 $gerirSalas = $currentUser->can('gerirSalas');
-
 $actionColumnButtons = $gerirSalas ? '{view} {update} {activate} {close}' : '{view}';
 
-$this->title = 'Salas';
-$this->params['breadcrumbs'][] = ['label' => $isAdmin ? 'Cinemas' : $userCinema->nome, 'url' => [$isAdmin ? 'cinema/index' : ('cinema/view?id=' . $userCinema->id)]];
-$this->params['breadcrumbs'][] = $this->title;
+$cinemaSelecionado = !empty($cinemaId) ? Cinema::findOne($cinemaId) : null;
+
+// ALGUM CINEMA FOI PASSADO POR PARÂMETRO
+if (!empty($cinemaId) && $cinemaSelecionado)
+{
+    $this->title = 'Salas de ' . $cinemaSelecionado->nome;
+    $this->params['breadcrumbs'][] = [
+        'label' => $cinemaSelecionado->nome,
+        'url' => ['cinema/view', 'id' => $cinemaSelecionado->id]
+    ];
+}
+
+// VISTA DE ADMIN/GERENTE
+else
+{
+    $this->title = 'Salas';
+    $this->params['breadcrumbs'][] = [
+        'label' => $isAdmin ? 'Cinemas' : $userCinema->nome,
+        'url' => [$isAdmin ? 'cinema/index' : ('cinema/view?id=' . $userCinema->id)]
+    ];
+}
+$this->params['breadcrumbs'][] = 'Salas';
+
 ?>
+
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-12">
@@ -63,7 +82,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'filter' => ArrayHelper::map(Cinema::find()->orderBy('nome')->asArray()->all(), 'id', 'nome'),
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
                                 'headerOptions' => ['style' => 'width: 12rem;'],
-                                'visible' => $isAdmin,
+                                'visible' => $isAdmin && empty($cinemaId),
                             ],
                             [
                                 'attribute' => 'estado',
@@ -76,7 +95,8 @@ $this->params['breadcrumbs'][] = $this->title;
                             [
                                 'class' => 'backend\components\AppActionColumn',
                                 'template' => $actionColumnButtons,
-                                'buttons' => ActionColumnButtonHelper::toggleButtons(),
+                                'buttons' => ActionColumnButtonHelper::salaButtons(),
+                                'headerOptions' => ['style' => 'width: 3rem;'],
                             ],
                         ],
                         'pager' => [

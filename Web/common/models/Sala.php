@@ -49,6 +49,7 @@ class Sala extends \yii\db\ActiveRecord
             [['estado'], 'string'],
             ['estado', 'in', 'range' => array_keys(self::optsEstado())],
             [['cinema_id'], 'exist', 'skipOnError' => true, 'targetClass' => Cinema::class, 'targetAttribute' => ['cinema_id' => 'id']],
+            ['num_filas', 'compare', 'compareValue' => 26, 'operator' => '<=', 'type' => 'number', 'message' => 'O número máximo de filas permitido é 26.'],
         ];
     }
 
@@ -72,13 +73,22 @@ class Sala extends \yii\db\ActiveRecord
     }
 
     // NOME DA SALA
-    public function getNome(){ return 'Sala ' . $this->numero; }
+    public function getNome()
+    {
+        return 'Sala ' . $this->numero;
+    }
 
     // NÚMERO DE LUGARES
-    public function getLugares() { return $this->num_filas * $this->num_colunas; }
+    public function getLugares()
+    {
+        return $this->num_filas * $this->num_colunas;
+    }
 
     // PREÇO DO BILHETE EM EUROS
-    public function getPrecoEmEuros() { return $this->preco_bilhete . '€'; }
+    public function getPrecoEmEuros()
+    {
+        return $this->preco_bilhete . '€';
+    }
 
     // OBTER ESTADO FORMATADO (PARA /INDEX E /VIEW)
     public function getEstadoFormatado(): string
@@ -98,34 +108,51 @@ class Sala extends \yii\db\ActiveRecord
     // VERIFICAR SE TEM SESSÕES ATIVAS
     public function hasSessoesAtivas(): bool
     {
-        foreach ($this->sessaos as $sessao) {
+        foreach ($this->sessaos as $sessao)
+        {
             // IGNORAR SESSÕES TERMINADAS
             if ($sessao->isEstadoTerminada()) {
                 continue;
             }
 
-            // SE A SESSÃO NÃO PODER SER ELIMINADA --> TEM SESSÕES ATIVAS
-            if (!$sessao->isDeletable()) {
+            // SE TEM SESSÕES ATIVAS --> NÃO PODER SER ELIMINADA
+            if (!$sessao->isDeletable())
+            {
                 return true;
             }
         }
 
-        // NENHUMA SESSÃO IMPEDE O ENCERRAMENTO DA SALA
+        // SE NENHUMA SESSÃO IMPEDE O ENCERRAMENTO DA SALA
         return false;
     }
 
+    // VERIFICAR SE TEM ALUGUERES ATIVOS
+    public function hasAlugueresAtivos(): bool
+    {
+        return $this->getAluguerSalas()
+            ->where(['estado' => [
+                AluguerSala::ESTADO_A_DECORRER,
+                AluguerSala::ESTADO_CONFIRMADO,
+            ]])
+            ->exists();
+    }
 
-    // VERIFICAR SE É EDITÁVEL
-    public function isEditable(): bool { return true; }
+    // VERIFICAR SE PODE SER EDITADA
+    public function isEditable(): bool
+    {
+        return true;
+    }
 
-    public function isActivatable()
+    // VERIFICAR SE PODE SER ATIVADA
+    public function isActivatable(): bool
     {
         return $this->estado === self::ESTADO_ENCERRADA;
     }
 
     // VERIFICAR SE PODE SER ENCERRADA
-    public function isClosable(): bool {
-        return $this->estado === self::ESTADO_ATIVA && !$this->hasSessoesAtivas();
+    public function isClosable(): bool
+    {
+        return !$this->hasSessoesAtivas() && !$this->hasAlugueresAtivos();
     }
 
     /**

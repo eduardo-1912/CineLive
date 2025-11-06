@@ -14,12 +14,34 @@ use yii\grid\GridView;
 /* @var $searchModel backend\models\SessaoSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Sessões';
-$this->params['breadcrumbs'][] = $this->title;
-
 $currentUser = Yii::$app->user;
+$userCinema = $currentUser->identity->profile->cinema;
 $isAdmin = $currentUser->can('admin');
 $gerirSessoes = $currentUser->can('gerirSessoes');
+
+$cinemaSelecionado = !empty($cinemaId) ? Cinema::findOne($cinemaId) : null;
+$salaSelecionada = !empty($salaId) ? Sala::findOne($salaId) : null;
+
+// ALGUM CINEMA FOI PASSADO POR PARÂMETRO
+if (!empty($cinemaId) && $cinemaSelecionado)
+{
+    $this->title = 'Sessões de ' . $cinemaSelecionado->nome;
+    $this->params['breadcrumbs'][] = [
+        'label' => $cinemaSelecionado->nome,
+        'url' => ['cinema/view', 'id' => $cinemaSelecionado->id]
+    ];
+}
+
+// VISTA DE ADMIN/GERENTE
+else
+{
+    $this->title = 'Sessões';
+    $this->params['breadcrumbs'][] = [
+        'label' => $isAdmin ? 'Cinemas' : $userCinema->nome,
+        'url' => [$isAdmin ? 'cinema/index' : ('cinema/view?id=' . $userCinema->id)]
+    ];
+}
+$this->params['breadcrumbs'][] = 'Sessões';
 
 ?>
 
@@ -77,7 +99,7 @@ $gerirSessoes = $currentUser->can('gerirSessoes');
                                 'filter' => ArrayHelper::map(Cinema::find()->asArray()->all(), 'id', 'nome'),
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
                                 'headerOptions' => ['style' => 'width: 28rem;'],
-                                'visible' => $isAdmin,
+                                'visible' => $isAdmin && empty($cinemaId),
                             ],
                             [
                                 'attribute' => 'numeroSala',
