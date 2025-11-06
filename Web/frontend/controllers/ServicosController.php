@@ -11,16 +11,25 @@ class ServicosController extends Controller
 {
     public function actionIndex(){
 
-        return $this->render('index');
-    }
-    public function ActionValidateForm(){
-
         $model = new ContactForm();
+        return $this->render('index', ['model' => $model]);
+    }
 
+    public function actionContact()
+    {
+        $model = new ContactForm();
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            Yii::$app->session->setFlash('contactFormSubmitted');
+            if ($model->sendEmail(Yii::$app->params['adminEmail'])) {
+                Yii::$app->session->setFlash('success', 'Thank you for contacting us. We will respond to you as soon as possible.');
+            } else {
+                Yii::$app->session->setFlash('error', 'There was an error sending your message.');
+            }
+
             return $this->refresh();
         }
-        return $this->render('index', ['model' => $model]);
+
+        return $this->render('index', [
+            'model' => $model,
+        ]);
     }
 }
