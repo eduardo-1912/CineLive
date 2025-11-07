@@ -140,11 +140,7 @@ class Filme extends \yii\db\ActiveRecord
     public function isEditable(): bool { return true; }
 
     // VERIFICAR SE PODE SER ELIMINADO
-    public function isDeletable(): bool
-    {
-        // se existirem sessões associadas, não é deletável
-        return !$this->getSessaos()->exists();
-    }
+    public function isDeletable(): bool { return !$this->getSessaos()->exists(); }
 
     public function getFilmeGeneros()
     {
@@ -153,11 +149,10 @@ class Filme extends \yii\db\ActiveRecord
 
     public function getGeneros()
     {
-        return $this->hasMany(Genero::class, ['id' => 'genero_id'])
-            ->via('filmeGeneros');
+        return $this->hasMany(Genero::class, ['id' => 'genero_id'])->via('filmeGeneros');
     }
 
-    // PREENCHER ARRAY COM IDs DOS GÉNEROS DO FILME
+    // OBTER GÉNEROS DO FILME
     public function afterFind()
     {
         parent::afterFind();
@@ -175,10 +170,10 @@ class Filme extends \yii\db\ActiveRecord
         // ADICIONAR GÉNEROS NOVOS
         if (is_array($this->generosSelecionados)) {
             foreach ($this->generosSelecionados as $generoId) {
-                $fg = new FilmeGenero();
-                $fg->filme_id = $this->id;
-                $fg->genero_id = $generoId;
-                $fg->save();
+                $filmeGenero = new FilmeGenero();
+                $filmeGenero->filme_id = $this->id;
+                $filmeGenero->genero_id = $generoId;
+                $filmeGenero->save();
             }
         }
     }
@@ -186,32 +181,7 @@ class Filme extends \yii\db\ActiveRecord
     // OBTER ESTREIA FORMATADA (DD/MM/AAAA)
     public function getEstreiaFormatada(): string
     {
-        if (empty($this->estreia)) {
-            return '-';
-        }
-
-        try {
-            return Yii::$app->formatter->asDate($this->estreia, 'php:d/m/Y');
-        }
-        catch (Exception $e) {
-            return $this->estreia; // FALLBACK
-        }
-    }
-
-    // OBTER ESTADO FORMATADO
-    public function getEstadoFormatado(): string
-    {
-        $labels = self::optsEstado();
-        $label = $labels[$this->estado] ?? 'Desconhecida';
-
-        $colors = [
-            self::ESTADO_BREVEMENTE => 'text-secondary',
-            self::ESTADO_EM_EXIBICAO => '',
-            self::ESTADO_TERMINADO => 'text-secondary font-italic',
-        ];
-
-        $class = $colors[$this->estado] ?? 'text-secondary';
-        return "<span class='{$class}'>{$label}</span>";
+        return Yii::$app->formatter->asDate($this->estreia, 'php:d/m/Y');
     }
 
     /**

@@ -1,5 +1,6 @@
 <?php
 
+use backend\components\ActionColumnButtonHelper;
 use common\models\Filme;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
@@ -20,7 +21,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="col-md-12">
                     <div class="d-flex mb-3 gap-1">
                         <?php if (Yii::$app->user->can('admin')): ?>
-                            <?= Html::a('Editar', ['update', 'id' => $model->id], ['class' => 'btn btn-warning']) ?>
 
                             <?php if ($model->estado == $model::ESTADO_EM_EXIBICAO): ?>
                                 <?= Html::a('Criar Sessão', ['sessao/create', 'filme_id' => $model->id], [
@@ -30,28 +30,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                 ]); ?>
                             <?php endif; ?>
 
-                            <div class="btn-group">
-                                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <?= $model->displayEstado() ?>
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <?php foreach (Filme::optsEstado() as $estado => $label): ?>
-                                        <?php if ($estado !== $model->estado):?>
-                                            <li>
-                                                <?= Html::a($label, ['change-status', 'id' => $model->id, 'estado' => $estado], [
-                                                    'class' => 'dropdown-item',
-                                                    'data' => [
-                                                        'method' => 'post',
-                                                        'confirm' => "Tem a certeza que quer alterar o estado para '{$label}'?",
-                                                    ],
-                                                ]) ?>
-                                            </li>
-                                        <?php endif; ?>
-                                    <?php endforeach; ?>
-                                </ul>
-                            </div>
+                            <?= Html::a('Editar', ['update', 'id' => $model->id], ['class' => 'btn btn-warning']) ?>
 
-                            <?php if (!$model->getSessaos()->exists()): ?>
+                            <?php if ($model->isDeletable()): ?>
                                 <?= Html::a('Eliminar', ['delete', 'id' => $model->id], [
                                     'class' => 'btn btn-danger',
                                     'title' => 'Eliminar',
@@ -71,7 +52,22 @@ $this->params['breadcrumbs'][] = $this->title;
                             'id',
                             'titulo',
                             'sinopse:ntext',
-                            'duracao',
+                            [
+                                'attribute' => 'duracao',
+                                'value' => function ($model) {
+                                    return $model->duracao . ' minutos';
+                                }
+                            ],
+                            [
+                                'label' => 'Géneros',
+                                'format' => 'raw',
+                                'value' => function ($model) {
+                                    $generos = array_map(fn($g) => Html::encode($g->nome), $model->generos);
+                                    return !empty($generos)
+                                        ? implode(', ', $generos)
+                                        : '-';
+                                },
+                            ],
                             'rating',
                             'estreia',
                             'idioma',
@@ -79,7 +75,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'trailer_url:url',
                             [
                                 'attribute' => 'estado',
-                                'value' => fn($model) => $model->estadoFormatado,
+                                'value' => fn($model) => ActionColumnButtonHelper::filmeEstadoDropdown($model),
                                 'format' => 'raw',
                             ],
                             [
@@ -97,6 +93,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                         ],
                     ]) ?>
+
                 </div>
                 <!--.col-md-12-->
             </div>

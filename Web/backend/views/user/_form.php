@@ -14,7 +14,6 @@ use common\models\Cinema;
 ?>
 
 <div class="user-form">
-
     <?php $form = ActiveForm::begin(); ?>
 
     <?= $form->field($model, 'id')->hiddenInput()->label(false) ?>
@@ -24,7 +23,7 @@ use common\models\Cinema;
     <?= $form->field($profile, 'telemovel')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'email')->input('email') ?>
 
-    <!-- SE USER ATUAL FOR ADMIN PODE EDITAR TUDO -->
+    <!-- SE FOR ADMIN -> PODE SELECIONAR CINEMA/ROLE -->
     <?php if (Yii::$app->user->can('admin')): ?>
 
         <!-- DROPDOWN DOS ROLES-->
@@ -35,7 +34,7 @@ use common\models\Cinema;
             // OBTER CINEMAS ATIVOS
             $queryCinemas = Cinema::find()->where(['estado' => Cinema::ESTADO_ATIVO]);
 
-            // SE O UTILIZADOR A SER EDITADO PERTENÇA A UM CINEMA ENCERRADO --> INCLUIR ESSE CINEMA
+            // SE PERTENCE A UM CINEMA ENCERRADO --> INCLUIR ESSE CINEMA
             if ($profile->cinema_id) {
                 $queryCinemas->orWhere(['id' => $profile->cinema_id]);
             }
@@ -44,27 +43,21 @@ use common\models\Cinema;
             $cinemas = ArrayHelper::map($queryCinemas->orderBy('nome')->all(), 'id', 'nome');
         ?>
 
-        <!-- DROPDOWN DOS CINEMAS-->
+        <!-- DROPDOWN DOS CINEMAS (VÍSIVEL SE ROLE SELECIONADO == FUNCIONÁRIO/GERENTE) -->
         <div id="formFieldCinema" style="display:none;">
             <?= $form->field($profile, 'cinema_id')->dropDownList($cinemas, ['prompt' => 'Selecione o cinema']) ?>
         </div>
 
-        <!-- DROPDOWN DE ESTADO DA CONTA -->
+        <!-- DROPDOWN DE ESTADO -->
         <?= $form->field($model, 'status')->dropDownList(User::optsStatus()) ?>
 
-    <!-- SE FOR GERENTE NÃO PODE ALTERAR ROLE NEM CINEMA, SÓ PODE CRIAR FUNCIONÁRIO PARA O SEU CINEMA -->
+    <!-- SE FOR GERENTE SÓ PODE CRIAR FUNCIONÁRIOS PARA O SEU CINEMA -->
     <?php elseif (Yii::$app->user->can('gerente')): ?>
 
-        <!-- ROLE 'FUNCIONÁRIO', CINEMA DO GERENTE E ESTADO DA CONTA 'ATIVVA' -->
+        <!-- ROLE 'FUNCIONÁRIO', CINEMA DO GERENTE E ESTADO 'ATIVO' -->
         <?= Html::activeHiddenInput($model, 'role', ['value' => 'funcionario']) ?>
         <?= Html::activeHiddenInput($profile, 'cinema_id', ['value' => Yii::$app->user->identity->profile->cinema_id]) ?>
         <?= Html::activeHiddenInput($model, 'status', ['value' => User::STATUS_ACTIVE]) ?>
-
-    <?php else: ?>
-
-        <!-- ROLE E CINEMA EM MODO READ-ONLY PARA FUNCIONÁRIOS -->
-        <?= $form->field($model, 'role')->textInput(['value' => $model->role ? ucfirst($model->role) : '', 'readonly' => true,]) ?>
-        <?= $form->field($profile, 'cinema_id')->dropDownList(ArrayHelper::map(Cinema::find()->all(), 'id', 'nome'), ['disabled' => true]) ?>
 
     <?php endif; ?>
 
@@ -78,7 +71,7 @@ use common\models\Cinema;
 <?php
 $script = <<<JS
 
-    // FUNÇÃO PARA MOSTRAR/ESCONDER CAMPO DE CINEMA CONSOANTE O ROLE SELECIONADO
+    // MOSTRAR/ESCONDER CAMPO DE CINEMA CONSOANTE O ROLE SELECIONADO
     function toggleCinemaField()
     {
         // OBTER VALOR DO CAMPO ROLE
@@ -97,7 +90,8 @@ $script = <<<JS
         }
     }
     
-    $(document).ready(function() {
+    $(document).ready(function()
+    {
         toggleCinemaField();
         $('#user-role').on('change', toggleCinemaField);
     });

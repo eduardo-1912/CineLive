@@ -29,8 +29,6 @@ if (!empty($cinemaId) && $cinemaSelecionado)
         'url' => ['cinema/view', 'id' => $cinemaSelecionado->id]
     ];
 }
-
-// VISTA DE ADMIN/GERENTE
 else
 {
     $this->title = 'Salas';
@@ -39,8 +37,8 @@ else
         'url' => [$isAdmin ? 'cinema/index' : ('cinema/view?id=' . $userCinema->id)]
     ];
 }
-$this->params['breadcrumbs'][] = 'Salas';
 
+$this->params['breadcrumbs'][] = 'Salas';
 ?>
 
 <div class="container-fluid">
@@ -50,7 +48,7 @@ $this->params['breadcrumbs'][] = 'Salas';
                 <div class="card-body">
                     <div class="row mb-2">
                         <div class="col-md-12">
-                            <?php if($isAdmin || $gerirSalas): ?>
+                            <?php if ($gerirSalas): ?>
                                 <?= Html::a('Criar Sala', ['create'], ['class' => 'btn btn-success']) ?>
                             <?php endif; ?>
                         </div>
@@ -59,6 +57,9 @@ $this->params['breadcrumbs'][] = 'Salas';
                     <?= AppGridView::widget([
                         'dataProvider' => $dataProvider,
                         'filterModel' => $searchModel,
+                        'pager' => [
+                            'class' => 'yii\bootstrap4\LinkPager',
+                        ],
                         'columns' => [
                             [
                                 'attribute' => 'id',
@@ -98,9 +99,6 @@ $this->params['breadcrumbs'][] = 'Salas';
                                 'buttons' => ActionColumnButtonHelper::salaButtons(),
                                 'headerOptions' => ['style' => 'width: 3rem;'],
                             ],
-                        ],
-                        'pager' => [
-                            'class' => 'yii\bootstrap4\LinkPager',
                         ],
                     ]); ?>
 

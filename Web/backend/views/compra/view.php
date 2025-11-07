@@ -24,46 +24,29 @@ $gerirCompras = $currentUser->can('gerirCompras');
         <div class="card-body">
             <div class="row">
                 <div class="col-md-12">
-                    <div class="mb-3">
-                        <?php
-                        $btnClass = match ($model->estado) {
-                            Compra::ESTADO_CONFIRMADA => 'btn-success',
-                            Compra::ESTADO_CANCELADA => 'btn-danger disabled',
-                            default => 'btn-secondary',
-                        };
+                    <p>
+                        <?php if ($gerirCompras): ?>
 
-                        // SE A COMPRA ESTIVER CANCELADA --> DESATIVAR BOTÃO
-                        if ($model->estado === Compra::ESTADO_CANCELADA): ?>
-                            <div class="btn-group">
-                                <button type="button" class="btn <?= $btnClass ?>">
-                                    <?= Html::encode($model->displayEstado()) ?>
-                                </button>
-                            </div>
+                            <?php if ($model->estado === $model::ESTADO_CONFIRMADA): ?>
+                                <?= Html::a('Cancelar', ['change-status', 'id' => $model->id, 'estado' => $model::ESTADO_CANCELADA], [
+                                    'class' => 'btn btn-danger',
+                                    'data' => [
+                                        'confirm' => 'Tem a certeza que quer cancelar esta compra?',
+                                        'method' => 'post',
+                                    ],
+                                ]) ?>
+                            <?php elseif ($model->estado === $model::ESTADO_CANCELADA): ?>
+                                <?= Html::a('Confirmar', ['change-status', 'id' => $model->id, 'estado' => $model::ESTADO_CONFIRMADA], [
+                                    'class' => 'btn btn-success',
+                                    'data' => [
+                                        'confirm' => 'Tem a certeza que quer confirmar esta compra?',
+                                        'method' => 'post',
+                                    ],
+                                ]) ?>
+                            <?php endif; ?>
 
-                        <?php else: ?>
-                            <div class="btn-group">
-                                <button type="button" class="btn <?= $btnClass ?> dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <?= Html::encode($model->displayEstado()) ?>
-                                </button>
-
-                                <ul class="dropdown-menu">
-                                    <?php foreach (Compra::optsEstado() as $estado => $label): ?>
-                                        <?php if ($estado === $model->estado || $estado === Compra::ESTADO_PENDENTE) continue; ?>
-                                        <li>
-                                            <?= Html::a($label, ['compra/change-status', 'id' => $model->id, 'estado' => $estado], [
-                                                'class' => 'dropdown-item',
-                                                'data' => [
-                                                    'method' => 'post',
-                                                    'confirm' => "Tem a certeza que quer alterar o estado para '{$label}'?",
-                                                ],
-                                            ]) ?>
-                                        </li>
-                                    <?php endforeach; ?>
-                                </ul>
-                            </div>
                         <?php endif; ?>
-
-                    </div>
+                    </p>
 
 
                     <?= DetailView::widget([

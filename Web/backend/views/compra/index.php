@@ -46,14 +46,19 @@ $isAdmin = $currentUser->can('admin');
                                 'filter' => Html::activeTextInput($searchModel, 'nomeCliente', ['class' => 'form-control',]),
                             ],
                             [
-                                'attribute' => 'data',
-                                'value' => 'dataFormatada',
-                                'filterInputOptions' => ['class' => 'form-control', 'type' => 'date',],
-                            ],
-                            [
-                                'attribute' => 'total',
-                                'value' => fn($model) => $model->totalFormatado . '€',
-                                'filterInputOptions' => ['class' => 'form-control', 'type' => 'number',],
+                                'attribute' => 'nomeCinema',
+                                'label' => 'Cinema',
+                                'format' => 'raw',
+                                'value' => function ($model) {
+                                    return $model->cinema
+                                        ? Html::a(Html::encode($model->cinema->nome),
+                                            ['cinema/view', 'id' => $model->cinema->id],
+                                            ['class' => 'text-decoration-none text-primary'])
+                                        : '<span class="text-muted">-</span>';
+                                },
+                                'filter' => ArrayHelper::map(Cinema::find()->asArray()->all(), 'id', 'nome'),
+                                'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
+                                'visible' => $isAdmin,
                             ],
                             [
                                 'attribute' => 'sessao_id',
@@ -68,19 +73,14 @@ $isAdmin = $currentUser->can('admin');
 
                             ],
                             [
-                                'attribute' => 'nomeCinema',
-                                'label' => 'Cinema',
-                                'format' => 'raw',
-                                'value' => function ($model) {
-                                    return $model->cinema
-                                        ? Html::a(Html::encode($model->cinema->nome),
-                                            ['cinema/view', 'id' => $model->cinema->id],
-                                            ['class' => 'text-decoration-none text-primary'])
-                                        : '<span class="text-muted">-</span>';
-                                },
-                                'filter' => ArrayHelper::map(Cinema::find()->asArray()->all(), 'id', 'nome'),
-                                'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
-                                'visible' => $isAdmin,
+                                'attribute' => 'data',
+                                'value' => 'dataFormatada',
+                                'filterInputOptions' => ['class' => 'form-control', 'type' => 'date',],
+                            ],
+                            [
+                                'attribute' => 'total',
+                                'value' => fn($model) => $model->totalFormatado . '€',
+                                'filterInputOptions' => ['class' => 'form-control', 'type' => 'number',],
                             ],
                             [
                                 'attribute' => 'estado',

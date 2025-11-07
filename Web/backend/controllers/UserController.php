@@ -33,12 +33,12 @@ class UserController extends Controller
                     ],
                     [
                         'allow' => true,
-                        'actions' => ['create', 'index', 'deactivate', 'activate', 'delete'],
+                        'actions' => ['create', 'index', 'change-status'],
                         'roles' => ['gerente'],
                     ],
                     [
                         'allow' => true,
-                        'roles' => ['@'],
+                        'roles' => ['funcionario'],
                         'actions' => ['view', 'update'],
                     ],
                 ],
@@ -46,18 +46,15 @@ class UserController extends Controller
         ];
     }
 
-    /**
-     * Lists all User models.
-     * @return mixed
-     */
-
-    // CRUD DE UTILIZADORES PARA ADMIN / CRUD DE FUNCIONÁRIOS PARA GERENTE
+    // ADMIN --> TABELA COM TODOS OS UTILIZADORES
+    // GERENTE --> TABELA COM OS SEUS FUNCIONÁRIOS (ATIVOS E INATIVOS)
     public function actionIndex()
     {
-        $user = Yii::$app->user;
+        // OBTER USER ATUAL
+        $currentUser = Yii::$app->user;
 
         // VERIFICAR PERMISSÕES
-        if (!$user->can('admin') && !$user->can('gerente')) {
+        if (!$currentUser->can('admin') && !$currentUser->can('gerente')) {
             throw new ForbiddenHttpException('Não tem permissão para aceder a esta página.');
         }
 
@@ -65,14 +62,14 @@ class UserController extends Controller
         $searchModel = new UserSearch();
         $params = Yii::$app->request->queryParams;
 
-        // SE FOR ADMIN --> VÊ TODOS OS UTILIZADORES
-        if ($user->can('admin')) {
+        // ADMIN --> VÊ TODOS OS UTILIZADORES
+        if ($currentUser->can('admin')) {
             $dataProvider = $searchModel->search($params);
         }
 
         // SE FOR GERENTE --> APENAS VÊ OS FUNCIONÁRIOS DO SEU CINEMA
         else {
-            $gerenteProfile = $user->identity->profile;
+            $gerenteProfile = $currentUser->identity->profile;
 
             if (!$gerenteProfile || !$gerenteProfile->cinema_id) {
                 throw new ForbiddenHttpException('Não está associado a nenhum cinema.');
@@ -94,76 +91,57 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Displays a single User model.
-     * @param int $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
 
-    // VER DETALHES DE UM UTILIZADOR (ADMIN VÊ TODOS, GERENTE VÊ DO SEU CINEMA, FUNCIONÁRIO VÊ O SEU)
-    public function actionView($id = null) // $id = null porque se user atual apenas mete 'user/view' é redirecionado para o seu perfil
+    // ADMIN --> VÊ DETALHES DE TODOS OS UTILIZADORES
+    // GERENTE --> APENAS VÊ FUNCIONÁRIOS DO SEU CINEMA
+    // FUNCIONÁRIO --> VÊ APENAS O SEU PERFIL
+    public function actionView($id = null)
     {
         // OBTER USER ATUAL
         $currentUser = Yii::$app->user;
-        $currentUserId = $currentUser->id;
 
         // SE NÃO FOR PASSADO ID --> REDIRECIONA PARA PERIFL DO USER ATUAL
-        if ($id === null) {
-            return $this->redirect(['view', 'id' => $currentUserId]);
-        }
+        $id = $id ?? $currentUser->id;
 
-        $model = $this->findModel($currentUserId);
-
-        // SE O UTILIZADOR NÃO EXISTE, REDIRECIONAR PARA O PERFIL DO UTILIZADOR ATUAL
-        $model = User::findOne($id);
-        if ($model === null) {
-            return $this->redirect(['view', 'id' => $currentUserId]);
-        }
+        // OBTER UTILIZADOR A VISUALIZAR
+        $model = $this->findModel($id);
 
         // SE FOR ADMIN --> PODE VER TODOS OS UTILIZADORES
         if ($currentUser->can('admin')) {
-            $model = $this->findModel($id);
             return $this->render('view', ['model' => $model]);
         }
 
         // SE FOR GERENTE --> PODE VER O SEU PERFIL E DOS FUNCIONÁRIOS DO SEU CINEMA
         if ($currentUser->can('gerente')) {
-            $model = $this->findModel($id);
+
+            // OBTER PERFIL DO GERENTE
+            $gerenteProfile = $currentUser->identity->profile;
 
             // SE FOR O SEU PRÓPRIO PERFIL
-            if ($model->id == $currentUserId) {
+            if ($id == $currentUser->id) {
                 return $this->render('view', ['model' => $model]);
             }
 
-            // SE NÃO FOR O PERFIL DO GERENTE --> OBTER CINEMA DO GERENTE
-            $gerenteProfile = $currentUser->identity->profile;
-
-            // SE O CINEMA DO FUNCIONÁRIO FOR IGUAL AO CINEMA DO GERENTE --> TEM ACESSO
-            if ($gerenteProfile->cinema_id && $model->profile->cinema_id == $gerenteProfile->cinema_id && $model->status != User::STATUS_DELETED) {
+            // SE FOR SEU FUNCIONÁRIO --> TEM ACESSO
+            if ($gerenteProfile->cinema_id && $model->profile->cinema_id == $gerenteProfile->cinema_id && !$model->isStatusDeleted()) {
                 return $this->render('view', ['model' => $model]);
             }
 
             // CASO CONTRÁRIO --> É REDIRECIONADO PARA O SEU PERFIL
-            return $this->redirect(['view', 'id' => $currentUserId]);
+            return $this->redirect(['view', 'id' => $currentUser->id]);
         }
 
-        // OUTROS --> SÓ PODE VER O SEU PRÓPRIO PERFIL
-        if ($id === null || $currentUserId != $id) {
-            return $this->redirect(['view', 'id' => $currentUserId]);
+        // OUTROS --> SÓ PODEM VER O SEU PRÓPRIO PERFIL
+        if ($id === null || $currentUser->id != $id) {
+            return $this->redirect(['view', 'id' => $currentUser->id]);
         }
 
-        $model = $this->findModel($currentUserId);
         return $this->render('view', ['model' => $model]);
     }
 
-    /**
-     * Creates a new User model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
 
-    // CRIAR UM NOVO UTILIZADOR (GERENTE PODE CRIAR QUALQUER UTILIZADOR, GERENTE PODE CRIAR FUNCIONÁRIOS PARA O SEU CINEMA)
+    // ADMIN --> CRIA QUALQUER UTILIZADOR
+    // GERENTE --> APENAS CRIA FUNCIONÁRIOS PARA O SEU CINEMA
     public function actionCreate()
     {
         // OBTER USER ATUAL
@@ -198,12 +176,12 @@ class UserController extends Controller
                         // ATRIBUIR ROLE RBAC
                         $auth = Yii::$app->authManager;
 
-                        // SE ROLE ESCOLHIDO NO FORM EXISTIR NO RBAC --> DAR ASSIGN DO UTILIZADOR NOVO
+                        // DAR ASSIGN DO ROLE AO UTILIZADOR NOVO
                         if ($role = $auth->getRole($model->role)) {
                             $auth->assign($role, $model->id);
                         }
 
-                        // SE UTILIZADOR CRIADO FOR GERENTE --> ATUALIZAR CAMPO 'gerente_id' DO CINEMA ESCOLHIDO
+                        // SE UTILIZADOR CRIADO FOR GERENTE --> ATUALIZAR CAMPO GERENTE DO CINEMA ESCOLHIDO
                         $this->atualizarGerenteCinema($model, $profile);
 
                         // DAR COMMIT NA TRANSACTION
@@ -220,14 +198,16 @@ class UserController extends Controller
                         return $this->redirect(['view', 'id' => $model->id]);
                     }
                 }
+
                 // GERENTE --> APENAS PODE CRIAR FUNCIONÁRIOS PARA O SEU CINEMA
                 if ($currentUser->can('gerente')) {
 
                     // OBTER PERFIL DO GERENTE
                     $gerenteProfile = $currentUser->identity->profile;
 
-                    // FORÇAR CRIAÇÃO DO FUNCIONÁRIO
+                    // FORÇAR CRIAÇÃO COM ROLE FUNCIONÁRIO
                     $model->role = 'funcionario';
+
                     if ($model->save()) {
 
                         // ATRIBUIR USER_PROFILE AO FUNCIONÁRIO CRIADO
@@ -263,52 +243,42 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Updates an existing User model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param int $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
 
-    // ATUALIZAR UM UTILIZADOR QUE JÁ EXISTE (ADMIN PODE EDITAR TODOS OS UTILIZADORES, GERENTE APENAS EDITA O SEU, FUNCIONÁRIO PODE EDITAR O SEU)
-    public function actionUpdate($id = null) // $id = null porque se user atual apenas mete 'user/view' é redirecionado para o seu perfil
+    // ADMIN --> EDITA QUALQUER UTILIZADOR
+    // GERENTE/FUNCIONÁRIO --> APENAS SE EDITA A SI MESMO
+    public function actionUpdate($id = null)
     {
         // OBTER USER ATUAL
         $currentUser = Yii::$app->user;
 
-        // VER SE USER ATUAL É ADMIN
-        $isAdmin = $currentUser->can('admin');
-
         // SE USER ATUAL NÃO FOR ADMIN --> APENAS PODE EDITAR O SEU PERFIL
-        if (!$isAdmin) {
-            // SE NÃO FOR PASSADO NENHUM ID OU NÃO FOR O ID DO USER ATUAL --> REDIRECIONAR PARA O UPDATE DO SEU PRÓPRIO PERFIL
-            if ($id === null || $currentUser->id != $id) {
-                return $this->redirect(['update', 'id' => $currentUser->id]);
-            }
+        if (!$currentUser->can('admin')) {
+            $id = $currentUser->id;
+        }
+        elseif ($id === null) {
+            return $this->redirect(['index']);
         }
 
-        // OBTER USER E PERFIL
+        // OBTER UTILIZADOR
         $model = $this->findModel($id ?? $currentUser->id);
         $profile = $model->profile ?? new UserProfile(['user_id' => $model->id]);
 
         // OBTER O ROLE DO UTILIZADOR
         $roles = Yii::$app->authManager->getRolesByUser($model->id);
-        if (!empty($roles)) {
-            $model->role = array_key_first($roles);
-        }
+        $model->role = !empty($roles) ? array_key_first($roles) : null;
 
         // GUARDAR ALTERAÇÕES
         if ($model->load(Yii::$app->request->post()) && $profile->load(Yii::$app->request->post())) {
             if ($model->save()) {
+
                 $profile->user_id = $model->id;
                 $profile->save(false);
 
-                // SE O USER ATUAL É ADMIN E O ROLE O UTILIZADOR A SER ATUALIZADO MUDOU
-                if ($isAdmin && $model->role) {
-                    $auth = Yii::$app->authManager;
+                // SE O USER ATUAL É ADMIN E O ROLE DO UTILIZADOR A SER ATUALIZADO MUDOU
+                if ($currentUser->can('admin') && $model->role) {
 
                     // RETIRAR TODOS OS ROLES E PERMISSÕES ANTIGAS
+                    $auth = Yii::$app->authManager;
                     $auth->revokeAll($model->id);
 
                     // DAR ASSIGN DO ROLE NOVO
@@ -317,12 +287,15 @@ class UserController extends Controller
                     }
                 }
 
-                // SE O UTILIZADOR A SER ATUALIZADO É GERENTE --> ATUALIZAR CAMPO 'gerente_id' DO CINEMA (CASO TENHA MUDADO)
+                // SE O UTILIZADOR A SER ATUALIZADO É GERENTE --> ATUALIZAR CAMPO GERENTE DO CINEMA
                 $this->atualizarGerenteCinema($model, $profile);
 
                 // MENSAGEM DE SUCESSO E REDIRECIONAR PARA OS DETALHES DO USER ATUALIZADO
                 Yii::$app->session->setFlash('success', 'Utilizador atualizado com sucesso.');
                 return $this->redirect(['view', 'id' => $model->id]);
+            }
+            else {
+                Yii::$app->session->setFlash('error', 'Ocorreu um erro ao atualizar o utilizador.');
             }
         }
 
@@ -332,92 +305,55 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Deletes an existing User model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param int $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
 
-    // ELIMINAR UTILIZADOR (ADMIN DÁ HARD-DELETE A TODOS, GERENTE DÁ SOFT-DELETE AOS FUNCIONÁRIOS, ADMIN SÓ PODE DAR SOFT-DELETE A SI MESMO)
+    // ADMIN --> ELIMINA QUALQUER UTILIZADOR, MENOS A SI MESMO
     public function actionDelete($id)
     {
         // OBTER USER ATUAL
         $currentUser = Yii::$app->user;
 
         // OBTER UTILIZADOR A SER ELIMINADO
-        $user = $this->findModel($id);
-
-        // SHORTCUTS PARA VERIFICAR PERMISSÕES
-        $isAdmin = $currentUser->can('admin');
-        $isGerente = $currentUser->can('gerente');
-        $isOwnAccount = ($currentUser->id == $id);
+        $model = $this->findModel($id);
 
         // SE ADMIN ESTÁ A ELIMINAR OUTRO UTILIZADOR --> HARD-DELETE
-        if ($isAdmin && !$isOwnAccount) {
+        if ($currentUser->can('gerirUtilizadores')) {
 
-            // SE UTILIZADOR FOR GERENTE --> LIBERTAR CINEMAS QUE GERIA
-            Cinema::updateAll(['gerente_id' => null], ['gerente_id' => $user->id]);
-
-            // RETIRAR ROLES RBAC DO UTILIZADOR
-            $auth = Yii::$app->authManager;
-            $auth->revokeAll($user->id);
-
-            // APAGAR O USER_PROFILE DO UTILIZADOR
-            if ($user->profile) {
-                $user->profile->delete();
-            }
-
-            // HARD-DELETE
-            $user->delete();
-
-            // MENSAGEM DE SUCESSO E REDIRECIONAR PARA INDEX
-            Yii::$app->session->setFlash('success', 'Utilizador eliminado permanentemente.');
-            return $this->redirect(['index']);
-        }
-
-        // SE ADMIN/GERENTE TENTAR SE ELIMINAR --> SOFT-DELETE
-        if ($isOwnAccount && $isAdmin) {
-
-            // DAR SOFT-DELETE
-            $user->status = User::STATUS_DELETED;
-
-            // MENSAGENS DE SUCESSO/ERRO
-            if ($user->save(false, ['status'])) {
-                Yii::$app->session->setFlash('success', 'A sua conta foi eliminada.');
-            } else {
-                Yii::$app->session->setFlash('error', 'Ocorreu um erro ao eliminar a sua conta.');
-            }
-
-            // FAZER LOGOUT E REDIRECIONAR PARA PÁGINA DE LOGIN
-            Yii::$app->user->logout();
-            return $this->redirect(['/site/login']);
-        }
-
-        // SE GERENTE ELIMINAR FUNCIONÁRIOS DO SEU CINEMA --> SOFT-DELETE
-        if ($isGerente && !$isOwnAccount) {
-
-            // OBTER PERFIL DO GERENTE
-            $gerenteProfile = $currentUser->identity->profile;
-
-            // SE NÃO FOR SEU FUNCIONÁRIO --> SEM PERMISSÃO
-            if (!$gerenteProfile || !$user->profile || $user->profile->cinema_id != $gerenteProfile->cinema_id) {
-                Yii::$app->session->setFlash('warning', 'Só pode eliminar funcionários do seu cinema.');
+            // SE ADMIN/GERENTE TENTAR SE ELIMINAR --> SEM PERMISSÃO
+            if ($currentUser->id == $id) {
+                Yii::$app->session->setFlash('error', 'Não se pode eliminar a si próprio.');
                 return $this->redirect(['index']);
             }
 
-            // DAR SOFT-DELETE
-            $user->status = User::STATUS_DELETED;
+            $transaction = Yii::$app->db->beginTransaction();
 
-            // MENSAGENS DE SUCESSO/ERRO
-            if ($user->save(false, ['status'])) {
-                Yii::$app->session->setFlash('success', 'Utilizador eliminado com sucesso.');
-            } else {
+            try {
+                // SE UTILIZADOR FOR GERENTE --> REMOVER O SEU ID DOS CINEMAS QUE GERIA
+                Cinema::updateAll(['gerente_id' => null], ['gerente_id' => $model->id]);
+
+                // RETIRAR ROLES RBAC DO UTILIZADOR
+                $auth = Yii::$app->authManager;
+                $auth->revokeAll($model->id);
+
+                // APAGAR O USER_PROFILE DO UTILIZADOR
+                if ($model->profile) {
+                    $model->profile->delete();
+                }
+
+                // HARD-DELETE
+                $model->delete();
+
+                // DAR COMMIT NA TRANSACTION
+                $transaction->commit();
+
+                // MENSAGEM DE SUCESSO E REDIRECIONAR PARA INDEX
+                Yii::$app->session->setFlash('success', 'Utilizador eliminado permanentemente.');
+                return $this->redirect(['index']);
+            }
+            catch (Exception $e) {
+                $transaction->rollBack();
+                Yii::error($e->getMessage());
                 Yii::$app->session->setFlash('error', 'Ocorreu um erro ao eliminar o utilizador.');
             }
-
-            return $this->redirect(['index']);
         }
 
         // CASO CONTRÁRIO --> SEM PERMISSÃO
@@ -425,150 +361,102 @@ class UserController extends Controller
         return $this->redirect(['view', 'id' => $currentUser->id]);
     }
 
-    // DESATIVAR A CONTA DE UM UTILIZADOR (ADMIN PODE TODOS, GERENTE PODE DESATIVAR OS SEUS FUNCIONÁRIOS)
-    public function actionDeactivate($id)
+
+    // ADMIN --> MUDA O ESTADO DE QUALQUER UTILIZADOR
+    // GERENTE --> APENAS MUDA O ESTADO DOS SEUS FUNCIONÁRIOS
+    public function actionChangeStatus($id, $estado)
     {
-        // OBTER USER ATUAL
         $currentUser = Yii::$app->user;
 
-        // SE NÃO FOR ADMIN NEM GERENTE --> SEM PERMISSÃO
-        if (!$currentUser->can('admin') && !$currentUser->can('gerente')) {
-            Yii::$app->session->setFlash('error', 'Não tem permissão para desativar utilizadores.');
+        // VERIFICAR PERMISSÕES
+        if (!$currentUser->can('gerirFuncionarios') && !$currentUser->can('gerirUtilizadores')) {
+            throw new ForbiddenHttpException('Não tem permissão para alterar o estado de utilizadores.');
+        }
+
+        // OBTER O UTILIZADOR A SER ALTERADO
+        $model = $this->findModel($id);
+
+        // VERIFICAR SE O ESTADO É VÁLIDO
+        $estadosValidos = array_keys(User::optsStatus());
+        if (!in_array($estado, $estadosValidos)) {
+            Yii::$app->session->setFlash('error', 'Estado inválido.');
             return $this->redirect(['index']);
         }
 
-        // SE FOR GERENTE E TENTAR DESATIVAR O SEU PRÓPRIO PERFIL --> NÃO TEM PERMISSÃO
-        if ($currentUser->can('gerente') && !$currentUser->can('admin')  && Yii::$app->user->id == $id) {
-            Yii::$app->session->setFlash('warning', 'Não pode desativar a sua própria conta.');
-            return $this->redirect(['view', 'id' => $id]);
-        }
-
-        // OBTER UTIIZADOR A SER DESATIVADO
-        $model = $this->findModel($id);
-
-        // SE FOR GERENTE MAS NÃO FOR ADMIN
-        if ($currentUser->can('gerente') && !$currentUser->can('admin')) {
-
-            // OBTER PERFIL DO GERENTE
-            $gerenteProfile = $currentUser->identity->profile;
-
-            // SE O CINEMA DO GERENTE NÃO FOR IGUAL AO DO FUNCIONÁRIO PARA DESATIVAR --> SEM PERMISSÃO
-            if (!$gerenteProfile || !$model->profile || $model->profile->cinema_id != $gerenteProfile->cinema_id) {
-                Yii::$app->session->setFlash('warning', 'Só pode desativar funcionários do seu cinema.');
-                return $this->redirect(['index']);
-            }
-        }
-
-        // ATUALIZAR STATUS DA CONTA PARA 'INATIVA'
-        $model->status = User::STATUS_INACTIVE;
-
-        // GUARDAR
-        if ($model->save(false, ['status'])) {
-            Yii::$app->session->setFlash('success', 'Utilizador desativado com sucesso.');
-        } else {
-            Yii::$app->session->setFlash('error', 'Ocorreu um erro ao desativar o utilizador.');
-        }
-
-        // VOLTAR
-        return $this->redirect(['index']);
-    }
-
-    // ATIVAR UTILIZADOR (ADMIN PODE TODOS, GERENTE PODE ATIVAR OS SEUS FUNCIONÁRIOS)
-    public function actionActivate($id)
-    {
-        // OBTER USER ATUAL
-        $currentUser = Yii::$app->user;
-
-        // SE NÃO FOR ADMIN NEM GERENTE --> SEM PERMISSÃO
-        if (!$currentUser->can('admin') && !$currentUser->can('gerente')) {
-            Yii::$app->session->setFlash('error', 'Não tem permissão para ativar utilizadores.');
+        // SE JÁ ESTIVER NO ESTADO PRETENDIDO
+        if ($model->status === $estado) {
+            Yii::$app->session->setFlash('info', "O utilizador já se encontra no estado selecionado.");
             return $this->redirect(['index']);
         }
 
-        // OBTER UTIIZADOR A SER ATIVADO
-        $model = $this->findModel($id);
+        // IMPEDIR ATIVAR O UTILIZADOR SE O SEU CINEMA ESTIVER ENCERRADO
+        if ($estado == $model::STATUS_ACTIVE && $model->cinema->isEstadoEncerrado()) {
+            Yii::$app->session->setFlash('error', 'Não pode ativar funcionários com cinema encerrado.');
+            return $this->redirect(['index']);
+        }
 
-        // SE FOR GERENTE MAS NÃO FOR ADMIN
+        // REGRAS PARA GERENTE
         if ($currentUser->can('gerente') && !$currentUser->can('admin')) {
 
-            // OBTER PERFIL DO GERENTE
+            // IMPEDIR ALTERAR O ESTADO DA PRÓPRIA CONTA
+            if ($currentUser->id == $id) {
+                Yii::$app->session->setFlash('error', 'Não pode alterar o estado da sua própria conta.');
+                return $this->redirect(['view', 'id' => $id]);
+            }
+
+            // OBTER PERFIS
             $gerenteProfile = $currentUser->identity->profile;
+            $funcionarioProfile = $model->profile;
 
-            // SE O CINEMA DO GERENTE NÃO FOR IGUAL AO DO FUNCIONÁRIO PARA ATIVAR --> SEM PERMISSÃO
-            if (!$gerenteProfile || !$model->profile || $model->profile->cinema_id != $gerenteProfile->cinema_id) {
-                Yii::$app->session->setFlash('warning', 'Só pode ativar funcionários do seu cinema.');
+            // SE FOR SEU FUNCIONÁRIO --> TEM ACESSO
+            if (!$gerenteProfile || !$funcionarioProfile || $funcionarioProfile->cinema_id != $gerenteProfile->cinema_id) {
+                Yii::$app->session->setFlash('error', 'Só pode alterar o estado de funcionários do seu cinema.');
                 return $this->redirect(['index']);
             }
 
-            if ($model->status == User::STATUS_DELETED) {
-                Yii::$app->session->setFlash('warning', 'Não pode ativar funcionários eliminados.');
+            // IMPEDIR ATIVAR FUNCIONÁRIOS ELIMINADOS
+            if ($estado == User::STATUS_ACTIVE && $model->status == User::STATUS_DELETED) {
+                Yii::$app->session->setFlash('error', 'Não pode ativar funcionários eliminados.');
                 return $this->redirect(['index']);
             }
-
         }
 
-        // ATUALIZAR STATUS DA CONTA PARA 'ATIVA'
-        $model->status = User::STATUS_ACTIVE;
+        // ATUALIZAR ESTDO
+        $model->status = $estado;
 
-        // GUARDAR
         if ($model->save(false, ['status'])) {
-            Yii::$app->session->setFlash('success', 'Utilizador ativado com sucesso.');
-        } else {
-            Yii::$app->session->setFlash('error', 'Ocorreu um erro ao ativar o utilizador.');
+            $label = User::optsStatus()[$estado] ?? 'Desconhecido';
+            Yii::$app->session->setFlash('success', "Estado alterado para '{$label}' com sucesso.");
+        }
+        else {
+            Yii::$app->session->setFlash('error', 'Ocorreu um erro ao alterar o estado do utilizador.');
         }
 
-        // VOLTAR
         return $this->redirect(['index']);
     }
 
-    // ATUALIZAR O CAMPO 'gerente_id' DE UM CINEMA
+
+    // ATUALIZAR O GERENTE DE UM CINEMA
     private function atualizarGerenteCinema($model, $profile)
     {
-        // SE UTILIZADOR DEIXOU DE SER GERENTE --> REMOVER DE QUALQUER CINEMA
-        if ($model->role !== 'gerente') {
-            Cinema::updateAll(['gerente_id' => null], ['gerente_id' => $model->id]);
-            return;
-        }
-
-        // SE O GERENTE FICOU SEM CINEMA ASSOCIADO --> REMOVER DO CINEMA
-        if (!$profile->cinema_id) {
-            Cinema::updateAll(['gerente_id' => null], ['gerente_id' => $model->id]);
-            return;
-        }
-
-        // 1 - OBTER O NOVO CINEMA ESCOLHIDO
+        // OBTER O NOVO CINEMA ESCOLHIDO
         $novoCinema = Cinema::findOne($profile->cinema_id);
         if (!$novoCinema) return;
 
-        // 2 - LIBERTAR O GERENTE DOS OUTROS CINEMAS (para evitar duplicados)
+        // LIBERTAR O GERENTE DOS OUTROS CINEMAS (PARA EVITAR DUPLICADOS)
         Cinema::updateAll(['gerente_id' => null], ['gerente_id' => $model->id]);
 
-        // SE O NOVO CINEMA JÁ TINHA OUTRO GERENTE --> LIMPAR PERFIL DELE
+        // SE O NOVO CINEMA JÁ TINHA OUTRO GERENTE --> LIMPAR O PERFIL DELE
         if ($novoCinema->gerente_id && $novoCinema->gerente_id != $model->id) {
             UserProfile::updateAll(['cinema_id' => null], ['user_id' => $novoCinema->gerente_id]);
         }
 
-        // 3 - ASSOCIAR O NOVO CINEMA AO GERENTE ATUAL
+        // ASSOCIAR O NOVO CINEMA AO GERENTE ATUAL
         $novoCinema->gerente_id = $model->id;
         $novoCinema->save(false);
-
-        // 4 - GARANTIR QUE NENHUM OUTRO GERENTE FICA COM O MESMO CINEMA NO PERFIL
-        $gerentes = Yii::$app->authManager->getUserIdsByRole('gerente');
-        if (!empty($gerentes)) {
-            UserProfile::updateAll(
-                ['cinema_id' => null],
-                ['and', ['cinema_id' => $novoCinema->id], ['in', 'user_id', $gerentes], ['!=', 'user_id', $model->id],]
-            );
-        }
     }
 
-    /**
-     * Finds the User model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param int $id
-     * @return User the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
+
     protected function findModel($id)
     {
         if (($model = User::findOne($id)) !== null) {

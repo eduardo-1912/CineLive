@@ -71,10 +71,9 @@ class UserSearch extends User
             ->andFilterWhere(['like', 'user_profile.telemovel', $this->telemovel]);
 
         // FILTRAR POR ROLE
-        if (!empty($this->role)) {
-            // OBTER IDS DOS UTILIZADORES COM O ROLE SELECIONADO NO FILTRO DROPDOWN
-            $userIds = Yii::$app->authManager->getUserIdsByRole($this->role);
-            $query->andFilterWhere(['user.id' => $userIds]);
+        if ($this->role) {
+            $ids = Yii::$app->authManager->getUserIdsByRole($this->role);
+            $query->andWhere(['user.id' => $ids ?: 0]);
         }
 
         return $dataProvider;

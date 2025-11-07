@@ -12,7 +12,6 @@ use common\models\Sala;
  */
 class SalaSearch extends Sala
 {
-    // ATRIBUTO VIRTUAL (PARA FILTRAR NO GRIDVIEW)
     public $lugares;
 
     /**
@@ -76,6 +75,7 @@ class SalaSearch extends Sala
 
         $query->andFilterWhere(['like', 'estado', $this->estado]);
 
+        // FILTRAR POR NÚMERO DE LUGARES
         if (!empty($this->lugares)) {
             $query->andWhere('(num_filas * num_colunas) = :lugares', [':lugares' => $this->lugares]);
         }

@@ -13,21 +13,6 @@ use yii\web\JqueryAsset;
 
 ?>
 
-<?php
-$this->registerCssFile('https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css');
-$this->registerCssFile('https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css');
-$this->registerJsFile('https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js', [
-    'depends' => [JqueryAsset::class],
-]);
-
-$this->registerJs("
-    $('#generos-select').select2({
-        theme: 'bootstrap-5',
-        allowClear: true,
-    });
-");
-?>
-
 <div class="filme-form">
 
     <?php $form = ActiveForm::begin([
@@ -73,3 +58,18 @@ $this->registerJs("
 
     <?php ActiveForm::end(); ?>
 </div>
+
+<?php
+$this->registerCssFile('https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css');
+$this->registerCssFile('https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css');
+$this->registerJsFile('https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js', [
+    'depends' => [JqueryAsset::class],
+]);
+
+$this->registerJs("
+    $('#generos-select').select2({
+        theme: 'bootstrap-5',
+        allowClear: true,
+    });
+");
+?>

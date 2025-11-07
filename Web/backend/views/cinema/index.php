@@ -22,13 +22,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     <div class="row mb-2">
                         <div class="col-md-12">
                             <?= Html::a('Criar Cinema', ['create'], ['class' => 'btn btn-success']) ?>
-                            <?= Html::a('Salas', ['sala/index'], ['class' => 'btn btn-primary']) ?>
-                            <?= Html::a('Sessões', ['sessao/index'], ['class' => 'btn btn-secondary']) ?>
                         </div>
                     </div>
-
-
-                    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
                     <?= AppGridView::widget([
                         'dataProvider' => $dataProvider,
@@ -40,12 +35,11 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                             'nome',
                             [
-                                'label' => 'Morada',
                                 'attribute' => 'morada',
                                 'value' => function ($model) {
                                     return "{$model->rua}, {$model->codigo_postal} {$model->cidade}";
                                 },
-                                'headerOptions' => ['style' => 'width: 25rem;'],
+                                'headerOptions' => ['style' => 'width: 22rem;'],
                             ],
                             'email:email',
                             'telefone',
@@ -58,7 +52,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'value' => fn($model) => $model->estadoFormatado,
                                 'format' => 'raw',
                                 'filter' => Cinema::optsEstado(),
-                                'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos',],
+                                'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
+                                'headerOptions' => ['style' => 'width: 8rem;'],
                             ],
                             [
                                 'class' => 'backend\components\AppActionColumn',

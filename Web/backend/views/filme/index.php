@@ -32,8 +32,6 @@ $this->params['breadcrumbs'][] = $this->title;
                         </div>
                     </div>
 
-                    <!-- <?= $this->render('_search', ['model' => $searchModel]); ?> -->
-
                     <?= AppGridView::widget([
                         'dataProvider' => $dataProvider,
                         'filterModel' => $searchModel,
@@ -45,9 +43,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'attribute' => 'poster_path',
                                 'format' => 'raw',
                                 'value' => fn($model) => Html::img($model->getPosterUrl(), [
-                                    'style' => 'width: 3rem; border-radius:4px;'
+                                    'style' => 'width: 4rem; height: 31px; border-radius:4px; object-fit: cover;'
                                 ]),
-                                'headerOptions' => ['style' => 'width: 3rem;'],
+                                'headerOptions' => ['style' => 'width: 4rem;'],
                             ],
                             [
                                 'attribute' => 'id',
@@ -72,7 +70,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                             [
                                 'attribute' => 'estado',
-                                'value' => fn($model) => $model->estadoFormatado,
+                                'value' => fn($model) => ActionColumnButtonHelper::filmeEstadoDropdown($model),
                                 'format' => 'raw',
                                 'filter' => Filme::optsEstado(),
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos',],
@@ -80,13 +78,10 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                             [
                                 'class' => 'backend\components\AppActionColumn',
-                                'template' => '{view} {createSessao} {update} {delete}',
-                                'buttons' => ActionColumnButtonHelper::filmeButtons(),
+                                'template' => '{view} {update} {delete}',
                             ],
                         ]
                     ]); ?>
-
-
 
                 </div>
                 <!--.card-body-->

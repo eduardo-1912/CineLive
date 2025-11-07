@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\helpers\Url;
+use yii\bootstrap4\ActiveForm;
 
 ?>
 <!-- Navbar -->
@@ -13,9 +14,9 @@ use yii\helpers\Url;
         </li>
         <li class="nav-item d-flex align-items-center">
             <!-- SEARCH FORM -->
-            <form class="d-none d-md-flex form-inline">
+            <form action="<?= Url::to(['/filme/index']) ?>" method="get" class="d-none d-md-flex form-inline">
                 <div class="input-group input-group-md">
-                    <input class="form-control form-control-navbar" type="search" placeholder="Pesquisar Filmes..." aria-label="Search">
+                    <input type="text" name="FilmeSearch[titulo]" class="form-control form-control-navbar" placeholder="Pesquisar Filmes..." aria-label="Search">
                     <div class="input-group-append">
                         <button class="btn btn-navbar" type="submit">
                             <i class="fas fa-search"></i>

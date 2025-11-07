@@ -49,37 +49,32 @@ class SalaController extends Controller
         ];
     }
 
-    /**
-     * Lists all Sala models.
-     * @return mixed
-     */
+    // ADMIN --> VÊ TODAS AS SALAS
+    // GERENTE/FUNCIONÁRIO --> VÊ AS SALAS DO SEU CINEMA
     public function actionIndex($cinema_id = null)
     {
         // OBTER O USER ATUAL
-        $user = Yii::$app->user;
-
-        // VERIFICAR PERMISSÕES
-        if (!$user->can('funcionario')) {
-            Yii::$app->session->setFlash('error', 'Não tem permissão para aceder a esta página.');
-            return $this->redirect(['index']);
-        }
+        $currentUser = Yii::$app->user;
 
         // CRIAR SEARCH MODEL E QUERY NA DB
         $searchModel = new SalaSearch();
         $params = Yii::$app->request->queryParams;
 
-        // SE FOR ADMIN --> VÊ TODOS OS UTILIZADORES
-        if ($user->can('admin')) {
+        // SE FOR ADMIN --> VÊ TODAS AS SALAS
+        if ($currentUser->can('admin')) {
+
+            // SE ALGUM CINEMA FOI PASSADO COM PARÂMETRO
             if ($cinema_id !== null) {
                 $params['SalaSearch']['cinema_id'] = $cinema_id;
             }
+
             $dataProvider = $searchModel->search($params);
         }
 
         // SE FOR GERENTE/FUNCIONÁRIO --> APENAS VÊ OS SALAS DO SEU CINEMA
         else {
             // OBTER PERFIL DO USER ATUAL
-            $userProfile = $user->identity->profile;
+            $userProfile = $currentUser->identity->profile;
 
             // VERIFICAR SE TEM CINEMA ASSOCIADO
             if (!$userProfile || !$userProfile->cinema_id) {
@@ -90,7 +85,7 @@ class SalaController extends Controller
                 $this->redirect(['index']);
             }
 
-            // APLICAR FILTRO DE CINEMA
+            // APLICAR FILTRO DO SEU CINEMA
             $params['SalaSearch']['cinema_id'] = $userProfile->cinema_id;
             $dataProvider = $searchModel->search($params);
         }
@@ -102,26 +97,21 @@ class SalaController extends Controller
         ]);
     }
 
-    /**
-     * Displays a single Sala model.
-     * @param int $id ID
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
+
+    // ADMIN --> VÊ DETALHES DE TODAS AS SALAS
+    // GERENTE/FUNCIONÁRIO --> APENAS VÊ AS SUAS SALAS
     public function actionView($id)
     {
         // OBTER O USER ATUAL
-        $user = Yii::$app->user;
+        $currentUser = Yii::$app->user;
 
-        // VERIFICAR PERMISSÕES
-        if (!$user->can('funcionario')) {
-            throw new ForbiddenHttpException('Não tem permissão para aceder a esta página.');
-        }
+        // SE É GERENTE/FUNCIONÁRIO --> APENAS VÊ SALAS DO SEU CINEMA
+        if (!$currentUser->can('admin')) {
 
-        if (!$user->can('admin')) {
             // OBTER ID DO CINEMA DO USER ATUAL
-            $cinemaId = $user->identity->profile->cinema_id;
+            $cinemaId = $currentUser->identity->profile->cinema_id;
 
+            // OBTER SALA SELECIONADA
             $model = $this->findModel($id);
 
             // SE CINEMA DO USER E CINEMA DA SALA FOREM DIFERENTES --> SEM ACESSO
@@ -137,18 +127,16 @@ class SalaController extends Controller
         ]);
     }
 
-    /**
-     * Creates a new Sala model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
+
+    // ADMIN --> CRIA SALAS PARA QUALQUER CINEMA
+    // GERENTE --> APENAS CRIA SALAS PARA O SEU CINEMA
     public function actionCreate()
     {
         // OBTER O USER ATUAL
-        $user = Yii::$app->user;
+        $currentUser = Yii::$app->user;
 
         // VERIFICAÇÃO DE PERMISSÕES
-        if (!$user->can('admin') && !$user->can('gerente')) {
+        if (!$currentUser->can('admin') && !$currentUser->can('gerente')) {
             throw new ForbiddenHttpException('Não tem permissão para criar salas.');
         }
 
@@ -156,19 +144,18 @@ class SalaController extends Controller
         $model = new Sala();
 
         // SE FOR GERENTE --> FORÇAR ATRIBUIÇÃO CINEMA_ID DO GERENTE
-        if ($user->can('gerente') && !$user->can('admin')) {
-            $model->cinema_id = $user->identity->profile->cinema_id;
+        if ($currentUser->can('gerente') && !$currentUser->can('admin')) {
+            $model->cinema_id = $currentUser->identity->profile->cinema_id;
         }
 
         // GUARDAR
         if ($model->load(Yii::$app->request->post())) {
-
             if ($model->save()) {
                 Yii::$app->session->setFlash('success', 'Sala criada com sucesso.');
                 return $this->redirect(['view', 'id' => $model->id]);
             }
             else {
-                Yii::$app->session->setFlash('error', 'Erro ao criar a sala.');
+                Yii::$app->session->setFlash('error', 'Ocorreu um erro ao criar a sala.');
             }
         }
 
@@ -178,67 +165,60 @@ class SalaController extends Controller
     }
 
 
-    /**
-     * Updates an existing Sala model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param int $id ID
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-
-    // ATUALIZAR SALA
+    // ADMIN --> EDITA QUALQUER SALA
+    // GERENTE --> APENAS EDITA SALAS DO SEU CINEMA
     public function actionUpdate($id)
     {
         // OBTER USER ATUAL
-        $user = Yii::$app->user;
+        $currentUser = Yii::$app->user;
 
         // VERIFICAR PERMISSÕES
-        if (!$user->can('admin') && !$user->can('gerente')) {
-            throw new ForbiddenHttpException('Não tem permissão para atualizar salas.');
+        if (!$currentUser->can('admin') && !$currentUser->can('gerente')) {
+            Yii::$app->session->setFlash('error', 'Não tem permissão para editar salas.');
+            return $this->redirect(['index']);
         }
 
-        // OBTER SALA
+        // OBTER SALA SELECIONADA
         $model = $this->findModel($id);
 
-        // SE É GERENTE --> SÓ PODE EDITAR UMA SALA DO SEU CINEMA
-        if ($user->can('gerente') && !$user->can('admin')) {
+        // SE É GERENTE --> SÓ PODE EDITAR SALAS DO SEU CINEMA
+        if ($currentUser->can('gerente') && !$currentUser->can('admin')) {
 
             // OBTER ID DO CINEMA DO USER
-            $userCinemaId = $user->identity->profile->cinema_id;
+            $userCinemaId = $currentUser->identity->profile->cinema_id;
 
             // SE CINEMAS NÃO COINCIDEM --> SEM PERMISSÃO
             if ($model->cinema_id != $userCinemaId) {
-                throw new ForbiddenHttpException('Não tem permissão para editar salas de outro cinema.');
+                Yii::$app->session->setFlash('error', 'Não tem permissão para editar salas de outro cinema.');
+                return $this->redirect(['index']);
             }
         }
 
         // OBTER DADOS ORIGINAIS
         $anterior = $this->findModel($id);
-        $estadoAnterior = $model->estado;
 
         // GUARDAR
         if ($model->load(Yii::$app->request->post())) {
 
+            // SE NÃO PODER SER ENCERRADA --> NÃO DEIXAR ALTERAR ESTES DADOS
             if (!$model->isClosable()) {
-                // NÃO DEIXAR ALTERAR ESTES DADOS
                 $model->cinema_id = $anterior->cinema_id;
                 $model->num_filas = $anterior->num_filas;
                 $model->num_colunas = $anterior->num_colunas;
-                $model->estado = $estadoAnterior;
+                $model->estado = $anterior->estado;
             }
 
             // FORÇAR CINEMA_ID SE FOR GERENTE
-            if ($user->can('gerente') && !$user->can('admin')) {
-                $model->cinema_id = $user->identity->profile->cinema_id;
+            if ($currentUser->can('gerente') && !$currentUser->can('admin')) {
+                $model->cinema_id = $currentUser->identity->profile->cinema_id;
             }
 
-            // GUARDAR
             if ($model->save()) {
                 Yii::$app->session->setFlash('success', 'Sala atualizada com sucesso.');
                 return $this->redirect(['view', 'id' => $model->id]);
             }
             else {
-                Yii::$app->session->setFlash('error', 'Erro ao atualizar a sala.');
+                Yii::$app->session->setFlash('error', 'Ocorreu um erro ao atualizar a sala.');
             }
         }
 
@@ -247,15 +227,15 @@ class SalaController extends Controller
         ]);
     }
 
+
     // MUDAR O ESTADO DA SALA
     public function actionChangeStatus($id, $estado)
     {
         // OBTER USER ATUAL
-        $user = Yii::$app->user;
+        $currentUser = Yii::$app->user;
 
         // VERIFICAR PERMISSÕES
-        if (!$user->can('admin') && !$user->can('gerente'))
-        {
+        if (!$currentUser->can('admin') && !$currentUser->can('gerente')) {
             Yii::$app->session->setFlash('error', 'Não tem permissão para alterar o estado das salas.');
             return $this->redirect(['index']);
         }
@@ -264,13 +244,11 @@ class SalaController extends Controller
         $model = $this->findModel($id);
 
         // VERIFICAR CINEMA (GERENTE SÓ PODE ALTERAR AS SUAS SALAS)
-        if ($user->can('gerente') && !$user->can('admin'))
-        {
-            $userCinemaId = $user->identity->profile->cinema_id;
+        if ($currentUser->can('gerente') && !$currentUser->can('admin')) {
+            $userCinemaId = $currentUser->identity->profile->cinema_id;
 
             // SE SALA NÃO FOR DO CINEMA DO GERENTE --> MENSAGEM DE ERRO
-            if ($model->cinema_id != $userCinemaId)
-            {
+            if ($model->cinema_id != $userCinemaId) {
                 Yii::$app->session->setFlash('error', 'Não tem permissão para alterar salas de outro cinema.');
                 return $this->redirect(['index']);
             }
@@ -280,31 +258,26 @@ class SalaController extends Controller
         $estadosValidos = array_keys(Sala::optsEstado());
 
         // SE ESTADO NÃO FOR VÁLIDO --> MENSAGEM DE ERRO
-        if (!in_array($estado, $estadosValidos))
-        {
+        if (!in_array($estado, $estadosValidos)) {
             Yii::$app->session->setFlash('error', 'Estado inválido.');
             return $this->redirect(['index']);
         }
 
         // SE JÁ ESTIVER NO ESTADO PRETENDIDO
-        if ($model->estado === $estado)
-        {
+        if ($model->estado === $estado) {
             Yii::$app->session->setFlash('info', "O cinema já se encontra no estado selecionado.");
             return $this->redirect(['index']);
         }
 
-        if ($estado === Sala::ESTADO_ENCERRADA)
-        {
+        if ($estado === Sala::ESTADO_ENCERRADA) {
             // SE SALA JÁ ESTIVER ENCERRADA --> MENSAGEM DE AVISO
-            if ($model->isActivatable())
-            {
+            if ($model->isActivatable()) {
                 Yii::$app->session->setFlash('info', 'Esta sala já se encontra encerrada.');
                 return $this->redirect(['index']);
             }
 
             // SE TIVER SESSÕES ATIVAS --> NÃO DEIXAR ENCERRAR
-            if (!$model->isClosable())
-            {
+            if (!$model->isClosable()) {
                 Yii::$app->session->setFlash('error', 'Não é possível encerrar esta sala pois existem sessões ativas ou com bilhetes associadas.');
                 return $this->redirect(['index']);
             }
@@ -313,13 +286,11 @@ class SalaController extends Controller
         // ALTERAR ESTADO
         $model->estado = $estado;
 
-        if ($model->save(false, ['estado']))
-        {
+        if ($model->save(false, ['estado'])) {
             $mensagem = $estado === Sala::ESTADO_ATIVA ? 'Sala ativada com sucesso.' : 'Sala encerrada com sucesso.';
             Yii::$app->session->setFlash('success', $mensagem);
         }
-        else
-        {
+        else {
             Yii::$app->session->setFlash('error', 'Erro ao alterar o estado da sala.');
         }
 
@@ -327,14 +298,6 @@ class SalaController extends Controller
     }
 
 
-
-    /**
-     * Finds the Sala model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param int $id ID
-     * @return Sala the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
     protected function findModel($id)
     {
         if (($model = Sala::findOne($id)) !== null) {

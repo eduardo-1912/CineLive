@@ -90,11 +90,11 @@ class Sala extends \yii\db\ActiveRecord
         return $this->preco_bilhete . '€';
     }
 
-    // OBTER ESTADO FORMATADO (PARA /INDEX E /VIEW)
+    // OBTER ESTADO FORMATADO
     public function getEstadoFormatado(): string
     {
         $labels = self::optsEstado();
-        $label = $labels[$this->estado] ?? 'Desconhecida';
+        $label = $labels[$this->estado] ?? '-';
 
         $colors = [
             self::ESTADO_ATIVA => '',
@@ -115,7 +115,7 @@ class Sala extends \yii\db\ActiveRecord
                 continue;
             }
 
-            // SE TEM SESSÕES ATIVAS --> NÃO PODER SER ELIMINADA
+            // SE TEM SESSÕES ATIVAS
             if (!$sessao->isDeletable())
             {
                 return true;
@@ -137,11 +137,42 @@ class Sala extends \yii\db\ActiveRecord
             ->exists();
     }
 
-    // VERIFICAR SE PODE SER EDITADA
-    public function isEditable(): bool
+    // OBTER SALAS DISPONÍVEIS
+    public static function getSalasDisponiveis($cinemaId, $data, $horaInicio, $horaFim)
     {
-        return true;
+        // SALAS COM SESSÕES SOBREPOSTAS NESSE HORÁRIO
+        $salasOcupadas = Sessao::find()
+            ->select('sala_id')
+            ->where(['data' => $data])
+            ->andWhere(['and',
+                ['<', 'hora_inicio', $horaFim],
+                ['>', 'hora_fim', $horaInicio],
+            ])->column();
+
+        // SALAS COM ALUGUERES CONFIRMADOS NESSE HORÁRIO
+        $salasAlugadas = AluguerSala::find()
+            ->select('sala_id')
+            ->where(['data' => $data])
+            ->andWhere(['estado' => [AluguerSala::ESTADO_CONFIRMADO, AluguerSala::ESTADO_A_DECORRER]])
+            ->andWhere(['and',
+                ['<', 'hora_inicio', $horaFim],
+                ['>', 'hora_fim', $horaInicio],
+            ])->column();
+
+        // IDs DAS SALAS INDISPONÍVEIS
+        $salasIndisponiveis = array_unique(array_merge($salasOcupadas, $salasAlugadas));
+
+        // DEVOLVER APENAS AS SALAS ATIVAS E DISPONÍVEIS
+        return self::find()
+            ->where(['cinema_id' => $cinemaId, 'estado' => self::ESTADO_ATIVA])
+            ->andFilterWhere(['not in', 'id', $salasIndisponiveis])
+            ->orderBy('numero')
+            ->all();
     }
+
+
+    // VERIFICAR SE PODE SER EDITADA
+    public function isEditable(): bool { return true; }
 
     // VERIFICAR SE PODE SER ATIVADA
     public function isActivatable(): bool

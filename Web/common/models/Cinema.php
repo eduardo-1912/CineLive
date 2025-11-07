@@ -84,16 +84,17 @@ class Cinema extends \yii\db\ActiveRecord
             'telefone' => 'Telefone',
             'horario_abertura' => 'Hórario de Abertura',
             'horario_fecho' => 'Hórario de Fecho',
+            'horario' => 'Horário',
             'estado' => 'Estado',
             'gerente_id' => 'Gerente',
         ];
     }
 
-    // OBTER ESTADO FORMATADO (/INDEX E /VIEW)
+    // OBTER ESTADO FORMATADO
     public function getEstadoFormatado(): string
     {
         $labels = self::optsEstado();
-        $label = $labels[$this->estado] ?? 'Desconhecido';
+        $label = $labels[$this->estado] ?? '-';
 
         $colors = [
             self::ESTADO_ATIVO => '',
@@ -153,11 +154,28 @@ class Cinema extends \yii\db\ActiveRecord
             ]])->exists();
     }
 
-    // VERIFICAR SE PODE SER EDITADO
-    public function isEditable(): bool
+    // HORA INÍCIO FORMATADA (HH:mm)
+    public function getHoraInicioFormatada()
     {
-        return true;
+        return Yii::$app->formatter->asTime($this->hora_inicio, 'php:H:i');
     }
+
+    // HORA FIM FORMATADA (HH:mm)
+    public function getHoraFimFormatada()
+    {
+        return Yii::$app->formatter->asTime($this->hora_fim, 'php:H:i');
+    }
+
+    // OBTER HORA JUNTA
+    public function getHorario()
+    {
+        return Yii::$app->formatter->asTime($this->horario_abertura, 'php:H:i')
+            . ' - ' .
+            Yii::$app->formatter->asTime($this->horario_fecho, 'php:H:i');
+    }
+
+    // VERIFICAR SE PODE SER EDITADO
+    public function isEditable(): bool { return true; }
 
     // VERIFICAR SE PODE SER ATIVADO
     public function isActivatable(): bool

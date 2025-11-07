@@ -14,9 +14,6 @@ $isAdmin = $currentUser->can('admin');
 $gerirSalas = $currentUser->can('gerirSalas');
 $userCinemaId = $currentUser->identity->profile->cinema_id ?? null;
 
-// VERIFICAR SE SALA TEM SESSÕES ATIVAS
-$temBilhetes = $model->hasSessoesAtivas();
-
 $isNewRecord = $model->isNewRecord ? 'true' : 'false';
 
 // ARRAY COM PRÓXIMO NÚMERO DA SALA PARA CADA CINEMA
@@ -53,11 +50,11 @@ $arrayProximosNumeros = json_encode(Cinema::getProximoNumeroPorCinema());
         <?= $form->field($model, 'numero')->textInput() ?>
     </div>
 
-    <?= $form->field($model, 'num_filas')->textInput(['disabled' => $temBilhetes]) ?>
-    <?= $form->field($model, 'num_colunas')->textInput(['disabled' => $temBilhetes]) ?>
+    <?= $form->field($model, 'num_filas')->textInput(['disabled' => !$model->isClosable()]) ?>
+    <?= $form->field($model, 'num_colunas')->textInput(['disabled' => !$model->isClosable()]) ?>
     <?= $form->field($model, 'preco_bilhete')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'estado')->dropDownList($model::optsEstado(), ['disabled' => $temBilhetes]) ?>
+    <?= $form->field($model, 'estado')->dropDownList($model::optsEstado(), ['disabled' => !$model->isClosable()]) ?>
 
     <div class="form-group mt-3">
         <?= Html::submitButton('Guardar', ['class' => 'btn btn-success']) ?>
@@ -81,19 +78,20 @@ $script = <<<JS
         // OBTER O VALOR DO CAMPO CINEMA
         var cinemaId = $('#sala-cinema_id').val();
         
-        // SE NENHUM CINEMA ESTIVER SELECIONADO --> ESCONDER NÚMERO
-        if (!cinemaId)
-        {
-            $('#formFieldNumero').hide();
-            $('#sala-numero').val('');
+        // SE NENHUM CINEMA ESTIVER SELECIONADO --> ESCONDER CAMPO NÚMERO
+        if (isNewRecord) {
+            if (!cinemaId) {
+                 $('#formFieldNumero').hide();
+                $('#sala-numero').val('');
+            }
+            else {
+                $('#formFieldNumero').show();
+                var proximoNumero = proximosNumeros[cinemaId] || 1;
+                $('#sala-numero').val(proximoNumero);
+            }
         }
-        
-        $('#formFieldNumero').show();
-        
-        if (isNewRecord)
-        {
-            var proximoNumero = proximosNumeros[cinemaId] || 1;
-            $('#sala-numero').val(proximoNumero);
+        else {
+            $('#formFieldNumero').show();
         }
     }
 

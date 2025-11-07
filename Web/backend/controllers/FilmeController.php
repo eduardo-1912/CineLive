@@ -46,11 +46,7 @@ class FilmeController extends Controller
         ];
     }
 
-    /**
-     * Lists all Filme models.
-     *
-     * @return string
-     */
+    // VER FILMES
     public function actionIndex()
     {
         $searchModel = new FilmeSearch();
@@ -62,12 +58,7 @@ class FilmeController extends Controller
         ]);
     }
 
-    /**
-     * Displays a single Filme model.
-     * @param int $id ID
-     * @return string
-     * @throws NotFoundHttpException if the model cannot be found
-     */
+    // VER DETALHES DE UM FILME
     public function actionView($id)
     {
         return $this->render('view', [
@@ -75,11 +66,7 @@ class FilmeController extends Controller
         ]);
     }
 
-    /**
-     * Creates a new Filme model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return string|\yii\web\Response
-     */
+    // ADMIN --> CRIA FILME
     public function actionCreate()
     {
         $model = new Filme();
@@ -224,7 +211,7 @@ class FilmeController extends Controller
             );
         }
 
-        return $this->redirect(['view', 'id' => $model->id]);
+        return $this->redirect(['index']);
     }
 
 

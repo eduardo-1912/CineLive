@@ -80,9 +80,6 @@ $this->params['breadcrumbs'][] = 'Sessões';
                                     ['filme/view', 'id' => $model->filme_id],
                                     ['class' => 'text-decoration-none text-primary']);
                                 },
-                                'filter' => ArrayHelper::map(Filme::find()->where(['estado' => Filme::ESTADO_EM_EXIBICAO])
-                                            ->orderBy('titulo')->all(), 'titulo', 'titulo'),
-                                'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
                                 'headerOptions' => ['style' => 'width: 18rem;'],
 
                             ],

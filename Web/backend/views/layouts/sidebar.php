@@ -29,7 +29,7 @@
                     ['label' => 'Dashboard',  'icon' => 'columns', 'url' => ['/site/index']],
 
                     ['label' => 'Gestão', 'header' => true, 'visible' => $gerirFuncionarios],
-                    ['label' => $gerirUtilizadores ? 'Utilizadores' : 'Funcionários',  'icon' => 'users', 'url' => ['/user/index']],
+                    ['label' => $gerirUtilizadores ? 'Utilizadores' : 'Funcionários',  'icon' => 'users', 'url' => ['/user/index'], 'visible' => $gerirFuncionarios],
 
                     ['label' => 'Espaços', 'header' => true],
                     ['label' => $gerirCinemas ? 'Cinemas' : 'Cinema',  'icon' => 'building', 'url' => [$gerirCinemas ? '/cinema/index' : ('/cinema/view?id=' . $profile->cinema->id)]],

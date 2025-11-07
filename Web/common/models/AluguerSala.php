@@ -75,13 +75,14 @@ class AluguerSala extends \yii\db\ActiveRecord
             'hora_inicio' => 'Hora Início',
             'hora_fim' => 'Hora Fim',
             'estado' => 'Estado',
-            'tipo_evento' => 'Tipo Evento',
+            'tipo_evento' => 'Tipo de Evento',
             'observacoes' => 'Observações',
             'horaInicioFormatada' => 'Hora Início',
             'horaFimFormatada' => 'Hora Fim',
         ];
     }
 
+    // OBTER ESTADOS PERSONALIZADOS
     public function atualizarEstadoAutomatico(): void
     {
         // AGORA

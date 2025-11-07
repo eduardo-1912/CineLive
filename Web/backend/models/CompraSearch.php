@@ -56,6 +56,9 @@ class CompraSearch extends Compra
             'pagination' => [
                 'pageSize' => Yii::$app->params['pageSize'],
             ],
+            'sort' => [
+                'defaultOrder' => ['estado' => SORT_ASC],
+            ],
         ]);
 
         // PERMITIR ORDENAR POR NOME DO CLIENTE

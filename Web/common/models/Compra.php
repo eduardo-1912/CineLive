@@ -26,7 +26,6 @@ class Compra extends \yii\db\ActiveRecord
     const PAGAMENTO_MBWAY = 'mbway';
     const PAGAMENTO_CARTAO = 'cartao';
     const PAGAMENTO_MULTIBANCO = 'multibanco';
-    const ESTADO_PENDENTE = 'pendente';
     const ESTADO_CONFIRMADA = 'confirmada';
     const ESTADO_CANCELADA = 'cancelada';
 
@@ -119,7 +118,6 @@ class Compra extends \yii\db\ActiveRecord
         $label = $labels[$this->estado] ?? 'Desconhecida';
 
         $colors = [
-            self::ESTADO_PENDENTE => 'text-secondary font-italic',
             self::ESTADO_CONFIRMADA => '',
             self::ESTADO_CANCELADA => 'text-danger',
         ];
@@ -168,7 +166,6 @@ class Compra extends \yii\db\ActiveRecord
     public static function optsEstado()
     {
         return [
-            self::ESTADO_PENDENTE => 'Pendente',
             self::ESTADO_CONFIRMADA => 'Confirmada',
             self::ESTADO_CANCELADA => 'Cancelada',
         ];
@@ -227,19 +224,6 @@ class Compra extends \yii\db\ActiveRecord
     public function displayEstado()
     {
         return self::optsEstado()[$this->estado];
-    }
-
-    /**
-     * @return bool
-     */
-    public function isEstadoPendente()
-    {
-        return $this->estado === self::ESTADO_PENDENTE;
-    }
-
-    public function setEstadoToPendente()
-    {
-        $this->estado = self::ESTADO_PENDENTE;
     }
 
     /**

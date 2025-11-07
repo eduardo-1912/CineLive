@@ -87,8 +87,10 @@ class User extends ActiveRecord implements IdentityInterface
             'id' => 'ID',
             'username' => 'Username',
             'email' => 'Email',
+            'telemovel' => 'Telemóvel',
             'password' => 'Password',
             'role' => 'Função',
+            'roleFormatted' => 'Função',
             'status' => 'Estado',
             'cinema_id' => 'Cinema',
         ];
@@ -102,15 +104,9 @@ class User extends ActiveRecord implements IdentityInterface
         return static::findOne(['id' => $id, 'status' => self::STATUS_ACTIVE]);
     }
 
-    public function isEditable(): bool
-    {
-        return true;
-    }
+    public function isEditable(): bool { return true; }
 
-    public function isDeletable(): bool
-    {
-        return true;
-    }
+    public function isDeletable(): bool { return true; }
 
     // GUARDAR A PASSWORD E AUTH_KEY/TOKEN
     public function beforeSave($insert)
@@ -131,18 +127,6 @@ class User extends ActiveRecord implements IdentityInterface
         return parent::beforeSave($insert);
     }
 
-    // OBTER USER_PROFILE DO USER
-    public function getProfile()
-    {
-        return $this->hasOne(UserProfile::class, ['user_id' => 'id']);
-    }
-
-    // OBTER CINEMA DO USER
-    public function getCinema()
-    {
-        return $this->hasOne(Cinema::class, ['id' => 'cinema_id'])->via('profile');
-    }
-
     // OBTER ROLE DO USER
     public function getRoleName()
     {
@@ -150,11 +134,13 @@ class User extends ActiveRecord implements IdentityInterface
         return empty($roles) ? null : array_key_first($roles);
     }
 
-    // OBTER ROLE DO USER FORMATO (PARA MOSTRAR NAS VIEWS)
+    // OBTER ROLE DO USER FORMATADO
     public function getRoleFormatted()
     {
         $roles = Yii::$app->authManager->getRolesByUser($this->id);
+
         if (empty($roles)) return '-';
+
         $labels = [
             'admin' => 'Administrador',
             'gerente' => 'Gerente',
@@ -166,10 +152,24 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     // VERIFICAR SE É GERENTE OU FUNCIONÁRIO
-    public function isStaff()
+    public function isStaff(): bool
     {
-        $roles = Yii::$app->authManager->getRolesByUser($this->id);
-        return (isset($roles['gerente']) || isset($roles['funcionario'])) && !isset($roles['admin']);
+        if ($this->roleName == 'gerente' || $this->roleName == 'funcionario'){
+            return true;
+        }
+        return false;
+    }
+
+    // OBTER USER_PROFILE DO USER
+    public function getProfile()
+    {
+        return $this->hasOne(UserProfile::class, ['user_id' => 'id']);
+    }
+
+    // OBTER CINEMA DO USER
+    public function getCinema()
+    {
+        return $this->hasOne(Cinema::class, ['id' => 'cinema_id'])->via('profile');
     }
 
     /**
@@ -199,21 +199,46 @@ class User extends ActiveRecord implements IdentityInterface
         ];
     }
 
-    // OBTER ESTADO FORMATADO (PARA /INDEX E /VIEW)
-    public function getStatusFormatado(): string
+    /**
+     * @return string
+     */
+        public function displayRole()
     {
-        $labels = self::optsStatus();
-        $label = $labels[$this->status] ?? 'Desconhecida';
-
-        $colors = [
-            self::STATUS_ACTIVE => '',
-            self::STATUS_INACTIVE => 'text-danger',
-            self::STATUS_DELETED => 'text-danger',
-        ];
-
-        $class = $colors[$this->status] ?? 'text-secondary';
-        return "<span class='{$class}'>{$label}</span>";
+        return self::optsRoles()[$this->roleName];
     }
+
+    /**
+     * @return bool
+     */
+    public function isRoleAdmin()
+    {
+        return $this->roleName === 'admin';
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRoleGerente()
+    {
+        return $this->roleName === 'gerente';
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRoleFuncionario()
+    {
+        return $this->roleName === 'funcionario';
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRoleCliente()
+    {
+        return $this->roleName === 'cliente';
+    }
+
 
     /**
      * @return string

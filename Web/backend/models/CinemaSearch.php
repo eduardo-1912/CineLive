@@ -12,7 +12,6 @@ use common\models\Cinema;
  */
 class CinemaSearch extends Cinema
 {
-    // ATRIBUTO VIRTUAL (PARA FILTRAR NO GRIDVIEW)
     public $morada;
 
     /**
@@ -84,7 +83,6 @@ class CinemaSearch extends Cinema
                 ['like', 'codigo_postal', $this->morada],
                 ['like', 'cidade', $this->morada],
             ]);
-
 
         return $dataProvider;
     }

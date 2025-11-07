@@ -328,13 +328,24 @@ class Sessao extends \yii\db\ActiveRecord
     }
 
     /**
+     * Gets query for [[Compras]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCompras()
+    {
+        return $this->hasOne(Compra::class, ['sessao_id' => 'id']);
+    }
+
+    /**
      * Gets query for [[Bilhetes]].
      *
      * @return \yii\db\ActiveQuery
      */
     public function getBilhetes()
     {
-        return $this->hasMany(Bilhete::class, ['sessao_id' => 'id']);
+        return $this->hasMany(Bilhete::class, ['compra_id' => 'id'])
+            ->via('compras');
     }
 
     /**

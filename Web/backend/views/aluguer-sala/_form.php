@@ -15,7 +15,17 @@ $currentUser = Yii::$app->user;
 $isAdmin = $currentUser->can('admin');
 
 $nomeCliente = $model->cliente->profile->nome ?? $model->cliente->username;
+$emailCliente = $model->cliente->email;
+$telemovelCliente = $model->cliente->profile->telemovel;
 $nomeCinema = $model->cinema->nome ?? '-';
+
+$salasDisponiveis = Sala::getSalasDisponiveis(
+    $model->cinema_id,
+    $model->data,
+    $model->hora_inicio,
+    $model->hora_fim
+);
+$salasDisponiveis[] = $model->sala;
 
 ?>
 
@@ -29,11 +39,6 @@ $nomeCinema = $model->cinema->nome ?? '-';
     <div class="<?= $isAdmin ? 'd-block' : 'd-none' ?> ">
         <?= $form->field($model, 'cinema_id')->textInput(['value' => $nomeCinema, 'disabled' => true]) ?>
     </div>
-
-    <?= $form->field($model, 'sala_id')->dropDownList(
-        ArrayHelper::map(Sala::find()->where(['cinema_id' => $model->cinema_id, 'estado' => Sala::ESTADO_ATIVA])
-        ->orderBy('numero')->all(), 'id', 'nome'), ['prompt' => 'Selecione a sala']) ?>
-
 
     <!-- DATA -->
     <?= $form->field($model, 'data')->input('date', ['value' => $model->data, 'disabled' => true]) ?>
@@ -49,9 +54,19 @@ $nomeCinema = $model->cinema->nome ?? '-';
     <!-- OBSERVAÇÕES -->
     <?= $form->field($model, 'observacoes')->textarea(['rows' => 4, 'disabled' => true]) ?>
 
+
+    <?= $form->field($model, 'sala_id')->dropDownList(
+        ArrayHelper::map($salasDisponiveis, 'id', 'nome'),
+        ['prompt' => 'Selecione uma sala']
+    ) ?>
+
+    <?= $form->field($model, 'estado')->dropDownList($model->optsEstadoBD()) ?>
+
     <div class="form-group">
-        <?= Html::submitButton('Guardar', ['class' => 'btn btn-success']) ?>
+        <?= Html::submitButton('Confirmar', ['class' => 'btn btn-success']) ?>
+        <a href="mailto:<?=$emailCliente?>" class="btn btn-primary" target="_blank">Email</a>
     </div>
+
 
     <?php ActiveForm::end(); ?>
 

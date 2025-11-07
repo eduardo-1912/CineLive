@@ -2,40 +2,21 @@
 
 namespace backend\components;
 
-use common\models\Compra;
+
+use common\models\Filme;
+use Yii;
 use yii\helpers\Html;
+use common\models\User;
 use common\models\Bilhete;
+use common\models\Compra;
 
 class ActionColumnButtonHelper
 {
     public static function userButtons()
     {
         return [
-            'activate' => function ($url, $model) {
-                if ($model->status == $model::STATUS_INACTIVE || $model->status == $model::STATUS_DELETED) {
-                    $btnColor = $model->isStatusInactive() ? 'btn-success' : 'btn-primary';
-                    return Html::a('<i class="fas fa-user-plus"></i>', ['activate', 'id' => $model->id], [
-                        'class' => 'btn btn-sm ' . $btnColor,
-                        'title' => 'Ativar Utilizador',
-                        'data-confirm' => 'Tem a certeza que quer ativar este utilizador?',
-                        'data-method' => 'post',
-                    ]);
-                }
-                return '';
-            },
-            'deactivate' => function ($url, $model) {
-                if ($model->status == $model::STATUS_ACTIVE) {
-                    return Html::a('<i class="fas fa-user-minus"></i>', ['deactivate', 'id' => $model->id], [
-                        'class' => 'btn btn-secondary btn-sm',
-                        'title' => 'Desativar Utilizador',
-                        'data-confirm' => 'Tem a certeza que quer desativar este utilizador?',
-                        'data-method' => 'post',
-                    ]);
-                }
-                return '';
-            },
             'softDelete' => function ($url, $model) {
-                return Html::a('<i class="fas fa-trash"></i>', ['delete', 'id' => $model->id], [
+                return Html::a('<i class="fas fa-trash"></i>', ['change-status', 'id' => $model->id, 'estado' => $model::STATUS_DELETED], [
                     'class' => 'btn btn-sm btn-danger',
                     'title' => 'Eliminar',
                     'data' => [
@@ -46,8 +27,8 @@ class ActionColumnButtonHelper
                 ]);
             },
             'hardDelete' => function ($url, $model) {
-                return Html::a('<i class="fas fa-skull"></i>', ['delete', 'id' => $model->id], [
-                    'class' => 'btn btn-sm btn-danger',
+                return Html::a('<i class="fas fa-trash"></i>', ['delete', 'id' => $model->id], [
+                    'class' => 'btn btn-sm ' . ($model->id == Yii::$app->user->identity->id ? 'btn-secondary disabled' : 'btn-danger'),
                     'title' => 'Eliminar',
                     'data' => [
                         'confirm' => 'Tem a certeza que quer eliminar este utilizador permanentemente? Esta ação não pode ser desfeita!',
@@ -57,6 +38,47 @@ class ActionColumnButtonHelper
                 ]);
             },
         ];
+    }
+
+    public static function userEstadoDropdown(User $model): string
+    {
+        $items = '';
+        foreach (User::optsStatus() as $estado => $label) {
+
+            // IGNORAR O ESTADO ATUAL
+            if ($estado === $model->status) continue;
+
+            // SE USER ATUAL FOR GERENTE, NÃO MOSTRAR 'ELIMINADO'
+            if (!Yii::$app->user->can('gerirUtilizadores')) {
+                if ($estado === User::STATUS_DELETED) continue;
+            }
+
+            $items .=
+            '<li>' .
+                Html::a($label, ['user/change-status', 'id' => $model->id, 'estado' => $estado], [
+                    'class' => 'dropdown-item',
+                    'data' => [
+                        'method' => 'post',
+                        'confirm' => "Tem a certeza que quer alterar o estado do utilizador para '$label'?",
+                    ]]) .
+            '</li>';
+        }
+
+        $btnClass = match ($model->status) {
+            User::STATUS_ACTIVE => '',
+            User::STATUS_INACTIVE => 'text-danger',
+            User::STATUS_DELETED => 'text-secondary font-italic',
+            default => '',
+        };
+
+        return '
+        <div class="btn-group"> ' .
+            Html::button($model->displayStatus(), [
+                'class' => "btn p-0 fs-6 text-align-start text-start $btnClass dropdown-toggle border-0",
+                'data-bs-toggle' => 'dropdown',
+                'aria-expanded' => 'false',]) . '
+            <ul class="dropdown-menu">' . $items . '</ul>
+        </div>';
     }
 
     public static function cinemaButtons()
@@ -117,17 +139,39 @@ class ActionColumnButtonHelper
         ];
     }
 
-    public static function filmeButtons()
+    public static function filmeEstadoDropdown(Filme $model): string
     {
-        return [
-            'createSessao' => function ($url, $model) {
-                return Html::a('<i class="fas fa-calendar-plus"></i>', ['sessao/create', 'filme_id' => $model->id], [
-                    'class' => 'btn btn-sm ' . ($model->estado == $model::ESTADO_EM_EXIBICAO ? 'btn-success' : ' btn-secondary disabled'),
-                    'title' => 'Criar Sessão',
-                    'data-method' => 'post',
-                ]);
-            },
-        ];
+        $items = '';
+        foreach (Filme::optsEstado() as $estado => $label) {
+
+            // IGNORAR O ESTADO ATUAL
+            if ($estado === $model->estado) continue;
+
+            $items .=
+                '<li>' .
+                Html::a($label, ['filme/change-status', 'id' => $model->id, 'estado' => $estado], [
+                    'class' => 'dropdown-item',
+                    'data' => [
+                        'method' => 'post',
+                        'confirm' => "Tem a certeza que quer alterar o estado do filme para '$label'?",
+                    ]]) .
+                '</li>';
+        }
+
+        $btnClass = match ($model->estado) {
+            Filme::ESTADO_BREVEMENTE => 'text-secondary',
+            Filme::ESTADO_TERMINADO => 'text-secondary font-italic',
+            default => '',
+        };
+
+        return '
+        <div class="btn-group"> ' .
+            Html::button($model->displayEstado(), [
+                'class' => "btn p-0 fs-6 text-align-start text-start $btnClass dropdown-toggle border-0",
+                'data-bs-toggle' => 'dropdown',
+                'aria-expanded' => 'false',]) . '
+            <ul class="dropdown-menu">' . $items . '</ul>
+        </div>';
     }
 
     public static function compraButtons()
@@ -147,7 +191,7 @@ class ActionColumnButtonHelper
             'confirm' => function ($url, $model) {
                 if (!$model->isEstadoConfirmada()) {
                     return Html::a('<i class="fas fa-check"></i>', ['change-status', 'id' => $model->id, 'estado' => $model::ESTADO_CONFIRMADA], [
-                        'class' => 'btn btn-sm ' . ($model->isEstadoPendente() ? 'btn-success' : ' btn-secondary disabled'),
+                        'class' => 'btn btn-sm btn-success',
                         'title' => 'Confirmar Compra',
                         'data-confirm' => 'Tem a certeza que quer confirmar esta compra?',
                         'data-method' => 'post',
@@ -156,59 +200,6 @@ class ActionColumnButtonHelper
                 return '';
             },
         ];
-    }
-
-    public static function compraEstadoDropdown(Compra $model): string
-    {
-        // 🧩 Gerar os itens do dropdown (apenas estados permitidos)
-        $items = '';
-        foreach (Compra::optsEstado() as $key => $label) {
-            // Ignorar o estado atual e o pendente
-            if ($key === $model->estado || $key === Compra::ESTADO_PENDENTE) continue;
-
-            $items .= Html::tag(
-                'li',
-                Html::a($label, ['compra/change-status', 'id' => $model->id, 'estado' => $key], [
-                    'class' => 'dropdown-item',
-                    'data' => [
-                        'method' => 'post',
-                        'confirm' => "Tem a certeza que quer alterar o estado para '{$label}'?",
-                    ],
-                ])
-            );
-        }
-
-        // 🎨 Escolher classe do botão conforme o estado
-        $btnClass = match ($model->estado) {
-            Compra::ESTADO_CONFIRMADA => 'btn-success',
-            Compra::ESTADO_CANCELADA => 'btn-danger',
-            default => 'btn-secondary',
-        };
-
-        // 🚫 Desativar dropdown se a compra já estiver cancelada
-        if ($model->estado === Compra::ESTADO_CANCELADA) {
-            return Html::tag('div',
-                Html::button($model->displayEstado(), [
-                    'class' => "btn btn-sm {$btnClass}",
-                    'style' => 'width: 100px; opacity: 0.7; cursor: not-allowed;',
-                    'disabled' => true,
-                    'title' => 'Compra cancelada — alteração de estado bloqueada',
-                ]),
-                ['class' => 'btn-group']
-            );
-        }
-
-        // ✅ Dropdown normal
-        return Html::tag('div',
-            Html::button($model->displayEstado(), [
-                'class' => "btn btn-sm {$btnClass} dropdown-toggle",
-                'style' => 'width: 100px',
-                'data-bs-toggle' => 'dropdown',
-                'aria-expanded' => 'false',
-            ]) .
-            Html::tag('ul', $items, ['class' => 'dropdown-menu']),
-            ['class' => 'btn-group']
-        );
     }
 
     public static function bilheteButtons()
@@ -269,5 +260,4 @@ class ActionColumnButtonHelper
             }
         ];
     }
-
 }

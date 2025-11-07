@@ -8,12 +8,12 @@ use yii\widgets\DetailView;
 /* @var $model common\models\Cinema */
 
 $currentUser = Yii::$app->user;
-$isAdmin = $currentUser->can('admin');
+$gerirCinemas = $currentUser->can('gerirCinemas');
 $isGerente = $currentUser->identity->roleName == 'gerente';
 $isOwnCinema = $currentUser->id == $model->gerente_id;
 
 $this->title = $model->nome;
-$this->params['breadcrumbs'][] = ['label' => 'Cinemas', 'url' => [$isAdmin ? 'index' : ('view?id=' . $currentUser->identity->profile->cinema_id)]];
+$this->params['breadcrumbs'][] = ['label' => 'Cinemas', 'url' => [$gerirCinemas ? 'index' : ('view?id=' . $currentUser->identity->profile->cinema_id)]];
 $this->params['breadcrumbs'][] = $model->nome;
 \yii\web\YiiAsset::register($this);
 ?>
@@ -27,11 +27,11 @@ $this->params['breadcrumbs'][] = $model->nome;
                         <?= Html::a('Salas', ['sala/index', 'cinema_id' => $model->id], ['class' => 'btn btn-primary']) ?>
                         <?= Html::a('Sessões', ['sessao/index', 'cinema_id' => $model->id], ['class' => 'btn btn-secondary']) ?>
 
-                        <?php if ($isAdmin || $isGerente && $isOwnCinema): ?>
+                        <?php if ($gerirCinemas || $isGerente && $isOwnCinema): ?>
                             <?= Html::a('Editar', ['update', 'id' => $model->id], ['class' => 'btn btn-warning']) ?>
 
-                            <?php if ($isAdmin): ?>
-                                <?php if ($model->estado === $model::ESTADO_ATIVO): ?>
+                            <?php if ($gerirCinemas): ?>
+                                <?php if ($model->estado === $model::ESTADO_ATIVO && $model->isClosable()): ?>
                                     <?= Html::a('Encerrar', ['change-status', 'id' => $model->id, 'estado' => $model::ESTADO_ENCERRADO], [
                                         'class' => 'btn btn-danger',
                                         'data' => [
@@ -64,11 +64,10 @@ $this->params['breadcrumbs'][] = $model->nome;
                                 'value' => function ($model) {
                                     return $model->gerente->profile->nome;
                                 },
-                                'visible' => !$isAdmin && !$isGerente,
+                                'visible' => !$gerirCinemas && !$isGerente,
                             ],
                             [
                                 'attribute' => 'gerente_id',
-                                'label' => 'Gerente',
                                 'format' => 'raw',
                                 'value' => function ($model) {
                                     return Html::a(
@@ -77,28 +76,19 @@ $this->params['breadcrumbs'][] = $model->nome;
                                         ['class' => 'text-decoration-none text-primary']
                                     );
                                 },
-                                'visible' => $isAdmin || $isGerente,
+                                'visible' => $gerirCinemas || $isGerente,
                             ],
                             'email:email',
                             'telefone',
                             [
-                                'label' => 'Morada',
                                 'attribute' => 'morada',
                                 'value' => function ($model) {
                                     return "{$model->rua}, {$model->codigo_postal} {$model->cidade}";
                                 },
                             ],
-                            [
-                                'label' => 'Horário',
-                                'value' => function ($model) {
-                                    $abertura = Yii::$app->formatter->asTime($model->horario_abertura, 'HH:mm');
-                                    $fecho = Yii::$app->formatter->asTime($model->horario_fecho, 'HH:mm');
-                                    return "{$abertura} - {$fecho}";
-                                },
-                            ],
+                            'horario',
                             [
                                 'attribute' => 'estado',
-                                'label' => 'Estado',
                                 'format' => 'raw',
                                 'value' => fn($model) => $model->estadoFormatado,
                                 'visible' => Yii::$app->user->can('gerirCinemas'),
@@ -112,9 +102,10 @@ $this->params['breadcrumbs'][] = $model->nome;
                                     $longitude = $model->longitude;
                                     $url = "https://www.google.com/maps?q={$nome}@{$latitude},{$longitude}&hl=pt&z=15&output=embed";
 
-                                    return "<div>
-                                                <iframe src='{$url}' width='100%' height='400' class='rounded-3' allowfullscreen loading='lazy'></iframe>
-                                            </div>";
+                                    return "
+                                    <div>
+                                        <iframe src='{$url}' width='100%' height='400' class='rounded-3' allowfullscreen loading='lazy'></iframe>
+                                    </div>";
                                 },
                             ],
                         ],

@@ -54,6 +54,9 @@ class AluguerSalaSearch extends AluguerSala
             'pagination' => [
                 'pageSize' => Yii::$app->params['pageSize'],
             ],
+            'sort' => [
+                'defaultOrder' => ['estado' => SORT_ASC],
+            ],
         ]);
 
         // PERMITIR ORDENAR POR NOME DO CLIENTE

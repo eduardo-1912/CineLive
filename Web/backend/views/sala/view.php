@@ -25,10 +25,10 @@ $this->params['breadcrumbs'][] = $model->numero;
             <div class="row">
                 <div class="col-md-12">
                     <p>
-                        <?php if($gerirSalas): ?>
+                        <?php if ($gerirSalas): ?>
                             <?= Html::a('Editar', ['update', 'id' => $model->id], ['class' => 'btn btn-warning']) ?>
 
-                            <?php if ($model->estado === $model::ESTADO_ATIVA): ?>
+                            <?php if ($model->estado === $model::ESTADO_ATIVA && $model->isClosable()): ?>
                                 <?= Html::a('Encerrar', ['change-status', 'id' => $model->id, 'estado' => $model::ESTADO_ENCERRADA], [
                                     'class' => 'btn btn-danger',
                                     'data' => [
@@ -68,6 +68,7 @@ $this->params['breadcrumbs'][] = $model->numero;
                             ],
                         ],
                     ]) ?>
+
                 </div>
                 <!--.col-md-12-->
             </div>

@@ -17,11 +17,8 @@ $currentUser = Yii::$app->user;
 $gerirUtilizadores = $currentUser->can('gerirUtilizadores');
 $gerirFuncionarios = $currentUser->can('gerirFuncionarios') && !$currentUser->can('gerirUtilizadores');
 
-$actionColumnButtons = $gerirUtilizadores
-    ? '{view} {update} {activate} {deactivate} {hardDelete}'
-    : '{view} {activate} {deactivate} {softDelete}';
-
 $title = $gerirUtilizadores ? 'Utilizadores' : 'Funcionários';
+$actionColumnButtons = $gerirUtilizadores ? '{view} {update} {hardDelete}' : '{view} {update} {softDelete}';
 
 $this->title = $title;
 $this->params['breadcrumbs'][] = $this->title;
@@ -58,7 +55,6 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'value' => 'profile.nome',
                             ],
                             [
-                                'label' => 'Telemóvel',
                                 'attribute' => 'telemovel',
                                 'value' => 'profile.telemovel',
                                 'visible' => $gerirFuncionarios,
@@ -79,16 +75,17 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                             [
                                 'attribute' => 'status',
-                                'value' => fn($model) => $model->statusFormatado,
+                                'value' => fn($model) => ActionColumnButtonHelper::userEstadoDropdown($model),
                                 'format' => 'raw',
-                                // ADMINS TÊM ACESSO A SOFT-DELETED
                                 'filter' => $gerirUtilizadores ? User::optsStatus() : array_slice(User::optsStatus(), 0, 2, true),
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos',],
+                                'headerOptions' => ['style' => 'width: 8rem'],
                             ],
                             [
                                 'class' => 'backend\components\AppActionColumn',
                                 'template' => $actionColumnButtons,
                                 'buttons' => ActionColumnButtonHelper::userButtons(),
+                                'headerOptions' => ['style' => 'width: 2rem;'],
                             ],
                         ],
                     ]); ?>
