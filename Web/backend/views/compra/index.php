@@ -46,7 +46,7 @@ $isAdmin = $currentUser->can('admin');
                                 'filter' => Html::activeTextInput($searchModel, 'nomeCliente', ['class' => 'form-control',]),
                             ],
                             [
-                                'attribute' => 'nomeCinema',
+                                'attribute' => 'cinema_id',
                                 'label' => 'Cinema',
                                 'format' => 'raw',
                                 'value' => function ($model) {
@@ -65,7 +65,7 @@ $isAdmin = $currentUser->can('admin');
                                 'format' => 'raw',
                                 'value' => function ($model) {
                                     return Html::a(
-                                        Html::encode("Sessão #{$model->sessao->id}"),
+                                        Html::encode($model->sessao->nome),
                                         ['sessao/view', 'id' => $model->sessao->id],
                                         ['class' => 'text-decoration-none text-primary']
                                     );
@@ -80,7 +80,6 @@ $isAdmin = $currentUser->can('admin');
                             [
                                 'attribute' => 'total',
                                 'value' => fn($model) => $model->totalFormatado . '€',
-                                'filterInputOptions' => ['class' => 'form-control', 'type' => 'number',],
                             ],
                             [
                                 'attribute' => 'estado',
@@ -88,13 +87,13 @@ $isAdmin = $currentUser->can('admin');
                                 'format' => 'raw',
                                 'filter' => Compra::optsEstado(),
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
-                                'value' => fn($model) => $model->estadoFormatado,
+                                'value' => fn($model) => ActionColumnButtonHelper::compraEstadoDropdown($model),
                                 'headerOptions' => ['style' => 'width: 9rem'],
                             ],
 
                             [
                                 'class' => 'backend\components\AppActionColumn',
-                                'template' => '{view} {cancel} {confirm}',
+                                'template' => '{view} {cancel} {confirm} {confirmarBilhetes}',
                                 'buttons' => ActionColumnButtonHelper::compraButtons(),
                                 'headerOptions' => ['style' => 'width: 3rem'],
                             ],

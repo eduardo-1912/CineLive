@@ -60,7 +60,7 @@ class SalaController extends Controller
         $searchModel = new SalaSearch();
         $params = Yii::$app->request->queryParams;
 
-        // SE FOR ADMIN --> VÊ TODAS AS SALAS
+        // ADMIN --> VÊ TODAS AS SALAS
         if ($currentUser->can('admin')) {
 
             // SE ALGUM CINEMA FOI PASSADO COM PARÂMETRO
@@ -71,7 +71,7 @@ class SalaController extends Controller
             $dataProvider = $searchModel->search($params);
         }
 
-        // SE FOR GERENTE/FUNCIONÁRIO --> APENAS VÊ OS SALAS DO SEU CINEMA
+        // GERENTE/FUNCIONÁRIO --> APENAS VÊ OS SALAS DO SEU CINEMA
         else {
             // OBTER PERFIL DO USER ATUAL
             $userProfile = $currentUser->identity->profile;
@@ -228,7 +228,7 @@ class SalaController extends Controller
     }
 
 
-    // MUDAR O ESTADO DA SALA
+    // ADMIN/GERENTE --> MUDAR O ESTADO DA SALA
     public function actionChangeStatus($id, $estado)
     {
         // OBTER USER ATUAL

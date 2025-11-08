@@ -58,6 +58,7 @@ class FilmeController extends Controller
         ]);
     }
 
+
     // VER DETALHES DE UM FILME
     public function actionView($id)
     {
@@ -66,31 +67,28 @@ class FilmeController extends Controller
         ]);
     }
 
+
     // ADMIN --> CRIA FILME
     public function actionCreate()
     {
+        // CRIAR NOVO FILME
         $model = new Filme();
 
         if ($model->load(Yii::$app->request->post())) {
+
+            // OBTER FICHEIRO DO POSTER
             $model->posterFile = UploadedFile::getInstance($model, 'posterFile');
 
+            // VALIDAR DADOS
             if ($model->validate()) {
-                if ($model->posterFile) {
-                    $basePath = Yii::getAlias(Yii::$app->params['posterPath']);
-                    if (!is_dir($basePath)) {
-                        mkdir($basePath, 0775, true);
-                    }
 
-                    $filename = uniqid('poster_') . '.' . $model->posterFile->extension;
-                    $savePath = $basePath . DIRECTORY_SEPARATOR . $filename;
+                // GUARDAR POSTER (SE EXISTIR)
+                $this->guardarPoster($model);
 
-                    if ($model->posterFile->saveAs($savePath)) {
-                        $model->poster_path = $filename;
-                    }
-                }
-
+                // ASSOCIAR GÉNEROS SELECIONADOS
                 $model->generosSelecionados = Yii::$app->request->post('Filme')['generosSelecionados'] ?? [];
 
+                // GUARDAR FILME
                 if ($model->save(false)) {
                     Yii::$app->session->setFlash('success', 'Filme criado com sucesso!');
                     return $this->redirect(['view', 'id' => $model->id]);
@@ -101,47 +99,33 @@ class FilmeController extends Controller
         return $this->render('create', ['model' => $model]);
     }
 
-    /**
-     * Updates an existing Filme model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param int $id ID
-     * @return string|\yii\web\Response
-     * @throws NotFoundHttpException if the model cannot be found
-     */
+
+    // ADMIN --> EDITA FILME
     public function actionUpdate($id)
     {
+        // OBTER FILME
         $model = $this->findModel($id);
+
+        // GUARDAR POSTER ANTIGO (CASO SEJA ALTERADO)
         $oldPoster = $model->poster_path;
 
         if ($model->load(Yii::$app->request->post())) {
+
+            // OBTER POSTER NOVO (CASO TENHA SIDO ENVIADO)
             $model->posterFile = UploadedFile::getInstance($model, 'posterFile');
 
+            // VALIDAR DADOS
             if ($model->validate()) {
-                if ($model->posterFile) {
-                    $basePath = Yii::getAlias(Yii::$app->params['posterPath']);
-                    if (!is_dir($basePath)) {
-                        mkdir($basePath, 0775, true);
-                    }
 
-                    $filename = uniqid('poster_') . '.' . $model->posterFile->extension;
-                    $savePath = $basePath . DIRECTORY_SEPARATOR . $filename;
+                // GUARDAR POSTER (SUBSTITUI SE NOVO FOI ENVIADO)
+                $this->guardarPoster($model, $oldPoster);
 
-                    if ($model->posterFile->saveAs($savePath)) {
-                        $model->poster_path = $filename;
-
-                        // Apagar o poster antigo
-                        if ($oldPoster && is_file($basePath . DIRECTORY_SEPARATOR . $oldPoster)) {
-                            @unlink($basePath . DIRECTORY_SEPARATOR . $oldPoster);
-                        }
-                    }
-                } else {
-                    $model->poster_path = $oldPoster;
-                }
-
+                // ASSOCIAR GÉNEROS SELECIONADOS
                 $model->generosSelecionados = Yii::$app->request->post('Filme')['generosSelecionados'] ?? [];
 
+                // GUARDAR ALTERAÇÕES
                 if ($model->save(false)) {
-                    Yii::$app->session->setFlash('success', 'Filme atualizado!');
+                    Yii::$app->session->setFlash('success', 'Filme atualizado com successo.');
                     return $this->redirect(['view', 'id' => $model->id]);
                 }
             }
@@ -150,22 +134,17 @@ class FilmeController extends Controller
         return $this->render('update', ['model' => $model]);
     }
 
-    /**
-     * Deletes an existing Filme model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param int $id ID
-     * @return \yii\web\Response
-     * @throws NotFoundHttpException if the model cannot be found
-     */
+
+    // ADMIN --> ELIMINA FILME
     public function actionDelete($id)
     {
         // OBTER FILME
         $model = $this->findModel($id);
 
-        //
+        // OBTER POSTER
         $basePath = Yii::getAlias(Yii::$app->params['posterPath']);
 
-
+        // ELIMINAR POSTER
         if ($model->poster_path && is_file($basePath . DIRECTORY_SEPARATOR . $model->poster_path)) {
             @unlink($basePath . DIRECTORY_SEPARATOR . $model->poster_path);
         }
@@ -176,6 +155,7 @@ class FilmeController extends Controller
         return $this->redirect(['index']);
     }
 
+    // ADMIN --> MUDA O ESTADO DO FILME
     public function actionChangeStatus($id, $estado)
     {
         // VERIFICAR PERMISSÕES
@@ -215,14 +195,43 @@ class FilmeController extends Controller
     }
 
 
+    // GUARDAR POSTER DE UM FILME
+    private function guardarPoster(Filme $model, ?string $oldPoster = null): void
+    {
+        // SE NÃO FOI ENVIADO NENHUM POSTER → MANTER ANTIGO
+        if (!$model->posterFile) {
+            if ($oldPoster) {
+                $model->poster_path = $oldPoster;
+            }
+            return;
+        }
 
-    /**
-     * Finds the Filme model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param int $id ID
-     * @return Filme the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
+        // DEFINIR DIRETÓRIO BASE (PARAMS.PHP)
+        $basePath = Yii::getAlias(Yii::$app->params['posterPath']);
+
+        // CRIAR DIRETÓRIO SE NÃO EXISTE
+        if (!is_dir($basePath)) {
+            mkdir($basePath, 0775, true);
+        }
+
+        // GERAR NOME ÚNICO PARA O NOVO POSTER
+        $filename = uniqid('poster_') . '.' . $model->posterFile->extension;
+
+        // CAMINHO COMPLETO PARA GUARDAR
+        $savePath = $basePath . DIRECTORY_SEPARATOR . $filename;
+
+        // GUARDAR FICHEIRO NO SERVIDOR
+        if ($model->posterFile->saveAs($savePath)) {
+            $model->poster_path = $filename;
+
+            // APAGAR POSTER ANTIGO (SE EXISTIR)
+            if ($oldPoster && is_file($basePath . DIRECTORY_SEPARATOR . $oldPoster)) {
+                @unlink($basePath . DIRECTORY_SEPARATOR . $oldPoster);
+            }
+        }
+    }
+
+
     protected function findModel($id)
     {
         if (($model = Filme::findOne(['id' => $id])) !== null) {

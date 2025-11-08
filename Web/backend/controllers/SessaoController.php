@@ -50,27 +50,19 @@ class SessaoController extends Controller
         ];
     }
 
-    /**
-     * Lists all Sessao models.
-     * @return mixed
-     */
+    // ADMIN -> VÊ AS SESSÕES DE TODOS OS CINEMAS
+    // GERENTE/FUNCIONÁRIO --> APENAS VÊ AS SESSÕES DO SEU CINEMA
     public function actionIndex($cinema_id = null)
     {
         // OBTER O USER ATUAL
-        $user = Yii::$app->user;
-
-        // VERIFICAR PERMISSÃO
-        if (!$user->can('funcionario')) {
-            Yii::$app->session->setFlash('error', 'Não tem permissão para aceder a esta página.');
-            return $this->redirect(['index']);
-        }
+        $currentUser = Yii::$app->user;
 
         // CRIAR SEARCH MODEL E QUERY NA DB
         $searchModel = new SessaoSearch();
         $params = Yii::$app->request->queryParams;
 
         // SE FOR ADMIN --> VÊ TODOS OS UTILIZADORES
-        if ($user->can('admin')) {
+        if ($currentUser->can('admin')) {
             if ($cinema_id !== null) {
                 $params['SessaoSearch']['cinema_id'] = $cinema_id;
             }
@@ -80,7 +72,7 @@ class SessaoController extends Controller
         // SE FOR GERENTE/FUNCIONÁRIO --> APENAS VÊ OS FUNCIONÁRIOS DO SEU CINEMA
         else {
             // OBTER PERFIL DO USER ATUAL
-            $userProfile = $user->identity->profile;
+            $userProfile = $currentUser->identity->profile;
 
             // VERIFICAR SE TEM CINEMA ASSOCIADO
             if (!$userProfile || !$userProfile->cinema_id) {
@@ -103,27 +95,21 @@ class SessaoController extends Controller
         ]);
     }
 
-    /**
-     * Displays a single Sessao model.
-     * @param int $id ID
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
+
+    // ADMIN -> VÊ OS DETALHES DAS SESSÕES DE TODOS OS CINEMAS
+    // GERENTE/FUNCIONÁRIO --> APENAS VÊ OS DETALHES DAS SESSÕES DO SEU CINEMA
     public function actionView($id)
     {
         // OBTER O USER ATUAL
-        $user = Yii::$app->user;
+        $currentUser = Yii::$app->user;
 
-        // VERIFICAR PERMISSÃO
-        if (!$user->can('funcionario')){
-            Yii::$app->session->setFlash('error', 'Não tem permissão para aceder a esta página.');
-            return $this->redirect(['index']);
-        }
+        // SE FOR GERENTE/FUNCIONÁRIO --> OBTER O SEU CINEMA
+        if (!$currentUser->can('admin')) {
 
-        if (!$user->can('admin')) {
             // OBTER ID DO CINEMA DO USER ATUAL
-            $cinemaId = $user->identity->profile->cinema_id;
+            $cinemaId = $currentUser->identity->profile->cinema_id;
 
+            // OBTER SESSÃO
             $model = $this->findModel($id);
 
             // SE CINEMA DO USER E CINEMA DA SESSÃO FOREM DIFERENTES --> SEM ACESSO
@@ -139,18 +125,15 @@ class SessaoController extends Controller
         ]);
     }
 
-    /**
-     * Creates a new Sessao model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
+    // ADMIN --> CRIA UMA SESSÃO PARA QUALQUER CINEMA
+    // GERENTE --> APENAS CRIA UMA SESSÃO PARA O SEU CINEMA
     public function actionCreate($filme_id = null)
     {
         // OBTER O USER ATUAL
-        $user = Yii::$app->user;
+        $currentUser = Yii::$app->user;
 
         // VERIFICAR PERMISSÃO
-        if (!$user->can('gerirSessoes')) {
+        if (!$currentUser->can('gerirSessoes')) {
             Yii::$app->session->setFlash('error', 'Não tem permissão para criar sessões.');
             return $this->redirect(['index']);
         }
@@ -158,13 +141,14 @@ class SessaoController extends Controller
         // CRIAR NOVA SESSÃO
         $model = new Sessao();
 
+        // VER SE ALGUM FILME FOI PASSADO POR PARÂMETRO
         if ($filme_id !== null) {
             $model->filme_id = $filme_id;
         }
 
         // SE FOR GERENTE --> FORÇAR ATRIBUIÇÃO CINEMA_ID DO GERENTE
-        if ($user->can('gerente') && !$user->can('admin')) {
-            $model->cinema_id = $user->identity->profile->cinema_id;
+        if ($currentUser->can('gerente') && !$currentUser->can('admin')) {
+            $model->cinema_id = $currentUser->identity->profile->cinema_id;
         }
 
         // METER A DATA DE HOJE POR DEFAULT
@@ -186,7 +170,7 @@ class SessaoController extends Controller
                     return $this->redirect(['view', 'id' => $model->id]);
                 }
                 else {
-                    Yii::$app->session->setFlash('error', 'Erro ao criar a sessão.');
+                    Yii::$app->session->setFlash('error', 'Ocorreu um erro ao criar a sessão.');
                 }
             }
         }
@@ -196,20 +180,16 @@ class SessaoController extends Controller
         ]);
     }
 
-    /**
-     * Updates an existing Sessao model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param int $id ID
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
+
+    // ADMIN --> EDITA SESSÕES DE QUALQUER CINEMA
+    // GERENTE --> APENAS EDITA SESSÕES DO O SEU CINEMA
     public function actionUpdate($id)
     {
         // OBTER O USER ATUAL
-        $user = Yii::$app->user;
+        $currentUser = Yii::$app->user;
 
         // VERIFICAR PERMISSÃO
-        if (!$user->can('gerirSessoes')) {
+        if (!$currentUser->can('gerirSessoes')) {
             Yii::$app->session->setFlash('error', 'Não tem permissão para editar sessões.');
             return $this->redirect(['index']);
         }
@@ -245,7 +225,7 @@ class SessaoController extends Controller
                     return $this->redirect(['view', 'id' => $model->id]);
                 }
                 else {
-                    Yii::$app->session->setFlash('error', 'Erro ao atualizar a sessão.');
+                    Yii::$app->session->setFlash('error', 'Ocorreu um erro ao atualizar a sessão.');
                 }
             }
         }
@@ -255,15 +235,12 @@ class SessaoController extends Controller
         ]);
     }
 
-    /**
-     * Deletes an existing Sessao model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param int $id ID
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
+
+    // ADMIN --> ELIMINA QUALQUER SESSÃO (QUE NÃO TENHA BILHETES ASSOCIADOS)
+    // GERENTE --> ELIMNA SESSÕES DO SEU CINEMA (QUE NÃO TENHA BILHETES ASSOCIADOS)
     public function actionDelete($id)
     {
+        // OBTER O USER ATUAL
         $currentUser = Yii::$app->user;
 
         // VERIFICAR PERMISSÃO
@@ -274,6 +251,7 @@ class SessaoController extends Controller
 
         $model = $this->findModel($id);
 
+        // SE NÃO PODE SER ELIMINADA --> MENSAGEM DE ERRO
         if (!$model->isDeletable()) {
             Yii::$app->session->setFlash('error', 'Não pode eliminar sessões a decorrer ou com bilhetes associados.');
             return $this->redirect(['index']);
@@ -283,10 +261,10 @@ class SessaoController extends Controller
         if ($currentUser->can('gerente') && !$currentUser->can('admin')) {
 
             // OBTER CINEMA DO GERENTE
-            $currentUserCinemaId = $currentUser->identity->profile->cinema_id;
+            $userCinemaId = $currentUser->identity->profile->cinema_id;
 
             // SE CINEMAS NÃO COINCIDIREM --> SEM PERMISSÃO
-            if ($model->cinema_id != $currentUserCinemaId) {
+            if ($model->cinema_id != $userCinemaId) {
                 Yii::$app->session->setFlash('error', 'Não tem permissão para eliminar sessões de outro cinema.');
                 return $this->redirect(['index']);
             }
@@ -302,13 +280,7 @@ class SessaoController extends Controller
         return $this->redirect(['index']);
     }
 
-    /**
-     * Finds the Sessao model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param int $id ID
-     * @return Sessao the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
+
     protected function findModel($id)
     {
         if (($model = Sessao::findOne($id)) !== null) {

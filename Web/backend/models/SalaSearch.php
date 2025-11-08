@@ -44,7 +44,7 @@ class SalaSearch extends Sala
      */
     public function search($params)
     {
-        $query = Sala::find();
+        $query = Sala::find()->orderBy(['cinema_id' => SORT_ASC,'sala.numero' => SORT_ASC]);
 
         // add conditions that should always apply here
 

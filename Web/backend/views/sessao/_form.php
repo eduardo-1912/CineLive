@@ -121,7 +121,6 @@ $(function() {
     }
     
     $(document).ready(function() {
-        // QUANDO O DOM ESTÁ PRONTO --> CHAMAR AS FUNÇÕES
         toggleSalaField();
         atualizarHoraFim();
         

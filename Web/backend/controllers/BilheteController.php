@@ -25,7 +25,7 @@ class BilheteController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'roles' => ['admin', 'gerente'],
+                        'roles' => ['admin', 'gerente', 'funcionario'],
                     ],
                 ],
             ],
@@ -38,15 +38,11 @@ class BilheteController extends Controller
         ];
     }
 
+    // ADMIN/GERENTE/FUNCIONÁRIO --> ATUALIZAR O LUGAR DO BILHETE
     public function actionUpdateLugar($id)
     {
+        // OBTER BILHETE
         $model = $this->findModel($id);
-
-        // 🔒 Verificar permissões
-        if (!Yii::$app->user->can('admin') && !Yii::$app->user->can('gerirCompras')) {
-            Yii::$app->session->setFlash('error', 'Não tem permissão para editar lugares.');
-            return $this->redirect(['compra/view', 'id' => $model->compra_id]);
-        }
 
         // 🚫 Só pode editar se o bilhete estiver pendente
         if ($model->estado !== Bilhete::ESTADO_PENDENTE) {
@@ -93,11 +89,10 @@ class BilheteController extends Controller
     }
 
 
-
-
-    // MUDAR O ESTADO DO BILHETE
+    // ADMIN/GERENTE/FUNCIONÁRIO --> ATUALIZAR O ESTADO DO BILHETE
     public function actionChangeStatus($id, $estado)
     {
+        // OBTER BILHETE
         $model = $this->findModel($id);
 
         // 🔒 Permissões
@@ -169,16 +164,6 @@ class BilheteController extends Controller
     }
 
 
-
-
-
-    /**
-     * Finds the Bilhete model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param int $id ID
-     * @return Bilhete the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
     protected function findModel($id)
     {
         if (($model = Bilhete::findOne($id)) !== null) {

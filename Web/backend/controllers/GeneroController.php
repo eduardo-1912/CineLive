@@ -38,10 +38,7 @@ class GeneroController extends Controller
         ];
     }
 
-    /**
-     * Lists all Genero models.
-     * @return mixed
-     */
+    // ADMIN --> VÊ E CRIA GÉNEROS
     public function actionIndex()
     {
         $searchModel = new GeneroSearch();
@@ -64,13 +61,7 @@ class GeneroController extends Controller
         ]);
     }
 
-    /**
-     * Updates an existing Genero model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param int $id ID
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
+    // ADMIN --> EDITA UM GÉNERO
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
@@ -84,13 +75,7 @@ class GeneroController extends Controller
         ]);
     }
 
-    /**
-     * Deletes an existing Genero model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param int $id ID
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
+    // ADMIN --> ELIMINA GÉNERO
     public function actionDelete($id)
     {
         $this->findModel($id)->delete();
@@ -98,13 +83,7 @@ class GeneroController extends Controller
         return $this->redirect(['index']);
     }
 
-    /**
-     * Finds the Genero model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param int $id ID
-     * @return Genero the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
+
     protected function findModel($id)
     {
         if (($model = Genero::findOne($id)) !== null) {

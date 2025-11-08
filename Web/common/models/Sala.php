@@ -170,7 +170,6 @@ class Sala extends \yii\db\ActiveRecord
             ->all();
     }
 
-
     // VERIFICAR SE PODE SER EDITADA
     public function isEditable(): bool { return true; }
 

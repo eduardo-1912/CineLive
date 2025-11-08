@@ -24,30 +24,6 @@ $gerirCompras = $currentUser->can('gerirCompras');
         <div class="card-body">
             <div class="row">
                 <div class="col-md-12">
-                    <p>
-                        <?php if ($gerirCompras): ?>
-
-                            <?php if ($model->estado === $model::ESTADO_CONFIRMADA): ?>
-                                <?= Html::a('Cancelar', ['change-status', 'id' => $model->id, 'estado' => $model::ESTADO_CANCELADA], [
-                                    'class' => 'btn btn-danger',
-                                    'data' => [
-                                        'confirm' => 'Tem a certeza que quer cancelar esta compra?',
-                                        'method' => 'post',
-                                    ],
-                                ]) ?>
-                            <?php elseif ($model->estado === $model::ESTADO_CANCELADA): ?>
-                                <?= Html::a('Confirmar', ['change-status', 'id' => $model->id, 'estado' => $model::ESTADO_CONFIRMADA], [
-                                    'class' => 'btn btn-success',
-                                    'data' => [
-                                        'confirm' => 'Tem a certeza que quer confirmar esta compra?',
-                                        'method' => 'post',
-                                    ],
-                                ]) ?>
-                            <?php endif; ?>
-
-                        <?php endif; ?>
-                    </p>
-
 
                     <?= DetailView::widget([
                         'model' => $model,
@@ -70,6 +46,15 @@ $gerirCompras = $currentUser->can('gerirCompras');
                                     ['class' => 'text-decoration-none text-primary']
                                 ),
                             ],
+                            [
+                                'label' => 'Filme',
+                                'format' => 'raw',
+                                'value' => fn($model) => Html::a(
+                                    $model->sessao->filme->titulo,
+                                    ['filme/view', 'id' => $model->sessao->filme->id],
+                                    ['class' => 'text-decoration-none text-primary']
+                                ),
+                            ],
                             'dataFormatada',
                             [
                                 'attribute' => 'total',
@@ -88,6 +73,11 @@ $gerirCompras = $currentUser->can('gerirCompras');
                                 },
                                 'visible' => $isAdmin,
                             ],
+                            [
+                                'attribute' => 'estado',
+                                'value' => fn($model) => ActionColumnButtonHelper::compraEstadoDropdown($model),
+                                'format' => 'raw',
+                            ],
                         ],
                     ]) ?>
                 </div>
@@ -105,8 +95,18 @@ $gerirCompras = $currentUser->can('gerirCompras');
         <div class="card">
             <div class="card-body">
                 <div class="row">
-
                     <div class="col-md-12">
+                        <p>
+                            <?php if ($model->isEstadoConfirmada() && !$model->isTodosBilhetesConfirmados() && count($model->bilhetes) > 1): ?>
+                                <?= Html::a('Confirmar Todos', ['confirm-all-tickets', 'id' => $model->id], [
+                                    'class' => 'btn btn-success',
+                                    'data' => [
+                                        'confirm' => 'Tem a certeza que quer confirmar todos os bilhetes desta compra?',
+                                        'method' => 'post',
+                                    ],
+                                ]); ?>
+                            <?php endif; ?>
+                        </p>
                         <?= $this->render('_bilhetes', [
                             'dataProvider' => $bilhetesDataProvider,
                             'compra' => $model,

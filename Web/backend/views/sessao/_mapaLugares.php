@@ -21,6 +21,8 @@ $mapaLugaresCompra = $model->mapaLugaresCompra;
             <div class="d-flex justify-content-center mb-2 flex-wrap">
                 <?php for ($coluna = 1; $coluna <= $sala->num_colunas; $coluna++): ?>
                     <?php
+
+                    // CRIAR LUGAR (EX.: A5, B6, C7)
                     $lugar = chr(64 + $fila) . $coluna;
                     $ocupado = in_array($lugar, $lugaresOcupados);
                     $confirmado = in_array($lugar, $lugaresConfirmados);

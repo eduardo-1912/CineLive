@@ -86,17 +86,12 @@ class Compra extends \yii\db\ActiveRecord
         }
     }
 
-    // OBTER SESSÕES
-    public function getSessao()
+    // VERIFICAR SE TODOS OS BILHETES ESTÃO CONFIRMADOS
+    public function isTodosBilhetesConfirmados(): bool
     {
-        return $this->hasOne(Sessao::class, ['id' => 'sessao_id']);
-    }
-
-
-    // OBTER CINEMAS
-    public function getCinema()
-    {
-        return $this->hasOne(Cinema::class, ['id' => 'cinema_id'])->via('sessao');
+        return !$this->getBilhetes()
+            ->andWhere(['!=', 'estado', Bilhete::ESTADO_CONFIRMADO])
+            ->exists();
     }
 
     // OBTER TOTAL DA COMPRA
@@ -126,14 +121,23 @@ class Compra extends \yii\db\ActiveRecord
         return "<span class='{$class}'>{$label}</span>";
     }
 
-    /**
-     * Gets query for [[Bilhetes]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
+    // OBTER BILHETES
     public function getBilhetes()
     {
         return $this->hasMany(Bilhete::class, ['compra_id' => 'id']);
+    }
+
+    // OBTER SESSÕES
+     public function getSessao()
+    {
+        return $this->hasOne(Sessao::class, ['id' => 'sessao_id']);
+    }
+
+
+    // OBTER CINEMAS
+    public function getCinema()
+    {
+        return $this->hasOne(Cinema::class, ['id' => 'cinema_id'])->via('sessao');
     }
 
     /**

@@ -151,8 +151,39 @@ class Cinema extends \yii\db\ActiveRecord
             ->where(['estado' => [
                 AluguerSala::ESTADO_A_DECORRER,
                 AluguerSala::ESTADO_CONFIRMADO,
-            ]])->exists();
+                AluguerSala::ESTADO_PENDENTE]])
+            ->exists();
     }
+
+    // VERIFICAR SE NOVO HORÁRIO TEM CONFLITOS
+    public function hasConflitosHorario(): bool
+    {
+        $agora = date('Y-m-d H:i:s');
+
+        $sessoes = Sessao::find()
+            ->where(['cinema_id' => $this->id])
+            ->andWhere(['>', 'data_hora_fim', $agora])
+            ->andWhere([
+                'or',
+                ['<', 'hora_inicio', $this->hora_abertura],
+                ['>', 'hora_fim', $this->hora_fecho],
+            ])
+            ->exists();
+
+        $alugueres = AluguerSala::find()
+            ->where(['cinema_id' => $this->id])
+            ->andWhere(['estado' => AluguerSala::ESTADO_CONFIRMADO])
+            ->andWhere(['>', 'data_fim', $agora]) // futuros
+            ->andWhere([
+                'or',
+                ['<', 'hora_inicio', $this->hora_abertura],
+                ['>', 'hora_fim', $this->hora_fecho],
+            ])
+            ->exists();
+
+        return $sessoes || $alugueres;
+    }
+
 
     // HORA INÍCIO FORMATADA (HH:mm)
     public function getHoraInicioFormatada()

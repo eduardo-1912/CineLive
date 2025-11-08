@@ -14,6 +14,11 @@ use yii\helpers\Url;
 /* @var $searchModel backend\models\UserSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
+$currentUser = Yii::$app->user;
+$gerirFilmes = $currentUser->can('gerirFilmes');
+
+$actionColumnButtons = $gerirFilmes ? '{view} {update} {delete}' : '{view}';
+
 $this->title = 'Filmes';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -78,7 +83,8 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                             [
                                 'class' => 'backend\components\AppActionColumn',
-                                'template' => '{view} {update} {delete}',
+                                'template' => $actionColumnButtons,
+                                'headerOptions' => ['style' => 'width: 1rem;'],
                             ],
                         ]
                     ]); ?>

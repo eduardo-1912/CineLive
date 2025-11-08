@@ -2,10 +2,13 @@
 
 namespace backend\controllers;
 
+use common\models\Bilhete;
 use Yii;
 use common\models\Compra;
 use backend\models\CompraSearch;
+use yii\data\ActiveDataProvider;
 use yii\web\Controller;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
@@ -43,14 +46,48 @@ class CompraController extends Controller
         ];
     }
 
-    /**
-     * Lists all Compra models.
-     * @return mixed
-     */
-    public function actionIndex()
+    // ADMIN --> VÊ AS COMPRAS DE QUALQUER CINEMA
+    // GERENTE/FUNCIONÁRIO --> VÊ AS COMPRAS DO SEU CINEMA
+    public function actionIndex($cinema_id = null)
     {
+        // OBTER USER ATUAL
+        $currentUser = Yii::$app->user;
+
+        // CRIAR SEARCH MODEL E RECEBER PARÂMETROS DA QUERY
         $searchModel = new CompraSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $params = Yii::$app->request->queryParams;
+
+        // ADMIN --> VÊ TODAS AS COMPRAS
+        if ($currentUser->can('admin')) {
+
+            // SE FOI PASSADO CINEMA_ID VIA PARÂMETRO
+            if ($cinema_id !== null) {
+                $params['CompraSearch']['cinema_id'] = $cinema_id;
+            }
+
+            $dataProvider = $searchModel->search($params);
+        }
+
+        // GERENTE/FUNCIONÁRIO --> APENAS AS COMPRAS DO SEU CINEMA
+        else {
+
+            // OBTER PERFIL DO USER ATUAL
+            $userProfile = $currentUser->identity->profile ?? null;
+
+            // VERIFICAR SE TEM CINEMA ASSOCIADO
+            if (!$userProfile || !$userProfile->cinema_id) {
+                throw new ForbiddenHttpException('Não está associado a nenhum cinema.');
+            }
+
+            // SE TENTAR PASSAR CINEMA_ID NA URL --> REDIRECIONAR
+            if ($cinema_id !== null) {
+                return $this->redirect(['index']);
+            }
+
+            // APLICAR FILTRO DO SEU CINEMA
+            $params['CompraSearch']['cinema_id'] = $userProfile->cinema_id;
+            $dataProvider = $searchModel->search($params);
+        }
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -58,17 +95,35 @@ class CompraController extends Controller
         ]);
     }
 
-    /**
-     * Displays a single Compra model.
-     * @param int $id ID
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
+
+    // ADMIN --> VÊ DETALHES DAS COMPRAS DE QUALQUER CINEMA
+    // GERENTE/FUNCIONÁRIO --> VÊ DETALHES DAS COMPRAS DO SEU CINEMA
     public function actionView($id)
     {
+        // OBTER USER ATUAL
+        $currentUser = Yii::$app->user;
+
+        // OBTER COMPRA
         $model = $this->findModel($id);
 
-        $bilhetesDataProvider = new \yii\data\ActiveDataProvider([
+        // SE FOR GERENTE/FUNCIONÁRIIO --> SÓ VÊ COMPRAS DO SEU CINEMA
+        if (!$currentUser->can('admin')) {
+
+            // OBTER CINEMA DO USER ATUAL
+            $userCinemaId = $currentUser->identity->profile->cinema_id ?? null;
+
+            // OBTER CINEMA DA COMPRA (via sessão da compra)
+            $compraCinemaId = $model->sessao->cinema_id ?? null;
+
+            // SE USER NÃO TIVER CINEMA OU FOR DIFERENTE DO DA COMPRA --> SEM PERMISSÃO
+            if (!$userCinemaId || $userCinemaId != $compraCinemaId) {
+                Yii::$app->session->setFlash('error', 'Não tem permissão para ver esta compra.');
+                return $this->redirect(['index']);
+            }
+        }
+
+        // LISTAR OS BILHETES ASSOCIADOS À COMPRA
+        $bilhetesDataProvider = new ActiveDataProvider([
             'query' => $model->getBilhetes(),
             'pagination' => false,
         ]);
@@ -80,79 +135,60 @@ class CompraController extends Controller
     }
 
 
-    // MUDAR O ESTADO DA COMPRA
+    // ADMIN/GERENTE --> MUDA O ESTADO DA COMPRA
     public function actionChangeStatus($id, $estado)
     {
         $model = $this->findModel($id);
 
-        // 🔒 Permissões
-        if (!Yii::$app->user->can('admin') && !Yii::$app->user->can('gerirCompras')) {
+        // VERIFICAR PERMISSÃO
+        if (!Yii::$app->user->can('gerirCompras')) {
             Yii::$app->session->setFlash('error', 'Não tem permissão para alterar o estado das compras.');
             return $this->redirect(['index']);
         }
 
-        // ⚠️ Estados válidos
-        $estadosValidos = array_keys(\common\models\Compra::optsEstado());
+        // VERIFICAR QUE O ESTADO É VÁLIDO
+        $estadosValidos = array_keys(Compra::optsEstado());
         if (!in_array($estado, $estadosValidos)) {
             Yii::$app->session->setFlash('error', 'Estado inválido.');
             return $this->redirect(['index']);
         }
 
-        // 🚫 Se já estiver no estado pretendido
+        // SE JÁ ESTIVER NO ESTADO PRETENDIDO
         if ($model->estado === $estado) {
             Yii::$app->session->setFlash('info', 'A compra já se encontra neste estado.');
             return $this->redirect(['index']);
         }
 
-        // 🚫 Impedir voltar a "pendente" se já estiver confirmada ou cancelada
-        if ($estado === \common\models\Compra::ESTADO_PENDENTE &&
-            in_array($model->estado, [\common\models\Compra::ESTADO_CONFIRMADA, \common\models\Compra::ESTADO_CANCELADA])) {
-            Yii::$app->session->setFlash('warning', 'Não é possível alterar uma compra confirmada ou cancelada para pendente.');
-            return $this->redirect(['index']);
-        }
-
-        // 🧾 Atualizar estado da compra
+        // ATUALIZAR O ESTADO DA COMPRA
         $model->estado = $estado;
 
         if ($model->save(false, ['estado'])) {
-            // 🔄 Atualizar bilhetes associados
+
+            // ATUALIZAR O ESTADO DOS BILHETES
             foreach ($model->bilhetes as $bilhete) {
-                if ($estado === \common\models\Compra::ESTADO_CANCELADA) {
-                    $bilhete->estado = \common\models\Bilhete::ESTADO_CANCELADO;
+
+                // SE COMPRA FOR CANCELADA --> CANCELAR OS SEUS BILHETES
+                if ($estado === Compra::ESTADO_CANCELADA) {
+                    $bilhete->estado = Bilhete::ESTADO_CANCELADO;
                     $bilhete->save(false, ['estado']);
-                } elseif ($estado === \common\models\Compra::ESTADO_CONFIRMADA) {
-                    // Só confirmar bilhetes que estavam pendentes
-                    if ($bilhete->estado === \common\models\Bilhete::ESTADO_PENDENTE) {
-                        $bilhete->estado = \common\models\Bilhete::ESTADO_CONFIRMADO;
-                        $bilhete->save(false, ['estado']);
-                    }
+                    Yii::$app->session->setFlash('success', 'Compra cancelada e bilhetes anulados.');
+                }
+                // SE COMPRA FOR RE-CONFIRMADA --> COLOCAR BILHETES EM ESTADO PENDENTE
+                elseif ($estado === Compra::ESTADO_CONFIRMADA) {
+                    $bilhete->estado = Bilhete::ESTADO_PENDENTE;
+                    $bilhete->save(false, ['estado']);
+                    Yii::$app->session->setFlash('success', 'Compra re-confirmada e bilhetes colocados em estado pendente.');
                 }
             }
-
-            // ✅ Mensagem de sucesso personalizada
-            $mensagem = match ($estado) {
-                \common\models\Compra::ESTADO_CONFIRMADA => 'Compra confirmada e bilhetes ativados com sucesso.',
-                \common\models\Compra::ESTADO_CANCELADA => 'Compra cancelada e bilhetes anulados.',
-                default => 'Estado da compra atualizado com sucesso.',
-            };
-            Yii::$app->session->setFlash('success', $mensagem);
-
-        } else {
-            Yii::$app->session->setFlash('error', 'Erro ao atualizar o estado da compra.');
+        }
+        else {
+            Yii::$app->session->setFlash('error', 'Ocorreu um erro ao atualizar o estado da compra.');
         }
 
         return $this->redirect(['index']);
     }
 
 
-
-    /**
-     * Finds the Compra model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param int $id ID
-     * @return Compra the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
     protected function findModel($id)
     {
         if (($model = Compra::findOne($id)) !== null) {

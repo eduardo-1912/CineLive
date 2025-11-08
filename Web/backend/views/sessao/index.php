@@ -22,6 +22,8 @@ $gerirSessoes = $currentUser->can('gerirSessoes');
 $cinemaSelecionado = !empty($cinemaId) ? Cinema::findOne($cinemaId) : null;
 $salaSelecionada = !empty($salaId) ? Sala::findOne($salaId) : null;
 
+$actionColumnButtons = $gerirSessoes ? '{view} {update} {delete}' : '{view}';
+
 // ALGUM CINEMA FOI PASSADO POR PARÂMETRO
 if (!empty($cinemaId) && $cinemaSelecionado)
 {
@@ -57,8 +59,6 @@ $this->params['breadcrumbs'][] = 'Sessões';
                             <?php endif; ?>
                         </div>
                     </div>
-
-                    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
                     <?= AppGridView::widget([
                         'dataProvider' => $dataProvider,
@@ -152,11 +152,11 @@ $this->params['breadcrumbs'][] = 'Sessões';
                             ],
                             [
                                 'class' => 'backend\components\AppActionColumn',
-                                'template' => '{view} {update} {delete}',
+                                'template' => $actionColumnButtons,
+                                'headerOptions' => ['style' => 'width: 1rem;'],
                             ],
                         ],
                     ]); ?>
-
 
                 </div>
                 <!--.card-body-->

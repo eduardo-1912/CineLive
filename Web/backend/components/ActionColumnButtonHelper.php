@@ -141,22 +141,7 @@ class ActionColumnButtonHelper
 
     public static function filmeEstadoDropdown(Filme $model): string
     {
-        $items = '';
-        foreach (Filme::optsEstado() as $estado => $label) {
-
-            // IGNORAR O ESTADO ATUAL
-            if ($estado === $model->estado) continue;
-
-            $items .=
-                '<li>' .
-                Html::a($label, ['filme/change-status', 'id' => $model->id, 'estado' => $estado], [
-                    'class' => 'dropdown-item',
-                    'data' => [
-                        'method' => 'post',
-                        'confirm' => "Tem a certeza que quer alterar o estado do filme para '$label'?",
-                    ]]) .
-                '</li>';
-        }
+        $currentUser = Yii::$app->user;
 
         $btnClass = match ($model->estado) {
             Filme::ESTADO_BREVEMENTE => 'text-secondary',
@@ -164,12 +149,32 @@ class ActionColumnButtonHelper
             default => '',
         };
 
+        if (!$currentUser->can('gerirFilmes')) {
+            return Html::tag('span', Html::encode($model->displayEstado()), ['class' => "fs-6 $btnClass"]);
+        }
+
+        $items = '';
+        foreach (Filme::optsEstado() as $estado => $label) {
+            if ($estado === $model->estado) continue;
+
+            $items .= '<li>' .
+                Html::a($label, ['filme/change-status', 'id' => $model->id, 'estado' => $estado], [
+                    'class' => 'dropdown-item',
+                    'data' => [
+                        'method' => 'post',
+                        'confirm' => "Tem a certeza que quer alterar o estado do filme para '$label'?",
+                    ],
+                ]) .
+                '</li>';
+        }
+
         return '
-        <div class="btn-group"> ' .
+        <div class="btn-group">' .
             Html::button($model->displayEstado(), [
                 'class' => "btn p-0 fs-6 text-align-start text-start $btnClass dropdown-toggle border-0",
                 'data-bs-toggle' => 'dropdown',
-                'aria-expanded' => 'false',]) . '
+                'aria-expanded' => 'false',
+            ]) . '
             <ul class="dropdown-menu">' . $items . '</ul>
         </div>';
     }
@@ -177,30 +182,57 @@ class ActionColumnButtonHelper
     public static function compraButtons()
     {
         return [
-            'cancel' => function ($url, $model) {
-                if (!$model->isEstadoCancelada()) {
-                    return Html::a('<i class="fas fa-ban"></i>', ['change-status', 'id' => $model->id, 'estado' => $model::ESTADO_CANCELADA], [
-                        'class' => 'btn btn-sm btn-danger',
-                        'title' => 'Cancelar Compra',
-                        'data-confirm' => 'Tem a certeza que quer cancelar esta compra?',
-                        'data-method' => 'post',
-                    ]);
-                }
-                return '';
-            },
-            'confirm' => function ($url, $model) {
-                if (!$model->isEstadoConfirmada()) {
-                    return Html::a('<i class="fas fa-check"></i>', ['change-status', 'id' => $model->id, 'estado' => $model::ESTADO_CONFIRMADA], [
-                        'class' => 'btn btn-sm btn-success',
-                        'title' => 'Confirmar Compra',
-                        'data-confirm' => 'Tem a certeza que quer confirmar esta compra?',
-                        'data-method' => 'post',
-                    ]);
-                }
-                return '';
+            'confirmarBilhetes' => function ($url, $model) {
+                return Html::a('<i class="fas fa-check-double"></i>', ['confirm-tickets', 'id' => $model->id], [
+                    'class' => 'btn btn-sm ' .($model->isEstadoConfirmada() && !$model->isTodosBilhetesConfirmados()
+                    ? 'btn-success' : 'btn-secondary disabled'),
+                    'title' => 'Confirmar Bilhetes',
+                    'data-confirm' => 'Tem a certeza que quer confirmar todos os bilhetes desta compra?',
+                    'data-method' => 'post',
+                ]);
             },
         ];
     }
+
+    public static function compraEstadoDropdown(Compra $model): string
+    {
+        $currentUser = Yii::$app->user;
+
+        $btnClass = match ($model->estado) {
+            Compra::ESTADO_CANCELADA => 'text-danger',
+            default => '',
+        };
+
+        if (!$currentUser->can('gerirCompras')) {
+            return Html::tag('span', Html::encode($model->displayEstado()), ['class' => "fs-6 $btnClass"]);
+        }
+
+        $items = '';
+        foreach (Compra::optsEstado() as $estado => $label) {
+            if ($estado === $model->estado) continue;
+
+            $items .= '<li>' .
+                Html::a($label, ['compra/change-status', 'id' => $model->id, 'estado' => $estado], [
+                    'class' => 'dropdown-item',
+                    'data' => [
+                        'method' => 'post',
+                        'confirm' => "Tem a certeza que quer alterar o estado da compra para '$label'?",
+                    ],
+                ]) .
+                '</li>';
+        }
+
+        return '
+        <div class="btn-group">' .
+            Html::button($model->displayEstado(), [
+                'class' => "btn p-0 fs-6 text-align-start text-start $btnClass dropdown-toggle border-0",
+                'data-bs-toggle' => 'dropdown',
+                'aria-expanded' => 'false',
+            ]) . '
+            <ul class="dropdown-menu">' . $items . '</ul>
+        </div>';
+    }
+
 
     public static function bilheteButtons()
     {

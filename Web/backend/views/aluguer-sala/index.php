@@ -111,6 +111,7 @@ $isAdmin = $currentUser->can('admin');
                                 'class' => 'backend\components\AppActionColumn',
                                 'template' => '{view} {delete}',
                                 //'buttons' => ActionColumnButtonHelper::aluguerButtons(),
+                                'headerOptions' => ['style' => 'width: 1rem;'],
                             ],
                         ],
                     ]); ?>

@@ -101,13 +101,13 @@ class Sessao extends \yii\db\ActiveRecord
     public function getEstadoFormatado(): string
     {
         $labels = self::optsEstado();
-        $label = $labels[$this->estado] ?? 'Desconhecida';
+        $label = $labels[$this->estado] ?? '-';
 
         $colors = [
             self::ESTADO_ATIVA => '',
-            self::ESTADO_A_DECORRER => 'text-danger fw-bold',
+            self::ESTADO_A_DECORRER => 'text-danger',
             self::ESTADO_ESGOTADA => 'text-secondary',
-            self::ESTADO_TERMINADA => 'text-secondary',
+            self::ESTADO_TERMINADA => 'text-secondary font-italic',
         ];
 
         $class = $colors[$this->estado] ?? 'text-secondary';

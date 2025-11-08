@@ -107,7 +107,6 @@ class CinemaController extends Controller
         $model = new Cinema();
 
         if ($model->load(Yii::$app->request->post())) {
-
             if ($model->save()) {
                 Yii::$app->session->setFlash('success', 'Cinema criado com sucesso.');
                 return $this->redirect(['view', 'id' => $model->id]);
@@ -163,39 +162,48 @@ class CinemaController extends Controller
 
 
         // ATUALIZAÇÃO DO CINEMA
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post())) {
 
-            // SE O ESTADO MUDOU --> ATUALIZAR O STAFF
-            if ($estadoAntigo !== $model->estado) {
-                if ($model->isEstadoEncerrado()) {
+            // VERIFICAR SE TEM CONFILTOS COM O HORÁRIO
+            if ($model->hasConflitosHorario()) {
+                Yii::$app->session->setFlash('error', 'Existem sessões ou alugueres futuros fora do novo horário.');
+                return $this->redirect(['update', 'id' => $model->id]);
+            }
 
-                    // SE NÃO PODE SER ENCERRADO --> REPOR ESTADO ANTERIOR
-                    if ($model->hasSessoesAtivas() || $model->hasAlugueresAtivos()) {
-                        Yii::$app->session->setFlash('error', 'Não é possível encerrar este cinema pois existem sessões ou alugueres ativos.');
+            if ($model->save()) {
+                // SE O ESTADO MUDOU --> ATUALIZAR O STAFF
+                if ($estadoAntigo !== $model->estado) {
+                    if ($model->isEstadoEncerrado()) {
 
-                        // REPOR ESTADO ANTERIOR
-                        $model->estado = $estadoAntigo;
-                        $model->save(false, ['estado']);
+                        // SE NÃO PODE SER ENCERRADO --> REPOR ESTADO ANTERIOR
+                        if ($model->hasSessoesAtivas() || $model->hasAlugueresAtivos()) {
+                            Yii::$app->session->setFlash('error', 'Não é possível encerrar este cinema pois existem sessões ou alugueres ativos ou pendentes.');
 
-                        return $this->redirect(['update', 'id' => $model->id]);
+                            // REPOR ESTADO ANTERIOR
+                            $model->estado = $estadoAntigo;
+                            $model->save(false, ['estado']);
+
+                            return $this->redirect(['update', 'id' => $model->id]);
+                        }
+
+                        // DESATIVAR UTILIZADORES
+                        $this->atualizarEstadoUtilizadores($model);
+                        Yii::$app->session->setFlash('success', 'Cinema encerrado. Gerente e funcionários foram desativados.');
+                    }
+                    elseif ($model->isEstadoAtivo()) {
+                        // ATIVAR UTILIZADORES
+                        $this->atualizarEstadoUtilizadores($model);
+                        Yii::$app->session->setFlash('success', 'Cinema reativado com sucesso. Gerente e funcionários voltaram a estar ativos.');
                     }
 
-                    // DESATIVAR UTILIZADORES
-                    $this->atualizarEstadoUtilizadores($model);
-                    Yii::$app->session->setFlash('success', 'Cinema encerrado. Gerente e funcionários foram desativados.');
                 }
-                elseif ($model->isEstadoAtivo()) {
-                    // ATIVAR UTILIZADORES
-                    $this->atualizarEstadoUtilizadores($model);
-                    Yii::$app->session->setFlash('success', 'Cinema reativado com sucesso. Gerente e funcionários voltaram a estar ativos.');
+                else {
+                    Yii::$app->session->setFlash('success', 'Cinema atualizado com sucesso.');
                 }
 
-            }
-            else {
-                Yii::$app->session->setFlash('success', 'Cinema atualizado com sucesso.');
+                return $this->redirect(['view', 'id' => $model->id]);
             }
 
-            return $this->redirect(['view', 'id' => $model->id]);
         }
 
         return $this->render('update', [
@@ -236,7 +244,7 @@ class CinemaController extends Controller
 
             // SE NÃO PODE SER ENCERRADO --> MENSAGEM DE ERRO
             if (!$model->isClosable()) {
-                Yii::$app->session->setFlash('error', 'Não é possível encerrar este cinema pois existem sessões ou alugueres ativos.');
+                Yii::$app->session->setFlash('error', 'Não é possível encerrar este cinema pois existem sessões ou alugueres ativos ou pendentes.');
                 return $this->redirect(['index']);
             }
 
