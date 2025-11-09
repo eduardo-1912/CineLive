@@ -74,6 +74,11 @@ class FilmeController extends Controller
         // CRIAR NOVO FILME
         $model = new Filme();
 
+        // METER A DATA DE HOJE POR DEFAULT
+        if ($model->isNewRecord) {
+            $model->estreia = date('Y-m-d');
+        }
+
         if ($model->load(Yii::$app->request->post())) {
 
             // OBTER FICHEIRO DO POSTER

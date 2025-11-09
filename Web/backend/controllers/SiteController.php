@@ -5,6 +5,7 @@ namespace backend\controllers;
 use common\models\AluguerSala;
 use common\models\Bilhete;
 use common\models\Cinema;
+use common\models\Compra;
 use common\models\Filme;
 use common\models\LoginForm;
 use common\models\Sessao;
@@ -77,26 +78,33 @@ class SiteController extends Controller
 
         $now = date('Y-m-d');
 
-        // TOTAL DE FILMES EM EXIBIÇÃO
+        // SE É ADMIN
         if ($isAdmin) {
             $totalFilmesEmExibicao = Filme::find()->where(['estado' => Filme::ESTADO_EM_EXIBICAO])->count();
-        }
-        else {
-            $totalFilmesEmExibicao = Filme::find()->joinWith('sessaos s')->where(['>=', 's.data', $now])->andWhere(['s.cinema_id' => $userCinemaId])->distinct()->count();
-        }
-
-        // TOTAL ALUGUERES
-        if ($isAdmin) {
             $totalAlugueres = AluguerSala::find()->where(['estado' => AluguerSala::ESTADO_PENDENTE])->count();
-        }
-        elseif ($isGerente) {
-            $totalAlugueres = AluguerSala::find()->where(['estado' => AluguerSala::ESTADO_PENDENTE, 'cinema_id' => $userCinemaId,])->count();
-        }
-        else {
-            $totalAlugueres = AluguerSala::find()->where(['data' => $now, 'cinema_id' => $userCinemaId,])->count();
+            $ultimasCompras = Compra::find()->with(['sessao.filme', 'sessao.cinema'])->orderBy(['id' => SORT_DESC])->limit(10)->all();
+            $filmesEmExibicao = Filme::find()->where(['estado' => Filme::ESTADO_EM_EXIBICAO])->all();
         }
 
-        // SESSÕES AGENDADAS PARA HOJE
+        // SE É GERENTE
+        if ($isGerente) {
+            $totalAlugueres = AluguerSala::find()->where(['estado' => AluguerSala::ESTADO_PENDENTE, 'cinema_id' => $userCinemaId])->count();
+        }
+
+        // SE TEM CINEMA
+        if ($userCinemaId !== null) {
+            $totalFilmesEmExibicao = Filme::find()->joinWith('sessaos s')->where(['>=', 's.data', $now])->andWhere(['s.cinema_id' => $userCinemaId])->distinct()->count();
+            $totalAlugueres = AluguerSala::find()->where(['data' => $now, 'cinema_id' => $userCinemaId,])->count();
+            $ultimasCompras = Compra::find()
+                ->alias('c')
+                ->joinWith(['sessao s'])
+                ->where(['s.cinema_id' => $userCinemaId])
+                ->with(['sessao.filme', 'sessao.cinema'])
+                ->orderBy(['c.id' => SORT_DESC])
+                ->limit(10)
+                ->all();
+            $filmesEmExibicao = Filme::getFilmesEmExibicaoPorCinema($userCinemaId);
+        }
 
         $totalSessoesHoje = Sessao::find()->where(['data' => $now])->andFilterWhere($isAdmin ? [] : ['cinema_id' => $userCinemaId])->count();
 
@@ -104,6 +112,8 @@ class SiteController extends Controller
             'totalFilmesEmExibicao' => $totalFilmesEmExibicao,
             'totalAlugueres' => $totalAlugueres,
             'totalSessoesHoje' => $totalSessoesHoje,
+            'ultimasCompras' => $ultimasCompras,
+            'filmesEmExibicao' => $filmesEmExibicao,
         ]);
     }
 

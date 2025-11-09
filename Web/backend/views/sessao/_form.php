@@ -72,7 +72,7 @@ $temBilhetes = !$model->isNewRecord && count($model->lugaresOcupados) > 0;
 $script = <<<JS
 $(function() {
     
-    // FUNÇÃO PARA CALCULAR A HORA FIM CONSOANTE O FILME SELECIONADO E HORA DE INÍCIO
+    // CALCULAR A HORA FIM CONSOANTE O FILME SELECIONADO E HORA DE INÍCIO
     function atualizarHoraFim() {
         
         // OBTER ARRAY DE DURAÇÕES DOS FILMES

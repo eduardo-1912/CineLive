@@ -184,6 +184,25 @@ class Filme extends \yii\db\ActiveRecord
         return Yii::$app->formatter->asDate($this->estreia, 'php:d/m/Y');
     }
 
+    // OBTER FILMES EM EXIBIÇÃO POR CINEMA
+    public static function getFilmesEmExibicaoPorCinema($cinemaId)
+    {
+        $hoje = date('Y-m-d');
+
+        return self::find()
+            ->alias('f')
+            ->joinWith('sessaos s')
+            ->where([
+                'f.estado' => self::ESTADO_EM_EXIBICAO,
+                's.cinema_id' => $cinemaId,
+            ])
+            ->andWhere(['>=', 's.data', $hoje])
+            ->distinct()
+            ->orderBy(['f.titulo' => SORT_ASC])
+            ->all();
+    }
+
+
     /**
      * Gets query for [[Sessaos]].
      *

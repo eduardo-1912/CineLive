@@ -87,7 +87,7 @@ $this->registerJsFile($publishedRes[1].'/control_sidebar.js', ['depends' => '\ha
 
                 <div class="form-group form-check ms-1">
                     <?= Html::checkbox('confirmar_todos', false, ['class' => 'form-check-input', 'id' => 'confirmar-todos', 'value' => 1,]) ?>
-                    <?= Html::label('Confirmar todos os bilhetes da mesma compra', 'confirmar-todos', ['class' => 'form-check-label']) ?>
+                    <?= Html::label('Confirmar todos os bilhetes pendentes da mesma compra', 'confirmar-todos', ['class' => 'form-check-label']) ?>
                 </div>
 
                 <?= Html::submitButton('Validar Bilhete', ['class' => 'btn btn-success btn-block',]) ?>
