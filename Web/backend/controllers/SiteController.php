@@ -2,8 +2,12 @@
 
 namespace backend\controllers;
 
+use common\models\AluguerSala;
+use common\models\Bilhete;
 use common\models\Cinema;
+use common\models\Filme;
 use common\models\LoginForm;
+use common\models\Sessao;
 use common\models\User;
 use common\models\UserProfile;
 use Yii;
@@ -65,7 +69,42 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        $user = Yii::$app->user;
+        $isAdmin = $user->can('admin');
+        $isGerente = $user->can('gerente');
+        $isFuncionario = $user->can('funcionario');
+        $userCinemaId = $user->identity->profile->cinema_id ?? null;
+
+        $now = date('Y-m-d');
+
+        // TOTAL DE FILMES EM EXIBIÇÃO
+        if ($isAdmin) {
+            $totalFilmesEmExibicao = Filme::find()->where(['estado' => Filme::ESTADO_EM_EXIBICAO])->count();
+        }
+        else {
+            $totalFilmesEmExibicao = Filme::find()->joinWith('sessaos s')->where(['>=', 's.data', $now])->andWhere(['s.cinema_id' => $userCinemaId])->distinct()->count();
+        }
+
+        // TOTAL ALUGUERES
+        if ($isAdmin) {
+            $totalAlugueres = AluguerSala::find()->where(['estado' => AluguerSala::ESTADO_PENDENTE])->count();
+        }
+        elseif ($isGerente) {
+            $totalAlugueres = AluguerSala::find()->where(['estado' => AluguerSala::ESTADO_PENDENTE, 'cinema_id' => $userCinemaId,])->count();
+        }
+        else {
+            $totalAlugueres = AluguerSala::find()->where(['data' => $now, 'cinema_id' => $userCinemaId,])->count();
+        }
+
+        // SESSÕES AGENDADAS PARA HOJE
+
+        $totalSessoesHoje = Sessao::find()->where(['data' => $now])->andFilterWhere($isAdmin ? [] : ['cinema_id' => $userCinemaId])->count();
+
+        return $this->render('index', [
+            'totalFilmesEmExibicao' => $totalFilmesEmExibicao,
+            'totalAlugueres' => $totalAlugueres,
+            'totalSessoesHoje' => $totalSessoesHoje,
+        ]);
     }
 
     /**
