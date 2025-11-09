@@ -44,7 +44,7 @@ $this->title = 'Dashboard';
             <div class="small-box bg-warning p-0 mb-0">
                 <div class="inner d-flex flex-column align-items-start">
                     <h3>150</h3>
-                    <p>Sessões agendadas hoje</p>
+                    <p>Sessões agendadas para hoje</p>
                 </div>
                 <div class="icon">
                     <i class="fas fa-calendar-alt"></i>

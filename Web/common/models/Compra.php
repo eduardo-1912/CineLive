@@ -67,10 +67,9 @@ class Compra extends \yii\db\ActiveRecord
             'estado' => 'Estado',
             'dataFormatada' => 'Data de Compra',
             'nomeCinema' => 'Cinema',
+            'numeroBilhetes' => 'Bilhetes',
         ];
     }
-
-    public function isEditable() { return true; }
 
     public function getDataFormatada(): string
     {
@@ -104,6 +103,11 @@ class Compra extends \yii\db\ActiveRecord
     public function getTotalFormatado(): string
     {
         return number_format($this->total, 2, '.', '');
+    }
+
+    public function getNumeroBilhetes(): int
+    {
+        return $this->getBilhetes()->count();
     }
 
     // OBTER ESTADO FORMATADO

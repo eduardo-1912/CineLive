@@ -25,6 +25,12 @@ use yii\bootstrap4\ActiveForm;
                 </div>
             </form>
         </li>
+        <li class="nav-item">
+            <a href="" class="nav-link" data-toggle="modal" data-target="#modal-validar-bilhete">
+                <span>Validar Bilhete</span>
+            </a>
+        </li>
+
     </ul>
 
 

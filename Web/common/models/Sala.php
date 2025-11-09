@@ -170,6 +170,24 @@ class Sala extends \yii\db\ActiveRecord
             ->all();
     }
 
+    // OBTER LUGARES VÁLIDOS (EX.: A1, B2, C3)
+    public function getLugaresValidos(): array
+    {
+        $lugares = [];
+
+        // GERA AS LETRAS DAS FILAS (A, B, C, ...)
+        $filas = range('A', chr(ord('A') + $this->filas - 1));
+
+        // GERA LUGARES POR CADA FILA
+        foreach ($filas as $fila) {
+            for ($coluna = 1; $coluna <= $this->colunas; $coluna++) {
+                $lugares[] = "{$fila}{$coluna}";
+            }
+        }
+
+        return $lugares;
+    }
+
     // VERIFICAR SE PODE SER EDITADA
     public function isEditable(): bool { return true; }
 

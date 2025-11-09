@@ -92,6 +92,12 @@ class AluguerSala extends \yii\db\ActiveRecord
         $inicio = new DateTime("{$this->data} {$this->hora_inicio}");
         $fim = new DateTime("{$this->data} {$this->hora_fim}");
 
+        // SE ESTIVER PENDENTE E A HORA DE INÍCIO JÁ PASSOU --> CANCELAR AUTOMATICAMENTE
+        if ($this->estado === self::ESTADO_PENDENTE && $now > $inicio) {
+            $this->estado = self::ESTADO_CANCELADO;
+            $this->save(false, ['estado']);
+        }
+
         // SÓ ATUALIZAR SE ESTADO ANTERIOR FOSSE CONFIRMADO
         if ($this->estado === self::ESTADO_CONFIRMADO) {
             if ($now >= $inicio && $now <= $fim) {
@@ -128,29 +134,18 @@ class AluguerSala extends \yii\db\ActiveRecord
     }
 
     // OBTER ESTADO FORMATADO
-    public function getEstadoFormatado(): string
+    public function getEstadoFormatado()
     {
         $label = self::optsEstado()[$this->estado] ?? '-';
         $cores = [
             self::ESTADO_PENDENTE => 'text-secondary',
             self::ESTADO_CONFIRMADO => '',
-            self::ESTADO_A_DECORRER => 'text-danger fw-bold',
+            self::ESTADO_A_DECORRER => 'text-danger',
             self::ESTADO_TERMINADO => 'text-secondary font-italic',
             self::ESTADO_CANCELADO => 'text-secondary font-italic',
         ];
         $classe = $cores[$this->estado] ?? 'text-secondary';
         return "<span class='{$classe}'>{$label}</span>";
-    }
-
-    // VERIFICAR SE PODE SER EDITADO
-    public function isEditable(): bool
-    {
-        return true;
-    }
-
-    public function isDeletable(): bool
-    {
-        return true;
     }
 
     // VALIDAR O HORÁRIO DO ALUGUER

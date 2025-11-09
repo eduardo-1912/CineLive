@@ -45,7 +45,7 @@ $isAdmin = $currentUser->can('admin');
                                 'filter' => Html::activeTextInput($searchModel, 'nomeCliente', ['class' => 'form-control',]),
                             ],
                             [
-                                'attribute' => 'nomeCinema',
+                                'attribute' => 'cinema_id',
                                 'label' => 'Cinema',
                                 'format' => 'raw',
                                 'value' => function ($model) {
@@ -101,16 +101,17 @@ $isAdmin = $currentUser->can('admin');
                             ],
                             [
                                 'attribute' => 'estado',
-                                'value' => 'estadoFormatado',
+                                'label' => 'Estado',
+                                'value' => fn($model) => ActionColumnButtonHelper::aluguerEstadoDropdown($model),
                                 'format' => 'raw',
                                 'filter' => AluguerSala::optsEstadoBD(),
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
-                                'headerOptions' => ['style' => 'width: 10rem;'],
+                                'headerOptions' => ['style' => 'width: 100px;'],
                             ],
+
                             [
                                 'class' => 'backend\components\AppActionColumn',
-                                'template' => '{view} {delete}',
-                                //'buttons' => ActionColumnButtonHelper::aluguerButtons(),
+                                'template' => '{view}',
                                 'headerOptions' => ['style' => 'width: 1rem;'],
                             ],
                         ],

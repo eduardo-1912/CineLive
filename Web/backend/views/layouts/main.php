@@ -4,10 +4,12 @@
 /* @var $content string */
 
 use common\components\ToastWidget;
+use yii\bootstrap4\ActiveForm;
 use yii\helpers\Html;
 use backend\assets\AppAsset;
 use hail812\adminlte3\assets\FontAwesomeAsset;
 use hail812\adminlte3\assets\AdminLteAsset;
+use yii\helpers\Url;
 
 AppAsset::register($this);
 FontAwesomeAsset::register($this);
@@ -63,6 +65,39 @@ $this->registerJsFile($publishedRes[1].'/control_sidebar.js', ['depends' => '\ha
 </div>
 
 <?= ToastWidget::widget() ?>
+
+<!-- MODAL PARA VALIDAR BILHETE -->
+<div class="modal fade" id="modal-validar-bilhete" tabindex="-1" role="dialog" aria-labelledby="modalValidarLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalValidarLabel">Validar Bilhete</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <?php $form = ActiveForm::begin(['id' => 'form-validar-bilhete', 'action' => Url::to(['/bilhete/validate']), 'method' => 'post',]); ?>
+
+                <div class="form-group">
+                    <?= Html::label('Código do Bilhete', 'codigo-bilhete') ?>
+                    <?= Html::textInput('codigo', '', ['id' => 'codigo-bilhete', 'class' => 'form-control',
+                        'required' => true, 'placeholder' => 'Ex: ABC123',]) ?>
+                </div>
+
+                <div class="form-group form-check ms-1">
+                    <?= Html::checkbox('confirmar_todos', false, ['class' => 'form-check-input', 'id' => 'confirmar-todos', 'value' => 1,]) ?>
+                    <?= Html::label('Confirmar todos os bilhetes da mesma compra', 'confirmar-todos', ['class' => 'form-check-label']) ?>
+                </div>
+
+                <?= Html::submitButton('Validar Bilhete', ['class' => 'btn btn-success btn-block',]) ?>
+
+                <?php ActiveForm::end(); ?>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <?php $this->endBody() ?>
 </body>

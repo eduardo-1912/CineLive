@@ -86,7 +86,7 @@ class AluguerSalaSearch extends AluguerSala
             ->andFilterWhere(['like', 'tipo_evento', $this->tipo_evento])
             ->andFilterWhere(['like', 'observacoes', $this->observacoes])
             ->andFilterWhere(['like', 'user_profile.nome', $this->nomeCliente])
-            ->andFilterWhere(['cinema.id' => $this->nomeCinema])
+            ->andFilterWhere(['cinema.id' => $this->cinema_id])
             ->andFilterWhere(['sala.id' => $this->numeroSala]);
 
         return $dataProvider;

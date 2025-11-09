@@ -81,6 +81,7 @@ $isAdmin = $currentUser->can('admin');
                                 'attribute' => 'total',
                                 'value' => fn($model) => $model->totalFormatado . '€',
                             ],
+                            'numeroBilhetes',
                             [
                                 'attribute' => 'estado',
                                 'label' => 'Estado',

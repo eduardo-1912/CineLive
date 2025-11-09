@@ -16,7 +16,7 @@ class CompraSearch extends Compra
     public $cinema_id;
     public $nomeCinema;
     public $total;
-
+    public $numeroBilhetes;
 
     /**
      * {@inheritdoc}
@@ -24,7 +24,7 @@ class CompraSearch extends Compra
     public function rules()
     {
         return [
-            [['id', 'cliente_id', 'sessao_id', 'cinema_id'], 'integer'],
+            [['id', 'cliente_id', 'sessao_id', 'cinema_id', 'numeroBilhetes'], 'integer'],
             [['total'], 'number'],
             [['data', 'pagamento', 'estado', 'nomeCliente', 'nomeCinema'], 'safe'],
         ];
@@ -67,6 +67,12 @@ class CompraSearch extends Compra
             'desc' => ['user.username' => SORT_DESC],
         ];
 
+        // PERMITIR ORDENAR POR NÚMERO DE BILHETES
+        $dataProvider->sort->attributes['numeroBilhetes'] = [
+            'asc' => ['COUNT(bilhete.id)' => SORT_ASC],
+            'desc' => ['COUNT(bilhete.id)' => SORT_DESC],
+        ];
+
         $this->load($params);
 
         if (!$this->validate()) {
@@ -88,7 +94,13 @@ class CompraSearch extends Compra
             ->andFilterWhere(['like', 'user_profile.nome', $this->nomeCliente])
             ->andFilterWhere(['cinema.id' => $this->cinema_id]);
 
+        // FILTRAR POR TOTAL
         $query->andFilterHaving(['>=', 'SUM(bilhete.preco)', $this->total]);
+
+        // FILTRAR POR NÚMERO DE BILHETES
+        if (!empty($this->numeroBilhetes)) {
+            $query->having(['=', 'COUNT(bilhete.id)', $this->numeroBilhetes]);
+        }
 
         return $dataProvider;
     }

@@ -256,7 +256,6 @@ class Sessao extends \yii\db\ActiveRecord
         return true;
     }
 
-
     public static function optsEstado()
     {
         return [

@@ -35,13 +35,14 @@ use backend\components\AppGridView;
             'value' => function ($bilhete) {
 
                 $isPendente = $bilhete->estado === Bilhete::ESTADO_PENDENTE;
+                $isSessaoTerminada = $bilhete->compra->sessao->isEstadoTerminada();
                 $btnClass = $isPendente ? 'btn-warning' : 'btn-secondary';
 
                 return Html::beginForm(['bilhete/update-lugar', 'id' => $bilhete->id], 'post', [
                         'class' => 'd-inline-flex gap-1 align-items-center',
                     ]) .
                     Html::input('text', 'Bilhete[lugar]', $bilhete->lugar, [
-                        'class' => 'form-control form-control-sm', 'style' => 'width: 20rem', 'disabled' => !$isPendente,
+                        'class' => 'form-control form-control-sm', 'style' => 'width: 20rem', 'disabled' => !$isPendente || $isSessaoTerminada,
                     ]) .
                     Html::submitButton('<i class="fas fa-edit"></i>', [
                         'class' => "btn btn-sm {$btnClass}",
@@ -56,7 +57,7 @@ use backend\components\AppGridView;
             'header' => 'Estado',
             'class' => 'backend\components\AppActionColumn',
             'template' => '{changeStatus}',
-            'buttons' => ActionColumnButtonHelper::bilheteButtons(),
+            'buttons' => ActionColumnButtonHelper::bilheteEstadoDropdown(),
         ],
     ],
 ]); ?>

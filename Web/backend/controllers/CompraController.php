@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use common\components\EmailHelper;
 use common\models\Bilhete;
 use Yii;
 use common\models\Compra;
@@ -33,7 +34,7 @@ class CompraController extends Controller
                     [
                         'allow' => true,
                         'roles' => ['funcionario'],
-                        'actions' => ['index', 'view'],
+                        'actions' => ['index', 'view', 'confirm-all-tickets'],
                     ],
                 ],
             ],
@@ -135,15 +136,31 @@ class CompraController extends Controller
     }
 
 
-    // ADMIN/GERENTE --> MUDA O ESTADO DA COMPRA
+    // ADMIN --> MUDA O ESTADO DE QUALQUER COMPRA
+    // GERENTE/FUNCIONÁRIO --> MUDA O ESTADO DA COMPRA SE FOR DO SEU CINEMA
     public function actionChangeStatus($id, $estado)
     {
+        // OBTER USER ATUAL
+        $currentUser = Yii::$app->user;
+
+        // OBTER COMPRA
         $model = $this->findModel($id);
 
         // VERIFICAR PERMISSÃO
         if (!Yii::$app->user->can('gerirCompras')) {
             Yii::$app->session->setFlash('error', 'Não tem permissão para alterar o estado das compras.');
             return $this->redirect(['index']);
+        }
+
+        // VERIFICAR CINEMA (GERENTE/FUNCIONÁRIO --> SÓ O SEU CINEMA)
+        if (!$currentUser->can('admin')) {
+
+            $userCinemaId = $currentUser->identity->profile->cinema_id ?? null;
+
+            if ($userCinemaId === null || $userCinemaId != $model->sessao->cinema_id) {
+                Yii::$app->session->setFlash('error', 'Não tem permissão para alterar compras de outro cinema.');
+                return $this->redirect(['index']);
+            }
         }
 
         // VERIFICAR QUE O ESTADO É VÁLIDO
@@ -159,10 +176,37 @@ class CompraController extends Controller
             return $this->redirect(['index']);
         }
 
+        // SE A SESSÃO JÁ TERMINOU --> NÃO DEIXAR ALTERAR O ESTADO
+        if ($model->sessao->isEstadoTerminada()) {
+            Yii::$app->session->setFlash('error', 'Não pode alterar o estado de compras cuja sessão já terminou.');
+            return $this->redirect(['index']);
+        }
+
+        // SE A COMPRA ESTIVER CANCELADA --> NÃO DEIXAR RE-ATIVAR
+        if ($model->isEstadoCancelada()) {
+            Yii::$app->session->setFlash('error', 'Não é possível alterar o estado de uma compra já cancelada.');
+            return $this->redirect(['index']);
+        }
+
         // ATUALIZAR O ESTADO DA COMPRA
         $model->estado = $estado;
 
         if ($model->save(false, ['estado'])) {
+
+            // SE A COMPRA FOR CANCELADA --> ENVIAR EMAIL PARA O CLIENTE
+            if ($estado === Compra::ESTADO_CANCELADA) {
+                $cliente = $model->cliente;
+                $nome = $cliente->profile->nome ?? $cliente->username;
+                $email = $cliente->email;
+
+                $mensagem =
+                "<p>Olá <strong>{$nome}</strong>,</p>
+                    <p>Lamentamos informar que a sua <b>compra #{$model->id}</b> foi <span style='color:#c00;'>cancelada</span>.</p>
+                    <p>Se acha que isto foi um erro, por favor contacte o cinema correspondente.</p>
+                    <p style='margin-top:0.75rem;'>Cumprimentos,<br><b>Equipa CineLive</b></p>";
+
+                EmailHelper::enviarEmail($email, 'Cancelamento da sua compra - CineLive', $mensagem);
+            }
 
             // ATUALIZAR O ESTADO DOS BILHETES
             foreach ($model->bilhetes as $bilhete) {
@@ -186,6 +230,77 @@ class CompraController extends Controller
         }
 
         return $this->redirect(['index']);
+    }
+
+
+    // ADMIN/GERENTE/FUNCIONÁRIO --> MUDA O ESTADO DOS BILHETES PENDENTES ASSOCIADOS À COMPRA
+    // GERENTE/FUNCIONÁRIO --> MUDA O ESTADO DOS BILHETES PENDENTES ASSOCIADOS À COMPRA (DO SEU CINEMA)
+    public function actionConfirmAllTickets($id)
+    {
+        // OBTER USER ATUAL
+        $currentUser = Yii::$app->user;
+
+        // OBTER COMPRA
+        $model = $this->findModel($id);
+
+        if (!Yii::$app->user->can('validarBilhetes')) {
+            Yii::$app->session->setFlash('error', 'Não tem permissão para confirmar bilhetes.');
+            return $this->redirect(['index']);
+        }
+
+        // OBTER CINEMA DA COMPRA
+        $cinemaId = $model->sessao->cinema_id ?? null;
+
+        // GERENTE/FUNCIONÁRIO --> SÓ PODEM CONFIRMAR COMPRAS DO SEU CINEMA
+        if (!$currentUser->can('admin')) {
+
+            // OBTER CINEMA DO USER ATUAL
+            $userCinemaId = $currentUser->identity->profile->cinema_id ?? null;
+
+            if ($userCinemaId === null || $userCinemaId != $cinemaId) {
+                Yii::$app->session->setFlash('error', 'Não tem permissão para confirmar bilhetes de outro cinema.');
+                return $this->redirect(['index']);
+            }
+        }
+
+        // BLOQUEAR SE A SESSÃO JÁ TERMINOU
+        if ($model->sessao->isEstadoTerminada()) {
+            Yii::$app->session->setFlash('error', 'Não é possível confirmar bilhetes de uma sessão já iniciada ou terminada.');
+            return $this->redirect(['index']);
+        }
+
+        // SE TODOS OS BILHETES DA COMPRA JÁ FORAM CONFIRMADOS --> VOLTAR
+        if ($model->isTodosBilhetesConfirmados()) {
+            Yii::$app->session->setFlash('info', 'Todos os bilhetes desta compra já foram confirmados.');
+            return $this->redirect(['index']);
+        }
+
+        // OBTER BILHETES ASSOCIADOS À COMPRA
+        $bilhetes = $model->bilhetes;
+        if (empty($bilhetes)) {
+            Yii::$app->session->setFlash('info', 'Esta compra não possui bilhetes.');
+            return $this->redirect(['index']);
+        }
+
+        // CONFIRMAR TODOS OS BILHETES PENDENTES
+        $confirmados = 0;
+        foreach ($bilhetes as $bilhete) {
+            if ($bilhete->estado !== Bilhete::ESTADO_CONFIRMADO) {
+                $bilhete->estado = Bilhete::ESTADO_CONFIRMADO;
+                $bilhete->save(false, ['estado']);
+                $confirmados++;
+            }
+        }
+
+        // MENSAGEM FINAL
+        if ($confirmados > 0) {
+            Yii::$app->session->setFlash('success', "Foram confirmados {$confirmados} bilhete(s).");
+        }
+        else {
+            Yii::$app->session->setFlash('info', 'Todos os bilhetes desta compra já estavam confirmados.');
+        }
+
+        return $this->redirect(['view', 'id' => $model->id]);
     }
 
 

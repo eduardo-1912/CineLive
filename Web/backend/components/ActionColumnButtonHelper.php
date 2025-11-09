@@ -3,6 +3,7 @@
 namespace backend\components;
 
 
+use common\models\AluguerSala;
 use common\models\Filme;
 use Yii;
 use yii\helpers\Html;
@@ -184,7 +185,7 @@ class ActionColumnButtonHelper
         return [
             'confirmarBilhetes' => function ($url, $model) {
                 return Html::a('<i class="fas fa-check-double"></i>', ['confirm-tickets', 'id' => $model->id], [
-                    'class' => 'btn btn-sm ' .($model->isEstadoConfirmada() && !$model->isTodosBilhetesConfirmados()
+                    'class' => 'btn btn-sm ' .($model->isEstadoConfirmada() && !$model->isTodosBilhetesConfirmados() && !$model->sessao->isEstadoTerminada()
                     ? 'btn-success' : 'btn-secondary disabled'),
                     'title' => 'Confirmar Bilhetes',
                     'data-confirm' => 'Tem a certeza que quer confirmar todos os bilhetes desta compra?',
@@ -203,7 +204,7 @@ class ActionColumnButtonHelper
             default => '',
         };
 
-        if (!$currentUser->can('gerirCompras')) {
+        if (!$currentUser->can('gerirCompras') || $model->sessao->isEstadoTerminada() || $model->isEstadoCancelada()) {
             return Html::tag('span', Html::encode($model->displayEstado()), ['class' => "fs-6 $btnClass"]);
         }
 
@@ -233,16 +234,14 @@ class ActionColumnButtonHelper
         </div>';
     }
 
-
-    public static function bilheteButtons()
+    public static function bilheteEstadoDropdown()
     {
         return [
             'changeStatus' => function ($url, $model) {
-                // 🚫 Se a compra estiver cancelada, desativar o botão
-                if ($model->compra && $model->compra->estado === \common\models\Compra::ESTADO_CANCELADA) {
+                if ($model->compra && $model->compra->estado === Compra::ESTADO_CANCELADA || $model->compra->sessao->isEstadoTerminada()) {
                     $btnClass = match ($model->estado) {
-                        \common\models\Bilhete::ESTADO_CONFIRMADO => 'btn-success',
-                        \common\models\Bilhete::ESTADO_CANCELADO  => 'btn-danger',
+                        Bilhete::ESTADO_CONFIRMADO => 'btn-success',
+                        Bilhete::ESTADO_CANCELADO  => 'btn-danger',
                         default => 'btn-secondary',
                     };
 
@@ -251,16 +250,15 @@ class ActionColumnButtonHelper
                             'class' => "btn btn-sm {$btnClass}",
                             'style' => 'width: 100px; opacity: 0.6; cursor: not-allowed;',
                             'disabled' => true,
-                            'title' => 'Compra cancelada — alteração de estado bloqueada'
                         ]),
                         ['class' => 'btn-group']
                     );
                 }
 
-                // 🔽 Caso normal — gerar dropdown
                 $items = '';
-                foreach (\common\models\Bilhete::optsEstado() as $estado => $label) {
+                foreach (Bilhete::optsEstado() as $estado => $label) {
                     if ($model->estado === $estado) continue;
+                    if ($model->estado === Bilhete::ESTADO_CANCELADO && $estado === Bilhete::ESTADO_CONFIRMADO) continue;
 
                     $items .= Html::tag('li',
                         Html::a($label, ['bilhete/change-status', 'id' => $model->id, 'estado' => $estado], [
@@ -274,8 +272,8 @@ class ActionColumnButtonHelper
                 }
 
                 $btnClass = match ($model->estado) {
-                    \common\models\Bilhete::ESTADO_CONFIRMADO => 'btn-success',
-                    \common\models\Bilhete::ESTADO_CANCELADO  => 'btn-danger',
+                    Bilhete::ESTADO_CONFIRMADO => 'btn-success',
+                    Bilhete::ESTADO_CANCELADO  => 'btn-danger',
                     default => 'btn-secondary',
                 };
 
@@ -291,5 +289,51 @@ class ActionColumnButtonHelper
                 );
             }
         ];
+    }
+
+    public static function aluguerEstadoDropdown($model)
+    {
+        if (
+            $model->isEstadoCancelado() ||
+            $model->isEstadoADecorrer() ||
+            $model->isEstadoTerminado()
+        ) {
+            return $model->getEstadoFormatado();
+        }
+
+        $items = '';
+        foreach ([$model::ESTADO_CONFIRMADO => 'Confirmar', $model::ESTADO_CANCELADO  => 'Cancelar',] as $estado => $label) {
+
+            if ($model->estado === $estado) continue;
+
+            $items .= Html::tag('li',
+                Html::a($label, ['aluguer-sala/change-status', 'id' => $model->id, 'estado' => $estado], [
+                    'class' => 'dropdown-item',
+                    'data' => [
+                        'method' => 'post',
+                        'confirm' => "Tem a certeza que quer alterar o estado para '{$label}'?",
+                    ],
+                ])
+            );
+        }
+
+        $btnClass = match ($model->estado) {
+            $model::ESTADO_PENDENTE   => 'text-primary',
+            default => '',
+        };
+
+        return '
+        <div class="btn-group">
+            <button class="btn text-start p-0 border-0 ' . $btnClass . ' dropdown-toggle"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    style="width: 100px;">
+                ' . $model->displayEstado() . '
+            </button>
+            <ul class="dropdown-menu">
+                ' . $items . '
+            </ul>
+        </div>
+        ';
     }
 }

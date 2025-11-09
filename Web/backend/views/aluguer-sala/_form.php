@@ -1,5 +1,6 @@
 <?php
 
+use common\models\AluguerSala;
 use common\models\Cinema;
 use common\models\Sala;
 use common\models\User;
@@ -36,17 +37,20 @@ $salasDisponiveis[] = $model->sala;
     <!-- NOME CLIENTE -->
     <?= $form->field($model, 'cliente_id')->textInput(['value' => $nomeCliente, 'disabled' => true]) ?>
 
+    <!-- EMAIL CLIENTE -->
+    <?= $form->field($model, 'email')->textInput(['value' => $emailCliente, 'disabled' => true,])->label('Email') ?>
+
+    <!-- TELEMÓVEL CLIENTE -->
+    <?= $form->field($model, 'telemovel')->textInput(['value' => $telemovelCliente, 'disabled' => true,])->label('Telemóvel') ?>
+
     <div class="<?= $isAdmin ? 'd-block' : 'd-none' ?> ">
         <?= $form->field($model, 'cinema_id')->textInput(['value' => $nomeCinema, 'disabled' => true]) ?>
     </div>
 
-    <!-- DATA -->
-    <?= $form->field($model, 'data')->input('date', ['value' => $model->data, 'disabled' => true]) ?>
-
     <!-- HORA INÍCIO/FIM -->
-    <?= $form->field($model, 'hora_inicio')->input('time', ['value' => $model->hora_inicio, 'disabled' => true,]) ?>
-
-    <?= $form->field($model, 'hora_fim')->input('time', ['value' => $model->hora_fim, 'disabled' => true,]) ?>
+    <?= $form->field($model, 'horario')->textInput
+    (['value' => $model->dataFormatada . ' | ' . $model->horaInicioFormatada . ' - ' . $model->horaFimFormatada, 'disabled' => true,])
+    ->label('Horário') ?>
 
     <!-- TIPO EVENTO-->
     <?= $form->field($model, 'tipo_evento')->textInput(['maxlength' => true, 'disabled' => true]) ?>
@@ -54,17 +58,47 @@ $salasDisponiveis[] = $model->sala;
     <!-- OBSERVAÇÕES -->
     <?= $form->field($model, 'observacoes')->textarea(['rows' => 4, 'disabled' => true]) ?>
 
-
+    <!-- SALA -->
     <?= $form->field($model, 'sala_id')->dropDownList(
         ArrayHelper::map($salasDisponiveis, 'id', 'nome'),
-        ['prompt' => 'Selecione uma sala']
+        [
+            'prompt' => 'Selecione uma sala',
+            'disabled' => in_array($model->estado, [
+                $model::ESTADO_A_DECORRER,
+                $model::ESTADO_TERMINADO,
+            ]),
+        ]
     ) ?>
 
-    <?= $form->field($model, 'estado')->dropDownList($model->optsEstadoBD()) ?>
+
+    <!-- ESTADO -->
+    <?php
+    $estados = $model->optsEstadoBD();
+
+    if ($model->estado === $model::ESTADO_CONFIRMADO) {
+        unset($estados[$model::ESTADO_PENDENTE]);
+    }
+
+    if (!isset($estados[$model->estado])) {
+        $estados[$model->estado] = $model->displayEstado();
+    }
+
+    echo $form->field($model, 'estado')->dropDownList(
+        $estados,
+        [
+            'disabled' => in_array($model->estado, [
+                $model::ESTADO_A_DECORRER,
+                $model::ESTADO_TERMINADO,
+                $model::ESTADO_CANCELADO,
+            ]),
+        ]
+    );
+    ?>
+
+
 
     <div class="form-group">
-        <?= Html::submitButton('Confirmar', ['class' => 'btn btn-success']) ?>
-        <a href="mailto:<?=$emailCliente?>" class="btn btn-primary" target="_blank">Email</a>
+        <?= Html::submitButton('Guardar', ['class' => 'btn btn-success']) ?>
     </div>
 
 
