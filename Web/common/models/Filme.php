@@ -120,6 +120,7 @@ class Filme extends \yii\db\ActiveRecord
             'duracao' => 'Duração',
             'rating' => 'Rating',
             'estreia' => 'Estreia',
+            'estreiaFormatada' => 'Estreia',
             'idioma' => 'Idioma',
             'realizacao' => 'Realização',
             'trailer_url' => 'Trailer',
@@ -184,24 +185,51 @@ class Filme extends \yii\db\ActiveRecord
         return Yii::$app->formatter->asDate($this->estreia, 'php:d/m/Y');
     }
 
+    // OBTER DURAÇÃO EM HORAS
+    public function getDuracaoEmHoras()
+    {
+        if (!$this->duracao || $this->duracao <= 0) {
+            return '-';
+        }
+
+        $horas = floor($this->duracao / 60);
+        $minutos = $this->duracao % 60;
+
+        if ($horas > 0) {
+            return sprintf('%dh %02dmin', $horas, $minutos);
+        }
+        return sprintf('%dmin', $minutos);
+    }
+
     // OBTER FILMES EM EXIBIÇÃO POR CINEMA
     public static function getFilmesEmExibicaoPorCinema($cinemaId)
     {
-        $hoje = date('Y-m-d');
+        $now = date('Y-m-d');
 
         return self::find()
             ->alias('f')
             ->joinWith('sessaos s')
             ->where([
-                'f.estado' => self::ESTADO_EM_EXIBICAO,
                 's.cinema_id' => $cinemaId,
             ])
-            ->andWhere(['>=', 's.data', $hoje])
+            ->andWhere(['>=', 's.data', $now])
             ->distinct()
             ->orderBy(['f.titulo' => SORT_ASC])
             ->all();
     }
 
+    // OBTER CINEMAS COM SESSÕES FUTURAS PARA O DETERMINADO FILME
+    public function getCinemasComSessoesFuturas()
+    {
+        return Cinema::find()
+            ->alias('c')
+            ->joinWith('sessaos s')
+            ->where(['s.filme_id' => $this->id, 'c.estado' => Cinema::ESTADO_ATIVO])
+            ->andWhere(['>=', 's.data', date('Y-m-d')])
+            ->distinct()
+            ->orderBy(['c.nome' => SORT_ASC])
+            ->all();
+    }
 
     /**
      * Gets query for [[Sessaos]].

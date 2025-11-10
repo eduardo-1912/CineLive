@@ -1,5 +1,6 @@
 <?php
 
+use common\models\Cinema;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
@@ -10,17 +11,86 @@ $this->title = 'Filmes';
 ?>
 
 <div class="container">
-    <h3 class="page-title"><?= Html::encode($this->title) ?></h3>
+    <div class="d-flex justify-content-between align-items-center mb-4" style="min-height: 35px;">
+        <h4 class="page-title m-0"><?= Html::encode($this->title) ?></h4>
 
-    <div class="row row-cols-1 row-cols-md-4 g-3">
+        <div class="d-flex gap-3 align-items-center">
+            <div class="d-flex gap-1 d-none d-sm-block">
+                <!-- EM EXIBIÇÃO -->
+                <a class="btn btn-sm btn-estado-filme <?= $estado === null ? 'active' : '' ?>"
+                   href="<?= Url::to(['filme/index', 'cinema_id' => $cinema_id, 'q' => $q]) ?>">
+                    Em Exibição
+                </a>
+
+                <!-- KIDS -->
+                <?php if ($estado !== 'brevemente'): ?>
+                    <a class="btn btn-sm btn-estado-filme <?= $estado === 'kids' ? 'active' : '' ?>"
+                       href="<?= Url::to(['filme/index', 'estado' => 'kids', 'q' => $q, 'cinema_id' => $cinema_id]) ?>">Kids</a>
+                <?php endif; ?>
+
+                <!-- BREVEMENTE -->
+                <a class="btn btn-sm btn-estado-filme <?= $estado === 'brevemente' ? 'active' : '' ?>"
+                   href="<?= Url::to(['filme/index', 'estado' => 'brevemente', 'q' => $q]) ?>">Brevemente</a>
+            </div>
+
+            <!-- TOGGLE PARA 'KIDS' OU 'EM EXIBIÇÃO' APENAS PARA MOBILE -->
+            <div class="d-block d-sm-none">
+                <?php if ($estado !== 'brevemente'): ?>
+                <form method="get" action="<?= Url::to(['filme/index']) ?>" class="d-inline-flex align-items-center">
+
+                    <!-- CINEMA ESCOLHIDO -->
+                    <?= Html::hiddenInput('cinema_id', $cinema_id) ?>
+
+                    <div class="form-check form-switch m-0 ps-0">
+                        <?= Html::checkbox('estado', $estado === 'kids', [
+                            'value' => 'kids',
+                            'class' => 'form-check-input',
+                            'id' => 'kidsSwitch',
+                            'onchange' => 'this.form.submit()'
+                        ]) ?>
+                        <label class="form-check-label fw-semibold" for="kidsSwitch">Kids</label>
+                    </div>
+
+                </form>
+                <?php endif; ?>
+            </div>
+
+            <!-- DROPDOWN DE CINEMAS -->
+                <div class="dropdown-center <?= ($estado === 'brevemente' ? 'd-block d-sm-none' : 'd-block') ?>">
+                    <button class="btn btn-sm dropdown-toggle" type="button" id="dropdownCinema" data-bs-toggle="dropdown" aria-expanded="false">
+                        <?= Html::encode(Cinema::findOne($cinema_id)->nome ?? 'Brevemente') ?>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownCinema">
+                        <li class="d-block d-sm-none">
+                            <a class="dropdown-item <?= $estado === 'brevemente' ? 'active' : '' ?>"
+                               href="<?= Url::to(['filme/index', 'estado' => 'brevemente', 'q' => $q]) ?>">Brevemente</a>
+                        </li>
+                        <li class="dropdown-divider d-block d-sm-none"></li>
+                        <?php foreach ($cinemas as $cinema): ?>
+                            <li>
+                                <a class="dropdown-item <?= $cinema_id == $cinema->id ? 'active' : '' ?>"
+                                   href="<?= Url::to(['filme/index', 'cinema_id' => $cinema->id, 'q' => $q]) ?>">
+                                    <?= Html::encode($cinema->nome) ?>
+                                </a>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+        </div>
+
+    </div>
+
+    <!-- CARD DE FILMES -->
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
         <?php foreach ($filmes as $filme): ?>
             <div class="col">
                 <div class="h-100 border-0">
-                    <a href="<?= Url::to(['filme/view?id=']) . $filme->id ?>" class="card-filme text-center text-decoration-none text-black d-flex flex-column gap-1">
+                    <a href="<?= Url::to(['filme/view', 'id' => $filme->id, 'cinema_id' => $cinema_id]) ?>"
+                       class="card-filme text-center text-decoration-none text-black d-flex flex-column gap-1">
                         <?= Html::img($filme->getPosterUrl(), [
                             'class' => 'card-img-top shadow-sm rounded-4',
                             'alt' => $filme->titulo,
-                            'style' => 'object-fit: cover; height: 400px;'
+                            'style' => 'object-fit: cover; aspect-ratio: 2/3;'
                         ]) ?>
                         <h5 class="fw-semibold fs-6"><?= Html::encode($filme->titulo) ?></h5>
                     </a>
@@ -29,3 +99,42 @@ $this->title = 'Filmes';
         <?php endforeach; ?>
     </div>
 </div>
+
+<?php
+$script = <<<JS
+
+    // GUARDAR O ÚLTIMO CINEMA ESCOLHIDO NA DROPDOWN EM LOCAL-STORAGE
+    document.querySelectorAll('.dropdown-item').forEach(item => {
+        item.addEventListener('click', function() {
+            
+            // OBTER PARÂMETROS PASSADOS NO URL
+            var urlParams = new URLSearchParams(this.href.split('?')[1]);
+            
+            // OBTER cinema_id
+            var cinemaId = urlParams.get('cinema_id');
+            
+            // GUARDAR ID DO CINEMA
+            if (cinemaId) {
+                localStorage.setItem('cinema_id', cinemaId);
+            }
+        });
+    });
+    
+    // SE NÃO HOUVER CINEMA NA QUERY E NÃO FOR 'BREVEMENTE' --> REDIRECIONAR PARA O DA LOCAL-STORAGE
+    const isBrevemente = window.location.search.includes('estado=brevemente');
+    if (!isBrevemente && !window.location.search.includes('cinema_id')) {
+        
+        // OBTER O ÚLTIMO CINEMA ESCOLHIDO NO DROPDOWN DE CINEMAS
+        var savedCinemaId = localStorage.getItem('cinema_id');
+        
+        // SE HÁ ALGUMA CINEMA GUARDADO --> USAR
+        if (savedCinemaId) {
+            var params = new URLSearchParams(window.location.search);
+            params.set('cinema_id', savedCinemaId);
+            window.location.search = params.toString();
+        }
+    }
+    
+JS;
+$this->registerJs($script);
+?>

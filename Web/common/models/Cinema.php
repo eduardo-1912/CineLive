@@ -184,7 +184,6 @@ class Cinema extends \yii\db\ActiveRecord
         return $sessoes || $alugueres;
     }
 
-
     // HORA INÍCIO FORMATADA (HH:mm)
     public function getHoraInicioFormatada()
     {
@@ -204,6 +203,22 @@ class Cinema extends \yii\db\ActiveRecord
             . ' - ' .
             Yii::$app->formatter->asTime($this->horario_fecho, 'php:H:i');
     }
+
+    // OBTER SESSÕES FUTURAS DESTE CINEMA (FILME OPCIONAL)
+    public function getSessoesFuturas($filmeId = null)
+    {
+        $query = $this->getSessaos()
+            ->andWhere(['>=', 'data', date('Y-m-d')])
+            ->andWhere(['estado' => Sessao::ESTADO_ATIVA])
+            ->orderBy(['data' => SORT_ASC, 'hora_inicio' => SORT_ASC]);
+
+        if ($filmeId !== null) {
+            $query->andWhere(['filme_id' => $filmeId]);
+        }
+
+        return $query->all();
+    }
+
 
     // VERIFICAR SE PODE SER EDITADO
     public function isEditable(): bool { return true; }

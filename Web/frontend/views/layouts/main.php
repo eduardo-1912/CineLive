@@ -61,7 +61,7 @@ AppAsset::register($this);
                     ['label' => 'Serviços', 'url' => ['/servicos/index']],
                 ];
                 echo Nav::widget([
-                    'options' => ['class' => 'navbar-nav font-15 fw-medium ls-10'],
+                    'options' => ['class' => 'navbar-nav font-15 fw-medium ls-10 gap-1'],
                     'items' => $menuItems,
                 ]);
             ?>
@@ -84,62 +84,87 @@ AppAsset::register($this);
                     'placeholder' => 'Pesquisar filmes...',
                     'aria-label' => 'Pesquisar filmes',
                 ]) ?>
+
+                <!-- HIDDEN-INPUT DE CINEMA -->
+                <?= Html::hiddenInput('cinema_id', '', ['id' => 'navbar-cinema-id']) ?>
+
                 <button class="btn bg-light border-0 d-inline-flex" type="submit">
                     <?= file_get_contents(Yii::getAlias($iconsPath . 'search.svg')) ?>
                 </button>
             </div>
             <?php ActiveForm::end(); ?>
 
-                <!-- LINK LOGIN -->
-                <?php if (Yii::$app->user->isGuest): ?>
-                    <div class="d-flex align-items-center gap-3">
-                        <?php echo Nav::widget([
-                            'options' => ['class' => 'navbar-nav font-15 fw-medium ls-10'],
-                            'items' => [
-                                ['label' => 'Login', 'url' => ['/site/login']],
-                            ],
-                        ]); ?>
-                    </div>
+            <script>
 
-                <!-- DROPDOWN ÁREA DE CLIENTE (DESKTOP) -->
-                <?php else: ?>
-                    <div class="dropdown">
-                        <button class="btn d-none d-lg-inline-flex align-items-center icon-link p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <?= file_get_contents(Yii::getAlias($iconsPath . 'user-circle.svg')) ?>
-                        </button>
+                // OBTER ÚLTIMO CINEMA ESCOLHIDO DA LOCAL STORAGE
+                const savedCinema = localStorage.getItem('cinema_id');
 
-                        <ul class="fs-15 dropdown-menu dropdown-menu-end mt-2">
-                            <?php $dropdownItemClasses = 'dropdown-item d-inline-flex align-items-center gap-1' ?>
-                            <li>
-                                <a class="<?= $dropdownItemClasses ?>" href="<?= Url::to(['/user/index']) ?>">
-                                    <?= file_get_contents(Yii::getAlias($iconsPath . 'user.svg')) ?>
-                                    Perfil
-                                </a>
-                            </li>
-                            <li>
-                                <a class="<?= $dropdownItemClasses ?>" href="<?= Url::to(['/user/index']) ?>">
-                                    <?= file_get_contents(Yii::getAlias($iconsPath . 'ticket.svg')) ?>Bilhetes
-                                </a>
-                            </li>
-                            <li><hr class="dropdown-divider"></li>
-                            <?= Html::beginForm(['/site/logout'], 'post', ['class' => 'p-0 m-0']) ?>
-                            <?= Html::submitButton(
-                                file_get_contents(Yii::getAlias($iconsPath . 'logout.svg')) . 'Logout',
-                                ['class' => $dropdownItemClasses, 'encode' => false]
-                            ) ?>
-                            <?= Html::endForm() ?>
-                        </ul>
-                    </div>
+                // ATUALIZAR INPUT DA BARRA DE PESQUISA
+                const cinemaInput = document.getElementById('navbar-cinema-id');
+                if (savedCinema && cinemaInput) {
+                    cinemaInput.value = savedCinema;
+                }
 
-                    <!-- LINK ÁREA DE CLIENTE (MOBILE) -->
-                   <?php
-                        echo Nav::widget([
-                            'options' => ['class' => 'd-flex d-lg-none navbar-nav font-15 fw-medium ls-10'],
-                            'items' => [
-                                ['label' => 'Área de Cliente', 'url' => ['/user/index']],
-                            ],
-                        ]); ?>
-                <?php endif; ?>
+                // ATUALIZAR O NAV-LINK 'Filmes'
+                const filmesLink = document.querySelector('a.nav-link[href$="/filme/index"]');
+                if (savedCinema && filmesLink) {
+                    const url = new URL(filmesLink.href, window.location.origin);
+                    url.searchParams.set('cinema_id', savedCinema);
+                    filmesLink.href = url.toString();
+                }
+
+            </script>
+
+            <!-- LINK LOGIN -->
+            <?php if (Yii::$app->user->isGuest): ?>
+                <div class="d-flex align-items-center gap-3">
+                    <?php echo Nav::widget([
+                        'options' => ['class' => 'navbar-nav font-15 fw-medium ls-10'],
+                        'items' => [
+                            ['label' => 'Login', 'url' => ['/site/login']],
+                        ],
+                    ]); ?>
+                </div>
+
+            <!-- DROPDOWN ÁREA DE CLIENTE (DESKTOP) -->
+            <?php else: ?>
+                <div class="dropdown">
+                    <button class="btn d-none d-lg-inline-flex align-items-center icon-link p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <?= file_get_contents(Yii::getAlias($iconsPath . 'user-circle.svg')) ?>
+                    </button>
+
+                    <ul class="fs-15 dropdown-menu dropdown-menu-end mt-2">
+                        <?php $dropdownItemClasses = 'dropdown-item d-inline-flex align-items-center gap-1' ?>
+                        <li>
+                            <a class="<?= $dropdownItemClasses ?>" href="<?= Url::to(['/user/index']) ?>">
+                                <?= file_get_contents(Yii::getAlias($iconsPath . 'user.svg')) ?>
+                                Perfil
+                            </a>
+                        </li>
+                        <li>
+                            <a class="<?= $dropdownItemClasses ?>" href="<?= Url::to(['/user/index']) ?>">
+                                <?= file_get_contents(Yii::getAlias($iconsPath . 'ticket.svg')) ?>Bilhetes
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <?= Html::beginForm(['/site/logout'], 'post', ['class' => 'p-0 m-0']) ?>
+                        <?= Html::submitButton(
+                            file_get_contents(Yii::getAlias($iconsPath . 'logout.svg')) . 'Logout',
+                            ['class' => $dropdownItemClasses, 'encode' => false]
+                        ) ?>
+                        <?= Html::endForm() ?>
+                    </ul>
+                </div>
+
+                <!-- LINK ÁREA DE CLIENTE (MOBILE) -->
+               <?php
+                    echo Nav::widget([
+                        'options' => ['class' => 'd-flex d-lg-none navbar-nav font-15 fw-medium ls-10'],
+                        'items' => [
+                            ['label' => 'Área de Cliente', 'url' => ['/user/index']],
+                        ],
+                    ]); ?>
+            <?php endif; ?>
         </div>
     </div>
 </nav>
@@ -147,7 +172,7 @@ AppAsset::register($this);
 <!-- MAIN -->
 <main role="main" class="flex-shrink-0">
 
-    <div class="container">
+    <div class="">
         <?php foreach (Yii::$app->session->getAllFlashes() as $type => $message): ?>
             <div class="alert alert-<?= $type ?> alert-dismissible fade show mt-3" role="alert">
                 <?= $message ?>

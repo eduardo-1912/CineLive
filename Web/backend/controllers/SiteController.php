@@ -12,6 +12,7 @@ use common\models\Sessao;
 use common\models\User;
 use common\models\UserProfile;
 use Yii;
+use yii\db\Expression;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -89,6 +90,22 @@ class SiteController extends Controller
         // SE É GERENTE
         if ($isGerente) {
             $totalAlugueres = AluguerSala::find()->where(['estado' => AluguerSala::ESTADO_PENDENTE, 'cinema_id' => $userCinemaId])->count();
+
+            $vendasPorCinema = Compra::find()
+                ->alias('c')
+                ->joinWith(['bilhetes b', 'sessao s', 'sessao.cinema ci'])
+                ->select([
+                    'ci.nome AS cinema',
+                    new Expression('SUM(b.preco) AS total')
+                ])
+                ->groupBy('ci.id')
+                ->orderBy(['total' => SORT_DESC])
+                ->asArray()
+                ->all();
+
+            $labelsCinemas = array_column($vendasPorCinema, 'cinema');
+            $valoresVendas = array_map('floatval', array_column($vendasPorCinema, 'total'));
+
         }
 
         // SE TEM CINEMA
@@ -104,6 +121,9 @@ class SiteController extends Controller
                 ->limit(10)
                 ->all();
             $filmesEmExibicao = Filme::getFilmesEmExibicaoPorCinema($userCinemaId);
+
+            $labelsCinemas = [];
+            $valoresVendas = [];
         }
 
         $totalSessoesHoje = Sessao::find()->where(['data' => $now])->andFilterWhere($isAdmin ? [] : ['cinema_id' => $userCinemaId])->count();
@@ -114,6 +134,8 @@ class SiteController extends Controller
             'totalSessoesHoje' => $totalSessoesHoje,
             'ultimasCompras' => $ultimasCompras,
             'filmesEmExibicao' => $filmesEmExibicao,
+            'labelsCinemas' => $labelsCinemas,
+            'valoresVendas' => $valoresVendas,
         ]);
     }
 

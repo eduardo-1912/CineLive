@@ -69,7 +69,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 },
                             ],
                             'rating',
-                            'estreia',
+                            'estreiaFormatada',
                             'idioma',
                             'realizacao',
                             'trailer_url:url',
