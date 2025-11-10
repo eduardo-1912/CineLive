@@ -231,7 +231,7 @@ if ($('#vendasChart').length) {
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: 'Total'
+                        text: 'Total (€)'
                     }
                 }
             }

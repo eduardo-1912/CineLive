@@ -209,7 +209,6 @@ class Cinema extends \yii\db\ActiveRecord
     {
         $query = $this->getSessaos()
             ->andWhere(['>=', 'data', date('Y-m-d')])
-            ->andWhere(['estado' => Sessao::ESTADO_ATIVA])
             ->orderBy(['data' => SORT_ASC, 'hora_inicio' => SORT_ASC]);
 
         if ($filmeId !== null) {
@@ -218,7 +217,6 @@ class Cinema extends \yii\db\ActiveRecord
 
         return $query->all();
     }
-
 
     // VERIFICAR SE PODE SER EDITADO
     public function isEditable(): bool { return true; }

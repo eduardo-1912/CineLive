@@ -179,6 +179,21 @@ class Filme extends \yii\db\ActiveRecord
         }
     }
 
+    // VERIFICAR SE TEM SESSÕES ATIVAS
+    public function hasSessoesAtivas(): bool
+    {
+        foreach ($this->sessaos as $sessao) {
+            $estado = $sessao->getEstado();
+
+            if ($estado === Sessao::ESTADO_ATIVA) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
     // OBTER ESTREIA FORMATADA (DD/MM/AAAA)
     public function getEstreiaFormatada(): string
     {
@@ -229,6 +244,17 @@ class Filme extends \yii\db\ActiveRecord
             ->distinct()
             ->orderBy(['c.nome' => SORT_ASC])
             ->all();
+    }
+
+    // VERIFICAR SE O RATING É PARA CRIANÇAS
+    public static function ratingsKids()
+    {
+        return [self::RATING_TODOS, self::RATING_M3, self::RATING_M6];
+    }
+
+    public function isRatingKids()
+    {
+        return ($this->isRatingTodos() || $this->isRatingM3() || $this->isRatingM6());
     }
 
     /**

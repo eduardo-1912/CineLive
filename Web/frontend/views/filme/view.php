@@ -1,5 +1,6 @@
 <?php
 
+use common\models\Filme;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
@@ -15,14 +16,14 @@ $this->title = $model->titulo;
         <!-- LEFT - POSTER -->
         <div class="col-md-4">
             <?= Html::img($model->getPosterUrl(), [
-                'class' => 'img-fluid rounded-4 shadow-sm',
+                'class' => 'img-fluid d-none d-md-block rounded-4 shadow-sm',
                 'style' => 'aspect-ratio: 2/3;',
                 'alt' => $model->titulo,
             ]) ?>
 
 
             <!-- SESSÕES -->
-            <div class="mt-3">
+            <div class="mt-0 mt-md-3">
 
                 <!-- FORM PARA ESCOLHER A SESSÃO -->
                 <form method="get" action="<?= Url::to(['filme/view']) ?>" class="d-flex flex-column gap-2">
@@ -51,9 +52,8 @@ $this->title = $model->titulo;
                     ]) ?>
                     </div>
 
-
-                    <a href="<?= Url::to(['sessao/view', 'id' => $sessaoSelecionada->id ?? null]) ?>"
-                       class="btn btn-dark py-2 rounded-3 fs-14 w-100 <?= !$sessaoSelecionada ? 'disabled' : '' ?>">
+                    <a href="<?= Url::to(['compra/create', 'sessao_id' => $sessaoSelecionada->id ?? null]) ?>"
+                        class="btn btn-dark py-2 rounded-3 fs-14 w-100 <?= !$sessaoSelecionada ? 'disabled' : '' ?>">
                         Comprar Bilhetes
                     </a>
 
@@ -69,7 +69,10 @@ $this->title = $model->titulo;
             <div class="d-flex flex-column gap-2 mb-3">
                 <div class="d-flex justify-content-between align-items-center">
                     <h2 class="fw-bold m-0"><?= $model->titulo ?></h2>
-                    <h5 class="m-0 py-1 px-3 rounded-pill bg-danger fw-bold text-white"><?= $model->rating ?></h5>
+                    <h5 class="m-0 py-1 px-3 rounded-pill fw-bold text-white
+                        <?= $model->isRatingKids() ? 'bg-success' : 'bg-danger' ?>">
+                        <?= Html::encode($model->rating) ?>
+                    </h5>
                 </div>
                 <?php if ($model->generos): ?>
                     <div class="d-flex mb-1 gap-1">

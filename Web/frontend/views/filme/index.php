@@ -55,7 +55,7 @@ $this->title = 'Filmes';
                 <?php endif; ?>
             </div>
 
-            <!-- DROPDOWN DE CINEMAS -->
+                <!-- DROPDOWN DE CINEMAS -->
                 <div class="dropdown-center <?= ($estado === 'brevemente' ? 'd-block d-sm-none' : 'd-block') ?>">
                     <button class="btn btn-sm dropdown-toggle" type="button" id="dropdownCinema" data-bs-toggle="dropdown" aria-expanded="false">
                         <?= Html::encode(Cinema::findOne($cinema_id)->nome ?? 'Brevemente') ?>
@@ -82,21 +82,27 @@ $this->title = 'Filmes';
 
     <!-- CARD DE FILMES -->
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
-        <?php foreach ($filmes as $filme): ?>
-            <div class="col">
-                <div class="h-100 border-0">
-                    <a href="<?= Url::to(['filme/view', 'id' => $filme->id, 'cinema_id' => $cinema_id]) ?>"
-                       class="card-filme text-center text-decoration-none text-black d-flex flex-column gap-1">
-                        <?= Html::img($filme->getPosterUrl(), [
-                            'class' => 'card-img-top shadow-sm rounded-4',
-                            'alt' => $filme->titulo,
-                            'style' => 'object-fit: cover; aspect-ratio: 2/3;'
-                        ]) ?>
-                        <h5 class="fw-semibold fs-6"><?= Html::encode($filme->titulo) ?></h5>
-                    </a>
+        <?php if (!empty($filmes)): ?>
+            <?php foreach ($filmes as $filme): ?>
+                <div class="col">
+                    <div class="h-100 border-0">
+                        <a href="<?= Url::to(['filme/view', 'id' => $filme->id, 'cinema_id' => $cinema_id]) ?>"
+                           class="card-filme text-center text-decoration-none text-black d-flex flex-column gap-1">
+                            <?= Html::img($filme->getPosterUrl(), [
+                                'class' => 'card-img-top shadow-sm rounded-4',
+                                'alt' => $filme->titulo,
+                                'style' => 'object-fit: cover; aspect-ratio: 2/3;'
+                            ]) ?>
+                            <h5 class="fw-semibold fs-6"><?= Html::encode($filme->titulo) ?></h5>
+                        </a>
+                    </div>
                 </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <div class="d-flex justify-content-center align-items-center w-100" style="height: 50vh;">
+                <h4 class="text-muted text-center fw-semibold m-0">Nenhum filme encontrado!</h4>
             </div>
-        <?php endforeach; ?>
+        <?php endif; ?>
     </div>
 </div>
 

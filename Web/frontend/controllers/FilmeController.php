@@ -5,6 +5,7 @@ namespace frontend\controllers;
 use common\models\Cinema;
 use Yii;
 use common\models\Filme;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
@@ -31,17 +32,24 @@ class FilmeController extends Controller
 
             return $this->render('index', [
                 'filmes' => $filmes,
-                'q' => $q,
                 'cinema_id' => $cinema_id,
                 'cinemas' => $cinemas,
                 'estado' => $estado,
+                'q' => $q,
             ]);
         }
 
         // SE ESTADO FOR 'EM EXIBIÇÃO' OU 'KIDS' --> PRECISA DE CINEMA
         // SE NENHUM CINEMA ESTIVER SELECIONADO --> REDIRECIONAR PARA O PRIMEIRO DISPONÍVEL
         if (!$cinema_id && !empty($cinemas)) {
-            return $this->redirect(['index', 'cinema_id' => $cinemas[0]->id]);
+            if (!$cinema_id && !empty($cinemas)) {
+                return $this->redirect([
+                    'index',
+                    'cinema_id' => $cinemas[0]->id,
+                    'estado' => $estado,
+                    'q' => $q
+                ]);
+            }
         }
 
         // OBTER TODOS OS FILMES COM SESSÕES FUTURAS (EM EXIBIÇÃO)
@@ -59,11 +67,14 @@ class FilmeController extends Controller
 
         // SE ESTADO FOR 'KIDS' --> ADICIONA QUERY COM RATINGS PARA CRIANÇAS
         if ($estado === 'kids') {
-            $query->andWhere(['f.rating' => [Filme::RATING_TODOS, Filme::RATING_M3, Filme::RATING_M6]]);
+            $query->andWhere(['f.rating' => Filme::ratingsKids()]);
         }
 
         // ORDERNAR POR TÍTULO
         $filmes = $query->orderBy(['f.titulo' => SORT_ASC])->all();
+
+        // APENAS MOSTRAR FILMES QUE TENHAM SESSÕES ATIVAS (NÃO ESTEJAM A DECORRER OU ESGOTADAS)
+        $filmes = array_filter($filmes, fn($filme) => $filme->hasSessoesAtivas());
 
         return $this->render('index', [
             'filmes' => $filmes,
@@ -81,30 +92,41 @@ class FilmeController extends Controller
         // OBTER FILME
         $model = $this->findModel($id);
 
+        // SE O FILME NÃO TEM SESSÕES ATIVAS --> NÃO DEIXAR VER
+        if (!$model->hasSessoesAtivas()) {
+            throw new NotFoundHttpException('Este filme já não está disponível para consulta.');
+        }
+
+        // OBTER PARÂMETROS DO URL
         $dataSelecionada = Yii::$app->request->get('data');
         $horaSelecionada = Yii::$app->request->get('hora');
 
-        // OBTER TODOS OS CINEMAS ATIVOS COM SESSÕES FUTURAS DESTE FILME
-        $cinemasDisponiveis = $model->getCinemasComSessoesFuturas();
-
-        // OBTER SESSÕES FUTURAS DO CINEMA SELECIONADO PARA O FILME
+        // SE UM CINEMA FOI PASSADO POR PARÂMETRO
         $sessoes = [];
         if ($cinema_id) {
 
             // ENCONTRAR CINEMA
             $cinema = Cinema::findOne($cinema_id);
 
-            // OBTER SESSÕES FUTURAS ATIVAS
-            $sessoes = $cinema ? $cinema->getSessoesFuturas($model->id) : [];
+            // OBTER SESSÕES FUTURAS
+            if ($cinema) {
+                $sessoes = $cinema->getSessoesFuturas($model->id);
+            }
 
-            // 3️⃣ Validar se a hora selecionada ainda é válida
+            // FILTRAR APENAS POR SESSÕES ATIVAS
+            // NÃO FAZEMOS NA QUERY PARA EXCLUIR ESGOTADAS E A DECORRER (ESTADOS DINÂMICOS)
+            $sessoes = array_filter($sessoes, fn($sessao) => $sessao->isEstadoAtiva());
+
+            // VALIDAR SE A HORA SELECIONADA É VÁLIDA
             if ($dataSelecionada && $horaSelecionada) {
-                $sessaoExiste = array_filter($sessoes, fn($s) =>
-                    $s->data === $dataSelecionada && substr($s->hora_inicio, 0, 5) === $horaSelecionada
+
+                // VER SE EXISTE ALGUMA SESSÃO COM CONJUNTO DATA + HORA IGUAL À SELECIONADA
+                $sessaoExiste = array_filter($sessoes, fn($sessao) =>
+                    $sessao->data === $dataSelecionada && $sessao->horaInicioFormatada === $horaSelecionada
                 );
 
+                // SE NÃO TEM NENHUMA CORRESPONDÊNCIA --> REDIRECIONAR COM APENAS CINEMA E DATA
                 if (empty($sessaoExiste)) {
-                    // Redirecionar apenas com data e cinema válidos
                     return $this->redirect([
                         'view',
                         'id' => $id,
@@ -115,39 +137,48 @@ class FilmeController extends Controller
             }
         }
 
-        // 4️⃣ Agrupar sessões por data
-        $datasAgrupadas = [];
+        // AGRUPAR SESSÕES POR DATA
+        // ISTO CRIA UM ARRAY DE SESSÕES POR DATA (EX.: 2025-11-03 => [sessao_1, sessao_2])
+        $datasSessoes = [];
         foreach ($sessoes as $sessao) {
-            $datasAgrupadas[$sessao->data][] = $sessao;
+            $datasSessoes[$sessao->data][] = $sessao;
         }
 
-        // 5️⃣ Preparar listas para dropdowns
-        $listaCinemas = \yii\helpers\ArrayHelper::map($cinemasDisponiveis, 'id', 'nome');
+        // OBTER TODOS OS CINEMAS ATIVOS COM SESSÕES FUTURAS DESTE FILME
+        $listaCinemas = ArrayHelper::map($model->getCinemasComSessoesFuturas(), 'id', 'nome');
 
+        // LISTA DE DATAS
+        // ISTO CRIA UM ARRAY DE DATAS FORMATADAS (EX.: [2025-11-03 => 11/03/2025, 2025-11-04 => 11/04/2025])
         $listaDatas = [];
-        foreach ($datasAgrupadas as $data => $lista) {
-            $listaDatas[$data] = $lista[0]->dataFormatada;
+        foreach ($datasSessoes as $data => $listaSessoes) {
+            // [0] PORQUE TODAS AS SESSÕES DENTRO DA LISTA DE DATAS TÊM A MESMA DATA
+            $listaDatas[$data] = $listaSessoes[0]->dataFormatada;
         }
 
+        // LISTA DE HORAS PARA A DATA SELECIONADA
         $listaHoras = [];
-        if ($dataSelecionada && isset($datasAgrupadas[$dataSelecionada])) {
-            foreach ($datasAgrupadas[$dataSelecionada] as $s) {
-                $listaHoras[$s->horaInicioFormatada] = $s->horaInicioFormatada;
+        if ($dataSelecionada && isset($datasSessoes[$dataSelecionada])) {
+            foreach ($datasSessoes[$dataSelecionada] as $sessao) {
+                // ADICIONAR HORAS NA LISTA DE HORAS, CHAVE E VALOR SÃO IGUAIS
+                $listaHoras[$sessao->horaInicioFormatada] = $sessao->horaInicioFormatada;
             }
         }
 
-        // 6️⃣ Encontrar sessão selecionada (para o botão "Comprar Bilhetes")
+        // ENCONTRAR UMA SESSÃO SELECIONADA PARA BOTÃO COMPRAR BILHETES
         $sessaoSelecionada = null;
-        if ($dataSelecionada && $horaSelecionada && isset($datasAgrupadas[$dataSelecionada])) {
-            foreach ($datasAgrupadas[$dataSelecionada] as $s) {
-                if (substr($s->hora_inicio, 0, 5) === $horaSelecionada) {
-                    $sessaoSelecionada = $s;
+
+        // SE DATA E HORA SELECIONADA E DATA SELECIONADA EXITE NO ARRAY DE DATAS
+        if ($dataSelecionada && $horaSelecionada && isset($datasSessoes[$dataSelecionada])) {
+            // PARA CADA SESSÃO DO ARRAY DE DATA AGRUPADAS
+            foreach ($datasSessoes[$dataSelecionada] as $sessao) {
+                // SE A HORA INÍCIO É IGUAL À HORA SELECIONADA --> SELECIONAR ESSA SESSÃO
+                if ($sessao->horaInicioFormatada === $horaSelecionada) {
+                    $sessaoSelecionada = $sessao;
                     break;
                 }
             }
         }
 
-        // 7️⃣ Renderizar a view
         return $this->render('view', [
             'model' => $model,
             'cinema_id' => $cinema_id,
