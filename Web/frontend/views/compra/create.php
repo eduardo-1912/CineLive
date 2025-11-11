@@ -72,7 +72,7 @@ $lugaresOcupados = $sessao->lugaresOcupados ?? [];
                     </div>
 
                     <!-- VOLTAR PARA VIEW DO FILME -->
-                    <a href="<?= Url::to(['filme/view', 'id' => $sessao->filme->id]) ?>"
+                    <a href="<?= Url::to(['filme/view', 'id' => $sessao->filme->id, 'cinema_id' => $sessao->cinema->id, 'data' => $sessao->data, 'hora' => $sessao->horaInicioFormatada]) ?>"
                        class="btn btn-dark py-2 rounded-3 fs-14 w-100">Voltar atrás</a>
 
                 </div>

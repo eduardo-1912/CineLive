@@ -15,26 +15,9 @@ $this->title = 'Filmes';
         <h4 class="page-title m-0"><?= Html::encode($this->title) ?></h4>
 
         <div class="d-flex gap-3 align-items-center">
-            <div class="d-flex gap-1 d-none d-sm-block">
-                <!-- EM EXIBIÇÃO -->
-                <a class="btn btn-sm btn-estado-filme <?= $estado === null ? 'active' : '' ?>"
-                   href="<?= Url::to(['filme/index', 'cinema_id' => $cinema_id, 'q' => $q]) ?>">
-                    Em Exibição
-                </a>
 
-                <!-- KIDS -->
-                <?php if ($estado !== 'brevemente'): ?>
-                    <a class="btn btn-sm btn-estado-filme <?= $estado === 'kids' ? 'active' : '' ?>"
-                       href="<?= Url::to(['filme/index', 'estado' => 'kids', 'q' => $q, 'cinema_id' => $cinema_id]) ?>">Kids</a>
-                <?php endif; ?>
-
-                <!-- BREVEMENTE -->
-                <a class="btn btn-sm btn-estado-filme <?= $estado === 'brevemente' ? 'active' : '' ?>"
-                   href="<?= Url::to(['filme/index', 'estado' => 'brevemente', 'q' => $q]) ?>">Brevemente</a>
-            </div>
-
-            <!-- TOGGLE PARA 'KIDS' OU 'EM EXIBIÇÃO' APENAS PARA MOBILE -->
-            <div class="d-block d-sm-none">
+            <!-- TOGGLE PARA 'KIDS' OU 'EM EXIBIÇÃO' -->
+            <div class="d-block">
                 <?php if ($estado !== 'brevemente'): ?>
                 <form method="get" action="<?= Url::to(['filme/index']) ?>" class="d-inline-flex align-items-center">
 
@@ -55,17 +38,17 @@ $this->title = 'Filmes';
                 <?php endif; ?>
             </div>
 
-                <!-- DROPDOWN DE CINEMAS -->
-                <div class="dropdown-center <?= ($estado === 'brevemente' ? 'd-block d-sm-none' : 'd-block') ?>">
+                <!-- DROPDOWN DE CINEMAS E ESTADO 'BREVEMENTE' -->
+                <div class="dropdown-center <?= ($estado === 'brevemente' ? 'd-block' : 'd-block') ?>">
                     <button class="btn btn-sm dropdown-toggle" type="button" id="dropdownCinema" data-bs-toggle="dropdown" aria-expanded="false">
                         <?= Html::encode(Cinema::findOne($cinema_id)->nome ?? 'Brevemente') ?>
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="dropdownCinema">
-                        <li class="d-block d-sm-none">
+                        <li class="d-block">
                             <a class="dropdown-item <?= $estado === 'brevemente' ? 'active' : '' ?>"
                                href="<?= Url::to(['filme/index', 'estado' => 'brevemente', 'q' => $q]) ?>">Brevemente</a>
                         </li>
-                        <li class="dropdown-divider d-block d-sm-none"></li>
+                        <li class="dropdown-divider d-block"></li>
                         <?php foreach ($cinemas as $cinema): ?>
                             <li>
                                 <a class="dropdown-item <?= $cinema_id == $cinema->id ? 'active' : '' ?>"

@@ -81,7 +81,7 @@ $this->title = $model->titulo;
 
                 <div class="d-flex justify-content-between align-items-center">
                     <h2 class="fw-bold m-0"><?= $model->titulo ?></h2>
-                    <h5 class="m-0 py-1 px-3 rounded-pill fw-bold text-white
+                    <h5 class="m-0 py-1 px-3 rounded-pill fw-semibold text-white
                         <?= $model->isRatingKids() ? 'bg-success' : 'bg-danger' ?>">
                         <?= Html::encode($model->rating) ?>
                     </h5>

@@ -3,6 +3,7 @@
 /** @var \yii\web\View $this */
 /** @var string $content */
 
+use common\components\ToastWidget;
 use common\widgets\Alert;
 use frontend\assets\AppAsset;
 use yii\bootstrap5\Breadcrumbs;
@@ -173,14 +174,10 @@ AppAsset::register($this);
 <main role="main" class="flex-shrink-0">
 
     <div class="">
-        <?php foreach (Yii::$app->session->getAllFlashes() as $type => $message): ?>
-            <div class="alert alert-<?= $type ?> alert-dismissible fade show mt-3" role="alert">
-                <?= $message ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        <?php endforeach; ?>
-
         <?= $content ?>
+
+        <?= ToastWidget::widget() ?>
+
     </div>
 </main>
 

@@ -2,8 +2,10 @@
 
 namespace frontend\controllers;
 
+use common\models\Bilhete;
 use common\models\Compra;
 use common\models\Sessao;
+use Exception;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
@@ -34,6 +36,7 @@ class CompraController extends Controller
         ];
     }
 
+    // ESCOLHER LUGARES E COMPRA BILHETES
     public function actionCreate($sessao_id)
     {
         // OBTER A SESSÃO
@@ -43,7 +46,7 @@ class CompraController extends Controller
         $lugaresSelecionados = Yii::$app->request->get('lugares', '');
         $lugaresSelecionados = array_filter(explode(',', $lugaresSelecionados));
 
-        // CALCULAR TOTAL
+        // CALCULAR TOTAL DA COMPRA
         $total = 0;
         if (!empty($lugaresSelecionados)) {
             $total = count($lugaresSelecionados) * (float)$sessao->sala->preco_bilhete;
@@ -56,66 +59,82 @@ class CompraController extends Controller
         ]);
     }
 
+    // CRIAR COMPRA E BILHETES
     public function actionPay()
     {
         $request = Yii::$app->request;
 
+        // OBTER DADOS
         $sessaoId = $request->post('sessao_id');
-        $lugares = explode(',', $request->post('lugares'));
+        $lugares = array_filter(explode(',', (string)$request->post('lugares')));
         $metodo = $request->post('metodo');
 
-        $sessao = \common\models\Sessao::findOne($sessaoId);
+        // OBTER A SESSÃO
+        $sessao = Sessao::findOne($sessaoId);
 
-        if (!$sessao || empty($lugares) || !$metodo) {
-            Yii::$app->session->setFlash('error', 'Ocorreu um erro.');
-            return $this->redirect(['filme/index']);
+        // SE A SESSÃO NÃO EXISTE --> VOLTAR
+        if (!$sessao) {
+            return $this->redirect(Yii::$app->request->referrer ?: ['user/index']);
         }
 
-        $userId = Yii::$app->user->id ?? null;
-        $total = count($lugares) * (float)$sessao->sala->preco_bilhete;
+        // SE ALGUM DOS DADOS NÃO FOI PASSADO --> VOLTAR
+        if (empty($lugares) || !$metodo) {
+            Yii::$app->session->setFlash('error', 'Ocorreu um erro ao criar a compra.');
+            return $this->redirect(Yii::$app->request->referrer ?: ['compra/create', 'sessao_id' => $sessaoId]);
 
-        // --- Criar a compra ---
-        $compra = new \common\models\Compra();
-        $compra->cliente_id = $userId;
-        $compra->sessao_id = $sessao->id;
-        $compra->data = date('Y-m-d H:i:s');
-        $compra->pagamento = $metodo;
-        $compra->estado = 'confirmada';
-
-        if (!$compra->save()) {
-            Yii::$app->session->setFlash('error', 'Erro ao criar a compra.');
-            return $this->redirect(['compra/create', 'sessao_id' => $sessaoId]);
         }
 
-        // --- Criar bilhetes ---
-        foreach ($lugares as $lugar) {
+        // INICIAR TRANSACTION (TER A CERTEZA QUE NENHUMA COMPRA É CRIADA SEM BILHETES)
+        $transaction = Yii::$app->db->beginTransaction();
 
-            do {
-                $codigo = strtoupper(Yii::$app->security->generateRandomString(6));
-            } while (\common\models\Bilhete::find()->where(['codigo' => $codigo])->exists());
+        try {
+            // CRIAR A COMPRA
+            $compra = new Compra();
+            $compra->cliente_id = Yii::$app->user->id;
+            $compra->sessao_id = $sessao->id;
+            $compra->data = date('Y-m-d H:i:s');
+            $compra->pagamento = $metodo;
+            $compra->estado = 'confirmada';
 
-
-
-            $bilhete = new \common\models\Bilhete();
-            $bilhete->compra_id = $compra->id;
-            $bilhete->lugar = $lugar;
-            $bilhete->preco = $sessao->sala->preco_bilhete;
-            $bilhete->codigo = $codigo;
-            $bilhete->estado = 'pendente';
-
-            if (!$bilhete->save()) {
-                Yii::$app->session->setFlash('error', 'Erro ao criar o bilhete para o lugar ' . $lugar);
-                return $this->redirect(['compra/create', 'sessao_id' => $sessaoId]);
+            // GUARDAR
+            if (!$compra->save()) {
+                throw new Exception('Ocorreu um erro ao guardar a compra: ' . json_encode($compra->getErrors()));
             }
+
+            // CRIAR BILHETES
+            foreach ($lugares as $lugar) {
+
+                // GERAR CÓDIGO ÚNICO
+                do { $codigo = strtoupper(Yii::$app->security->generateRandomString(6)); }
+                while (Bilhete::find()->where(['codigo' => $codigo])->exists());
+
+                // CRIAR BILHETE
+                $bilhete = new Bilhete();
+                $bilhete->compra_id = $compra->id;
+                $bilhete->lugar = $lugar;
+                $bilhete->preco = $sessao->sala->preco_bilhete;
+                $bilhete->codigo = $codigo;
+                $bilhete->estado = 'pendente';
+
+                // GUARDAR
+                if (!$bilhete->save()) {
+                    throw new Exception('Ocorreu um erro ao guardar o bilhete: ' . json_encode($bilhete->getErrors()));
+                }
+            }
+
+            // DAR COMMIT NA TRANSACTION
+            $transaction->commit();
+
+            Yii::$app->session->setFlash('success', 'Compra realizada com sucesso.');
+            return $this->redirect(['compra/view', 'id' => $compra->id]);
         }
-
-        // --- Redirecionar com sucesso ---
-        Yii::$app->session->setFlash('success', 'Compra realizada com sucesso!');
-        return $this->redirect(['compra/view', 'id' => $compra->id]);
+        catch (Exception $e) {
+            $transaction->rollBack();
+            Yii::error($e->getMessage());
+            Yii::$app->session->setFlash('error', 'Ocorreu um erro ao criar a compra.');
+            return $this->redirect(Yii::$app->request->referrer ?: ['compra/create', 'sessao_id' => $sessaoId]);
+        }
     }
-
-
-
 
     protected function findModel($id)
     {
