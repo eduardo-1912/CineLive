@@ -93,7 +93,7 @@ class FilmeController extends Controller
         $model = $this->findModel($id);
 
         // SE O FILME NÃO TEM SESSÕES ATIVAS --> NÃO DEIXAR VER
-        if (!$model->hasSessoesAtivas()) {
+        if (!$model->hasSessoesAtivas() && !$model->isEstadoBrevemente()) {
             throw new NotFoundHttpException('Este filme já não está disponível para consulta.');
         }
 

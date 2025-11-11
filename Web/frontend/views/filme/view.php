@@ -74,13 +74,15 @@ $this->title = $model->titulo;
                         <?= Html::encode($model->rating) ?>
                     </h5>
                 </div>
-                <?php if ($model->generos): ?>
                     <div class="d-flex mb-1 gap-1">
+                        <?php if ($model->generos): ?>
+
                         <?php foreach ($model->generos as $genero): ?>
                             <span class="badge-genero"><?= Html::encode($genero->nome) ?></span>
                         <?php endforeach; ?>
+                        <?php endif; ?>
+
                     </div>
-                <?php endif; ?>
             </div>
 
             <!-- OUTROS DADOS -->
@@ -106,7 +108,7 @@ $this->title = $model->titulo;
             <!-- SINOPSE -->
             <div class="mt-3">
                 <h5>Sinopse</h5>
-                <p class="text-muted"><?= nl2br(Html::encode($model->sinopse)) ?></p>
+                <p class="text-muted" style="height: 3lh"><?= nl2br(Html::encode($model->sinopse)) ?></p>
             </div>
 
             <!-- TRAILER -->

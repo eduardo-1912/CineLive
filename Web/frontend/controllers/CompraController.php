@@ -34,11 +34,29 @@ class CompraController extends Controller
         ];
     }
 
-    public function actionCreate($sessao_id){
-
+    public function actionCreate($sessao_id)
+    {
+        // OBTER A SESSÃO
         $sessao = Sessao::findOne($sessao_id);
-        return $this->render('create', ['sessao' => $sessao]);
+
+        // LER LUGARES DO URL
+        $lugaresSelecionados = Yii::$app->request->get('lugares', '');
+        $lugaresSelecionados = array_filter(explode(',', $lugaresSelecionados));
+
+        // CALCULAR TOTAL
+        $total = 0;
+        if (!empty($lugaresSelecionados)) {
+            $total = count($lugaresSelecionados) * (float)$sessao->sala->preco_bilhete;
+        }
+
+        return $this->render('create', [
+            'sessao' => $sessao,
+            'lugaresSelecionados' => $lugaresSelecionados,
+            'total' => $total,
+        ]);
     }
+
+
 
     protected function findModel($id)
     {

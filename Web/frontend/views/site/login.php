@@ -21,15 +21,14 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 <?= $form->field($model, 'username')->textInput(['autofocus' => true]) ?>
                 <?= $form->field($model, 'password')->passwordInput() ?>
-                <?= $form->field($model, 'rememberMe')->checkbox() ?>
+                <?= $form->field($model, 'rememberMe')->label('Lembrar-me')->checkbox() ?>
 
                 <div class="my-1 mx-0" style="color:#999;">
-                    Se se esqueceu da sua palavra-passe, pode <?= Html::a('redefini-la.', ['site/request-password-reset']) ?>.
+                    Se se esqueceu da sua palavra-passe, pode <?= Html::a('redefini-la', ['site/request-password-reset']) ?>.
                     <!-- <br>
                     Precisa de um novo e-mail de verificação? <?= Html::a('Reenviar', ['site/resend-verification-email']) ?> -->
                     <br>
-                    Ainda não tem conta?
-                    <?= Html::a('Criar Conta', ['site/signup']) ?>
+                    Ainda não tem conta? <?= Html::a('Criar Conta', ['site/signup']) ?>
                 </div>
 
                 <div class="form-group">
