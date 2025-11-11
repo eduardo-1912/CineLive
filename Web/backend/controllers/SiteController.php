@@ -85,11 +85,8 @@ class SiteController extends Controller
             $totalAlugueres = AluguerSala::find()->where(['estado' => AluguerSala::ESTADO_PENDENTE])->count();
             $ultimasCompras = Compra::find()->with(['sessao.filme', 'sessao.cinema'])->orderBy(['id' => SORT_DESC])->limit(10)->all();
             $filmesEmExibicao = Filme::find()->where(['estado' => Filme::ESTADO_EM_EXIBICAO])->all();
-        }
 
-        // SE É GERENTE
-        if ($isGerente) {
-            $totalAlugueres = AluguerSala::find()->where(['estado' => AluguerSala::ESTADO_PENDENTE, 'cinema_id' => $userCinemaId])->count();
+            $anoAtual = date('Y');
 
             $vendasPorCinema = Compra::find()
                 ->alias('c')
@@ -98,6 +95,7 @@ class SiteController extends Controller
                     'ci.nome AS cinema',
                     new Expression('SUM(b.preco) AS total')
                 ])
+                ->where(['YEAR(s.data)' => $anoAtual])
                 ->groupBy('ci.id')
                 ->orderBy(['total' => SORT_DESC])
                 ->asArray()
@@ -105,7 +103,12 @@ class SiteController extends Controller
 
             $labelsCinemas = array_column($vendasPorCinema, 'cinema');
             $valoresVendas = array_map('floatval', array_column($vendasPorCinema, 'total'));
+        }
 
+        // SE É GERENTE
+        if ($isGerente && !$isAdmin) {
+            $totalAlugueres = AluguerSala::find()->where(['estado' => AluguerSala::ESTADO_PENDENTE, 'cinema_id' => $userCinemaId])->count();
+            $valoresVendas = [];
         }
 
         // SE TEM CINEMA

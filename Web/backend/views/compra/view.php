@@ -32,7 +32,14 @@ $gerirCompras = $currentUser->can('gerirCompras');
                             [
                                 'attribute' => 'cliente',
                                 'value' => function ($model) {
-                                    return Html::a($model->cliente->profile->nome, ['user/view', 'id' => $model->cliente->id]);
+                                    if ($model->cliente && $model->cliente->profile) {
+                                        return Html::a(
+                                            Html::encode($model->cliente->profile->nome),
+                                            ['user/view', 'id' => $model->cliente->id],
+                                            ['class' => 'text-decoration-none text-primary']
+                                        );
+                                    }
+                                    return '<span class="text-muted">[Conta eliminada]</span>';
                                 },
                                 'format' => 'raw',
                             ],

@@ -42,7 +42,7 @@ $this->title = 'Dashboard';
                 <div class="icon">
                     <i class="fas fa-film"></i>
                 </div>
-                <a href="<?= Url::to(['/aluguer/index']) ?>" class="small-box-footer">
+                <a href="<?= Url::to(['/aluguer-sala/index']) ?>" class="small-box-footer">
                     Ver Alugueres <i class="fas fa-arrow-circle-right"></i>
                 </a>
             </div>
@@ -73,7 +73,7 @@ $this->title = 'Dashboard';
                 <div class="card card-primary shadow-sm">
                     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                         <h5 class="card-title mb-0">
-                            <i class="fas fa-chart-bar me-1"></i> Vendas por Cinema
+                            <i class="fas fa-chart-bar me-1"></i> Vendas por Cinema (<?= date('Y') ?>)
                         </h5>
                     </div>
                     <div class="card-body">

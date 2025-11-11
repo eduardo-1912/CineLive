@@ -5,7 +5,7 @@
 
 $this->title = 'Editar: Sala ' . $model->numero;
 $this->params['breadcrumbs'][] = ['label' => $model->cinema->nome, 'url' => ['cinema/view?id=' . $model->cinema_id]];
-$this->params['breadcrumbs'][] = ['label' => 'Salas', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Salas', 'url' => ['index', 'cinema_id' => $model->cinema_id]];
 $this->params['breadcrumbs'][] = ['label' => $model->numero, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = 'Editar';
 ?>

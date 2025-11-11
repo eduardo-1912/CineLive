@@ -153,7 +153,7 @@ class Sala extends \yii\db\ActiveRecord
         $salasAlugadas = AluguerSala::find()
             ->select('sala_id')
             ->where(['data' => $data])
-            ->andWhere(['estado' => [AluguerSala::ESTADO_CONFIRMADO, AluguerSala::ESTADO_A_DECORRER]])
+            ->andWhere(['estado' => [AluguerSala::ESTADO_PENDENTE, AluguerSala::ESTADO_CONFIRMADO, AluguerSala::ESTADO_A_DECORRER]])
             ->andWhere(['and',
                 ['<', 'hora_inicio', $horaFim],
                 ['>', 'hora_fim', $horaInicio],
@@ -186,6 +186,20 @@ class Sala extends \yii\db\ActiveRecord
         }
 
         return $lugares;
+    }
+
+    // OBTER O PRÓXIMO NÚMERO INDICATIVO AO CRIAR UMA SALA NOVA
+    public static function getProximoNumeroPorCinema($cinemaId): int
+    {
+        if (!$cinemaId) {
+            return 1;
+        }
+
+        $ultimoNumero = self::find()
+            ->where(['cinema_id' => $cinemaId])
+            ->max('numero');
+
+        return ($ultimoNumero ?? 0) + 1;
     }
 
     // VERIFICAR SE PODE SER EDITADA

@@ -2,6 +2,8 @@
 
 namespace backend\controllers;
 
+use common\models\Cinema;
+use common\models\Filme;
 use DateTime;
 use Yii;
 use common\models\Sessao;
@@ -127,7 +129,7 @@ class SessaoController extends Controller
 
     // ADMIN --> CRIA UMA SESSÃO PARA QUALQUER CINEMA
     // GERENTE --> APENAS CRIA UMA SESSÃO PARA O SEU CINEMA
-    public function actionCreate($filme_id = null)
+    public function actionCreate($cinema_id = null, $data = null, $filme_id = null, $hora_inicio = null)
     {
         // OBTER O USER ATUAL
         $currentUser = Yii::$app->user;
@@ -141,19 +143,47 @@ class SessaoController extends Controller
         // CRIAR NOVA SESSÃO
         $model = new Sessao();
 
+        // SE FOR GERENTE --> FORÇAR ATRIBUIÇÃO CINEMA_ID DO GERENTE
+        if ($currentUser->can('gerente') && !$currentUser->can('admin')) {
+            $model->cinema_id = $currentUser->identity->profile->cinema_id;
+            $cinema_id = $model->cinema_id;
+        }
+
+        // SE UM CINEMA FOI PASSADO POR PARÂMETRO
+        elseif ($cinema_id) {
+            // OBTER O CINEMA
+            $cinema = Cinema::findOne($cinema_id);
+
+            // SE CINEMA ESTIVER ENCERRADO --> REDIRECIONAR
+            if (!$cinema || $cinema->estado === Cinema::ESTADO_ENCERRADO) {
+                Yii::$app->session->setFlash('error', 'Não é possível criar salas para um cinema encerrado.');
+                return $this->redirect(['create']);
+            }
+
+            // CASO CONTRÁRIO, ATRIBUI O CINEMA AO MODELO
+            $model->cinema_id = $cinema_id;
+        }
+
         // VER SE ALGUM FILME FOI PASSADO POR PARÂMETRO
         if ($filme_id !== null) {
             $model->filme_id = $filme_id;
         }
 
-        // SE FOR GERENTE --> FORÇAR ATRIBUIÇÃO CINEMA_ID DO GERENTE
-        if ($currentUser->can('gerente') && !$currentUser->can('admin')) {
-            $model->cinema_id = $currentUser->identity->profile->cinema_id;
-        }
-
         // METER A DATA DE HOJE POR DEFAULT
         if ($model->isNewRecord) {
             $model->data = date('Y-m-d');
+        }
+
+        $model->filme_id = $filme_id;
+        $model->data = $data;
+        $model->hora_inicio = $hora_inicio;
+
+        // CALCULAR A HORA FIM AUTOMATICAMENTE SE JÁ TIVER FILME E HORA INÍCIO
+        if ($model->filme_id && $model->hora_inicio) {
+            $filme = Filme::findOne($model->filme_id);
+            if ($filme) {
+                $model->hora_fim = $model->getHoraFimCalculada($filme->duracao);
+            }
         }
 
         // GUARDAR
@@ -177,13 +207,14 @@ class SessaoController extends Controller
 
         return $this->render('create', [
             'model' => $model,
+            'cinema_id' => $cinema_id,
         ]);
     }
 
 
     // ADMIN --> EDITA SESSÕES DE QUALQUER CINEMA
     // GERENTE --> APENAS EDITA SESSÕES DO O SEU CINEMA
-    public function actionUpdate($id)
+    public function actionUpdate($id, $cinema_id = null, $data = null, $filme_id = null, $hora_inicio = null)
     {
         // OBTER O USER ATUAL
         $currentUser = Yii::$app->user;
@@ -203,9 +234,19 @@ class SessaoController extends Controller
             return $this->redirect(['index']);
         }
 
+        $model->filme_id = $filme_id ?? $model->filme_id;
+        $model->data = $data ?? $model->data;
+        $model->hora_inicio = $hora_inicio ?? $model->hora_inicio;
+
+        // OBTER DADOS ORIGINAIS
+        $anterior = $this->findModel($id);
+
         // GUARDAR
         if ($model->load(Yii::$app->request->post())) {
             if ($model->sala_id && $model->data && $model->hora_inicio && $model->hora_fim && $model->filme_id && $model->cinema_id) {
+
+                // NÃO DEIXAR ALTERAR O CINEMA DA SESSÃO
+                $model->cinema_id = $anterior->cinema_id;
 
                 // SE TIVER BILHETES ASSOCIADOS --> APENAS DEIXA EDITAR SALA
                 if (count($model->lugaresOcupados) > 0) {

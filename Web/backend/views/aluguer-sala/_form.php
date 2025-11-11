@@ -15,9 +15,9 @@ use yii\bootstrap4\ActiveForm;
 $currentUser = Yii::$app->user;
 $isAdmin = $currentUser->can('admin');
 
-$nomeCliente = $model->cliente->profile->nome ?? $model->cliente->username;
-$emailCliente = $model->cliente->email;
-$telemovelCliente = $model->cliente->profile->telemovel;
+$nomeCliente = $model->cliente->profile->nome ?? '-';
+$emailCliente = $model->cliente->email ?? '-';
+$telemovelCliente = $model->cliente->profile->telemovel ?? '-';
 $nomeCinema = $model->cinema->nome ?? '-';
 
 $salasDisponiveis = Sala::getSalasDisponiveis(
@@ -31,16 +31,10 @@ $salasDisponiveis[] = $model->sala;
 ?>
 
 <div class="aluguer-sala-form">
-
     <?php $form = ActiveForm::begin(); ?>
 
-    <!-- NOME CLIENTE -->
     <?= $form->field($model, 'cliente_id')->textInput(['value' => $nomeCliente, 'disabled' => true]) ?>
-
-    <!-- EMAIL CLIENTE -->
     <?= $form->field($model, 'email')->textInput(['value' => $emailCliente, 'disabled' => true,])->label('Email') ?>
-
-    <!-- TELEMÓVEL CLIENTE -->
     <?= $form->field($model, 'telemovel')->textInput(['value' => $telemovelCliente, 'disabled' => true,])->label('Telemóvel') ?>
 
     <div class="<?= $isAdmin ? 'd-block' : 'd-none' ?> ">
@@ -52,10 +46,7 @@ $salasDisponiveis[] = $model->sala;
     (['value' => $model->dataFormatada . ' | ' . $model->horaInicioFormatada . ' - ' . $model->horaFimFormatada, 'disabled' => true,])
     ->label('Horário') ?>
 
-    <!-- TIPO EVENTO-->
     <?= $form->field($model, 'tipo_evento')->textInput(['maxlength' => true, 'disabled' => true]) ?>
-
-    <!-- OBSERVAÇÕES -->
     <?= $form->field($model, 'observacoes')->textarea(['rows' => 4, 'disabled' => true]) ?>
 
     <!-- SALA -->
@@ -95,13 +86,9 @@ $salasDisponiveis[] = $model->sala;
     );
     ?>
 
-
-
     <div class="form-group">
         <?= Html::submitButton('Guardar', ['class' => 'btn btn-success']) ?>
     </div>
 
-
     <?php ActiveForm::end(); ?>
-
 </div>

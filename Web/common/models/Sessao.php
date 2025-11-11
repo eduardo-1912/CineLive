@@ -167,6 +167,20 @@ class Sessao extends \yii\db\ActiveRecord
         Yii::$app->formatter->asTime($this->hora_fim, 'php:H:i');
     }
 
+    // CALCULAR A HORA FIM CONSOANTE FILME SELECIONADO E HORA INÍCIO
+    public function getHoraFimCalculada($duracaoMinutos)
+    {
+        if (!$this->hora_inicio || !$duracaoMinutos) {
+            return null;
+        }
+
+        $inicio = new DateTime($this->hora_inicio);
+        $inicio->modify("+{$duracaoMinutos} minutes");
+
+        return $inicio->format('H:i');
+    }
+
+
     // VERIFICAR SE A SESSÃO PODE SER EDITADA
     public function isEditable(): bool
     {
@@ -187,13 +201,13 @@ class Sessao extends \yii\db\ActiveRecord
         $dataHoraInicio = new DateTime("{$this->data} {$this->hora_inicio}");
         $dataHoraFim = new DateTime("{$this->data} {$this->hora_fim}");
 
-        // SE A SESSÃO FOR HOJE E A HORA DE INÍCIO JÁ TIVER PASSADO --> MENSAGEM DE ERRO
+        // SE A HORA DE FIM FOR ANTERIOR À HORA DE INÍCIO --> MENSAGEM DE ERRO
         if ($dataHoraFim <= $dataHoraInicio) {
             Yii::$app->session->setFlash('error', 'A hora de fim deve ser posterior à hora de início.');
             return false;
         }
 
-        // SE A HORA DE FIM FOR ANTERIOR À HORA DE INÍCIO --> MENSAGEM DE ERRO
+        // SE A SESSÃO FOR HOJE E A HORA DE INÍCIO JÁ TIVER PASSADO --> MENSAGEM DE ERRO
         if ($dataHoraInicio < $now) {
             Yii::$app->session->setFlash('error', 'A hora de início não pode ser anterior à hora atual.');
             return false;

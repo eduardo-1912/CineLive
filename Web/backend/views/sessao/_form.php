@@ -1,12 +1,11 @@
 <?php
 
-use common\models\Cinema;
-use common\models\Filme;
-use common\models\Sala;
-use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\bootstrap4\ActiveForm;
-use yii\helpers\Json;
+use yii\helpers\ArrayHelper;
+use common\models\Cinema;
+use common\models\Sala;
+use common\models\Filme;
 
 $currentUser = Yii::$app->user;
 $isAdmin = $currentUser->can('admin');
@@ -17,50 +16,129 @@ $temBilhetes = !$model->isNewRecord && count($model->lugaresOcupados) > 0;
 ?>
 
 <div class="sessao-form">
-    <?php $form = ActiveForm::begin(); ?>
 
-    <!-- DATA -->
-    <?= $form->field($model, 'data')->input('date', ['value' => $model->data,
-        'min' => date('Y-m-d'), 'disabled' => $temBilhetes,]); ?>
+    <!-- FORM GET PARA OBTER DADOS -->
+    <?php $form = ActiveForm::begin(['method' => 'get',
+        'action' => [$model->isNewRecord ? 'create' : 'update', 'id' => $model->id],
+        'id' => 'sessao-form-get'
+    ]); ?>
 
-    <!-- LISTA DAS DURAÇÕES DE TODOS OS FILMES (CONVERTER PARA JSON PARA USAR COM JAVASCRIPT) -->
-    <?php $duracoesFilmes = Json::encode(ArrayHelper::map(Filme::find()->where(['estado' => Filme::ESTADO_EM_EXIBICAO])->all(), 'id', 'duracao')); ?>
-
-    <!-- DROPDOWN DOS FILMES -->
-    <?= $form->field($model, 'filme_id')->dropDownList(
-        ArrayHelper::map(Filme::find()->where(['estado' => Filme::ESTADO_EM_EXIBICAO])
-        ->orderBy('titulo')->all(), 'id', 'titulo'), ['prompt' => 'Selecione o filme', 'disabled' => $temBilhetes,]) ?>
-
-    <!-- HORA INÍCIO -->
-    <?= $form->field($model, 'hora_inicio')->input('time', ['disabled' => $temBilhetes]) ?>
-
-    <!-- HORA FIM (CALCULADA CONSOANTE O FILME SELECIONADO) -->
-    <?= $form->field($model, 'hora_fim')->input('time', ['disabled' => $temBilhetes]) ?>
-
-    <!-- SE É ADMIN PODE ESCOLHER O CINEMA -->
     <?php if ($isAdmin): ?>
+
         <!-- DROPDOWN DE CINEMAS -->
         <?= $form->field($model, 'cinema_id')->dropDownList(
-            ArrayHelper::map(Cinema::find()->where(['estado' => Cinema::ESTADO_ATIVO])->orderBy('nome')->all(), 'id', 'nome'),
-            ['prompt' => 'Selecione o cinema', 'onchange' => 'this.form.submit()', 'disabled' => !$model->isNewRecord]) ?>
+            ArrayHelper::map(Cinema::find()->where(['estado' => Cinema::ESTADO_ATIVO])
+                ->orderBy('nome')->all(), 'id', 'nome'),
+            [
+                'prompt' => 'Selecione o cinema',
+                'onchange' => 'this.form.submit()',
+                'name' => 'cinema_id',
+                'disabled' => !$model->isNewRecord,
+            ]
+        ) ?>
 
-        <!-- DROPDOWN DE SALAS -->
-        <div id="formFieldSala" style="<?= $model->cinema_id ? '' : 'display: none;' ?>">
-            <?= $form->field($model, 'sala_id')->dropDownList(
-                ArrayHelper::map(Sala::find()->where(['estado' => Sala::ESTADO_ATIVA, 'cinema_id' => $model->cinema_id ?: null,])
-                ->orderBy('numero')->all(), 'id', 'nome'), ['prompt' => 'Selecione a sala']) ?>
-        </div>
-
-    <!-- SE É GERENTE APENAS MOSTRAR SALAS DO SEU CINEMA -->
     <?php else: ?>
-        <?= Html::activeHiddenInput($model, 'cinema_id', ['value' => $userCinemaId]) ?>
 
-        <!-- DROPDOWN DE SALAS -->
-        <?= $form->field($model, 'sala_id')->dropDownList(
-            ArrayHelper::map(Sala::find()->where(['cinema_id' => $userCinemaId, 'estado' => Sala::ESTADO_ATIVA])
-            ->orderBy('numero')->all(), 'id', 'numero'), ['prompt' => 'Selecione a sala']) ?>
+        <!-- HIDDEN-INPUT COM CINEMA DO GERENTE -->
+        <?= Html::hiddenInput('cinema_id', $userCinemaId) ?>
+
     <?php endif; ?>
 
+    <!-- DATA -->
+    <?= $form->field($model, 'data')->input('date', [
+        'value' => $model->data ?? date('Y-m-d'),
+        'min' => date('Y-m-d'),
+        'name' => 'data',
+        'id' => 'sessao-data',
+        'disabled' => $temBilhetes,
+    ]) ?>
+
+    <!-- HORA INÍCIO -->
+    <?= $form->field($model, 'hora_inicio')->input('time', [
+        'name' => 'hora_inicio',
+        'id' => 'sessao-hora_inicio',
+        'disabled' => $temBilhetes,
+    ]) ?>
+
+    <!-- FILME -->
+    <?= $form->field($model, 'filme_id')->dropDownList(
+        ArrayHelper::map(Filme::find()->where(['estado' => Filme::ESTADO_EM_EXIBICAO])
+            ->orderBy('titulo')->all(), 'id', 'titulo'),
+        [
+            'prompt' => 'Selecione o filme',
+            'onchange' => 'this.form.submit()',
+            'name' => 'filme_id',
+            'disabled' => $temBilhetes,
+        ]
+    ) ?>
+
+    <?php ActiveForm::end(); ?>
+
+    <!-- FORM POST PARA GUARDAR -->
+    <?php $form = ActiveForm::begin(); ?>
+
+    <!-- HORA FIM -->
+    <?php
+
+    // SE FILME E HORA INÍCIO JÁ TÊM VALOR --> CALCULAR HORA FIM
+    if ($model->filme_id && $model->hora_inicio) {
+        $filme = Filme::findOne($model->filme_id);
+        if ($filme) {
+            $model->hora_fim = $model->getHoraFimCalculada($filme->duracao);
+        }
+    }
+
+    ?>
+
+    <?= $form->field($model, 'hora_fim')->input('time', [
+        'value' => $model->hora_fim,
+    ]) ?>
+
+    <!-- CAMPOS OCULTOS QUE VÊM DO FORM GET -->
+    <?= $form->field($model, 'cinema_id')->hiddenInput()->label(false) ?>
+    <?= $form->field($model, 'data')->hiddenInput()->label(false) ?>
+    <?= $form->field($model, 'filme_id')->hiddenInput()->label(false) ?>
+    <?= $form->field($model, 'hora_inicio')->hiddenInput()->label(false) ?>
+
+    <!-- SALAS DISPONÍVEIS -->
+    <?php if ($model->cinema_id): ?>
+        <?php
+        $salas = [];
+
+        if ($model->data && $model->hora_inicio && $model->hora_fim) {
+            $salas = Sala::getSalasDisponiveis(
+                $model->cinema_id,
+                $model->data,
+                $model->hora_inicio,
+                $model->hora_fim
+            );
+        }
+        else {
+            $salas = Sala::find()
+                ->where(['cinema_id' => $model->cinema_id, 'estado' => Sala::ESTADO_ATIVA])
+                ->orderBy('numero')
+                ->all();
+        }
+
+        // SE FOR UPDATE --> INCLUIR A SALA ATUAL
+        if ($model->sala_id) {
+            $salaAtual = Sala::findOne($model->sala_id);
+            if ($salaAtual && !in_array($salaAtual, $salas, true)) {
+                $salas[] = $salaAtual;
+            }
+        }
+
+        // ORDENAR AS SALAS POR NÚMERO
+        usort($salas, fn($a, $b) => $a->numero <=> $b->numero);
+
+        ?>
+        <?= $form->field($model, 'sala_id')->dropDownList(
+            ArrayHelper::map($salas, 'id', 'numero'),
+            ['prompt' => 'Selecione a sala']
+        ) ?>
+    <?php endif; ?>
+
+    <!-- BOTÃO GUARDAR -->
     <div class="form-group mt-3">
         <?= Html::submitButton('Guardar', ['class' => 'btn btn-success']) ?>
     </div>
@@ -72,65 +150,15 @@ $temBilhetes = !$model->isNewRecord && count($model->lugaresOcupados) > 0;
 $script = <<<JS
 $(function() {
     
-    // CALCULAR A HORA FIM CONSOANTE O FILME SELECIONADO E HORA DE INÍCIO
-    function atualizarHoraFim() {
-        
-        // OBTER ARRAY DE DURAÇÕES DOS FILMES
-        var duracoesFilmes = $duracoesFilmes;
+    var timer;
     
-        // OBTER FILME SELECIONADO E HORA INÍCIO
-        var filmeId = $('#sessao-filme_id').val();
-        var horaInicio = $('#sessao-hora_inicio').val();
-        
-        // OBTER DURAÇÃO DO FILME SELECIONADO
-        var duracao = duracoesFilmes[filmeId];
-    
-        // SE FILME/INÍCIO/DURAÇÃO FOR NULL --> VOLTAR
-        if (!filmeId || !horaInicio || !duracao) return;
-    
-        // TRANSFORMAR horaInicio PARA DATE OBJECT
-        var [h, m] = horaInicio.split(':');
-        var inicio = new Date();
-        inicio.setHours(h);
-        inicio.setMinutes(m);
-    
-        // SOMAR A DURAÇÃO DO FILME
-        inicio.setMinutes(inicio.getMinutes() + parseInt(duracao));
-    
-        // FORMATAR HORA FIM PARA HH:mm
-        var fimFormatado = inicio.toTimeString().slice(0, 5);
-        $('#sessao-hora_fim').val(fimFormatado);
-    }
-
-    // FUNÇÃO PARA MOSTRAR O CAMPO SALA SE ALGUM CINEMA ESTIER SELECIONADO
-    function toggleSalaField() {
-        // OBTER O ID DO CINEMA SELECIONADO
-        var cinemaId = $('#sessao-cinema_id').val();
-        
-        // SE ESTIVER ALGUM CINEMA SELECIONADO --> MOSTRAR CAMPO SALA
-        if (cinemaId) {
-            $('#formFieldSala').show();
-            $('#formFieldSala select').prop('disabled', false);
-        }
-        
-       // CASO CONTRÁRIO --> ESCONDER CAMPO SALA
-        else {
-            $('#formFieldSala').hide();
-            $('#formFieldSala select').prop('disabled', true);
-        }
-    }
-    
-    $(document).ready(function() {
-        toggleSalaField();
-        atualizarHoraFim();
-        
-        // SEMPRE QUE O USER MUDA O VALOR DO CAMPO 'CINEMA' --> MOSTRAR/ESCONDER CAMPO SALA
-        $('#sessao-cinema_id').on('change', toggleSalaField);
-        
-        // QUANDO O USER SELECIONAR FILME E HORA INÍCIO --> CALCULAR HORA FIM
-        $('#sessao-filme_id, #sessao-hora_inicio').on('change', atualizarHoraFim);
+    // QUANDO DATA OU HORA INÍCIO MUDAR --> DAR UM DELAY ANTES DE RECARREGAR
+    $('#sessao-data, #sessao-hora_inicio').on('input change', function() {
+        clearTimeout(timer);
+        timer = setTimeout(function() {
+            $('#sessao-form-get').submit();
+        }, 600);
     });
-
 });
 JS;
 $this->registerJs($script);

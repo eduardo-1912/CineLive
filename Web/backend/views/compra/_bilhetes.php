@@ -26,7 +26,7 @@ use backend\components\AppGridView;
         ],
         [
             'attribute' => 'lugar',
-            'value' => fn($b) => $b->lugar ? $b->lugar : '-',
+            'value' => fn($bilhete) => $bilhete->lugar ?? '-',
             'format' => 'raw',
         ],
         [

@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use common\models\Cinema;
 use Yii;
 use common\models\Sala;
 use backend\models\SalaSearch;
@@ -130,7 +131,7 @@ class SalaController extends Controller
 
     // ADMIN --> CRIA SALAS PARA QUALQUER CINEMA
     // GERENTE --> APENAS CRIA SALAS PARA O SEU CINEMA
-    public function actionCreate()
+    public function actionCreate($cinema_id = null)
     {
         // OBTER O USER ATUAL
         $currentUser = Yii::$app->user;
@@ -146,10 +147,35 @@ class SalaController extends Controller
         // SE FOR GERENTE --> FORÇAR ATRIBUIÇÃO CINEMA_ID DO GERENTE
         if ($currentUser->can('gerente') && !$currentUser->can('admin')) {
             $model->cinema_id = $currentUser->identity->profile->cinema_id;
+            $cinema_id = $model->cinema_id;
         }
+
+        // SE UM CINEMA FOI PASSADO POR PARÂMETRO
+        elseif ($cinema_id) {
+            // OBTER O CINEMA
+            $cinema = Cinema::findOne($cinema_id);
+
+            // SE CINEMA ESTIVER ENCERRADO --> REDIRECIONAR
+            if (!$cinema || $cinema->estado === Cinema::ESTADO_ENCERRADO) {
+                Yii::$app->session->setFlash('error', 'Não é possível criar salas para um cinema encerrado.');
+                return $this->redirect(['create']);
+            }
+
+            // CASO CONTRÁRIO, ATRIBUI O CINEMA AO MODELO
+            $model->cinema_id = $cinema_id;
+        }
+
+        // SE JÁ TIVERMOS UM CINEMA --> CALCULAR O NÚMERO DA SALA NOVA
+        $proximoNumero = $cinema_id ? Sala::getProximoNumeroPorCinema($cinema_id) : null;
 
         // GUARDAR
         if ($model->load(Yii::$app->request->post())) {
+
+            // SE O NÚMERO DA SALA AINDA NÃO VIER PREENCHIDO
+            if (empty($model->numero) && $model->cinema_id) {
+                $model->numero = Sala::getProximoNumeroPorCinema($model->cinema_id);
+            }
+
             if ($model->save()) {
                 Yii::$app->session->setFlash('success', 'Sala criada com sucesso.');
                 return $this->redirect(['view', 'id' => $model->id]);
@@ -161,6 +187,7 @@ class SalaController extends Controller
 
         return $this->render('create', [
             'model' => $model,
+            'proximoNumero' => $proximoNumero,
         ]);
     }
 
@@ -200,9 +227,11 @@ class SalaController extends Controller
         // GUARDAR
         if ($model->load(Yii::$app->request->post())) {
 
+            // NÃO DEIXAR ALTERAR O CINEMA DA SALA
+            $model->cinema_id = $anterior->cinema_id;
+
             // SE NÃO PODER SER ENCERRADA --> NÃO DEIXAR ALTERAR ESTES DADOS
             if (!$model->isClosable()) {
-                $model->cinema_id = $anterior->cinema_id;
                 $model->num_filas = $anterior->num_filas;
                 $model->num_colunas = $anterior->num_colunas;
                 $model->estado = $anterior->estado;

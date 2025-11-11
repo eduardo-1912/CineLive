@@ -59,6 +59,7 @@ use yii\web\JqueryAsset;
     <?php ActiveForm::end(); ?>
 </div>
 
+<!-- IMPORTAR O SELECT2 PARA SELECIONAR VÁRIOS GÉNEROS -->
 <?php
 $this->registerCssFile('https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css');
 $this->registerCssFile('https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css');
