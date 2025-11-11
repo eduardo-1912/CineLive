@@ -10,6 +10,7 @@ use Yii;
  *
  * @property int $id
  * @property int $cliente_id
+ * @property int $sessao_id
  * @property string $data
  * @property string $pagamento
  * @property string $estado

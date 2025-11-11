@@ -14,4 +14,13 @@ class CinemaController extends Controller
         return $this->render('index', ['cinemas' => $cinemas]);
     }
 
+
+    protected function findModel($id)
+    {
+        if (($model = Cinema::findOne(['id' => $id])) !== null) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException('The requested page does not exist.');
+    }
 }

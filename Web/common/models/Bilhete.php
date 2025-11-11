@@ -9,7 +9,6 @@ use Yii;
  *
  * @property int $id
  * @property int $compra_id
- * @property int $sessao_id
  * @property string $lugar
  * @property float $preco
  * @property string $codigo
@@ -51,7 +50,6 @@ class Bilhete extends \yii\db\ActiveRecord
             ['estado', 'in', 'range' => array_keys(self::optsEstado())],
             [['codigo'], 'unique'],
             [['compra_id'], 'exist', 'skipOnError' => true, 'targetClass' => Compra::class, 'targetAttribute' => ['compra_id' => 'id']],
-            [['sessao_id'], 'exist', 'skipOnError' => true, 'targetClass' => Sessao::class, 'targetAttribute' => ['sessao_id' => 'id']],
         ];
     }
 

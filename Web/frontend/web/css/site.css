@@ -36,7 +36,7 @@ body, p, span, a, button {
 
 .container {
     max-width: 1200px;
-    padding: 3rem 1rem;
+    padding: 2.5rem 1rem;
 }
 
 .navbar {
@@ -109,7 +109,7 @@ main {
 }
 
 .box-gray {
-    background-color: #f5f5f5;
+    background-color: #f6f7f8;
     border: 1px solid #eaeaea;
     padding: 1rem;
     border-radius: 1.5rem;
@@ -166,10 +166,10 @@ main {
     font-size: 13px;
     padding: 3px 10px;
     font-weight: 450;
-    color: #6c6c6c;
-    background-color: #ebebeb;
+    color: #878787;
+    background-color: #f2f2f2;
     margin-right: 2px;
-    border: 1px solid #cfcfcf;
+    border: 1px solid #dcdcdc;
 }
 
 

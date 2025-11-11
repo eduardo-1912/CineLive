@@ -8,58 +8,69 @@ use common\models\Sala;
 $this->title = 'Cinemas';
 ?>
 
-<div class="container my-5">
-    <h1 class="mb-4"><?= Html::encode($this->title) ?></h1>
+<div class="container">
 
+    <div class="mb-4">
+        <h4 class="page-title m-0">Os nossos cinemas</h4>
+    </div>
+
+    <!-- CINEMAS -->
     <?php foreach ($cinemas as $cinema): ?>
-        <!-- cartão do cinema: flex horizontal em MD+, coluna em XS/SM -->
-        <div class="cinema-card bg-light rounded-3 overflow-hidden shadow-sm mb-4"
-             style="display:flex; flex-direction:column; gap:0;">
+        <div class="box-gray p-0 overflow-hidden mb-4 shadow-sm border">
+            <div class="row row-cols-1 row-cols-lg-2">
 
-            <!-- wrapper que força row em MD+ -->
-            <div class="d-flex flex-column flex-md-row" style="width:100%;">
-
-                <!-- mapa: ocupa metade no MD+ -->
-                <div class="cinema-map" style="flex:0 0 50%; max-width:50%;">
+                <!-- MAPA -->
+                <div>
                     <iframe
-                            width="100%"
-                            height="320"
-                            style="border:0; display:block;"
-                            loading="lazy"
-                            allowfullscreen
-                            referrerpolicy="no-referrer-when-downgrade"
-                            src="https://www.google.com/maps?q=<?= Html::encode($cinema->latitude) ?>,<?= Html::encode($cinema->longitude) ?>&hl=pt&z=15&output=embed">
+                        width="100%" height="100%" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"
+                        src="https://www.google.com/maps?q=<?= $cinema->latitude ?>,<?= $cinema->longitude ?>&hl=pt&z=15&output=embed">
                     </iframe>
                 </div>
 
-                <!-- info: ocupa metade no MD+ -->
-                <div class="cinema-info p-4 d-flex flex-column justify-content-center"
-                     style="flex:1 1 50%; max-width:50%;">
-                    <h4 class="fw-bold mb-1"><?= Html::encode($cinema->nome) ?></h4>
-                    <p class="text-muted mb-3">Gerenciado por: <?= Html::encode($cinema->gerente->profile->nome ?? '—') ?></p>
+                <!-- DADOS DO CINEMA -->
+                <div class="px-4 px-lg-2 py-4 d-flex flex-column justify-content-center">
+                    <h3 class="fw-bold mb-1"><?= $cinema->nome ?></h3>
 
-                    <p class="mb-2"><strong>Morada:</strong><br>
-                        <?= Html::encode($cinema->rua . ", " . $cinema->codigo_postal . ", " . $cinema->cidade) ?>
-                    </p>
+                    <?php if ($cinema->gerente->profile->nome): ?>
+                        <p class="text-muted mb-4">Gerido por <span class="fw-medium"><?= $cinema->gerente->profile->nome ?></span></p>
+                    <?php endif; ?>
 
-                    <p class="mb-2"><strong>Telemóvel:</strong><br>
-                        <?= Html::encode($cinema->telefone) ?>
-                    </p>
+                    <div class="row row-cols-2 w-100 gy-3 mb-0 mb-lg-4">
 
-                    <p class="mb-2"><strong>Email:</strong><br>
-                        <?= Html::encode($cinema->email) ?>
-                    </p>
+                        <div class="col-12 d-flex flex-column text-start">
+                            <span class="fw-medium fs-14">Morada</span>
+                            <span class="text-muted"><?= $cinema->rua . ", " . $cinema->codigo_postal . ", " . $cinema->cidade ?></span>
+                        </div>
+                        <div class="d-flex flex-column text-start">
+                            <span class="fw-medium fs-14">Telefone</span>
+                            <span class="text-muted"><?= $cinema->telefone ?></span>
+                        </div>
+                        <div class="d-flex flex-column text-start">
+                            <span class="fw-medium fs-14">Horário</span>
+                            <span class="text-muted"><?= $cinema->horario ?></span>
+                        </div>
+                        <div class="d-flex flex-column text-start">
+                            <span class="fw-medium fs-14">Email</span>
+                            <a href="mailto:<?= $cinema->email ?>" target="_blank" class="text-decoration-none"><?= $cinema->email ?></a>
+                        </div>
+                        <div class="d-flex flex-column text-start">
+                            <span class="fw-medium fs-14">Capacidade</span>
 
-                    <p class="mb-2"><strong>Horário:</strong><br>
-                        <?= Html::encode($cinema->horario_abertura . " - " . $cinema->horario_fecho) ?>
-                    </p>
+                            <!-- CALCULAR LUGARES -->
+                            <?php $lugares = 0;
+                            foreach ($cinema->salas as $sala) {
+                                $lugares += ($sala->num_colunas * $sala->num_filas);
+                            } ?>
 
-                    <p class="mb-0"><strong>Capacidade:</strong><br>
-                        <?= Html::encode(Sala::find()->where(['cinema_id' => $cinema->id])->count() . " salas") ?>
-                    </p>
+                            <span class="text-muted"><?= count($cinema->salas) ?> Salas<span class="d-none d-sm-inline"> • <?= $lugares ?> Lugares</span></span>
+                        </div>
+
+                    </div>
+
                 </div>
 
             </div>
         </div>
     <?php endforeach; ?>
+
 </div>
