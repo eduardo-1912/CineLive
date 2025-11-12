@@ -40,7 +40,7 @@ $this->title = 'Filmes';
 
                 <!-- EM EXIBIÇÃO -->
                 <a class="d-none d-sm-flex btn btn-sm btn-estado-filme <?= $estado !== 'brevemente' ? 'active' : '' ?>"
-                   href="<?= Url::to(['filme/index', 'cinema_id' => $cinema_id, 'q' => $q]) ?>">Em Exibição</a>
+                   href="<?= Url::to(['filme/index', 'cinema_id' => $cinema_id]) ?>">Em Exibição</a>
 
                 <!-- BREVEMENTE -->
                 <a class="d-none d-sm-flex btn btn-sm btn-estado-filme <?= $estado === 'brevemente' ? 'active' : '' ?>"
@@ -50,7 +50,7 @@ $this->title = 'Filmes';
 
             <!-- DROPDOWN DE CINEMAS -->
             <div class="dropdown-center <?= ($estado === 'brevemente' ? 'd-block d-sm-none' : 'd-block') ?>">
-                <button class="btn btn-sm dropdown-toggle" type="button" id="dropdownCinema" data-bs-toggle="dropdown" aria-expanded="false">
+                <button class="btn btn-sm dropdown-toggle fw-medium" type="button" id="dropdownCinema" data-bs-toggle="dropdown" aria-expanded="false">
                     <?= Html::encode(Cinema::findOne($cinema_id)->nome ?? 'Brevemente') ?>
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="dropdownCinema">

@@ -22,11 +22,11 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?= $form->field($model, 'username')->textInput(['autofocus' => true]) ?>
                 <?= $form->field($model, 'password')->passwordInput() ?>
                 <?= $form->field($model, 'nome') ?>
-                <?= $form->field($model, 'telemovel')->label('Telemóvel') ?>
+                <?= $form->field($model, 'telemovel') ?>
                 <?= $form->field($model, 'email') ?>
 
             <div class="form-group">
-                <?= Html::submitButton('Signup', ['class' => 'btn btn-primary', 'name' => 'signup-button']) ?>
+                <?= Html::submitButton('Criar Conta', ['class' => 'btn btn-primary', 'name' => 'signup-button']) ?>
             </div>
 
             <?php ActiveForm::end(); ?>

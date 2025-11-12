@@ -8,7 +8,10 @@ use yii\widgets\DetailView;
 /* @var $model common\models\Cinema */
 
 $currentUser = Yii::$app->user;
+
 $gerirCinemas = $currentUser->can('gerirCinemas');
+$gerirSalas = $currentUser->can('gerirSalas');
+
 $isGerente = $currentUser->identity->roleName == 'gerente';
 $isOwnCinema = $currentUser->id == $model->gerente_id;
 
@@ -24,7 +27,6 @@ $this->params['breadcrumbs'][] = $model->nome;
             <div class="row">
                 <div class="col-md-12">
                     <p>
-                        <?= Html::a('Salas', ['sala/index', 'cinema_id' => $model->id], ['class' => 'btn btn-primary']) ?>
                         <?= Html::a('Sessões', ['sessao/index', 'cinema_id' => $model->id], ['class' => 'btn btn-secondary']) ?>
 
                         <?php if ($gerirCinemas || $isGerente && $isOwnCinema): ?>
@@ -61,36 +63,28 @@ $this->params['breadcrumbs'][] = $model->nome;
                             [
                                 'attribute' => 'gerente_id',
                                 'label' => 'Gerente',
-                                'value' => function ($model) {
-                                    return $model->gerente->profile->nome;
-                                },
+                                'value' => $model->gerente->profile->nome,
                                 'visible' => !$gerirCinemas && !$isGerente,
                             ],
                             [
                                 'attribute' => 'gerente_id',
                                 'format' => 'raw',
-                                'value' => function ($model) {
-                                    return Html::a(
-                                        Html::encode($model->gerente->profile->nome),
+                                'value' => Html::a($model->gerente->profile->nome,
                                         ['user/view', 'id' => $model->gerente->id],
-                                        ['class' => 'text-decoration-none text-primary']
-                                    );
-                                },
+                                        ['class' => 'text-decoration-none text-primary']),
                                 'visible' => $gerirCinemas || $isGerente,
                             ],
                             'email:email',
                             'telefone',
                             [
                                 'attribute' => 'morada',
-                                'value' => function ($model) {
-                                    return "{$model->rua}, {$model->codigo_postal} {$model->cidade}";
-                                },
+                                'value' => $model->moradaCompleta,
                             ],
                             'horario',
                             [
                                 'attribute' => 'estado',
                                 'format' => 'raw',
-                                'value' => fn($model) => $model->estadoFormatado,
+                                'value' => $model->estadoFormatado,
                                 'visible' => Yii::$app->user->can('gerirCinemas'),
                             ],
                             [
@@ -119,4 +113,28 @@ $this->params['breadcrumbs'][] = $model->nome;
         <!--.card-body-->
     </div>
     <!--.card-->
+
+    <?php if ($model->salas): ?>
+        <h3 class="mt-4 mb-3">Salas</h3>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <p>
+                            <?php if ($gerirSalas): ?>
+                                <?= Html::a('Criar Sala', ['sala/create', 'cinema_id' => $model->id], ['class' => 'btn btn-success']) ?>
+                            <?php endif; ?>
+                        </p>
+                        <?= $this->render('_salas', [
+                            'dataProvider' => $salasDataProvider,
+                            'compra' => $model,
+                            'gerirSalas' => $gerirSalas,
+                        ]) ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
+
 </div>

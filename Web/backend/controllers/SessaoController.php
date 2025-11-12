@@ -4,10 +4,13 @@ namespace backend\controllers;
 
 use common\models\Cinema;
 use common\models\Filme;
+use common\models\Sala;
 use DateTime;
 use Yii;
 use common\models\Sessao;
 use backend\models\SessaoSearch;
+use yii\data\ActiveDataProvider;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -63,6 +66,8 @@ class SessaoController extends Controller
         $searchModel = new SessaoSearch();
         $params = Yii::$app->request->queryParams;
 
+        $cinemaFilterOptions = ArrayHelper::map(Cinema::find()->asArray()->all(), 'id', 'nome');
+
         // SE FOR ADMIN --> VÊ TODOS OS UTILIZADORES
         if ($currentUser->can('admin')) {
             if ($cinema_id !== null) {
@@ -90,10 +95,15 @@ class SessaoController extends Controller
             $dataProvider = $searchModel->search($params);
         }
 
+        $cinemaSelecionado = !empty($cinema_id) ? Cinema::findOne($cinema_id) : null;
+
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'cinemaId' => $cinema_id,
+            'cinemaSelecionado' => $cinemaSelecionado,
+            'estadoFilterOptions' => Sessao::optsEstado(),
+            'cinemaFilterOptions' => $cinemaFilterOptions,
         ]);
     }
 
@@ -105,14 +115,14 @@ class SessaoController extends Controller
         // OBTER O USER ATUAL
         $currentUser = Yii::$app->user;
 
+        // OBTER SESSÃO
+        $model = $this->findModel($id);
+
         // SE FOR GERENTE/FUNCIONÁRIO --> OBTER O SEU CINEMA
         if (!$currentUser->can('admin')) {
 
             // OBTER ID DO CINEMA DO USER ATUAL
             $cinemaId = $currentUser->identity->profile->cinema_id;
-
-            // OBTER SESSÃO
-            $model = $this->findModel($id);
 
             // SE CINEMA DO USER E CINEMA DA SESSÃO FOREM DIFERENTES --> SEM ACESSO
             if ($cinemaId != $model->cinema_id) {
@@ -121,11 +131,21 @@ class SessaoController extends Controller
             }
         }
 
+        $comprasDataProvider = new ActiveDataProvider([
+            'query' => $model->getCompras(),
+            'pagination' => ['pageSize' => Yii::$app->params['pageSize']],
+            'sort' => [
+                'defaultOrder' => ['data' => SORT_DESC],
+            ],
+        ]);
+
         // SE É ADMIN OU UTILIZADOR É DO MESMO CINEMA DA SESSÃO --> TEM ACESSO
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
+            'comprasDataProvider' => $comprasDataProvider,
         ]);
     }
+
 
     // ADMIN --> CRIA UMA SESSÃO PARA QUALQUER CINEMA
     // GERENTE --> APENAS CRIA UMA SESSÃO PARA O SEU CINEMA
@@ -174,6 +194,7 @@ class SessaoController extends Controller
             $model->data = date('Y-m-d');
         }
 
+        // ATRIBUI OS PARÂMETROS RECEBIDOS AO MODELO
         $model->filme_id = $filme_id;
         $model->data = $data;
         $model->hora_inicio = $hora_inicio;
@@ -186,13 +207,64 @@ class SessaoController extends Controller
             }
         }
 
+        // DADOS PARA OS DROPDOWNS
+        $cinemasAtivos = ArrayHelper::map(
+            Cinema::find()->where(['estado' => Cinema::ESTADO_ATIVO])->orderBy('nome')->all(),
+            'id',
+            'nome'
+        );
+
+        $filmesEmExibicao = ArrayHelper::map(
+            Filme::find()->where(['estado' => Filme::ESTADO_EM_EXIBICAO])->orderBy('titulo')->all(),
+            'id',
+            'titulo'
+        );
+
+        // SALAS DISPONÍVEIS
+        $salas = [];
+        if ($model->cinema_id) {
+            if ($model->data && $model->hora_inicio && $model->hora_fim) {
+                $salas = Sala::getSalasDisponiveis(
+                    $model->cinema_id,
+                    $model->data,
+                    $model->hora_inicio,
+                    $model->hora_fim
+                );
+            }
+            else {
+                $salas = Sala::find()
+                    ->where(['cinema_id' => $model->cinema_id, 'estado' => Sala::ESTADO_ATIVA])
+                    ->orderBy('numero')
+                    ->all();
+            }
+
+            // SE FOR UPDATE --> INCLUIR A SALA ATUAL
+            if ($model->sala_id) {
+                $salaAtual = Sala::findOne($model->sala_id);
+                if ($salaAtual && !in_array($salaAtual, $salas, true)) {
+                    $salas[] = $salaAtual;
+                }
+            }
+
+            // ORDENAR AS SALAS POR NÚMERO
+            usort($salas, fn($a, $b) => $a->numero <=> $b->numero);
+        }
+
+        $salasDropdown = ArrayHelper::map($salas, 'id', 'numero');
+
         // GUARDAR
         if ($model->load(Yii::$app->request->post())) {
             if ($model->sala_id && $model->data && $model->hora_inicio && $model->hora_fim && $model->filme_id && $model->cinema_id) {
 
                 // VALIDAR HORÁRIO
                 if (!$model->validateHorario()) {
-                    return $this->render('create', ['model' => $model]);
+                    return $this->render('create', [
+                        'model' => $model,
+                        'cinemasAtivos' => $cinemasAtivos,
+                        'filmesEmExibicao' => $filmesEmExibicao,
+                        'salasDropdown' => $salasDropdown,
+                        'cinema_id' => $cinema_id,
+                    ]);
                 }
 
                 if ($model->save()) {
@@ -207,13 +279,15 @@ class SessaoController extends Controller
 
         return $this->render('create', [
             'model' => $model,
+            'cinemasAtivos' => $cinemasAtivos,
+            'filmesEmExibicao' => $filmesEmExibicao,
+            'salasDropdown' => $salasDropdown,
             'cinema_id' => $cinema_id,
         ]);
     }
 
-
     // ADMIN --> EDITA SESSÕES DE QUALQUER CINEMA
-    // GERENTE --> APENAS EDITA SESSÕES DO O SEU CINEMA
+    // GERENTE --> APENAS EDITA SESSÕES DO SEU CINEMA
     public function actionUpdate($id, $cinema_id = null, $data = null, $filme_id = null, $hora_inicio = null)
     {
         // OBTER O USER ATUAL
@@ -234,45 +308,104 @@ class SessaoController extends Controller
             return $this->redirect(['index']);
         }
 
+        // DEFINIR VALORES A PARTIR DOS PARÂMETROS
         $model->filme_id = $filme_id ?? $model->filme_id;
         $model->data = $data ?? $model->data;
         $model->hora_inicio = $hora_inicio ?? $model->hora_inicio;
 
         // OBTER DADOS ORIGINAIS
-        $anterior = $this->findModel($id);
+        $anterior = clone $model;
+
+        // CALCULAR A HORA FIM AUTOMATICAMENTE SE JÁ TIVER FILME E HORA INÍCIO
+        if ($model->filme_id && $model->hora_inicio) {
+            $filme = Filme::findOne($model->filme_id);
+            if ($filme) {
+                $model->hora_fim = $model->getHoraFimCalculada($filme->duracao);
+            }
+        }
+
+        // DADOS PARA OS DROPDOWNS (cinemas, filmes, salas)
+        $cinemasAtivos = ArrayHelper::map(
+            Cinema::find()->where(['estado' => Cinema::ESTADO_ATIVO])->orderBy('nome')->all(),
+            'id',
+            'nome'
+        );
+
+        $filmesEmExibicao = ArrayHelper::map(
+            Filme::find()->where(['estado' => Filme::ESTADO_EM_EXIBICAO])->orderBy('titulo')->all(),
+            'id',
+            'titulo'
+        );
+
+        // SALAS DISPONÍVEIS
+        $salas = [];
+        if ($model->cinema_id) {
+            if ($model->data && $model->hora_inicio && $model->hora_fim) {
+                $salas = Sala::getSalasDisponiveis(
+                    $model->cinema_id,
+                    $model->data,
+                    $model->hora_inicio,
+                    $model->hora_fim
+                );
+            }
+            else {
+                $salas = Sala::find()
+                    ->where(['cinema_id' => $model->cinema_id, 'estado' => Sala::ESTADO_ATIVA])
+                    ->orderBy('numero')
+                    ->all();
+            }
+
+            // INCLUIR A SALA ATUAL SE NÃO ESTIVER NA LISTA
+            if ($model->sala_id) {
+                $salaAtual = Sala::findOne($model->sala_id);
+                if ($salaAtual && !in_array($salaAtual, $salas, true)) {
+                    $salas[] = $salaAtual;
+                }
+            }
+
+            // ORDENAR AS SALAS POR NÚMERO
+            usort($salas, fn($a, $b) => $a->numero <=> $b->numero);
+        }
+
+        $salasDropdown = ArrayHelper::map($salas, 'id', 'numero');
 
         // GUARDAR
         if ($model->load(Yii::$app->request->post())) {
-            if ($model->sala_id && $model->data && $model->hora_inicio && $model->hora_fim && $model->filme_id && $model->cinema_id) {
 
-                // NÃO DEIXAR ALTERAR O CINEMA DA SESSÃO
-                $model->cinema_id = $anterior->cinema_id;
+            // NÃO DEIXAR ALTERAR O CINEMA DA SESSÃO
+            $model->cinema_id = $anterior->cinema_id;
 
-                // SE TIVER BILHETES ASSOCIADOS --> APENAS DEIXA EDITAR SALA
-                if (count($model->lugaresOcupados) > 0) {
-                    $model->updateAttributes(['sala_id' => $model->sala_id]);
+            // SE TIVER BILHETES ASSOCIADOS --> APENAS DEIXA EDITAR SALA
+            if (count($model->lugaresOcupados) > 0) {
+                $model->updateAttributes(['sala_id' => $model->sala_id]);
 
-                    Yii::$app->session->setFlash('success', 'Sessão atualizada com sucesso.');
-                    return $this->redirect(['view', 'id' => $model->id]);
-                }
+                Yii::$app->session->setFlash('success', 'Sessão atualizada com sucesso.');
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
 
-                // VALIDAR HORÁRIO
-                if (!$model->validateHorario()) {
-                    return $this->render('update', ['model' => $model]);
-                }
+            // VALIDAR HORÁRIO
+            if (!$model->validateHorario()) {
+                return $this->render('update', [
+                    'model' => $model,
+                    'cinemasAtivos' => $cinemasAtivos,
+                    'filmesEmExibicao' => $filmesEmExibicao,
+                    'salasDropdown' => $salasDropdown,
+                ]);
+            }
 
-                if ($model->save()) {
-                    Yii::$app->session->setFlash('success', 'Sessão atualizada com sucesso.');
-                    return $this->redirect(['view', 'id' => $model->id]);
-                }
-                else {
-                    Yii::$app->session->setFlash('error', 'Ocorreu um erro ao atualizar a sessão.');
-                }
+            if ($model->save()) {
+                Yii::$app->session->setFlash('success', 'Sessão atualizada com sucesso.');
+                return $this->redirect(['view', 'id' => $model->id]);
+            } else {
+                Yii::$app->session->setFlash('error', 'Ocorreu um erro ao atualizar a sessão.');
             }
         }
 
         return $this->render('update', [
             'model' => $model,
+            'cinemasAtivos' => $cinemasAtivos,
+            'filmesEmExibicao' => $filmesEmExibicao,
+            'salasDropdown' => $salasDropdown,
         ]);
     }
 

@@ -8,6 +8,8 @@ use common\models\User;
 use common\models\UserProfile;
 use backend\models\UserSearch;
 use common\models\Cinema;
+use yii\data\ActiveDataProvider;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -61,6 +63,9 @@ class UserController extends Controller
         $searchModel = new UserSearch();
         $params = Yii::$app->request->queryParams;
 
+        $cinemaFilterOptions = ArrayHelper::map(Cinema::find()->select(['id', 'nome'])->orderBy('nome')->all(), 'id', 'nome');
+        $statusFilterOptions = $currentUser->can('gerirUtilizadores') ? User::optsStatus() : array_slice(User::optsStatus(), 0, 2, true);
+
         // ADMIN --> VÊ TODOS OS UTILIZADORES
         if ($currentUser->can('admin')) {
             $dataProvider = $searchModel->search($params);
@@ -87,6 +92,9 @@ class UserController extends Controller
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'roleFilterOptions' => array_reverse(User::optsRoles(), true),
+            'cinemaFilterOptions' => $cinemaFilterOptions,
+            'statusFilterOptions' => $statusFilterOptions,
         ]);
     }
 
@@ -105,9 +113,20 @@ class UserController extends Controller
         // OBTER UTILIZADOR A VISUALIZAR
         $model = $this->findModel($id);
 
+        $comprasDataProvider = new ActiveDataProvider([
+            'query' => $model->getCompras(),
+            'pagination' => ['pageSize' => Yii::$app->params['pageSize']],
+            'sort' => [
+                'defaultOrder' => ['data' => SORT_DESC],
+            ],
+        ]);
+
         // SE FOR ADMIN --> PODE VER TODOS OS UTILIZADORES
         if ($currentUser->can('admin')) {
-            return $this->render('view', ['model' => $model]);
+            return $this->render('view', [
+                'model' => $model,
+                'comprasDataProvider' => $comprasDataProvider,
+            ]);
         }
 
         // SE FOR GERENTE --> PODE VER O SEU PERFIL E DOS FUNCIONÁRIOS DO SEU CINEMA
@@ -135,7 +154,10 @@ class UserController extends Controller
             return $this->redirect(['view', 'id' => $currentUser->id]);
         }
 
-        return $this->render('view', ['model' => $model]);
+        return $this->render('view', [
+            'model' => $model,
+            'comprasDataProvider' => $comprasDataProvider,
+        ]);
     }
 
 
@@ -149,6 +171,10 @@ class UserController extends Controller
         // CRIAR USER E USER_PROFILE
         $model = new User();
         $profile = new UserProfile();
+
+        // GERAR LISTA DE CINEMAS
+        $cinemasOptions = ArrayHelper::map(Cinema::find()->where(['estado' => Cinema::ESTADO_ATIVO])
+            ->orderBy('nome')->all(), 'id', 'nome');
 
         // SE NÃO FOR ADMIN NEM GERENTE --> SEM ACESSO
         if (!$currentUser->can('admin') && !$currentUser->can('gerente')) {
@@ -239,6 +265,7 @@ class UserController extends Controller
         return $this->render('create', [
             'model' => $model,
             'profile' => $profile,
+            'cinemasOptions' => $cinemasOptions,
         ]);
     }
 
@@ -261,6 +288,17 @@ class UserController extends Controller
         // OBTER UTILIZADOR
         $model = $this->findModel($id ?? $currentUser->id);
         $profile = $model->profile ?? new UserProfile(['user_id' => $model->id]);
+
+        // OBTER CINEMAS ATIVOS
+        $queryCinemas = Cinema::find()->where(['estado' => Cinema::ESTADO_ATIVO]);
+
+        // SE PERTENCE A UM CINEMA ENCERRADO --> INCLUIR ESSE CINEMA
+        if ($profile->cinema_id) {
+            $queryCinemas->orWhere(['id' => $profile->cinema_id]);
+        }
+
+        // GERAR LISTA DE CINEMAS
+        $cinemasOptions = ArrayHelper::map($queryCinemas->orderBy('nome')->all(), 'id', 'nome');
 
         // OBTER O ROLE DO UTILIZADOR
         $roles = Yii::$app->authManager->getRolesByUser($model->id);
@@ -301,6 +339,7 @@ class UserController extends Controller
         return $this->render('update', [
             'model' => $model,
             'profile' => $profile,
+            'cinemasOptions' => $cinemasOptions,
         ]);
     }
 

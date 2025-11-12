@@ -14,9 +14,15 @@ $this->params['breadcrumbs'][] = $model->id;
         <div class="card-body">
             <div class="row">
                 <div class="col-md-12">
-                    <?=$this->render('_form', [
-                        'model' => $model
+                    <?= $this->render('_form', [
+                        'model' => $model,
+                        'nomeCliente' => $nomeCliente,
+                        'emailCliente' => $emailCliente,
+                        'telemovelCliente' => $telemovelCliente,
+                        'nomeCinema' => $nomeCinema,
+                        'salasDisponiveis' => $salasDisponiveis,
                     ]) ?>
+
                 </div>
             </div>
         </div>

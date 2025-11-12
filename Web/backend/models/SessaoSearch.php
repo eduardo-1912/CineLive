@@ -57,9 +57,18 @@ class SessaoSearch extends Sessao
             'pagination' => [
                 'pageSize' => Yii::$app->params['pageSize'],
             ],
+            'sort' => [
+                'defaultOrder' => ['estado' => SORT_ASC],
+            ],
         ]);
 
         $this->load($params);
+
+        // PERMITIR ORDENAR POR NOME DO CLIENTE
+        $dataProvider->sort->attributes['estado'] = [
+            'asc' => ['estado' => SORT_ASC],
+            'desc' => ['estado' => SORT_DESC],
+        ];
 
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
@@ -110,9 +119,7 @@ class SessaoSearch extends Sessao
             return $ordemEstados[$a->estado] <=> $ordemEstados[$b->estado];
         });
 
-        // Atualizar o DataProvider
         $dataProvider->setModels($sessoes);
-        $dataProvider->setTotalCount(count($sessoes));
 
         return $dataProvider;
     }

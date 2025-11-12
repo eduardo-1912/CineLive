@@ -10,6 +10,8 @@ use yii\widgets\DetailView;
 $currentUser = Yii::$app->user;
 $isAdmin = $currentUser->can('admin');
 $gerirSalas = $currentUser->can('gerirSalas');
+$gerirSessoes = $currentUser->can('gerirSessoes');
+
 
 $this->title = 'Sala ' . $model->numero;
 $this->params['breadcrumbs'][] = ['label' => $model->cinema->nome, 'url' => ['cinema/view?id=' . $model->cinema_id]];
@@ -77,4 +79,26 @@ $this->params['breadcrumbs'][] = $model->numero;
         <!--.card-body-->
     </div>
     <!--.card-->
+
+    <?php if ($model->sessaos): ?>
+        <h3 class="mt-4 mb-3">Sessões</h3>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <p>
+                            <?php if ($gerirSessoes): ?>
+                                <?= Html::a('Criar Sessão', ['sessao/create', 'cinema_id' => $model->id], ['class' => 'btn btn-success']) ?>
+                            <?php endif; ?>
+                        </p>
+                        <?= $this->render('_sessoes', [
+                            'dataProvider' => $sessoesDataProvider,
+                        ]) ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
+
 </div>

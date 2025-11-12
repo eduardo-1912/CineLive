@@ -29,23 +29,9 @@ use common\models\Cinema;
         <!-- DROPDOWN DOS ROLES-->
         <?= $form->field($model, 'role')->dropDownList(User::optsRoles()) ?>
 
-        <!-- LISTA DE CINEMAS-->
-        <?php
-            // OBTER CINEMAS ATIVOS
-            $queryCinemas = Cinema::find()->where(['estado' => Cinema::ESTADO_ATIVO]);
-
-            // SE PERTENCE A UM CINEMA ENCERRADO --> INCLUIR ESSE CINEMA
-            if ($profile->cinema_id) {
-                $queryCinemas->orWhere(['id' => $profile->cinema_id]);
-            }
-
-            // GERAR LISTA DE CINEMAS
-            $cinemas = ArrayHelper::map($queryCinemas->orderBy('nome')->all(), 'id', 'nome');
-        ?>
-
         <!-- DROPDOWN DOS CINEMAS (VÍSIVEL SE ROLE SELECIONADO == FUNCIONÁRIO/GERENTE) -->
         <div id="formFieldCinema" style="display:none;">
-            <?= $form->field($profile, 'cinema_id')->dropDownList($cinemas, ['prompt' => 'Selecione o cinema']) ?>
+            <?= $form->field($profile, 'cinema_id')->dropDownList($cinemasOptions, ['prompt' => 'Selecione o cinema']) ?>
         </div>
 
         <!-- DROPDOWN DE ESTADO -->

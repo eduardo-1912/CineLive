@@ -164,6 +164,23 @@ class Cinema extends \yii\db\ActiveRecord
         return $sessoes || $alugueres;
     }
 
+    // OBTER MORADA COMPLETA
+    public function getMoradaCompleta(): string
+    {
+        return $this->rua . ', ' . $this->codigo_postal . ' ' . $this->cidade;
+    }
+
+    // OBTER NÚMERO DE LUGARES
+    public function getNumeroLugares(): int
+    {
+        $lugares = 0;
+        foreach ($this->salas as $sala) {
+            $lugares += ($sala->num_colunas * $sala->num_filas);
+        }
+
+        return $lugares;
+    }
+
     // HORA INÍCIO FORMATADA (HH:mm)
     public function getHoraInicioFormatada()
     {

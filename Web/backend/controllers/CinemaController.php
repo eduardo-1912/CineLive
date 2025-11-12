@@ -7,6 +7,7 @@ use common\models\UserProfile;
 use Yii;
 use common\models\Cinema;
 use backend\models\CinemaSearch;
+use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -60,6 +61,7 @@ class CinemaController extends Controller
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'estadoFilterOptions' => Cinema::optsEstado()
         ]);
     }
 
@@ -68,36 +70,38 @@ class CinemaController extends Controller
     // GERENTE/FUNCIONÁRIO --> APENAS VÊ O SEU CINEMA
     public function actionView($id = null)
     {
-        // OBTER USER ATUAL
         $currentUser = Yii::$app->user;
         $userCinemaId = $currentUser->identity->profile->cinema_id ?? null;
 
-        // ADMIN --> PODE VER QUALQUER CINEMA
-        if ($currentUser->can('gerirCinemas')) {
-            $model = $this->findModel($id);
-            return $this->render('view', ['model' => $model]);
-        }
-
-        // GERENTE/FUNCIONÁRIO --> APENAS VÊ O SEU CINEMA
-        if ($currentUser->can('gerente') || $currentUser->can('funcionario')) {
-
-            // SE NENHUM ID FOR PASSADO --> REDIRECIONAR PARA O CINEMA DO USER ATUAL
-            if ($id === null && $userCinemaId) {
-                return $this->redirect(['view', 'id' => $userCinemaId]);
-            }
-
-            // SE O ID PASSADO FOR IGUAL AO DO USER ATUAL --> PERMITIR
-            if ($id == $userCinemaId) {
-                $model = $this->findModel($userCinemaId);
-                return $this->render('view', ['model' => $model]);
-            }
-
-            // SE TENTAR VER OUTRO CINEMA --> REDIRECIONAR PARA O CINEMA DELE
+        // SE GERENTE OU FUNCIONÁRIO SEM ID --> REDIRECIONA PARA O SEU CINEMA
+        if (($currentUser->can('gerente') || $currentUser->can('funcionario')) && $id === null && $userCinemaId) {
             return $this->redirect(['view', 'id' => $userCinemaId]);
         }
 
-        // CASO CONTRÁRIO --> SEM PERMISSÃO
-        throw new ForbiddenHttpException('Não tem permissão para ver este cinema.');
+        // OBTER CINEMA
+        $model = $this->findModel($id);
+
+        // PERMISSÕES
+        if (!($currentUser->can('admin') || $currentUser->can('gerirCinemas'))) {
+            if ($currentUser->can('gerente') || $currentUser->can('funcionario')) {
+                if ($model->id != $userCinemaId) {
+                    return $this->redirect(['view', 'id' => $userCinemaId]);
+                }
+            } else {
+                throw new ForbiddenHttpException('Não tem permissão para ver este cinema.');
+            }
+        }
+
+        // PROVIDER DAS SALAS
+        $salasDataProvider = new ActiveDataProvider([
+            'query' => $model->getSalas()->orderBy(['numero' => SORT_ASC]),
+            'pagination' => ['pageSize' => Yii::$app->params['pageSize']],
+        ]);
+
+        return $this->render('view', [
+            'model' => $model,
+            'salasDataProvider' => $salasDataProvider,
+        ]);
     }
 
 
@@ -116,8 +120,11 @@ class CinemaController extends Controller
             }
         }
 
+        $dropdownEstados = $model::optsEstado();
+
         return $this->render('create', [
             'model' => $model,
+            'dropdownEstados' => $dropdownEstados,
         ]);
     }
 

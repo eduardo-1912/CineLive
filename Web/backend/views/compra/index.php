@@ -16,9 +16,6 @@ use yii\grid\GridView;
 $this->title = 'Compras';
 $this->params['breadcrumbs'][] = $this->title;
 
-$currentUser = Yii::$app->user;
-$isAdmin = $currentUser->can('admin');
-
 ?>
 <div class="container-fluid">
     <div class="row">
@@ -38,46 +35,39 @@ $isAdmin = $currentUser->can('admin');
                                 'headerOptions' => ['style' => 'width: 3rem;'],
                             ],
                             [
-                                'attribute' => 'cliente',
+                                'attribute' => 'nomeCliente',
+                                'label' => 'Cliente',
                                 'value' => function ($model) {
-                                    if ($model->cliente && $model->cliente->profile) {
-                                        return Html::a(
-                                            Html::encode($model->cliente->profile->nome),
+                                    return $model->cliente && $model->cliente->profile
+                                    ? Html::a($model->cliente->profile->nome,
                                             ['user/view', 'id' => $model->cliente->id],
-                                            ['class' => 'text-decoration-none text-primary']
-                                        );
-                                    }
-                                    return '<span class="text-muted">[Conta eliminada]</span>';
+                                            ['class' => 'text-decoration-none text-primary'])
+                                    : '<span class="text-muted">Conta eliminada</span>';
                                 },
                                 'format' => 'raw',
-                                'filter' => Html::activeTextInput($searchModel, 'nomeCliente', ['class' => 'form-control',]),
                             ],
                             [
                                 'attribute' => 'cinema_id',
                                 'label' => 'Cinema',
                                 'format' => 'raw',
-                                'value' => function ($model) {
-                                    return $model->cinema
-                                        ? Html::a(Html::encode($model->cinema->nome),
-                                            ['cinema/view', 'id' => $model->cinema->id],
-                                            ['class' => 'text-decoration-none text-primary'])
-                                        : '<span class="text-muted">-</span>';
-                                },
-                                'filter' => ArrayHelper::map(Cinema::find()->asArray()->all(), 'id', 'nome'),
+                                'value' => fn($model) =>
+                                     Html::a($model->cinema->nome,
+                                        ['cinema/view', 'id' => $model->cinema->id],
+                                        ['class' => 'text-decoration-none text-primary']
+                                    ),
+                                'filter' => $cinemaFilterOptions,
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
-                                'visible' => $isAdmin,
+                                'headerOptions' => ['style' => 'width: 14rem;'],
+                                'visible' => Yii::$app->user->can('admin'),
                             ],
                             [
                                 'attribute' => 'sessao_id',
                                 'format' => 'raw',
-                                'value' => function ($model) {
-                                    return Html::a(
-                                        Html::encode($model->sessao->nome),
+                                'value' => fn($model) =>
+                                     Html::a($model->sessao->nome,
                                         ['sessao/view', 'id' => $model->sessao->id],
                                         ['class' => 'text-decoration-none text-primary']
-                                    );
-                                },
-
+                                    ),
                             ],
                             [
                                 'attribute' => 'data',
@@ -86,14 +76,14 @@ $isAdmin = $currentUser->can('admin');
                             ],
                             [
                                 'attribute' => 'total',
-                                'value' => fn($model) => $model->totalFormatado . '€',
+                                'value' => 'totalEmEuros',
                             ],
                             'numeroBilhetes',
                             [
                                 'attribute' => 'estado',
                                 'label' => 'Estado',
                                 'format' => 'raw',
-                                'filter' => Compra::optsEstado(),
+                                'filter' => $estadoFilterOptions,
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
                                 'value' => fn($model) => ActionColumnButtonHelper::compraEstadoDropdown($model),
                                 'headerOptions' => ['style' => 'width: 9rem'],

@@ -35,11 +35,11 @@ $mapaLugaresCompra = $model->mapaLugaresCompra;
                     ?>
 
                     <?php if ($compraId): ?>
-                        <?= Html::a(Html::encode($lugar), ['compra/view', 'id' => $compraId],
+                        <?= Html::a($lugar, ['compra/view', 'id' => $compraId],
                             ['class' => $classes . ' text-decoration-none', 'title' => "Compra #{$compraId}",]) ?>
                     <?php else: ?>
                         <div class="<?= $classes ?>" title="Lugar livre">
-                            <?= Html::encode($lugar) ?>
+                            <?= $lugar ?>
                         </div>
                     <?php endif; ?>
                 <?php endfor; ?>

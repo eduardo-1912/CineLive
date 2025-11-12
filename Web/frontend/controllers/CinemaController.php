@@ -11,7 +11,12 @@ class CinemaController extends Controller
     public function actionIndex(){
 
         $cinemas = Cinema::find()->all();
-        return $this->render('index', ['cinemas' => $cinemas]);
+
+
+        return $this->render('index', [
+            'cinemas' => $cinemas,
+
+        ]);
     }
 
 

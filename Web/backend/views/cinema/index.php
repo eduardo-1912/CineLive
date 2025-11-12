@@ -33,25 +33,27 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'attribute' => 'id',
                                 'headerOptions' => ['style' => 'width: 3rem;'],
                             ],
-                            'nome',
+                            [
+                                'attribute' => 'nome',
+                                'headerOptions' => ['style' => 'width: 12rem;'],
+                            ],
                             [
                                 'attribute' => 'morada',
-                                'value' => function ($model) {
-                                    return "{$model->rua}, {$model->codigo_postal} {$model->cidade}";
-                                },
-                                'headerOptions' => ['style' => 'width: 22rem;'],
+                                'value' => 'moradaCompleta',
+                                'headerOptions' => ['style' => 'width: 28rem;'],
                             ],
                             'email:email',
                             'telefone',
                             [
                                 'attribute' => 'gerente_id',
                                 'value' => 'gerente.profile.nome',
+                                'headerOptions' => ['style' => 'width: 12rem;'],
                             ],
                             [
                                 'attribute' => 'estado',
-                                'value' => fn($model) => $model->estadoFormatado,
+                                'value' => 'estadoFormatado',
                                 'format' => 'raw',
-                                'filter' => Cinema::optsEstado(),
+                                'filter' => $estadoFilterOptions,
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
                                 'headerOptions' => ['style' => 'width: 8rem;'],
                             ],

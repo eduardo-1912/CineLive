@@ -49,15 +49,16 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'header' => 'Editar',
                                 'class' => 'yii\grid\DataColumn',
                                 'format' => 'raw',
-                                'value' => function ($model) { return
-                                    Html::beginForm(['genero/update', 'id' => $model->id], 'post',
-                                        ['class' => 'd-inline-flex gap-1',])
-                                    . Html::input('text', 'Genero[nome]', $model->nome,
-                                        ['class' => 'form-control form-control-sm', 'style' => 'width: 20rem'])
-                                    . Html::submitButton('<i class="fas fa-edit"></i>', [
-                                        'class' => 'btn btn-warning btn-sm'])
-                                    . Html::endForm();
-                                },
+                                'value' => function ($model) {
+                                    return
+                                        Html::beginForm(['genero/update', 'id' => $model->id], 'post',
+                                            ['class' => 'd-inline-flex gap-1',])
+                                        . Html::input('text', 'Genero[nome]', $model->nome,
+                                            ['class' => 'form-control form-control-sm', 'style' => 'width: 20rem'])
+                                        . Html::submitButton('<i class="fas fa-edit"></i>', [
+                                            'class' => 'btn btn-warning btn-sm'])
+                                        . Html::endForm();
+                                    },
                                 'filter' => Html::activeTextInput($searchModel, 'nome', ['class' => 'form-control']),
                                 'headerOptions' => ['style' => 'width: 20rem'],
                             ],

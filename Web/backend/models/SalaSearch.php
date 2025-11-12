@@ -2,10 +2,12 @@
 
 namespace backend\models;
 
+use common\models\Cinema;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\models\Sala;
+use yii\helpers\ArrayHelper;
 
 /**
  * SalaSearch represents the model behind the search form of `common\models\Sala`.
@@ -33,6 +35,11 @@ class SalaSearch extends Sala
     {
         // bypass scenarios() implementation in the parent class
         return Model::scenarios();
+    }
+
+    public static function getCinemaFilterOptions(): array
+    {
+        return ArrayHelper::map(Cinema::find()->orderBy('nome')->asArray()->all(), 'id', 'nome');
     }
 
     /**

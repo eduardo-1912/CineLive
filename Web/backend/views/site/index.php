@@ -123,7 +123,7 @@ $this->title = 'Dashboard';
                                     <td><a href="<?= Url::to(['/sessao/view', 'id' => $compra->sessao->id]) ?>"><?= $compra->sessao->nome ?></a></td>
                                     <td><a href="<?= Url::to(['filme/view', 'id' => $compra->sessao->filme->id]) ?>"><?= $compra->sessao->filme->titulo ?></a></td>
                                     <td><?= ucfirst($compra->estado) ?></td>
-                                    <td class="text-end"><?= $compra->totalFormatado ?>€</td>
+                                    <td class="text-end"><?= $compra->totalEmEuros ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php endif; ?>
@@ -153,8 +153,8 @@ $this->title = 'Dashboard';
                                 <li class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
 
                                         <a href="<?= Url::to(['filme/view', 'id' => $filme->id]) ?>">
-                                            <?= Html::encode($filme->titulo) ?>
-                                            <small class="text-muted"> (<?= Html::encode($filme->duracao) ?>min)</small>
+                                            <?= $filme->titulo ?>
+                                            <small class="text-muted"> (<?= $filme->duracao ?>min)</small>
                                         </a>
                                         <span class="badge bg-secondary"><?= $filme->rating ?></span>
 

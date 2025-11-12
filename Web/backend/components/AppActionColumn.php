@@ -26,13 +26,13 @@ class AppActionColumn extends ActionColumn
                 ]);
             },
             'update' => function ($url, $model) {
-                return Html::a('<i class="fas fa-edit"></i>', ['update', 'id' => $model->id], [
+                return Html::a('<i class="fas fa-edit"></i>', $url, [
                     'class' => 'btn btn-sm ' . ($model->isEditable() ? 'btn-warning' : ' btn-secondary disabled'),
                     'title' => 'Editar',
                 ]);
             },
             'delete' => function ($url, $model, $key) {
-                return Html::a('<i class="fas fa-trash"></i>', ['delete', 'id' => $model->id], [
+                return Html::a('<i class="fas fa-trash"></i>', $url, [
                     'class' => 'btn btn-sm ' . ($model->isDeletable() ? 'btn-danger' : ' btn-secondary disabled'),
                     'title' => 'Eliminar',
                     'data' => [

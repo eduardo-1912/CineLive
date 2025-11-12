@@ -3,9 +3,12 @@
 namespace backend\controllers;
 
 use common\components\EmailHelper;
+use common\models\Cinema;
+use common\models\Sala;
 use Yii;
 use common\models\AluguerSala;
 use backend\models\AluguerSalaSearch;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -25,6 +28,11 @@ class AluguerSalaController extends Controller
             'access' => [
                 'class' => \yii\filters\AccessControl::class,
                 'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['admin'],
+                        'actions' => ['delete'],
+                    ],
                     [
                         'allow' => true,
                         'roles' => ['funcionario'],
@@ -59,6 +67,7 @@ class AluguerSalaController extends Controller
                 $params['AluguerSalaSearch']['cinema_id'] = $cinema_id;
             }
 
+            $cinemaFilterOptions = ArrayHelper::map(Cinema::find()->select(['id', 'nome'])->orderBy('nome')->all(), 'id', 'nome');
             $dataProvider = $searchModel->search($params);
         }
 
@@ -84,6 +93,8 @@ class AluguerSalaController extends Controller
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'cinemaFilterOptions' => AluguerSalaSearch::getCinemaFilterOptions(),
+            'estadoFilterOptions' => AluguerSala::optsEstadoBD(),
         ]);
     }
 
@@ -115,6 +126,16 @@ class AluguerSalaController extends Controller
             }
         }
 
+        // DADOS CLIENTE E NOME CINEMA
+        $nomeCliente = $model->cliente->profile->nome ?? '-';
+        $emailCliente = $model->cliente->email ?? '-';
+        $telemovelCliente = $model->cliente->profile->telemovel ?? '-';
+        $nomeCinema = $model->cinema->nome ?? '-';
+
+        // SALAS DISPONÍVEIS
+        $salasDisponiveis = Sala::getSalasDisponiveis($model->cinema_id, $model->data, $model->hora_inicio, $model->hora_fim, $model->sala_id);
+        $salasDisponiveis = ArrayHelper::map($salasDisponiveis, 'id', 'nome');
+
         // SE ATUALIZAR SALA OU ESTADO
         if ($model->load(Yii::$app->request->post())) {
 
@@ -131,40 +152,13 @@ class AluguerSalaController extends Controller
 
                 // ENVIAR EMAIL SE ESTADO FOI MUDADO
                 if ($estadoAnterior !== $estadoNovo) {
-                    $cliente = $model->cliente;
-                    $nome = $cliente->profile->nome ?? $cliente->username;
-                    $email = $cliente->email;
-
-                    // SE ALUGUER FOI CONFIRMADO --> MANDAR EMAIL
-                    if ($estadoNovo === $model::ESTADO_CONFIRMADO) {
-                        $assunto = 'Confirmação do aluguer de sala - CineLive';
-                        $mensagem =
-                            "<p>Olá <strong>{$nome}</strong>,</p>
-                            <p>O seu <b>aluguer de sala #{$model->id}</b> foi <span style='color:green;'>confirmado</span> com sucesso!</p>
-                            <p><b>Data:</b> {$model->dataFormatada}<br>
-                               <b>Hora:</b> {$model->horaInicioFormatada} - {$model->horaFimFormatada}<br>
-                               <b>Sala:</b> {$model->sala->nome}</p>
-                            <p style='margin-top:0.75rem;'>Obrigado por escolher o CineLive.<br><b>Até breve!</b></p>";
+                    if ($model->enviarEmailEstado($estadoNovo)) {
+                        Yii::$app->session->setFlash('success', 'Estado do aluguer atualizado e email enviado ao cliente.');
                     }
-
-                    // SE ALUGUER FOI CANCELADO --> MANDAR EMAIL
-                    elseif ($estadoNovo === $model::ESTADO_CANCELADO) {
-                        $assunto = 'Cancelamento do aluguer de sala - CineLive';
-                        $mensagem =
-                            "<p>Olá <strong>{$nome}</strong>,</p>
-                            <p>O seu <b>aluguer de sala #{$model->id}</b> foi <span style='color:#c00;'>cancelado</span>.</p>
-                            <p>Se desejar reagendar, entre em contacto com o cinema.</p>
-                            <p style='margin-top:0.75rem;'>Cumprimentos,<br><b>Equipa CineLive</b></p>";
+                    else {
+                        Yii::$app->session->setFlash('success', 'Estado do aluguer atualizado.');
                     }
-
-                    // MANDAR EMAIL
-                    if (isset($assunto, $mensagem)) {
-                        EmailHelper::enviarEmail($email, $assunto, $mensagem);
-                        Yii::$app->session->setFlash('info', "Email enviado ao cliente ({$email}).");
-                    }
-                    }
-
-                Yii::$app->session->setFlash('success', 'Aluguer atualizado com sucesso.');
+                }
             }
             else {
                 Yii::$app->session->setFlash('error', 'Ocorreu um erro ao guardar as alterações.');
@@ -175,6 +169,11 @@ class AluguerSalaController extends Controller
 
         return $this->render('view', [
             'model' => $model,
+            'nomeCliente' => $nomeCliente,
+            'emailCliente' => $emailCliente,
+            'telemovelCliente' => $telemovelCliente,
+            'nomeCinema' => $nomeCinema,
+            'salasDisponiveis' => $salasDisponiveis,
         ]);
     }
 
@@ -238,45 +237,32 @@ class AluguerSalaController extends Controller
         $model->estado = $estado;
 
         if ($model->save(false, ['estado'])) {
-
-            $cliente = $model->cliente;
-            $nome = $cliente->profile->nome ?? $cliente->username;
-            $email = $cliente->email;
-
-            // SE ALUGUER FOI CANCELADO --> ENVIAR EMAIL
-            if ($estado === AluguerSala::ESTADO_CANCELADO) {
-                $assunto = 'Cancelamento do aluguer de sala - CineLive';
-                $mensagem =
-                    "<p>Olá <strong>{$nome}</strong>,</p>
-                    <p>O seu <b>aluguer de sala #{$model->id}</b> foi <span style='color:#c00;'>cancelado</span>.</p>
-                    <p>Se desejar reagendar, entre em contacto com o cinema.</p>
-                    <p style='margin-top:0.75rem;'>Cumprimentos,<br><b>Equipa CineLive</b></p>";
-
-                Yii::$app->session->setFlash('success', 'Aluguer cancelado com sucesso. Email enviado ao cliente.');
-
-            }
-
-            // SE ALUGUER FOI ACEITADO --> ENVIAR EMAIL
-            elseif ($estado === AluguerSala::ESTADO_CONFIRMADO) {
-                $assunto = 'Confirmação do aluguer de sala - CineLive';
-                $mensagem =
-                    "<p>Olá <strong>{$nome}</strong>,</p>
-                    <p>O seu <b>aluguer de sala #{$model->id}</b> foi <span style='color:green;'>confirmado</span> com sucesso!</p>
-                    <p><b>Data:</b> {$model->dataFormatada}<br>
-                       <b>Hora:</b> {$model->horaInicioFormatada} - {$model->horaFimFormatada}<br>
-                       <b>Sala:</b> {$model->sala->nome}</p>
-                    <p style='margin-top:10px;'>Obrigado por escolher o CineLive.<br><b>Até breve!</b></p>";
-
+            if ($model->enviarEmailEstado($estado)) {
                 Yii::$app->session->setFlash('success', 'Estado do aluguer atualizado e email enviado ao cliente.');
             }
-
-            // ENVIAR EMAIL
-            if (isset($assunto, $mensagem)) {
-                EmailHelper::enviarEmail($email, $assunto, $mensagem);
+            else {
+                Yii::$app->session->setFlash('success', 'Estado do aluguer atualizado.');
             }
+        } else {
+            Yii::$app->session->setFlash('error', 'Ocorreu um erro ao atualizar o estado do aluguer.');
+        }
+
+
+        return $this->redirect(['index']);
+    }
+
+
+    // ADMIN --> ELIMINA ALUGUER PENDENTE OU CANCELADO
+    public function actionDelete($id)
+    {
+        $model = $this->findModel($id);
+
+        if ($model->isDeletable()) {
+            $model->delete();
+            Yii::$app->session->setFlash('success', 'Aluguer eliminado com sucesso.');
         }
         else {
-            Yii::$app->session->setFlash('error', 'Ocorreu um erro ao atualizar o estado do aluguer.');
+            Yii::$app->session->setFlash('error', 'Não pode eliminar alugueres confirmados.');
         }
 
         return $this->redirect(['index']);

@@ -16,7 +16,8 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="row">
                 <div class="col-md-12">
                     <?=$this->render('_form', [
-                        'model' => $model
+                        'model' => $model,
+                        'dropdownEstados' => $dropdownEstados,
                     ]) ?>
                 </div>
             </div>

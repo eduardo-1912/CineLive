@@ -2,10 +2,12 @@
 
 namespace backend\models;
 
+use common\models\Genero;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\models\Filme;
+use yii\helpers\ArrayHelper;
 
 /**
  * FilmeSearch represents the model behind the search form of `common\models\Filme`.
@@ -21,6 +23,16 @@ class FilmeSearch extends Filme
             [['id', 'duracao'], 'integer'],
             [['titulo', 'sinopse', 'rating', 'estreia', 'idioma', 'realizacao', 'trailer_url', 'poster_path', 'estado'], 'safe'],
         ];
+    }
+
+    public static function getGenerosOptions(): array
+    {
+        return ArrayHelper::map(Genero::find()->orderBy('nome')->all(), 'id', 'nome');
+    }
+
+    public static function getRatingFilterOptions(): array
+    {
+        return array_diff_key(Filme::optsRating(), [Filme::RATING_TODOS => null]);
     }
 
     /**

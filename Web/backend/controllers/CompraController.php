@@ -4,10 +4,12 @@ namespace backend\controllers;
 
 use common\components\EmailHelper;
 use common\models\Bilhete;
+use common\models\Cinema;
 use Yii;
 use common\models\Compra;
 use backend\models\CompraSearch;
 use yii\data\ActiveDataProvider;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -58,6 +60,8 @@ class CompraController extends Controller
         $searchModel = new CompraSearch();
         $params = Yii::$app->request->queryParams;
 
+        $cinemaFilterOptions = ArrayHelper::map(Cinema::find()->asArray()->all(), 'id', 'nome');
+
         // ADMIN --> VÊ TODAS AS COMPRAS
         if ($currentUser->can('admin')) {
 
@@ -93,6 +97,8 @@ class CompraController extends Controller
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'cinemaFilterOptions' => $cinemaFilterOptions,
+            'estadoFilterOptions' => Compra::optsEstado(),
         ]);
     }
 
@@ -194,18 +200,11 @@ class CompraController extends Controller
         if ($model->save(false, ['estado'])) {
 
             // SE A COMPRA FOR CANCELADA --> ENVIAR EMAIL PARA O CLIENTE
-            if ($estado === Compra::ESTADO_CANCELADA) {
-                $cliente = $model->cliente;
-                $nome = $cliente->profile->nome ?? $cliente->username;
-                $email = $cliente->email;
-
-                $mensagem =
-                "<p>Olá <strong>{$nome}</strong>,</p>
-                    <p>Lamentamos informar que a sua <b>compra #{$model->id}</b> foi <span style='color:#c00;'>cancelada</span>.</p>
-                    <p>Se acha que isto foi um erro, por favor contacte o cinema correspondente.</p>
-                    <p style='margin-top:0.75rem;'>Cumprimentos,<br><b>Equipa CineLive</b></p>";
-
-                EmailHelper::enviarEmail($email, 'Cancelamento da sua compra - CineLive', $mensagem);
+            if ($model->enviarEmailEstado($estado)) {
+                Yii::$app->session->setFlash('success', 'Estado da compra atualizado e email enviado ao cliente.');
+            }
+            else {
+                Yii::$app->session->setFlash('success', 'Estado da compra atualizado.');
             }
 
             // ATUALIZAR O ESTADO DOS BILHETES
@@ -294,13 +293,13 @@ class CompraController extends Controller
 
         // MENSAGEM FINAL
         if ($confirmados > 0) {
-            Yii::$app->session->setFlash('success', "Foram confirmados {$confirmados} bilhete(s).");
+            Yii::$app->session->setFlash('success', "Foram confirmados {$confirmados} bilhetes.");
         }
         else {
             Yii::$app->session->setFlash('info', 'Todos os bilhetes desta compra já estavam confirmados.');
         }
 
-        return $this->redirect(['view', 'id' => $model->id]);
+        return $this->redirect(Yii::$app->request->referrer ?: ['view', 'id' => $model->id]);
     }
 
 

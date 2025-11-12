@@ -40,6 +40,16 @@ class SignupForm extends Model
         ];
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'telemovel' => 'Telemóvel',
+        ];
+    }
+
     // CRIAR CONTA
     public function signup()
     {

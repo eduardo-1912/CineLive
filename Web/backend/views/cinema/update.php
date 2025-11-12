@@ -3,9 +3,7 @@
 /* @var $this yii\web\View */
 /* @var $model common\models\Cinema */
 
-$currentUser = Yii::$app->user;
-$gerirCinemas = $currentUser->can('gerirCinemas');
-$return_path = $gerirCinemas ? 'index' : 'view?id=' . $currentUser->identity->profile->cinema_id;
+$return_path = Yii::$app->user->can('gerirCinemas') ? 'index' : 'view?id=' . $currentUser->identity->profile->cinema_id;
 
 $this->title = 'Editar: ' . $model->nome;
 $this->params['breadcrumbs'][] = ['label' => 'Cinemas', 'url' => [$return_path]];
@@ -19,7 +17,8 @@ $this->params['breadcrumbs'][] = 'Editar';
             <div class="row">
                 <div class="col-md-12">
                     <?=$this->render('_form', [
-                        'model' => $model
+                        'model' => $model,
+                        'dropdownEstados' => $dropdownEstados,
                     ]) ?>
                 </div>
             </div>

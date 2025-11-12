@@ -152,7 +152,7 @@ class Sala extends \yii\db\ActiveRecord
     }
 
     // OBTER SALAS DISPONÍVEIS
-    public static function getSalasDisponiveis($cinemaId, $data, $horaInicio, $horaFim)
+    public static function getSalasDisponiveis($cinemaId, $data, $horaInicio, $horaFim, $salaAtualId = null)
     {
         // SALAS COM SESSÕES SOBREPOSTAS NESSE HORÁRIO
         $salasOcupadas = Sessao::find()
@@ -167,22 +167,32 @@ class Sala extends \yii\db\ActiveRecord
         $salasAlugadas = AluguerSala::find()
             ->select('sala_id')
             ->where(['data' => $data])
-            ->andWhere(['estado' => [AluguerSala::ESTADO_PENDENTE, AluguerSala::ESTADO_CONFIRMADO, AluguerSala::ESTADO_A_DECORRER]])
+            ->andWhere(['estado' => [
+                AluguerSala::ESTADO_PENDENTE,
+                AluguerSala::ESTADO_CONFIRMADO,
+                AluguerSala::ESTADO_A_DECORRER
+            ]])
             ->andWhere(['and',
                 ['<', 'hora_inicio', $horaFim],
                 ['>', 'hora_fim', $horaInicio],
             ])->column();
 
-        // IDs DAS SALAS INDISPONÍVEIS
+        // IDS DAS SALAS INDISPONÍVEIS
         $salasIndisponiveis = array_unique(array_merge($salasOcupadas, $salasAlugadas));
 
-        // DEVOLVER APENAS AS SALAS ATIVAS E DISPONÍVEIS
+        // SE FOR PASSADA UMA SALA ESPECÍFICA --> TIRAR DAS INDISPONÍVEIS
+        if ($salaAtualId !== null) {
+            $salasIndisponiveis = array_diff($salasIndisponiveis, [$salaAtualId]);
+        }
+
+        // DEVOLVER APENAS AS SALAS ATIVAS E DISPONÍVEIS, ORDENADAS
         return self::find()
             ->where(['cinema_id' => $cinemaId, 'estado' => self::ESTADO_ATIVA])
             ->andFilterWhere(['not in', 'id', $salasIndisponiveis])
-            ->orderBy('numero')
+            ->orderBy(['numero' => SORT_ASC])
             ->all();
     }
+
 
     // OBTER O PRÓXIMO NÚMERO INDICATIVO AO CRIAR UMA SALA NOVA
     public static function getProximoNumeroPorCinema($cinemaId): int

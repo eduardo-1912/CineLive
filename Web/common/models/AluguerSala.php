@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\components\EmailHelper;
 use DateTime;
 use Yii;
 
@@ -115,6 +116,21 @@ class AluguerSala extends \yii\db\ActiveRecord
         $this->atualizarEstadoAutomatico();
     }
 
+    public function getEstadoOptions(): array
+    {
+        $estados = self::optsEstadoBD();
+
+        if ($this->estado === self::ESTADO_CONFIRMADO) {
+            unset($estados[self::ESTADO_PENDENTE]);
+        }
+
+        if (!isset($estados[$this->estado])) {
+            $estados[$this->estado] = $this->displayEstado();
+        }
+
+        return $estados;
+    }
+
     // OBTER DATA FORMATADA (DD/MM/AAAA)
     public function getDataFormatada()
     {
@@ -220,6 +236,53 @@ class AluguerSala extends \yii\db\ActiveRecord
         }
 
         return true;
+    }
+
+    // ENVIAR EMAIL AO CLIENTE CONFORME O NOVO ESTADO DO PEDIDO DE ALUGUER
+    public function enviarEmailEstado(?string $novoEstado = null): bool
+    {
+        $novoEstado = $novoEstado ?? $this->estado;
+
+        // OBTER CLIENTE
+        $cliente = $this->cliente;
+        if (!$cliente) return false;
+
+        $nome = $cliente->profile->nome ?? $cliente->username;
+        $email = $cliente->email;
+
+        switch ($novoEstado) {
+            case self::ESTADO_CONFIRMADO:
+                $assunto = 'Confirmação do aluguer de sala - CineLive';
+                $mensagem = "
+                    <p>Olá <strong>{$nome}</strong>,</p>
+                    <p>O seu <b>aluguer de sala #{$this->id}</b> foi <span style='color:green;'>confirmado</span> com sucesso!</p>
+                    <p><b>Data:</b> {$this->dataFormatada}<br>
+                       <b>Hora:</b> {$this->horaInicioFormatada} - {$this->horaFimFormatada}<br>
+                       <b>Sala:</b> {$this->sala->nome}</p>
+                    <p style='margin-top:0.75rem;'>Obrigado por escolher o CineLive.<br><b>Até breve!</b></p>";
+                break;
+
+            case self::ESTADO_CANCELADO:
+                $assunto = 'Cancelamento do aluguer de sala - CineLive';
+                $mensagem = "
+                    <p>Olá <strong>{$nome}</strong>,</p>
+                    <p>O seu <b>aluguer de sala #{$this->id}</b> foi <span style='color:#c00;'>cancelado</span>.</p>
+                    <p>Se desejar reagendar, entre em contacto com o cinema.</p>
+                    <p style='margin-top:0.75rem;'>Cumprimentos,<br><b>Equipa CineLive</b></p>";
+                break;
+
+            default:
+                return false;
+        }
+
+        // ENVIAR EMAIL
+        EmailHelper::enviarEmail($email, $assunto, $mensagem);
+        return true;
+    }
+
+    public function isDeletable(): bool
+    {
+        return $this->estado === self::ESTADO_CANCELADO || $this->estado === self::ESTADO_PENDENTE;
     }
 
     /**

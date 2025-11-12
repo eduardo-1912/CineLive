@@ -24,7 +24,7 @@ class CompraController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'roles' => ['@'],
+                        'roles' => ['cliente'],
                     ],
                 ],
             ],
@@ -120,7 +120,7 @@ class CompraController extends Controller
 
         // SE A SESSÃO NÃO EXISTE --> VOLTAR
         if (!$sessao) {
-            return $this->redirect(Yii::$app->request->referrer ?: ['user/index']);
+            return $this->redirect(Yii::$app->request->referrer ?: ['filme/index']);
         }
 
         // SE A SESSÃO ESTÁ ESGOTADA, TERMINADA OU A DECORRER --> SEM ACESSO

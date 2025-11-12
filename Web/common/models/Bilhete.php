@@ -63,9 +63,20 @@ class Bilhete extends \yii\db\ActiveRecord
             'compra_id' => 'Compra',
             'lugar' => 'Lugar',
             'preco' => 'Preço',
+            'precoEmEuros' => 'Preço',
             'codigo' => 'Código',
             'estado' => 'Estado',
         ];
+    }
+
+    public function getPrecoEmEuros(): string
+    {
+        return number_format($this->preco, 2, '.', '') . '€';
+    }
+
+    public function isEditable(): bool
+    {
+        return $this->isEstadoPendente() && !$this->compra->sessao->isEstadoTerminada();
     }
 
     /**

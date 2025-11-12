@@ -41,7 +41,7 @@ class ToastWidget extends Widget
                 }
 
                 $output .= <<<HTML
-                <div class="p-1 rounded-4 toast align-items-center shadow-sm {$class}" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="p-1 rounded-3 toast align-items-center shadow-sm {$class}" role="alert" aria-live="assertive" aria-atomic="true">
                   <div class="d-flex justify-content-between align-items-center">
                     <div class="toast-body">
                       {$message}

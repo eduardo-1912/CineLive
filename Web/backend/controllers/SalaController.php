@@ -2,10 +2,14 @@
 
 namespace backend\controllers;
 
+use backend\models\SessaoSearch;
 use common\models\Cinema;
+use common\models\Sessao;
 use Yii;
 use common\models\Sala;
 use backend\models\SalaSearch;
+use yii\data\ActiveDataProvider;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -91,10 +95,15 @@ class SalaController extends Controller
             $dataProvider = $searchModel->search($params);
         }
 
+        $cinemaSelecionado = $cinema_id ? Cinema::findOne($cinema_id) : null;
+
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'cinemaId' => $cinema_id,
+            'cinemaSelecionado' => $cinemaSelecionado,
+            'cinemaFilterOptions' => SalaSearch::getCinemaFilterOptions(),
+            'estadoFilterOptions' => Sala::optsEstado(),
         ]);
     }
 
@@ -106,14 +115,15 @@ class SalaController extends Controller
         // OBTER O USER ATUAL
         $currentUser = Yii::$app->user;
 
+        // OBTER SALA SELECIONADA
+        $model = $this->findModel($id);
+
+
         // SE É GERENTE/FUNCIONÁRIO --> APENAS VÊ SALAS DO SEU CINEMA
         if (!$currentUser->can('admin')) {
 
             // OBTER ID DO CINEMA DO USER ATUAL
             $cinemaId = $currentUser->identity->profile->cinema_id;
-
-            // OBTER SALA SELECIONADA
-            $model = $this->findModel($id);
 
             // SE CINEMA DO USER E CINEMA DA SALA FOREM DIFERENTES --> SEM ACESSO
             if ($cinemaId != $model->cinema_id) {
@@ -122,9 +132,19 @@ class SalaController extends Controller
             }
         }
 
+        // PROVIDER DAS SESSÕES
+        $sessoesDataProvider = new ActiveDataProvider([
+            'query' => $model->getSessaos(),
+            'pagination' => ['pageSize' => Yii::$app->params['pageSize']],
+            'sort' => [
+                'defaultOrder' => ['data' => SORT_DESC],
+            ],
+        ]);
+
         // SE É ADMIN OU UTILIZADOR É DO MESMO CINEMA DA SALA --> TEM ACESSO
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
+            'sessoesDataProvider' => $sessoesDataProvider,
         ]);
     }
 
@@ -143,6 +163,9 @@ class SalaController extends Controller
 
         // CRIAR NOVA SALA
         $model = new Sala();
+
+        // GERAR LISTA DE CINEMAS
+        $cinemasOptions = ArrayHelper::map(Cinema::find()->where(['estado' => Cinema::ESTADO_ATIVO])->orderBy('nome')->all(), 'id', 'nome');
 
         // SE FOR GERENTE --> FORÇAR ATRIBUIÇÃO CINEMA_ID DO GERENTE
         if ($currentUser->can('gerente') && !$currentUser->can('admin')) {
@@ -188,6 +211,7 @@ class SalaController extends Controller
         return $this->render('create', [
             'model' => $model,
             'proximoNumero' => $proximoNumero,
+            'cinemasOptions' => $cinemasOptions,
         ]);
     }
 
@@ -207,6 +231,17 @@ class SalaController extends Controller
 
         // OBTER SALA SELECIONADA
         $model = $this->findModel($id);
+
+        // OBTER CINEMAS ATIVOS
+        $queryCinemas = Cinema::find()->where(['estado' => Cinema::ESTADO_ATIVO]);
+
+        // SE A SALA A SER EDITADA PERTENCE A UM CINEMA ENCERRADO --> INCLUIR ESSE CINEMA
+        if ($model->cinema_id) {
+            $queryCinemas->orWhere(['id' => $model->cinema_id]);
+        }
+
+        // GERAR LISTA DE CINEMAS
+        $cinemasOptions = ArrayHelper::map($queryCinemas->orderBy('nome')->all(), 'id', 'nome');
 
         // SE É GERENTE --> SÓ PODE EDITAR SALAS DO SEU CINEMA
         if ($currentUser->can('gerente') && !$currentUser->can('admin')) {
@@ -253,6 +288,7 @@ class SalaController extends Controller
 
         return $this->render('update', [
             'model' => $model,
+            'cinemasOptions' => $cinemasOptions,
         ]);
     }
 

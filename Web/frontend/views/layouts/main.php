@@ -14,6 +14,10 @@ use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 
 AppAsset::register($this);
+
+$iconsPath = '@webroot/icons/';
+$perfilPath = '/perfil/index';
+
 ?>
 
 <?php $this->beginPage() ?>
@@ -36,8 +40,6 @@ AppAsset::register($this);
 <body class="d-flex flex-column h-100">
 <?php $this->beginBody() ?>
 
-<?php $iconsPath = '@webroot/icons/' ?>
-
 <!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container justify-content-between">
@@ -59,7 +61,7 @@ AppAsset::register($this);
                 $menuItems = [
                     ['label' => 'Filmes', 'url' => ['/filme/index']],
                     ['label' => 'Cinemas', 'url' => ['/cinema/index']],
-                    ['label' => 'Serviços', 'url' => ['/servicos/index']],
+                    ['label' => 'Serviços', 'url' => ['/site/contact']],
                 ];
                 echo Nav::widget([
                     'options' => ['class' => 'navbar-nav font-15 fw-medium ls-10 gap-1'],
@@ -95,6 +97,7 @@ AppAsset::register($this);
             </div>
             <?php ActiveForm::end(); ?>
 
+            <!-- OBTER CINEMA DA LOCAL-STORAGE -->
             <script>
 
                 // OBTER ÚLTIMO CINEMA ESCOLHIDO DA LOCAL STORAGE
@@ -137,13 +140,13 @@ AppAsset::register($this);
                     <ul class="fs-15 dropdown-menu dropdown-menu-end mt-2">
                         <?php $dropdownItemClasses = 'dropdown-item d-inline-flex align-items-center gap-1' ?>
                         <li>
-                            <a class="<?= $dropdownItemClasses ?>" href="<?= Url::to(['/user/index']) ?>">
+                            <a class="<?= $dropdownItemClasses ?>" href="<?= Url::to([$perfilPath]) ?>">
                                 <?= file_get_contents(Yii::getAlias($iconsPath . 'user.svg')) ?>
                                 Perfil
                             </a>
                         </li>
                         <li>
-                            <a class="<?= $dropdownItemClasses ?>" href="<?= Url::to(['/user/index']) ?>">
+                            <a class="<?= $dropdownItemClasses ?>" href="<?= Url::to([$perfilPath]) ?>">
                                 <?= file_get_contents(Yii::getAlias($iconsPath . 'ticket.svg')) ?>Bilhetes
                             </a>
                         </li>
@@ -161,7 +164,7 @@ AppAsset::register($this);
                 <?= Nav::widget([
                         'options' => ['class' => 'd-flex d-lg-none navbar-nav font-15 fw-medium ls-10'],
                         'items' => [
-                            ['label' => 'Área de Cliente', 'url' => ['/user/index']],
+                            ['label' => 'Área de Cliente', 'url' => [$perfilPath]],
                         ],
                     ]);
                 ?>
@@ -208,7 +211,7 @@ AppAsset::register($this);
             <div class="d-flex flex-column align-items-end gap-1">
                 <?php
                     $navFooterLinks = [
-                        'Área de Cliente' => '/user/index',
+                        'Área de Cliente' => $perfilPath,
                         'Termos e Condições' => '/',
                         'Administração' => '../../backend/web'
                     ];

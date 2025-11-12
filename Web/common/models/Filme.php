@@ -80,30 +80,30 @@ class Filme extends \yii\db\ActiveRecord
 
     public function getPosterUrl(): string
     {
-        // Caminhos definidos em common/config/params.php
-        $posterDir = Yii::getAlias(Yii::$app->params['posterPath']); // caminho físico absoluto
-        $posterUrlBase = Yii::$app->params['posterUrl']; // URL público acessível via browser
+        // CAMINHOS DEFINIDOS EM xommon/config/params.php
+        $posterDir = Yii::getAlias(Yii::$app->params['posterPath']); // CAMINHO FÍSICO ABSOLUTO
+        $posterUrlBase = Yii::$app->params['posterUrl']; // URL PÚBLICO ACESSÍVEL VIA BROWSER
 
-        // Caminho absoluto completo (ficheiro físico no servidor)
+        // CAMINHO ABSOLUTO COMPLETO
         $posterFile = rtrim($posterDir, '/') . '/' . ltrim($this->poster_path, '/');
 
-        // Caminho público (para o <img src="...">)
+        // CAMINHO PÚBLICO (para o <img src="...">)
         $posterUrl = rtrim($posterUrlBase, '/') . '/' . ltrim($this->poster_path, '/');
 
-        // Placeholder público (dentro da mesma pasta 'uploads')
+        // PLACEHOLDER PÚBLICO
         $placeholderUrl = rtrim($posterUrlBase, '/') . '/../placeholders/poster-placeholder.jpg';
 
-        // Se não tiver poster_path definido → devolve placeholder
+        // SE NÃO TIVER POSTER_PATH --> DEVOLVE PLACEHOLDER
         if (empty($this->poster_path)) {
             return $placeholderUrl;
         }
 
-        // Se o ficheiro não existir fisicamente → devolve placeholder
+        // SE O FICHEIRO NÃO EXISTER --> DEVOLVE PLACEHOLDER
         if (!file_exists($posterFile)) {
             return $placeholderUrl;
         }
 
-        // Caso contrário → devolve URL do poster
+        // CASO CONTRÁRIO --> DEVOLVE URL DO POSTER
         return $posterUrl;
     }
 
@@ -118,6 +118,7 @@ class Filme extends \yii\db\ActiveRecord
             'titulo' => 'Título',
             'sinopse' => 'Sinopse',
             'duracao' => 'Duração',
+            'duracaoEmMinutos' => 'Duração',
             'rating' => 'Rating',
             'estreia' => 'Estreia',
             'estreiaFormatada' => 'Estreia',
@@ -193,11 +194,15 @@ class Filme extends \yii\db\ActiveRecord
         return false;
     }
 
-
     // OBTER ESTREIA FORMATADA (DD/MM/AAAA)
     public function getEstreiaFormatada(): string
     {
         return Yii::$app->formatter->asDate($this->estreia, 'php:d/m/Y');
+    }
+
+    public function getDuracaoEmMinutos()
+    {
+        return $this->duracao . ' minutos';
     }
 
     // OBTER DURAÇÃO EM HORAS

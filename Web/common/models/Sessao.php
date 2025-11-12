@@ -353,7 +353,7 @@ class Sessao extends \yii\db\ActiveRecord
      */
     public function getCompras()
     {
-        return $this->hasOne(Compra::class, ['sessao_id' => 'id']);
+        return $this->hasMany(Compra::class, ['sessao_id' => 'id']);
     }
 
     /**

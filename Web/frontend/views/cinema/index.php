@@ -40,7 +40,7 @@ $this->title = 'Cinemas';
 
                         <div class="col-12 d-flex flex-column text-start">
                             <span class="fw-medium fs-14">Morada</span>
-                            <span class="text-muted"><?= $cinema->rua . ", " . $cinema->codigo_postal . ", " . $cinema->cidade ?></span>
+                            <span class="text-muted"><?= $cinema->moradaCompleta ?></span>
                         </div>
                         <div class="d-flex flex-column text-start">
                             <span class="fw-medium fs-14">Telefone</span>
@@ -56,14 +56,7 @@ $this->title = 'Cinemas';
                         </div>
                         <div class="d-flex flex-column text-start">
                             <span class="fw-medium fs-14">Capacidade</span>
-
-                            <!-- CALCULAR LUGARES -->
-                            <?php $lugares = 0;
-                            foreach ($cinema->salas as $sala) {
-                                $lugares += ($sala->num_colunas * $sala->num_filas);
-                            } ?>
-
-                            <span class="text-muted"><?= count($cinema->salas) ?> Salas<span class="d-none d-sm-inline"> • <?= $lugares ?> Lugares</span></span>
+                            <span class="text-muted"><?= count($cinema->salas) ?> Salas<span class="d-none d-sm-inline"> • <?= $cinema->numeroLugares ?> Lugares</span></span>
                         </div>
 
                     </div>

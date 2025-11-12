@@ -5,6 +5,7 @@ namespace backend\controllers;
 use common\models\Filme;
 use backend\models\FilmeSearch;
 use Yii;
+use yii\helpers\Html;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
@@ -55,6 +56,7 @@ class FilmeController extends Controller
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'ratingFilterOptions' => FilmeSearch::getRatingFilterOptions(),
         ]);
     }
 
@@ -62,8 +64,14 @@ class FilmeController extends Controller
     // VER DETALHES DE UM FILME
     public function actionView($id)
     {
+        $model = $this->findModel($id);
+
+        $generos = array_map(fn($g) => Html::encode($g->nome), $model->generos);
+        $generos = !empty($generos) ? implode(', ', $generos) : '-';
+
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
+            'generos' => $generos,
         ]);
     }
 
@@ -101,7 +109,10 @@ class FilmeController extends Controller
             }
         }
 
-        return $this->render('create', ['model' => $model]);
+        return $this->render('create', [
+            'model' => $model,
+            'generosOptions' => FilmeSearch::getGenerosOptions(),
+        ]);
     }
 
 
@@ -136,7 +147,10 @@ class FilmeController extends Controller
             }
         }
 
-        return $this->render('update', ['model' => $model]);
+        return $this->render('update', [
+            'model' => $model,
+            'generosOptions' => FilmeSearch::getGenerosOptions(),
+        ]);
     }
 
 

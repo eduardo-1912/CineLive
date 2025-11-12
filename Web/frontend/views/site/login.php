@@ -31,7 +31,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     Ainda não tem conta? <?= Html::a('Criar Conta', ['site/signup']) ?>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group mt-3">
                     <?= Html::submitButton('Login', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
                 </div>
 

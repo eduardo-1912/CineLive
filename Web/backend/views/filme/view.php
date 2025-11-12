@@ -52,21 +52,11 @@ $this->params['breadcrumbs'][] = $this->title;
                             'id',
                             'titulo',
                             'sinopse:ntext',
-                            [
-                                'attribute' => 'duracao',
-                                'value' => function ($model) {
-                                    return $model->duracao . ' minutos';
-                                }
-                            ],
+                            'duracaoEmMinutos',
                             [
                                 'label' => 'Géneros',
                                 'format' => 'raw',
-                                'value' => function ($model) {
-                                    $generos = array_map(fn($g) => Html::encode($g->nome), $model->generos);
-                                    return !empty($generos)
-                                        ? implode(', ', $generos)
-                                        : '-';
-                                },
+                                'value' => $generos,
                             ],
                             'rating',
                             'estreiaFormatada',
@@ -85,7 +75,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                     if ($model->poster_path) {
                                         return Html::img($model->getPosterUrl(), [
                                             'alt' => $model->titulo,
-                                            'style' => 'max-width:400px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.1);'
+                                            'style' => 'max-width:400px;',
+                                            'class' => 'rounded-3 shadow-sm',
                                         ]);
                                     }
                                     return Html::tag('span', 'Sem poster', ['class' => 'text-muted']);

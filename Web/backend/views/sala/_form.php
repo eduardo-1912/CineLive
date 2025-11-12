@@ -26,22 +26,10 @@ $proximoNumero = $proximoNumero ?? null;
 
     <!-- SE É ADMIN -> PODE ESCOLHER O CINEMA -->
     <?php if ($isAdmin): ?>
-        <?php
-        // OBTER CINEMAS ATIVOS
-        $queryCinemas = Cinema::find()->where(['estado' => Cinema::ESTADO_ATIVO]);
-
-        // SE A SALA A SER EDITADA PERTENCE A UM CINEMA ENCERRADO --> INCLUIR ESSE CINEMA
-        if ($model->cinema_id) {
-            $queryCinemas->orWhere(['id' => $model->cinema_id]);
-        }
-
-        // GERAR LISTA DE CINEMAS
-        $cinemas = ArrayHelper::map($queryCinemas->orderBy('nome')->all(), 'id', 'nome');
-        ?>
-
+    
         <div class="form-group">
             <label for="cinema_id">Cinema</label>
-            <?= Html::dropDownList('cinema_id', $model->cinema_id, $cinemas, [
+            <?= Html::dropDownList('cinema_id', $model->cinema_id, $cinemasOptions, [
                 'prompt' => 'Selecione o cinema',
                 'class' => 'form-control',
                 'onchange' => 'this.form.submit()',

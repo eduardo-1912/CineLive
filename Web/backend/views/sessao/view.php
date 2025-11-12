@@ -46,35 +46,28 @@ $gerirSessoes = $currentUser->can('gerirSessoes');
                                 'attribute' => 'tituloFilme',
                                 'label' => 'Filme',
                                 'format' => 'raw',
-                                'value' => function ($model) {
-                                    return Html::a(Html::encode($model->filme->titulo),
+                                'value' => fn($model) =>
+                                    Html::a($model->filme->titulo,
                                         ['filme/view', 'id' => $model->filme_id],
-                                        ['class' => 'text-decoration-none text-primary']);
-                                },
+                                        ['class' => 'text-decoration-none text-primary']),
                             ],
                             [
                                 'label' => 'Cinema',
                                 'attribute' => 'cinema.nome',
                                 'format' => 'raw',
-                                'value' => function ($model) {
-                                    return Html::a(
-                                        Html::encode($model->cinema->nome),
+                                'value' => fn($model) =>
+                                    Html::a($model->cinema->nome,
                                         ['cinema/view', 'id' => $model->cinema_id],
-                                        ['class' => 'text-decoration-none text-primary']
-                                    );
-                                },
+                                        ['class' => 'text-decoration-none text-primary']),
                                 'visible' => $isAdmin,
                             ],
                             [
                                 'label' => 'Sala',
                                 'format' => 'raw',
-                                'value' => function ($model) {
-                                    return Html::a(
-                                        Html::encode($model->sala->nome),
+                                'value' => fn($model) =>
+                                    Html::a($model->sala->nome,
                                         ['sala/view', 'id' => $model->sala_id],
-                                        ['class' => 'text-decoration-none text-primary']
-                                    );
-                                },
+                                        ['class' => 'text-decoration-none text-primary']),
                             ],
                             [
                                 'label' => 'Data',
@@ -84,9 +77,8 @@ $gerirSessoes = $currentUser->can('gerirSessoes');
                             [
                                 'label' => 'Lugares Disponíveis',
                                 'attribute' => 'lugaresDisponiveis',
-                                'value' => function ($model) {
-                                    return $model->numeroLugaresDisponiveis . '/' . $model->sala->lugares;
-                                },
+                                'value' => fn($model) =>
+                                     $model->numeroLugaresDisponiveis . '/' . $model->sala->lugares,
                             ],
                             [
                                 'label' => 'Estado',
@@ -108,7 +100,6 @@ $gerirSessoes = $currentUser->can('gerirSessoes');
     </div>
     <!--.card-->
 
-
     <div class="card">
         <div class="card-body">
             <div class="row">
@@ -119,5 +110,21 @@ $gerirSessoes = $currentUser->can('gerirSessoes');
             </div>
         </div>
     </div>
+
+    <?php if ($model->compras): ?>
+        <h3 class="mt-4 mb-3">Compras</h3>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <?= $this->render('_compras', [
+                            'dataProvider' => $comprasDataProvider,
+                        ]) ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
 
 </div>

@@ -59,18 +59,16 @@ $this->params['breadcrumbs'][] = $this->title;
                             'titulo',
                             [
                                 'attribute' => 'duracao',
-                                'value' => function ($model) {
-                                    return $model->duracao . ' minutos';
-                                }
+                                'value' => 'duracaoEmMinutos'
                             ],
                             [
                                 'attribute' => 'estreia',
-                                'value' => fn($model) => $model->estreiaFormatada,
+                                'value' => 'estreiaFormatada',
                                 'filterInputOptions' => ['type' => 'date', 'class' => 'form-control',],
                             ],
                             [
                                 'attribute' => 'rating',
-                                'filter' => array_diff_key(Filme::optsRating(), [Filme::RATING_TODOS => null]),
+                                'filter' => $ratingFilterOptions,
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
                             ],
                             [

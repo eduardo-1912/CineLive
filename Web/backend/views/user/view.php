@@ -62,7 +62,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                             [
                                 'attribute' => 'status',
-                                'value' => function ($model) { return ActionColumnButtonHelper::userEstadoDropdown($model); },
+                                'value' => fn($model) => ActionColumnButtonHelper::userEstadoDropdown($model),
                                 'format' => 'raw',
                                 'visible' => $gerirUtilizadores || $gerirFuncionarios && !$isOwnAccount,
                             ],
@@ -77,4 +77,21 @@ $this->params['breadcrumbs'][] = $this->title;
         <!--.card-body-->
     </div>
     <!--.card-->
+
+    <?php if ($model->compras && $model->roleName === 'cliente'): ?>
+        <h3 class="mt-4 mb-3">Compras</h3>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <?= $this->render('_compras', [
+                            'dataProvider' => $comprasDataProvider,
+                        ]) ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
+
 </div>

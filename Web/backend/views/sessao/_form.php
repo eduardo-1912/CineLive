@@ -26,9 +26,7 @@ $temBilhetes = !$model->isNewRecord && count($model->lugaresOcupados) > 0;
     <?php if ($isAdmin): ?>
 
         <!-- DROPDOWN DE CINEMAS -->
-        <?= $form->field($model, 'cinema_id')->dropDownList(
-            ArrayHelper::map(Cinema::find()->where(['estado' => Cinema::ESTADO_ATIVO])
-                ->orderBy('nome')->all(), 'id', 'nome'),
+        <?= $form->field($model, 'cinema_id')->dropDownList($cinemasAtivos,
             [
                 'prompt' => 'Selecione o cinema',
                 'onchange' => 'this.form.submit()',
@@ -61,9 +59,7 @@ $temBilhetes = !$model->isNewRecord && count($model->lugaresOcupados) > 0;
     ]) ?>
 
     <!-- FILME -->
-    <?= $form->field($model, 'filme_id')->dropDownList(
-        ArrayHelper::map(Filme::find()->where(['estado' => Filme::ESTADO_EM_EXIBICAO])
-            ->orderBy('titulo')->all(), 'id', 'titulo'),
+    <?= $form->field($model, 'filme_id')->dropDownList($filmesEmExibicao,
         [
             'prompt' => 'Selecione o filme',
             'onchange' => 'this.form.submit()',
@@ -77,21 +73,9 @@ $temBilhetes = !$model->isNewRecord && count($model->lugaresOcupados) > 0;
     <!-- FORM POST PARA GUARDAR -->
     <?php $form = ActiveForm::begin(); ?>
 
-    <!-- HORA FIM -->
-    <?php
-
-    // SE FILME E HORA INÍCIO JÁ TÊM VALOR --> CALCULAR HORA FIM
-    if ($model->filme_id && $model->hora_inicio) {
-        $filme = Filme::findOne($model->filme_id);
-        if ($filme) {
-            $model->hora_fim = $model->getHoraFimCalculada($filme->duracao);
-        }
-    }
-
-    ?>
-
     <?= $form->field($model, 'hora_fim')->input('time', [
         'value' => $model->hora_fim,
+        'disabled' => $temBilhetes,
     ]) ?>
 
     <!-- CAMPOS OCULTOS QUE VÊM DO FORM GET -->
@@ -102,40 +86,8 @@ $temBilhetes = !$model->isNewRecord && count($model->lugaresOcupados) > 0;
 
     <!-- SALAS DISPONÍVEIS -->
     <?php if ($model->cinema_id): ?>
-        <?php
-        $salas = [];
-
-        if ($model->data && $model->hora_inicio && $model->hora_fim) {
-            $salas = Sala::getSalasDisponiveis(
-                $model->cinema_id,
-                $model->data,
-                $model->hora_inicio,
-                $model->hora_fim
-            );
-        }
-        else {
-            $salas = Sala::find()
-                ->where(['cinema_id' => $model->cinema_id, 'estado' => Sala::ESTADO_ATIVA])
-                ->orderBy('numero')
-                ->all();
-        }
-
-        // SE FOR UPDATE --> INCLUIR A SALA ATUAL
-        if ($model->sala_id) {
-            $salaAtual = Sala::findOne($model->sala_id);
-            if ($salaAtual && !in_array($salaAtual, $salas, true)) {
-                $salas[] = $salaAtual;
-            }
-        }
-
-        // ORDENAR AS SALAS POR NÚMERO
-        usort($salas, fn($a, $b) => $a->numero <=> $b->numero);
-
-        ?>
-        <?= $form->field($model, 'sala_id')->dropDownList(
-            ArrayHelper::map($salas, 'id', 'numero'),
-            ['prompt' => 'Selecione a sala']
-        ) ?>
+        <?= $form->field($model, 'sala_id')->dropDownList($salasDropdown,
+            ['prompt' => 'Selecione a sala']) ?>
     <?php endif; ?>
 
     <!-- BOTÃO GUARDAR -->

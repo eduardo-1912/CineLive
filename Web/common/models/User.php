@@ -172,6 +172,12 @@ class User extends ActiveRecord implements IdentityInterface
         return $this->hasOne(Cinema::class, ['id' => 'cinema_id'])->via('profile');
     }
 
+    // OBTER COMPRAS DO USER
+    public function getCompras()
+    {
+        return $this->hasMany(Compra::class, ['cliente_id' => 'id']);
+    }
+
     /**
      * column status ENUM value labels
      * @return string[]

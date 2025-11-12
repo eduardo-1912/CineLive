@@ -18,8 +18,6 @@ $isAdmin = $currentUser->can('admin');
 $gerirSalas = $currentUser->can('gerirSalas');
 $actionColumnButtons = $gerirSalas ? '{view} {update} {activate} {close}' : '{view}';
 
-$cinemaSelecionado = !empty($cinemaId) ? Cinema::findOne($cinemaId) : null;
-
 // ALGUM CINEMA FOI PASSADO POR PARÂMETRO
 if (!empty($cinemaId) && $cinemaSelecionado)
 {
@@ -80,7 +78,7 @@ $this->params['breadcrumbs'][] = 'Salas';
                             [
                                 'attribute' => 'cinema_id',
                                 'value' => 'cinema.nome',
-                                'filter' => ArrayHelper::map(Cinema::find()->orderBy('nome')->asArray()->all(), 'id', 'nome'),
+                                'filter' => $cinemaFilterOptions,
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
                                 'headerOptions' => ['style' => 'width: 12rem;'],
                                 'visible' => $isAdmin && empty($cinemaId),
@@ -89,7 +87,7 @@ $this->params['breadcrumbs'][] = 'Salas';
                                 'attribute' => 'estado',
                                 'value' => 'estadoFormatado',
                                 'format' => 'raw',
-                                'filter' => Sala::optsEstado(),
+                                'filter' => $estadoFilterOptions,
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
                                 'headerOptions' => ['style' => 'width: 9rem;'],
                             ],

@@ -18,6 +18,8 @@ $this->params['breadcrumbs'][] = $this->title;
 $currentUser = Yii::$app->user;
 $isAdmin = $currentUser->can('admin');
 
+$actionColumnButtons = $isAdmin ? '{view} {delete}' : '{view}';
+
 ?>
 <div class="container-fluid">
     <div class="row">
@@ -38,16 +40,12 @@ $isAdmin = $currentUser->can('admin');
                             ],
                             [
                                 'attribute' => 'cliente',
-                                'value' => function ($model) {
-                                    if ($model->cliente && $model->cliente->profile) {
-                                        return Html::a(
-                                            Html::encode($model->cliente->profile->nome),
+                                'value' => fn($model) =>
+                                    $model->cliente && $model->cliente->profile
+                                        ? Html::a($model->cliente->profile->nome,
                                             ['user/view', 'id' => $model->cliente->id],
-                                            ['class' => 'text-decoration-none text-primary']
-                                        );
-                                    }
-                                    return '<span class="text-muted">[Conta eliminada]</span>';
-                                },
+                                            ['class' => 'text-decoration-none text-primary'])
+                                        : '<span class="text-muted">Conta eliminada</span>',
                                 'format' => 'raw',
                                 'filter' => Html::activeTextInput($searchModel, 'nomeCliente', ['class' => 'form-control',]),
                             ],
@@ -56,13 +54,12 @@ $isAdmin = $currentUser->can('admin');
                                 'label' => 'Cinema',
                                 'format' => 'raw',
                                 'value' => function ($model) {
-                                    return $model->cinema
-                                        ? Html::a(Html::encode($model->cinema->nome),
-                                            ['cinema/view', 'id' => $model->cinema->id],
-                                            ['class' => 'text-decoration-none text-primary'])
-                                        : '<span class="text-muted">-</span>';
+                                    return Html::a($model->cinema->nome,
+                                        ['cinema/view', 'id' => $model->cinema->id],
+                                        ['class' => 'text-decoration-none text-primary']
+                                    );
                                 },
-                                'filter' => ArrayHelper::map(Cinema::find()->asArray()->all(), 'id', 'nome'),
+                                'filter' => $cinemaFilterOptions,
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
                                 'visible' => $isAdmin,
                             ],
@@ -71,17 +68,10 @@ $isAdmin = $currentUser->can('admin');
                                 'label' => 'Sala',
                                 'format' => 'raw',
                                 'value' => function ($model) {
-                                    if ($model->sala) {
-                                        return Html::a(
-                                            Html::encode($model->sala->nome ?? '-'),
-                                            ['sala/view', 'id' => $model->sala_id],
-                                            ['class' => 'text-decoration-none text-primary']
-                                        );
-                                    }
-                                    else {
-                                        return '-';
-                                    }
-
+                                    return Html::a($model->sala->nome ?? '-',
+                                        ['sala/view', 'id' => $model->sala_id],
+                                        ['class' => 'text-decoration-none text-primary']
+                                    );
                                 },
                                 'headerOptions' => ['style' => 'width: 8rem;'],
                             ],
@@ -111,14 +101,14 @@ $isAdmin = $currentUser->can('admin');
                                 'label' => 'Estado',
                                 'value' => fn($model) => ActionColumnButtonHelper::aluguerEstadoDropdown($model),
                                 'format' => 'raw',
-                                'filter' => AluguerSala::optsEstadoBD(),
+                                'filter' => $estadoFilterOptions,
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
                                 'headerOptions' => ['style' => 'width: 100px;'],
                             ],
 
                             [
                                 'class' => 'backend\components\AppActionColumn',
-                                'template' => '{view}',
+                                'template' => $actionColumnButtons,
                                 'headerOptions' => ['style' => 'width: 1rem;'],
                             ],
                         ],

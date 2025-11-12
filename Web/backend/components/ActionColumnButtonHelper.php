@@ -117,7 +117,7 @@ class ActionColumnButtonHelper
         return [
             'activate' => function ($url, $model) {
                 if ($model->estado == $model::ESTADO_ENCERRADA) {
-                    return Html::a('<i class="fas fa-toggle-on"></i>', ['change-status', 'id' => $model->id, 'estado' => $model::ESTADO_ATIVA], [
+                    return Html::a('<i class="fas fa-toggle-on"></i>', ['sala/change-status', 'id' => $model->id, 'estado' => $model::ESTADO_ATIVA], [
                         'class' => 'btn btn-sm ' . ($model->isActivatable() ? 'btn-success' : ' btn-secondary disabled'),
                         'title' => 'Ativar Sala',
                         'data-confirm' => 'Tem a certeza que quer ativar esta sala?',
@@ -128,7 +128,7 @@ class ActionColumnButtonHelper
             },
             'close' => function ($url, $model) {
                 if ($model->estado == $model::ESTADO_ATIVA) {
-                    return Html::a('<i class="fas fa-toggle-off"></i>',  ['change-status', 'id' => $model->id, 'estado' => $model::ESTADO_ENCERRADA], [
+                    return Html::a('<i class="fas fa-toggle-off"></i>',  ['sala/change-status', 'id' => $model->id, 'estado' => $model::ESTADO_ENCERRADA], [
                         'class' => 'btn btn-sm ' . ($model->isClosable() ? 'btn-danger' : ' btn-secondary disabled'),
                         'title' => 'Encerrar Sala',
                         'data-confirm' => 'Tem a certeza que quer encerrar esta sala?',
@@ -184,7 +184,7 @@ class ActionColumnButtonHelper
     {
         return [
             'confirmarBilhetes' => function ($url, $model) {
-                return Html::a('<i class="fas fa-check-double"></i>', ['confirm-tickets', 'id' => $model->id], [
+                return Html::a('<i class="fas fa-check-double"></i>', ['compra/confirm-all-tickets', 'id' => $model->id], [
                     'class' => 'btn btn-sm ' .($model->isEstadoConfirmada() && !$model->isTodosBilhetesConfirmados() && !$model->sessao->isEstadoTerminada()
                     ? 'btn-success' : 'btn-secondary disabled'),
                     'title' => 'Confirmar Bilhetes',

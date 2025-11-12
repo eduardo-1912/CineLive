@@ -19,9 +19,6 @@ $userCinema = $currentUser->identity->profile->cinema;
 $isAdmin = $currentUser->can('admin');
 $gerirSessoes = $currentUser->can('gerirSessoes');
 
-$cinemaSelecionado = !empty($cinemaId) ? Cinema::findOne($cinemaId) : null;
-$salaSelecionada = !empty($salaId) ? Sala::findOne($salaId) : null;
-
 $actionColumnButtons = $gerirSessoes ? '{view} {update} {delete}' : '{view}';
 
 // ALGUM CINEMA FOI PASSADO POR PARÂMETRO
@@ -75,25 +72,20 @@ $this->params['breadcrumbs'][] = 'Sessões';
                                 'attribute' => 'tituloFilme',
                                 'label' => 'Filme',
                                 'format' => 'raw',
-                                'value' => function ($model) {
-                                    return Html::a(Html::encode($model->filme->titulo),
-                                    ['filme/view', 'id' => $model->filme_id],
-                                    ['class' => 'text-decoration-none text-primary']);
-                                },
+                                'value' => fn($model) =>
+                                    Html::a($model->filme->titulo,
+                                        ['filme/view', 'id' => $model->filme_id],
+                                        ['class' => 'text-decoration-none text-primary']),
                                 'headerOptions' => ['style' => 'width: 18rem;'],
-
                             ],
                             [
                                 'attribute' => 'cinema_id',
                                 'format' => 'raw',
-                                'value' => function ($model) {
-                                    return Html::a(
-                                        Html::encode($model->cinema->nome),
+                                'value' => fn($model) =>
+                                    Html::a($model->cinema->nome,
                                         ['cinema/view', 'id' => $model->cinema_id],
-                                        ['class' => 'text-decoration-none text-primary']
-                                    );
-                                },
-                                'filter' => ArrayHelper::map(Cinema::find()->asArray()->all(), 'id', 'nome'),
+                                        ['class' => 'text-decoration-none text-primary']),
+                                'filter' => $cinemaFilterOptions,
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
                                 'headerOptions' => ['style' => 'width: 28rem;'],
                                 'visible' => $isAdmin && empty($cinemaId),
@@ -102,13 +94,10 @@ $this->params['breadcrumbs'][] = 'Sessões';
                                 'attribute' => 'numeroSala',
                                 'label' => 'Sala',
                                 'format' => 'raw',
-                                'value' => function ($model) {
-                                    return Html::a(
-                                        Html::encode($model->sala->nome),
+                                'value' => fn($model) =>
+                                    Html::a($model->sala->nome,
                                         ['sala/view', 'id' => $model->sala_id],
-                                        ['class' => 'text-decoration-none text-primary']
-                                    );
-                                },
+                                        ['class' => 'text-decoration-none text-primary']),
                                 'headerOptions' => ['style' => 'width: 8rem;'],
                             ],
                             [
@@ -138,17 +127,16 @@ $this->params['breadcrumbs'][] = 'Sessões';
                             [
                                 'label' => 'Lugares Disponíveis',
                                 'attribute' => 'lugaresDisponiveis',
-                                'value' => function ($model) {
-                                    return $model->numeroLugaresDisponiveis . '/' . $model->sala->lugares;
-                                },
+                                'value' => fn($model) =>
+                                    $model->numeroLugaresDisponiveis . '/' . $model->sala->lugares,
                             ],
                             [
                                 'attribute' => 'estado',
                                 'value' => 'estadoFormatado',
                                 'format' => 'raw',
-                                'filter' => Sessao::optsEstado(),
+                                'filter' => $estadoFilterOptions,
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
-                                'headerOptions' => ['style' => 'width: 10rem;'],
+                                'headerOptions' => ['style' => 'width: 14rem;'],
                             ],
                             [
                                 'class' => 'backend\components\AppActionColumn',

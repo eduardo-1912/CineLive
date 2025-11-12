@@ -26,8 +26,7 @@ use yii\web\JqueryAsset;
     <?= $form->field($model, 'duracao')->textInput()->label('Duração (em minutos)') ?>
 
     <?= $form->field($model, 'generosSelecionados')->dropDownList(
-        ArrayHelper::map(Genero::find()->orderBy('nome')->all(), 'id', 'nome'),
-        ['multiple' => true, 'id' => 'generos-select',]
+        $generosOptions, ['multiple' => true, 'id' => 'generos-select',]
     ) ?>
 
     <?= $form->field($model, 'rating')->dropDownList(Filme::optsRating()) ?>

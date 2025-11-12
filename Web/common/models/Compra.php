@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\components\EmailHelper;
 use Exception;
 use Yii;
 
@@ -65,10 +66,12 @@ class Compra extends \yii\db\ActiveRecord
             'sessao_id' => 'Sessão',
             'data' => 'Data de Compra',
             'pagamento' => 'Pagamento',
+            'pagamentoFormatado' => 'Pagamento',
             'estado' => 'Estado',
             'dataFormatada' => 'Data de Compra',
             'nomeCinema' => 'Cinema',
             'numeroBilhetes' => 'Bilhetes',
+            'totalEmEuros' => 'Total',
         ];
     }
 
@@ -101,9 +104,9 @@ class Compra extends \yii\db\ActiveRecord
         return round((float) $total, 2);
     }
 
-    public function getTotalFormatado(): string
+    public function getTotalEmEuros(): string
     {
-        return number_format($this->total, 2, '.', '');
+        return number_format($this->total, 2, '.', '') . '€';
     }
 
     public function getNumeroBilhetes(): int
@@ -126,10 +129,58 @@ class Compra extends \yii\db\ActiveRecord
         return "<span class='{$class}'>{$label}</span>";
     }
 
+    public function getPagamentoFormatado(): string
+    {
+        return self::optsPagamento()[$this->pagamento] ?? ucfirst($this->pagamento);
+    }
+
     // OBTER BILHETES
     public function getBilhetes()
     {
         return $this->hasMany(Bilhete::class, ['compra_id' => 'id']);
+    }
+
+    public function enviarEmailEstado($estadoNovo)
+    {
+        // GARANTIR QUE EXISTE CLIENTE
+        if (!$this->cliente || !$this->cliente->email) {
+            return false;
+        }
+
+        // DADOS DO CLIENTE
+        $nome = $this->cliente->profile->nome ?? $this->cliente->username;
+        $email = $this->cliente->email;
+
+        // NOME DO CINEMA
+        $cinemaNome = $this->sessao->cinema->nome ?? 'CineLive';
+
+        // TEXTO DEPENDENTE DO ESTADO
+        switch ($estadoNovo) {
+            case self::ESTADO_CONFIRMADA:
+                $titulo = 'Confirmação da sua compra - CineLive';
+                $mensagem = "
+                <p>Olá <strong>{$nome}</strong>,</p>
+                <p>A sua <b>compra #{$this->id}</b> foi <span style='color:green;'>confirmada</span> com sucesso.</p>
+                <p>Os seus bilhetes estão disponíveis na sua área de cliente.</p>
+                <p style='margin-top:0.75rem;'>Cinema: <b>{$cinemaNome}</b></p>
+                <p style='margin-top:0.75rem;'>Cumprimentos,<br><b>Equipa CineLive</b></p>";
+                break;
+
+            case self::ESTADO_CANCELADA:
+                $titulo = 'Cancelamento da sua compra - CineLive';
+                $mensagem = "
+                <p>Olá <strong>{$nome}</strong>,</p>
+                <p>Lamentamos informar que a sua <b>compra #{$this->id}</b> foi <span style='color:#c00;'>cancelada</span>.</p>
+                <p>Se acha que isto foi um erro, por favor contacte o cinema correspondente.</p>
+                <p style='margin-top:0.75rem;'>Cumprimentos,<br><b>Equipa CineLive</b></p>";
+                break;
+
+            default:
+                return false;
+        }
+
+        // ENVIAR EMAIL
+        return EmailHelper::enviarEmail($email, $titulo, $mensagem);
     }
 
     // OBTER SESSÕES

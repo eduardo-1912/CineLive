@@ -31,53 +31,42 @@ $gerirCompras = $currentUser->can('gerirCompras');
                             'id',
                             [
                                 'attribute' => 'cliente',
-                                'value' => function ($model) {
-                                    if ($model->cliente && $model->cliente->profile) {
-                                        return Html::a(
-                                            Html::encode($model->cliente->profile->nome),
+                                'value' => fn($model) =>
+                                    $model->cliente && $model->cliente->profile
+                                        ? Html::a($model->cliente->profile->nome,
                                             ['user/view', 'id' => $model->cliente->id],
-                                            ['class' => 'text-decoration-none text-primary']
-                                        );
-                                    }
-                                    return '<span class="text-muted">[Conta eliminada]</span>';
-                                },
+                                            ['class' => 'text-decoration-none text-primary'])
+                                        : '<span class="text-muted">Conta eliminada</span>',
                                 'format' => 'raw',
                             ],
                             [
                                 'attribute' => 'sessao_id',
                                 'label' => 'Sessão',
                                 'format' => 'raw',
-                                'value' => fn($model) => Html::a(
-                                    $model->sessao->nome,
-                                    ['sessao/view', 'id' => $model->sessao->id],
-                                    ['class' => 'text-decoration-none text-primary']
-                                ),
+                                'value' => fn($model) =>
+                                    Html::a($model->sessao->nome,
+                                        ['sessao/view', 'id' => $model->sessao->id],
+                                        ['class' => 'text-decoration-none text-primary']),
                             ],
                             [
                                 'label' => 'Filme',
                                 'format' => 'raw',
-                                'value' => fn($model) => Html::a(
-                                    $model->sessao->filme->titulo,
-                                    ['filme/view', 'id' => $model->sessao->filme->id],
-                                    ['class' => 'text-decoration-none text-primary']
-                                ),
+                                'value' => fn($model) =>
+                                    Html::a($model->sessao->filme->titulo,
+                                        ['filme/view', 'id' => $model->sessao->filme->id],
+                                        ['class' => 'text-decoration-none text-primary']),
                             ],
                             'dataFormatada',
-                            [
-                                'attribute' => 'total',
-                                'value' => fn($model) => $model->totalFormatado . '€',
-                            ],
-                            [
-                                'attribute' => 'pagamento',
-                                'value' => fn($model) => $model->displayPagamento(),
-                            ],
+                            'totalEmEuros',
+                            'pagamentoFormatado',
+
                             [
                                 'attribute' => 'nomeCinema',
                                 'format' => 'raw',
-                                'value' => function ($model) {
-                                    return Html::a($model->cinema->nome, ['cinema/view', 'id' => $model->cinema->id],
-                                        ['class' => 'text-decoration-none text-primary']);
-                                },
+                                'value' => fn($model) =>
+                                    Html::a($model->cinema->nome,
+                                        ['cinema/view', 'id' => $model->cinema->id],
+                                        ['class' => 'text-decoration-none text-primary']),
                                 'visible' => $isAdmin,
                             ],
                             [

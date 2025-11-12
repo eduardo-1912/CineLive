@@ -20,13 +20,10 @@ use backend\components\AppGridView;
         [
             'attribute' => 'codigo',
         ],
-        [
-            'attribute' => 'preco',
-            'value' => fn($bilhete) => $bilhete->preco . ' €',
-        ],
+        'precoEmEuros',
         [
             'attribute' => 'lugar',
-            'value' => fn($bilhete) => $bilhete->lugar ?? '-',
+            'value' => 'lugar' ?? '-',
             'format' => 'raw',
         ],
         [
@@ -34,20 +31,18 @@ use backend\components\AppGridView;
             'format' => 'raw',
             'value' => function ($bilhete) {
 
-                $isPendente = $bilhete->estado === Bilhete::ESTADO_PENDENTE;
-                $isSessaoTerminada = $bilhete->compra->sessao->isEstadoTerminada();
-                $btnClass = $isPendente ? 'btn-warning' : 'btn-secondary';
+                $btnClass = !$bilhete->isEditable() ? 'btn-warning' : 'btn-secondary';
 
                 return Html::beginForm(['bilhete/update-lugar', 'id' => $bilhete->id], 'post', [
                         'class' => 'd-inline-flex gap-1 align-items-center',
                     ]) .
                     Html::input('text', 'Bilhete[lugar]', $bilhete->lugar, [
-                        'class' => 'form-control form-control-sm', 'style' => 'width: 20rem', 'disabled' => !$isPendente || $isSessaoTerminada,
+                        'class' => 'form-control form-control-sm', 'style' => 'width: 20rem', 'disabled' => !$bilhete->isEditable(),
                     ]) .
                     Html::submitButton('<i class="fas fa-edit"></i>', [
                         'class' => "btn btn-sm {$btnClass}",
                         'title' => 'Guardar',
-                        'disabled' => !$isPendente,
+                        'disabled' => !$bilhete->isEditable(),
                     ]) .
                     Html::endForm();
             },

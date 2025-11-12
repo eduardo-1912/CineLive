@@ -18,6 +18,7 @@ $this->params['breadcrumbs'][] = 'Update';
                 <div class="col-md-12">
                     <?= $this->render('_form', [
                         'model' => $model,
+                        'generosOptions' => $generosOptions,
                     ]) ?>
                 </div>
             </div>
