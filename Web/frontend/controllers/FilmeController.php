@@ -76,6 +76,23 @@ class FilmeController extends Controller
         // APENAS MOSTRAR FILMES QUE TENHAM SESSÕES ATIVAS (NÃO ESTEJAM A DECORRER OU ESGOTADAS)
         $filmes = array_filter($filmes, fn($filme) => $filme->hasSessoesAtivas());
 
+        // SE PESQUISA NÃO ENCONTRAR NADA --> VER SE EXISTEM FILMES BREVEMENTE COM ESSE TÍTULO
+        if ($q && empty($filmes)) {
+            $existeBrevemente = Filme::find()
+                ->where(['estado' => Filme::ESTADO_BREVEMENTE])
+                ->andWhere(['like', 'titulo', $q])
+                ->exists();
+
+            if ($existeBrevemente) {
+                // REDIRECIONAR AUTOMATICAMENTE PARA O ESTADO 'BREVEMENTE'
+                return $this->redirect([
+                    'index',
+                    'estado' => 'brevemente',
+                    'q' => $q
+                ]);
+            }
+        }
+
         return $this->render('index', [
             'filmes' => $filmes,
             'q' => $q,
@@ -108,21 +125,17 @@ class FilmeController extends Controller
             // ENCONTRAR CINEMA
             $cinema = Cinema::findOne($cinema_id);
 
-            // OBTER SESSÕES FUTURAS
+            // OBTER SESSÕES FUTURAS (EXCLUIR SESSÕES ESGOTADAS E A DECORRAR)
             if ($cinema) {
-                $sessoes = $cinema->getSessoesFuturas($model->id);
+                $sessoes = array_filter($cinema->getSessoesFuturas($model->id), fn($sessao) => $sessao->isEstadoAtiva());
             }
 
-            // FILTRAR APENAS POR SESSÕES ATIVAS
-            // NÃO FAZEMOS NA QUERY PARA EXCLUIR ESGOTADAS E A DECORRER (ESTADOS DINÂMICOS)
-            $sessoes = array_filter($sessoes, fn($sessao) => $sessao->isEstadoAtiva());
-
-            // VALIDAR SE A HORA SELECIONADA É VÁLIDA
+            // VALIDAR SE TEM DATA E HORA SELECIONADA
             if ($dataSelecionada && $horaSelecionada) {
 
                 // VER SE EXISTE ALGUMA SESSÃO COM CONJUNTO DATA + HORA IGUAL À SELECIONADA
                 $sessaoExiste = array_filter($sessoes, fn($sessao) =>
-                    $sessao->data === $dataSelecionada && $sessao->horaInicioFormatada === $horaSelecionada
+                    $sessao->dataFormatada === $dataSelecionada && $sessao->horaInicioFormatada === $horaSelecionada
                 );
 
                 // SE NÃO TEM NENHUMA CORRESPONDÊNCIA --> REDIRECIONAR COM APENAS CINEMA E DATA
@@ -138,39 +151,30 @@ class FilmeController extends Controller
         }
 
         // AGRUPAR SESSÕES POR DATA
-        // ISTO CRIA UM ARRAY DE SESSÕES POR DATA (EX.: 2025-11-03 => [sessao_1, sessao_2])
-        $datasSessoes = [];
+        $sessoesPorData = [];
         foreach ($sessoes as $sessao) {
-            $datasSessoes[$sessao->data][] = $sessao;
+            $sessoesPorData[$sessao->dataFormatada][] = $sessao;
         }
 
         // OBTER TODOS OS CINEMAS ATIVOS COM SESSÕES FUTURAS DESTE FILME
         $listaCinemas = ArrayHelper::map($model->getCinemasComSessoesFuturas(), 'id', 'nome');
 
-        // LISTA DE DATAS
-        // ISTO CRIA UM ARRAY DE DATAS FORMATADAS (EX.: [2025-11-03 => 11/03/2025, 2025-11-04 => 11/04/2025])
-        $listaDatas = [];
-        foreach ($datasSessoes as $data => $listaSessoes) {
-            // [0] PORQUE TODAS AS SESSÕES DENTRO DA LISTA DE DATAS TÊM A MESMA DATA
-            $listaDatas[$data] = $listaSessoes[0]->dataFormatada;
-        }
+        // LISTA DE DATAS (CHAVE => CHAVE)
+        $listaDatas = array_combine(array_keys($sessoesPorData), array_keys($sessoesPorData));
 
-        // LISTA DE HORAS PARA A DATA SELECIONADA
+        // LISTA DE HORAS (CHAVE => CHAVE)
         $listaHoras = [];
-        if ($dataSelecionada && isset($datasSessoes[$dataSelecionada])) {
-            foreach ($datasSessoes[$dataSelecionada] as $sessao) {
-                // ADICIONAR HORAS NA LISTA DE HORAS, CHAVE E VALOR SÃO IGUAIS
-                $listaHoras[$sessao->horaInicioFormatada] = $sessao->horaInicioFormatada;
-            }
+        if ($dataSelecionada && !empty($sessoesPorData[$dataSelecionada])) {
+            $listaHoras = ArrayHelper::map($sessoesPorData[$dataSelecionada], 'horaInicioFormatada', 'horaInicioFormatada');
         }
 
-        // ENCONTRAR UMA SESSÃO SELECIONADA PARA BOTÃO COMPRAR BILHETES
+        // ENCONTRAR A SESSÃO SELECIONADA
         $sessaoSelecionada = null;
+        if ($dataSelecionada && $horaSelecionada && isset($sessoesPorData[$dataSelecionada])) {
 
-        // SE DATA E HORA SELECIONADA E DATA SELECIONADA EXITE NO ARRAY DE DATAS
-        if ($dataSelecionada && $horaSelecionada && isset($datasSessoes[$dataSelecionada])) {
-            // PARA CADA SESSÃO DO ARRAY DE DATA AGRUPADAS
-            foreach ($datasSessoes[$dataSelecionada] as $sessao) {
+            // PARA CADA SESSÃO DO ARRAY DE SESSÕES POR DATA
+            foreach ($sessoesPorData[$dataSelecionada] as $sessao) {
+
                 // SE A HORA INÍCIO É IGUAL À HORA SELECIONADA --> SELECIONAR ESSA SESSÃO
                 if ($sessao->horaInicioFormatada === $horaSelecionada) {
                     $sessaoSelecionada = $sessao;

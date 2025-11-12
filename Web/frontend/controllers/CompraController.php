@@ -5,6 +5,7 @@ namespace frontend\controllers;
 use common\models\Bilhete;
 use common\models\Compra;
 use common\models\Sessao;
+use DateTime;
 use Exception;
 use Yii;
 use yii\filters\VerbFilter;
@@ -36,15 +37,60 @@ class CompraController extends Controller
         ];
     }
 
-    // ESCOLHER LUGARES E COMPRA BILHETES
+    // ESCOLHER LUGARES E PAGAMENTO
     public function actionCreate($sessao_id)
     {
         // OBTER A SESSÃO
         $sessao = Sessao::findOne($sessao_id);
 
+        if (!$sessao) {
+            return $this->redirect(Yii::$app->request->referrer ?: ['filme/index']);
+        }
+
+        // SE A SESSÃO ESTÁ ESGOTADA, TERMINADA OU A DECORRER --> SEM ACESSO
+        if ($sessao->isEstadoEsgotada() || $sessao->isEstadoTerminada() || $sessao->isEstadoADecorrer()) {
+            Yii::$app->session->setFlash('error', "Já não é possível comprar bilhetes para esta sessão.");
+            return $this->redirect(Yii::$app->request->referrer ?: ['filme/index']);
+        }
+
+        // CALCULAR SE A SESSÃO ESTÁ PERTO DE COMEÇAR
+        $now = new DateTime();
+        $inicioSessao = new DateTime($sessao->data . ' ' . $sessao->hora_inicio);
+
+        $segundosRestantes = $inicioSessao->getTimestamp() - $now->getTimestamp();
+        $minutosRestantes = floor($segundosRestantes / 60);
+
+        // AVISO SE COMEÇA DENTRO DE 60 MINUTOS, MAS AINDA NÃO COMEÇOU
+        if ($segundosRestantes > 0 && $minutosRestantes <= 60) {
+            Yii::$app->session->setFlash('warning', "A sessão começa dentro de {$minutosRestantes} minutos!");
+        }
+
+        $sala = $sessao->sala;
+        $lugaresSala = $sala->getArrayLugares();
+        $lugaresOcupados = $sessao->lugaresOcupados ?? [];
+
         // LER LUGARES DO URL
         $lugaresSelecionados = Yii::$app->request->get('lugares', '');
         $lugaresSelecionados = array_filter(explode(',', $lugaresSelecionados));
+
+        // VALIDAR LUGARES
+        $lugaresValidos = [];
+        foreach ($lugaresSelecionados as $lugar) {
+            // SE LUGAR EXISTE NA SALA E NÃO ESTÁ OCUPADO --> É VÁLIDO
+            if (in_array($lugar, $lugaresSala) && !in_array($lugar, $lugaresOcupados)) {
+                $lugaresValidos[] = $lugar;
+            }
+        }
+
+        // SE OS LUGARES FOREM DIFERENTES --> REDIRECIONAR COM LUGARES VÁLIDOS
+        if ($lugaresSelecionados !== $lugaresValidos) {
+            return $this->redirect([
+                'compra/create',
+                'sessao_id' => $sessao_id,
+                'lugares' => implode(',', $lugaresValidos)
+            ]);
+        }
+
 
         // CALCULAR TOTAL DA COMPRA
         $total = 0;
@@ -75,6 +121,12 @@ class CompraController extends Controller
         // SE A SESSÃO NÃO EXISTE --> VOLTAR
         if (!$sessao) {
             return $this->redirect(Yii::$app->request->referrer ?: ['user/index']);
+        }
+
+        // SE A SESSÃO ESTÁ ESGOTADA, TERMINADA OU A DECORRER --> SEM ACESSO
+        if ($sessao->isEstadoEsgotada() || $sessao->isEstadoTerminada() || $sessao->isEstadoADecorrer()) {
+            Yii::$app->session->setFlash('error', "Já não é possível comprar bilhetes para esta sessão.");
+            return $this->redirect(Yii::$app->request->referrer ?: ['filme/index']);
         }
 
         // SE ALGUM DOS DADOS NÃO FOI PASSADO --> VOLTAR

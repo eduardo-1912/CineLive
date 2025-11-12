@@ -158,13 +158,13 @@ AppAsset::register($this);
                 </div>
 
                 <!-- LINK ÁREA DE CLIENTE (MOBILE) -->
-               <?php
-                    echo Nav::widget([
+                <?= Nav::widget([
                         'options' => ['class' => 'd-flex d-lg-none navbar-nav font-15 fw-medium ls-10'],
                         'items' => [
                             ['label' => 'Área de Cliente', 'url' => ['/user/index']],
                         ],
-                    ]); ?>
+                    ]);
+                ?>
             <?php endif; ?>
         </div>
     </div>
@@ -173,11 +173,10 @@ AppAsset::register($this);
 <!-- MAIN -->
 <main role="main" class="flex-shrink-0">
 
-    <div class="">
+    <div>
         <?= $content ?>
 
         <?= ToastWidget::widget() ?>
-
     </div>
 </main>
 

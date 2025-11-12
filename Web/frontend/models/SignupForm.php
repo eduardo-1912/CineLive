@@ -3,6 +3,7 @@
 namespace frontend\models;
 
 use common\models\UserProfile;
+use Exception;
 use Yii;
 use yii\base\Model;
 use common\models\User;
@@ -46,17 +47,23 @@ class SignupForm extends Model
             return null;
         }
 
-        // CRIAR UTILIZADOR
-        $user = new User();
-        $user->username = $this->username;
-        $user->email = $this->email;
-        $user->setPassword($this->password);
-        $user->generateAuthKey();
-        $user->status = User::STATUS_ACTIVE; // CONTA ATIVA POR DEFAULT
+        // INICIAR TRANSACTION (TER A CERTEZA QUE NENHUM USER É CRIADO SEM USER_PROFILE)
+        $transaction = Yii::$app->db->beginTransaction();
 
-        if ($user->save()) {
+        try {
+            // CRIAR UTILIZADOR
+            $user = new User();
+            $user->username = $this->username;
+            $user->email = $this->email;
+            $user->setPassword($this->password);
+            $user->generateAuthKey();
+            $user->status = User::STATUS_ACTIVE;
 
-            // DAR ASSIGN DE ROLE 'CLIENTE'
+            if (!$user->save()) {
+                throw new \Exception('Ocorreu um erro ao criar o utilizador: ' . json_encode($user->getErrors()));
+            }
+
+            // ROLE CLIENTE
             $auth = Yii::$app->authManager;
             $role = $auth->getRole('cliente');
             if ($role) {
@@ -68,14 +75,21 @@ class SignupForm extends Model
             $profile->user_id = $user->id;
             $profile->nome = $this->nome;
             $profile->telemovel = $this->telemovel;
+
             if (!$profile->save()) {
-                Yii::error($profile->errors, __METHOD__);
+                throw new \Exception('Ocorreu um erro ao criar o perfil: ' . json_encode($profile->getErrors()));
             }
 
-            // DEVOLVE O USER EM VEZ DE TRUE/FALSE (DÁ PARA FAZER LOGIN AUTOMÁTICO)
+            // DAR COMMIT NA TRANSACTION
+            $transaction->commit();
+
             return $user;
         }
-        return null;
+        catch (Exception $e) {
+            $transaction->rollBack();
+            Yii::error($e->getMessage());
+            return null;
+        }
     }
 
     /**

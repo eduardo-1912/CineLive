@@ -90,10 +90,16 @@ class Sessao extends \yii\db\ActiveRecord
         // NÚMERO DE LUGARES OCUPADOS
         $lugaresOcupados = count($this->lugaresOcupados ?? 0);
 
-        // ESTADOS
+        // SE JÁ TERMINOU
         if ($now > $dataHoraFim) { return self::ESTADO_TERMINADA; }
+
+        // SE ESTÁ A DECORRER
         if ($now > $dataHoraInicio && $dataHoraFim > $now) { return self::ESTADO_A_DECORRER; }
+
+        // SE ESTÁ ESGOTADA
         if ($lugaresOcupados >= $this->sala->lugares) { return self::ESTADO_ESGOTADA; }
+
+        // SE ESTÁ ATIVA
         return self::ESTADO_ATIVA;
     }
 

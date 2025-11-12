@@ -157,7 +157,7 @@ $(function() {
         clearTimeout(timer);
         timer = setTimeout(function() {
             $('#sessao-form-get').submit();
-        }, 600);
+        }, 500);
     });
 });
 JS;

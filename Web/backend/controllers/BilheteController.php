@@ -62,7 +62,7 @@ class BilheteController extends Controller
         // OBTER CINEMA DA COMPRA
         $cinemaId = $sessao->cinema_id ?? null;
 
-        // GERENTE/FUNCIONÁRIO --> SÓ PODEM CONFIRMAR COMPRAS DO SEU CINEMA
+        // GERENTE/FUNCIONÁRIO --> SÓ PODEM EDITAR BILHETES DO SEU CINEMA
         if (!$currentUser->can('admin')) {
 
             // OBTER CINEMA DO USER ATUAL
@@ -88,31 +88,27 @@ class BilheteController extends Controller
 
         if ($model->load(Yii::$app->request->post())) {
 
-            // OBTER NOVO LUGAR
-            $model->lugar = strtoupper(trim($model->lugar));
-            $novoLugar = $model->lugar;
+            // NORMALIZAR NOVO LUGAR
+            $novoLugar = strtoupper(trim($model->lugar));
 
-            // OBTER LUGARES VÁLIDOS
-            $lugaresValidos = $sessao->sala->getLugaresValidos();
+            // OBTER DADOS DA SESSÃO E SALA
+            $sessao = $model->compra->sessao;
+            $sala = $sessao->sala;
 
-            // SE LUGAR NÀO FOR VÁLIDO --> MENSAGEM DE ERRO
-            if (!in_array($novoLugar, $lugaresValidos)) {
-                Yii::$app->session->setFlash('error', "O lugar {$novoLugar} não existe nesta sala.");
+            // OBTER TODOS OS LUGARES DA SALA E OS OCUPADOS
+            $lugaresSala = $sala->getArrayLugares();
+            $lugaresOcupados = $sessao->lugaresOcupados ?? [];
+
+            // FILTRAR LUGAR VÁLIDO E DISPONÍVEL
+            $lugarValido = in_array($novoLugar, $lugaresSala) && !in_array($novoLugar, $lugaresOcupados);
+
+            if (!$lugarValido) {
+                Yii::$app->session->setFlash('error', "O lugar {$novoLugar} não está disponível ou não existe nesta sala.");
                 return $this->redirect(['compra/view', 'id' => $model->compra_id]);
             }
 
-            // VERIFICAR SE O LUGAR ESTÁ OCUPADO
-            $lugarOcupado = $sessao->getBilhetes()
-                ->andWhere(['lugar' => $novoLugar])
-                ->andWhere(['<>', 'estado', Bilhete::ESTADO_CANCELADO])
-                ->andWhere(['<>', 'id', $model->id])
-                ->exists();
-
-            // SE O LUGAR ESTIVER OCUPADO --> MENSAGEM DE RRO
-            if ($lugarOcupado) {
-                Yii::$app->session->setFlash('error', "O lugar {$novoLugar} já está ocupado nesta sessão.");
-                return $this->redirect(['compra/view', 'id' => $model->compra_id]);
-            }
+            // ATUALIZAR E GUARDAR
+            $model->lugar = $novoLugar;
 
             // GUARDAR
             if ($model->save(false)) {

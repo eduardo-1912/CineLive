@@ -137,6 +137,20 @@ class Sala extends \yii\db\ActiveRecord
             ->exists();
     }
 
+    // OBTER ARRAY COM TODOS OS LUGARES DA SALA
+    public function getArrayLugares(): array
+    {
+        $lugares = [];
+
+        for ($fila = 1; $fila <= $this->num_filas; $fila++) {
+            for ($coluna = 1; $coluna <= $this->num_colunas; $coluna++) {
+                $lugares[] = chr(64 + $fila) . $coluna;
+            }
+        }
+
+        return $lugares;
+    }
+
     // OBTER SALAS DISPONÍVEIS
     public static function getSalasDisponiveis($cinemaId, $data, $horaInicio, $horaFim)
     {
@@ -168,24 +182,6 @@ class Sala extends \yii\db\ActiveRecord
             ->andFilterWhere(['not in', 'id', $salasIndisponiveis])
             ->orderBy('numero')
             ->all();
-    }
-
-    // OBTER LUGARES VÁLIDOS (EX.: A1, B2, C3)
-    public function getLugaresValidos(): array
-    {
-        $lugares = [];
-
-        // GERA AS LETRAS DAS FILAS (A, B, C, ...)
-        $filas = range('A', chr(ord('A') + $this->filas - 1));
-
-        // GERA LUGARES POR CADA FILA
-        foreach ($filas as $fila) {
-            for ($coluna = 1; $coluna <= $this->colunas; $coluna++) {
-                $lugares[] = "{$fila}{$coluna}";
-            }
-        }
-
-        return $lugares;
     }
 
     // OBTER O PRÓXIMO NÚMERO INDICATIVO AO CRIAR UMA SALA NOVA

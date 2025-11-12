@@ -1,6 +1,7 @@
 <?php
 use yii\helpers\Html;
 use common\models\Sala;
+use yii\helpers\Url;
 
 /** @var yii\web\View $this */
 /** @var common\models\Cinema[] $cinemas */
@@ -29,7 +30,7 @@ $this->title = 'Cinemas';
 
                 <!-- DADOS DO CINEMA -->
                 <div class="px-4 px-lg-2 py-4 d-flex flex-column justify-content-center">
-                    <h3 class="fw-bold mb-1"><?= $cinema->nome ?></h3>
+                    <a href="<?= Url::to(['filme/index', 'cinema_id' => $cinema->id]) ?>" class="fw-bold fs-4 link-dark text-decoration-none mb-1"><?= $cinema->nome ?></a>
 
                     <?php if ($cinema->gerente->profile->nome): ?>
                         <p class="text-muted mb-4">Gerido por <span class="fw-medium"><?= $cinema->gerente->profile->nome ?></span></p>
