@@ -131,6 +131,7 @@ main {
 
 .form-label {
     color: #888888;
+    margin-bottom: 4px;
     font-weight: 500;
     font-size: 14px;
 }
@@ -142,6 +143,11 @@ main {
     border-radius: 10px;
     padding-block: 8px;
     font-size: 15px;
+}
+
+.form-control:disabled {
+    background-color: var(--gray-200);
+    color: var(--gray-700);
 }
 
 .form-control:focus {

@@ -37,6 +37,27 @@ class CompraController extends Controller
         ];
     }
 
+    // VER TODAS AS SUAS COMPRAS
+    public function actionIndex()
+    {
+        $currentUser = Yii::$app->user->identity;
+        $compras = $currentUser->compras;
+
+        return $this->render('index', [
+            'compras' => $compras,
+        ]);
+    }
+
+    public function actionView($id)
+    {
+        $currentUser = Yii::$app->user;
+        $model = $this->findModel($id);
+
+        return $this->render('view', [
+            'model' => $model,
+        ]);
+    }
+
     // ESCOLHER LUGARES E PAGAMENTO
     public function actionCreate($sessao_id)
     {

@@ -2,6 +2,8 @@
 
 namespace frontend\controllers;
 
+use common\models\AluguerSala;
+use common\models\Compra;
 use common\models\User;
 use Yii;
 use yii\filters\VerbFilter;
@@ -34,14 +36,46 @@ class PerfilController extends Controller
         ];
     }
 
-    public function actionIndex() {
-        $userId = Yii::$app->user->id;
-        $user = User::findOne($userId);
-        $profile = $user->profile ?? null;
+    public function actionIndex()
+    {
+        $currentUser = Yii::$app->user;
+
+        $model = $this->findModel($currentUser->id);
+        $edit = Yii::$app->request->get('edit') == 1;
+
+        $compras = Compra::find()->where(['cliente_id' => $currentUser->id])
+            ->orderBy(['id' => SORT_DESC])->limit(3)->all();
+
+        $alugueres = AluguerSala::find()->where(['cliente_id' => $currentUser->id])
+            ->orderBy(['id' => SORT_DESC])->limit(2)->all();
+
+
+        // SE ESTÁ A EDITAR O PERFIL
+        if ($model->load(Yii::$app->request->post()) && $model->profile->load(Yii::$app->request->post())) {
+
+            // GUARDAR
+            if ($model->save(false) && $model->profile->save()) {
+                Yii::$app->session->setFlash('success', 'Dados atualizados com sucesso.');
+                return $this->redirect(['index']);
+            }
+
+            Yii::$app->session->setFlash('error', 'Ocorreu um erro ao atualizar os dados.');
+        }
 
         return $this->render('index', [
-            'user' => $user,
-            'profile' => $profile,
+            'model' => $model,
+            'edit' => $edit,
+            'compras' => $compras,
+            'alugueres' => $alugueres,
         ]);
+    }
+
+    protected function findModel($id)
+    {
+        if (($model = User::findOne(['id' => $id])) !== null) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException('The requested page does not exist.');
     }
 }

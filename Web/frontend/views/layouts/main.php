@@ -146,8 +146,8 @@ $perfilPath = '/perfil/index';
                             </a>
                         </li>
                         <li>
-                            <a class="<?= $dropdownItemClasses ?>" href="<?= Url::to([$perfilPath]) ?>">
-                                <?= file_get_contents(Yii::getAlias($iconsPath . 'ticket.svg')) ?>Bilhetes
+                            <a class="<?= $dropdownItemClasses ?>" href="<?= Url::to(['compra/index']) ?>">
+                                <?= file_get_contents(Yii::getAlias($iconsPath . 'ticket.svg')) ?>Compras
                             </a>
                         </li>
                         <li><hr class="dropdown-divider"></li>

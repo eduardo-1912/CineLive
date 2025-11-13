@@ -115,15 +115,6 @@ class User extends ActiveRecord implements IdentityInterface
             $this->setPassword($this->password);
         }
 
-        if ($insert) {
-            if (empty($this->auth_key)) {
-                $this->generateAuthKey();
-            }
-            if (empty($this->verification_token)) {
-                $this->generateEmailVerificationToken();
-            }
-        }
-
         return parent::beforeSave($insert);
     }
 

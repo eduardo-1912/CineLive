@@ -5,6 +5,7 @@ namespace frontend\controllers;
 use Yii;
 use common\models\Cinema;
 use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 
 class CinemaController extends Controller
 {

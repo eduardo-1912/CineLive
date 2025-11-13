@@ -109,9 +109,16 @@ class Compra extends \yii\db\ActiveRecord
         return number_format($this->total, 2, '.', '') . '€';
     }
 
-    public function getNumeroBilhetes(): int
+    // OBTER O NÚMERO DE BILHETES
+    public function getTotalBilhetes(): int
     {
-        return $this->getBilhetes()->count();
+        return count($this->bilhetes);
+    }
+
+    public function getLabelBilhetes(): string
+    {
+        $total = $this->totalBilhetes;
+        return $total . ' ' . ($total == 1 ? 'Bilhete' : 'Bilhetes');
     }
 
     // OBTER ESTADO FORMATADO
@@ -132,6 +139,12 @@ class Compra extends \yii\db\ActiveRecord
     public function getPagamentoFormatado(): string
     {
         return self::optsPagamento()[$this->pagamento] ?? ucfirst($this->pagamento);
+    }
+
+    // OBTER LUGARES (EX.: A1, A2, A3)
+    public function getListaLugares()
+    {
+        return implode(', ', array_column($this->bilhetes, 'lugar'));
     }
 
     // OBTER BILHETES

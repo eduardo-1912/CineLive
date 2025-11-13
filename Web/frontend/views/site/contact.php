@@ -25,8 +25,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <div class="row align-items-stretch">
         <div class="col-12 col-md-8 mb-5 mb-md-0">
-            <?php $form = ActiveForm::begin([
-                'id' => 'contact-form',
+            <?php $form = ActiveForm::begin(['id' => 'contact-form',
                 'fieldConfig' => [
                     'options' => ['class' => 'mb-2'],
                 ]
@@ -61,7 +60,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     <p class="text-muted mb-0">Celebra com amigos e familiares.</p>
                 </div>
             </div>
-            <a href="<?= Url::to(['/aluguer-sala/create']) ?>" class="<?= $btnClasses ?>">Iniciar Sessão</a>
+            <a href="<?= Url::to(['/aluguer-sala/create']) ?>" class="<?= $btnClasses ?>"><?= Yii::$app->user->isGuest ? 'Iniciar Sessão' : 'Fazer pedido' ?></a>
         </div>
     </div>
 
