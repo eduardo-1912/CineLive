@@ -1,5 +1,6 @@
 <?php
 
+use backend\components\LinkHelper;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
@@ -10,10 +11,6 @@ $this->title = $model->nome;
 $this->params['breadcrumbs'][] = ['label' => 'Sessões', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $model->id;
 \yii\web\YiiAsset::register($this);
-
-$currentUser = Yii::$app->user;
-$isAdmin = $currentUser->can('admin');
-$gerirSessoes = $currentUser->can('gerirSessoes');
 
 ?>
 
@@ -43,31 +40,23 @@ $gerirSessoes = $currentUser->can('gerirSessoes');
                         'attributes' => [
                             'id',
                             [
-                                'attribute' => 'tituloFilme',
+                                'attribute' => 'filme.titulo',
                                 'label' => 'Filme',
                                 'format' => 'raw',
-                                'value' => fn($model) =>
-                                    Html::a($model->filme->titulo,
-                                        ['filme/view', 'id' => $model->filme_id],
-                                        ['class' => 'text-decoration-none text-primary']),
+                                'value' => fn($model) => LinkHelper::filme($model),
                             ],
                             [
                                 'label' => 'Cinema',
                                 'attribute' => 'cinema.nome',
                                 'format' => 'raw',
-                                'value' => fn($model) =>
-                                    Html::a($model->cinema->nome,
-                                        ['cinema/view', 'id' => $model->cinema_id],
-                                        ['class' => 'text-decoration-none text-primary']),
-                                'visible' => $isAdmin,
+                                'value' => fn($model) => LinkHelper::cinema($model),
+                                'visible' => $gerirCinemas,
                             ],
                             [
                                 'label' => 'Sala',
                                 'format' => 'raw',
-                                'value' => fn($model) =>
-                                    Html::a($model->sala->nome,
-                                        ['sala/view', 'id' => $model->sala_id],
-                                        ['class' => 'text-decoration-none text-primary']),
+                                'value' => fn($model) => LinkHelper::sala($model),
+
                             ],
                             [
                                 'label' => 'Data',
@@ -77,8 +66,7 @@ $gerirSessoes = $currentUser->can('gerirSessoes');
                             [
                                 'label' => 'Lugares Disponíveis',
                                 'attribute' => 'lugaresDisponiveis',
-                                'value' => fn($model) =>
-                                     $model->numeroLugaresDisponiveis . '/' . $model->sala->lugares,
+                                'value' => fn($model) => $model->numeroLugaresDisponiveis . '/' . $model->sala->lugares,
                             ],
                             [
                                 'label' => 'Estado',

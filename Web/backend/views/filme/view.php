@@ -20,9 +20,9 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="row">
                 <div class="col-md-12">
                     <div class="d-flex mb-3 gap-1">
-                        <?php if (Yii::$app->user->can('admin')): ?>
+                        <?php if ($gerirFilmes): ?>
 
-                            <?php if ($model->estado == $model::ESTADO_EM_EXIBICAO): ?>
+                            <?php if ($model->isEstadoEmExibicao()): ?>
                                 <?= Html::a('Criar Sessão', ['sessao/create', 'filme_id' => $model->id], [
                                     'class' => 'btn btn-success',
                                     'title' => 'Criar Sessão',
@@ -71,16 +71,11 @@ $this->params['breadcrumbs'][] = $this->title;
                             [
                                 'attribute' => 'poster_path',
                                 'format' => 'raw',
-                                'value' => function ($model) {
-                                    if ($model->poster_path) {
-                                        return Html::img($model->getPosterUrl(), [
-                                            'alt' => $model->titulo,
-                                            'style' => 'max-width:400px;',
-                                            'class' => 'rounded-3 shadow-sm',
-                                        ]);
-                                    }
-                                    return Html::tag('span', 'Sem poster', ['class' => 'text-muted']);
-                                },
+                                'value' => fn($model) =>
+                                    Html::img($model->getPosterUrl(), [
+                                        'alt' => $model->titulo,
+                                        'style' => 'max-width:400px;',
+                                        'class' => 'rounded-3 shadow-sm',]),
                             ],
                         ],
                     ]) ?>

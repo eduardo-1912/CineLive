@@ -21,6 +21,9 @@ $this->params['breadcrumbs'][] = $this->title;
                         'filmesEmExibicao' => $filmesEmExibicao,
                         'salasDropdown' => $salasDropdown,
                         'cinema_id' => $cinema_id,
+                        'gerirCinemas' => $gerirCinemas,
+                        'userCinemaId' => $userCinemaId,
+                        'temBilhetes' => $temBilhetes,
                     ]) ?>
                 </div>
             </div>

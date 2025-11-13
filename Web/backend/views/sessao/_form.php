@@ -7,12 +7,6 @@ use common\models\Cinema;
 use common\models\Sala;
 use common\models\Filme;
 
-$currentUser = Yii::$app->user;
-$isAdmin = $currentUser->can('admin');
-$userCinemaId = $currentUser->identity->profile->cinema_id ?? null;
-
-$temBilhetes = !$model->isNewRecord && count($model->lugaresOcupados) > 0;
-
 ?>
 
 <div class="sessao-form">
@@ -23,7 +17,7 @@ $temBilhetes = !$model->isNewRecord && count($model->lugaresOcupados) > 0;
         'id' => 'sessao-form-get'
     ]); ?>
 
-    <?php if ($isAdmin): ?>
+    <?php if ($gerirCinemas): ?>
 
         <!-- DROPDOWN DE CINEMAS -->
         <?= $form->field($model, 'cinema_id')->dropDownList($cinemasAtivos,
@@ -73,10 +67,7 @@ $temBilhetes = !$model->isNewRecord && count($model->lugaresOcupados) > 0;
     <!-- FORM POST PARA GUARDAR -->
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'hora_fim')->input('time', [
-        'value' => $model->hora_fim,
-        'disabled' => $temBilhetes,
-    ]) ?>
+    <?= $form->field($model, 'hora_fim')->input('time', ['value' => $model->hora_fim, 'disabled' => $temBilhetes,]) ?>
 
     <!-- CAMPOS OCULTOS QUE VÊM DO FORM GET -->
     <?= $form->field($model, 'cinema_id')->hiddenInput()->label(false) ?>
@@ -86,8 +77,7 @@ $temBilhetes = !$model->isNewRecord && count($model->lugaresOcupados) > 0;
 
     <!-- SALAS DISPONÍVEIS -->
     <?php if ($model->cinema_id): ?>
-        <?= $form->field($model, 'sala_id')->dropDownList($salasDropdown,
-            ['prompt' => 'Selecione a sala']) ?>
+        <?= $form->field($model, 'sala_id')->dropDownList($salasDropdown, ['prompt' => 'Selecione a sala']) ?>
     <?php endif; ?>
 
     <!-- BOTÃO GUARDAR -->
@@ -111,6 +101,7 @@ $(function() {
             $('#sessao-form-get').submit();
         }, 500);
     });
+    
 });
 JS;
 $this->registerJs($script);

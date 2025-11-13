@@ -2,6 +2,7 @@
 
 use backend\components\ActionColumnButtonHelper;
 use backend\components\AppGridView;
+use backend\components\LinkHelper;
 use common\models\Cinema;
 use common\models\Compra;
 use common\models\Sessao;
@@ -37,37 +38,23 @@ $this->params['breadcrumbs'][] = $this->title;
                             [
                                 'attribute' => 'nomeCliente',
                                 'label' => 'Cliente',
-                                'value' => function ($model) {
-                                    return $model->cliente && $model->cliente->profile
-                                    ? Html::a($model->cliente->profile->nome,
-                                            ['user/view', 'id' => $model->cliente->id],
-                                            ['class' => 'text-decoration-none text-primary'])
-                                    : '<span class="text-muted">Conta eliminada</span>';
-                                },
+                                'value' => fn($model) => LinkHelper::cliente($model),
                                 'format' => 'raw',
                             ],
                             [
                                 'attribute' => 'cinema_id',
                                 'label' => 'Cinema',
                                 'format' => 'raw',
-                                'value' => fn($model) =>
-                                     Html::a($model->cinema->nome,
-                                        ['cinema/view', 'id' => $model->cinema->id],
-                                        ['class' => 'text-decoration-none text-primary']
-                                    ),
+                                'value' => fn($model) => LinkHelper::cinema($model->sessao),
                                 'filter' => $cinemaFilterOptions,
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
                                 'headerOptions' => ['style' => 'width: 14rem;'],
-                                'visible' => Yii::$app->user->can('admin'),
+                                'visible' => $gerirCinemas,
                             ],
                             [
                                 'attribute' => 'sessao_id',
                                 'format' => 'raw',
-                                'value' => fn($model) =>
-                                     Html::a($model->sessao->nome,
-                                        ['sessao/view', 'id' => $model->sessao->id],
-                                        ['class' => 'text-decoration-none text-primary']
-                                    ),
+                                'value' => fn($model) => LinkHelper::sessao($model),
                             ],
                             [
                                 'attribute' => 'data',
@@ -88,7 +75,6 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'value' => fn($model) => ActionColumnButtonHelper::compraEstadoDropdown($model),
                                 'headerOptions' => ['style' => 'width: 9rem'],
                             ],
-
                             [
                                 'class' => 'backend\components\AppActionColumn',
                                 'template' => '{view} {cancel} {confirm} {confirmarBilhetes}',

@@ -5,10 +5,6 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model common\models\User */
 
-$currentUser = Yii::$app->user;
-$gerirUtilizadores = $currentUser->can('gerirUtilizadores');
-$gerirFuncionarios = $currentUser->can('gerirFuncionarios') && !$currentUser->can('gerirUtilizadores');
-
 $this->title = 'Criar ' . ($gerirUtilizadores ? 'Utilizador' : 'Funcionário');
 $this->params['breadcrumbs'][] = ['label' => $gerirUtilizadores ? 'Utilizadores' : 'Funcionários', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
@@ -23,6 +19,9 @@ $this->params['breadcrumbs'][] = $this->title;
                         'model' => $model,
                         'profile' => $profile,
                         'cinemasOptions' => $cinemasOptions,
+                        'userCinemaId' => $userCinemaId,
+                        'gerirUtilizadores' => $gerirUtilizadores,
+                        'gerirFuncionarios' => $gerirFuncionarios,
                     ]) ?>
 
                 </div>

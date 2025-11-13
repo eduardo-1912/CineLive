@@ -2,6 +2,7 @@
 
 use backend\components\ActionColumnButtonHelper;
 use backend\components\AppGridView;
+use backend\components\LinkHelper;
 use common\models\Cinema;
 use common\models\Filme;
 use common\models\Sala;
@@ -13,13 +14,6 @@ use yii\grid\GridView;
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\SessaoSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
-
-$currentUser = Yii::$app->user;
-$userCinema = $currentUser->identity->profile->cinema;
-$isAdmin = $currentUser->can('admin');
-$gerirSessoes = $currentUser->can('gerirSessoes');
-
-$actionColumnButtons = $gerirSessoes ? '{view} {update} {delete}' : '{view}';
 
 // ALGUM CINEMA FOI PASSADO POR PARÂMETRO
 if (!empty($cinemaId) && $cinemaSelecionado)
@@ -36,8 +30,8 @@ else
 {
     $this->title = 'Sessões';
     $this->params['breadcrumbs'][] = [
-        'label' => $isAdmin ? 'Cinemas' : $userCinema->nome,
-        'url' => [$isAdmin ? 'cinema/index' : ('cinema/view?id=' . $userCinema->id)]
+        'label' => $gerirCinemas ? 'Cinemas' : $userCinema->nome,
+        'url' => [$gerirCinemas ? 'cinema/index' : ('cinema/view?id=' . $userCinema->id)]
     ];
 }
 $this->params['breadcrumbs'][] = 'Sessões';
@@ -72,32 +66,23 @@ $this->params['breadcrumbs'][] = 'Sessões';
                                 'attribute' => 'tituloFilme',
                                 'label' => 'Filme',
                                 'format' => 'raw',
-                                'value' => fn($model) =>
-                                    Html::a($model->filme->titulo,
-                                        ['filme/view', 'id' => $model->filme_id],
-                                        ['class' => 'text-decoration-none text-primary']),
+                                'value' => fn($model) => LinkHelper::filme($model),
                                 'headerOptions' => ['style' => 'width: 18rem;'],
                             ],
                             [
                                 'attribute' => 'cinema_id',
                                 'format' => 'raw',
-                                'value' => fn($model) =>
-                                    Html::a($model->cinema->nome,
-                                        ['cinema/view', 'id' => $model->cinema_id],
-                                        ['class' => 'text-decoration-none text-primary']),
+                                'value' => fn($model) => LinkHelper::cinema($model),
                                 'filter' => $cinemaFilterOptions,
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
                                 'headerOptions' => ['style' => 'width: 28rem;'],
-                                'visible' => $isAdmin && empty($cinemaId),
+                                'visible' => $gerirCinemas && empty($cinemaId),
                             ],
                             [
                                 'attribute' => 'numeroSala',
                                 'label' => 'Sala',
                                 'format' => 'raw',
-                                'value' => fn($model) =>
-                                    Html::a($model->sala->nome,
-                                        ['sala/view', 'id' => $model->sala_id],
-                                        ['class' => 'text-decoration-none text-primary']),
+                                'value' => fn($model) => LinkHelper::sala($model),
                                 'headerOptions' => ['style' => 'width: 8rem;'],
                             ],
                             [

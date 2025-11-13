@@ -32,7 +32,7 @@ use yii\bootstrap4\ActiveForm;
 
     <?= $form->field($model, 'horario_fecho')->input('time') ?>
 
-    <?php if (Yii::$app->user->can('admin')): ?>
+    <?php if ($gerirCinemas): ?>
         <?= $form->field($model, 'estado')->dropDownList($dropdownEstados,
             ['disabled' => (!$model->isClosable() && !$model->isEstadoEncerrado() && !$model->isNewRecord)]) ?>
     <?php endif; ?>

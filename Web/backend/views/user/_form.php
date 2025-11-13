@@ -24,7 +24,7 @@ use common\models\Cinema;
     <?= $form->field($model, 'email')->input('email') ?>
 
     <!-- SE FOR ADMIN -> PODE SELECIONAR CINEMA/ROLE -->
-    <?php if (Yii::$app->user->can('admin')): ?>
+    <?php if ($gerirUtilizadores): ?>
 
         <!-- DROPDOWN DOS ROLES-->
         <?= $form->field($model, 'role')->dropDownList(User::optsRoles()) ?>
@@ -38,7 +38,7 @@ use common\models\Cinema;
         <?= $form->field($model, 'status')->dropDownList(User::optsStatus()) ?>
 
     <!-- SE FOR GERENTE SÓ PODE CRIAR FUNCIONÁRIOS PARA O SEU CINEMA -->
-    <?php elseif (Yii::$app->user->can('gerente')): ?>
+    <?php elseif ($gerirFuncionarios): ?>
 
         <!-- ROLE 'FUNCIONÁRIO', CINEMA DO GERENTE E ESTADO 'ATIVO' -->
         <?= Html::activeHiddenInput($model, 'role', ['value' => 'funcionario']) ?>

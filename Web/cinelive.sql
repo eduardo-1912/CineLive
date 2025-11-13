@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Nov 09, 2025 at 09:13 PM
+-- Generation Time: Nov 13, 2025 at 10:51 AM
 -- Server version: 9.1.0
 -- PHP Version: 8.4.13
 
@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS `aluguer_sala` (
 
 INSERT INTO `aluguer_sala` (`id`, `cliente_id`, `cinema_id`, `sala_id`, `data`, `hora_inicio`, `hora_fim`, `estado`, `tipo_evento`, `observacoes`) VALUES
 (1, 14, 1, 4, '2025-11-09', '10:00:00', '19:00:00', 'confirmado', 'Festa de anos', 'fsdfs'),
-(2, 15, 2, 2, '2025-11-19', '10:00:00', '15:00:00', 'pendente', 'fs', 'fds');
+(2, 15, 2, 9, '2025-11-19', '10:00:00', '15:00:00', 'pendente', 'fs', 'fds');
 
 -- --------------------------------------------------------
 
@@ -203,17 +203,30 @@ CREATE TABLE IF NOT EXISTS `bilhete` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `codigo` (`codigo`),
   KEY `idx-bilhete-compra_id` (`compra_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `bilhete`
 --
 
 INSERT INTO `bilhete` (`id`, `compra_id`, `lugar`, `preco`, `codigo`, `estado`) VALUES
-(1, 1, 'A5', 8.00, '3FWSE', 'confirmado'),
+(1, 1, 'A5', 8.00, '3FWSE3', 'confirmado'),
 (2, 1, 'A6', 8.00, '453R3G', 'confirmado'),
 (3, 1, 'A7', 8.00, 'R43F45', 'confirmado'),
-(4, 2, 'C4', 8.00, '32FRR23', 'pendente');
+(4, 2, 'C4', 8.00, '32RR23', 'pendente'),
+(5, 3, 'C6', 8.00, 'C5T4VF', 'confirmado'),
+(6, 4, 'G6', 8.00, 'XE5TGN', 'pendente'),
+(7, 4, 'G7', 8.00, 'EEWN2B', 'pendente'),
+(8, 4, 'G8', 8.00, 'TCZ6NR', 'cancelado'),
+(9, 5, 'C5', 10.00, '1RVWMI', 'confirmado'),
+(10, 5, 'C6', 10.00, 'YRVFFD', 'confirmado'),
+(11, 5, 'C7', 10.00, 'X6-AOK', 'confirmado'),
+(12, 6, 'E4', 8.00, 'RLNVG_', 'pendente'),
+(13, 6, 'E5', 8.00, '0CTGDH', 'pendente'),
+(14, 6, 'E6', 8.00, '8GHIEA', 'pendente'),
+(15, 7, 'F7', 8.00, 'G6QK9O', 'pendente'),
+(16, 7, 'F8', 8.00, '6NCRJA', 'pendente'),
+(17, 7, 'F9', 8.00, 'NVLBRC', 'pendente');
 
 -- --------------------------------------------------------
 
@@ -266,7 +279,7 @@ CREATE TABLE IF NOT EXISTS `compra` (
   PRIMARY KEY (`id`),
   KEY `idx-compra-cliente_id` (`cliente_id`),
   KEY `sessao_id` (`sessao_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `compra`
@@ -274,7 +287,12 @@ CREATE TABLE IF NOT EXISTS `compra` (
 
 INSERT INTO `compra` (`id`, `cliente_id`, `sessao_id`, `data`, `pagamento`, `estado`) VALUES
 (1, 14, 1, '2025-11-03 00:00:00', 'mbway', 'confirmada'),
-(2, 15, 2, '2025-11-04 00:00:00', 'cartao', 'confirmada');
+(2, 15, 2, '2025-11-04 00:00:00', 'cartao', 'confirmada'),
+(3, 14, 4, '2025-11-11 19:17:45', 'mbway', 'confirmada'),
+(4, 14, 4, '2025-11-11 19:21:26', 'mbway', 'confirmada'),
+(5, 14, 3, '2025-11-11 21:42:16', 'cartao', 'confirmada'),
+(6, 14, 7, '2025-11-12 22:04:46', 'mbway', 'confirmada'),
+(7, 14, 7, '2025-11-12 22:05:00', 'cartao', 'confirmada');
 
 -- --------------------------------------------------------
 
@@ -309,8 +327,8 @@ INSERT INTO `filme` (`id`, `titulo`, `sinopse`, `duracao`, `rating`, `estreia`, 
 (4, 'The Social Network', 'Um estudante de Harvard cria uma plataforma online que rapidamente se transforma no Facebook, mas o sucesso traz consigo conflitos pessoais e batalhas legais pela sua verdadeira autoria.', 120, 'M12', '2010-10-01', 'Inglês', 'David Fincher', 'https://www.youtube.com/watch?v=lB95KLmpLR4', 'poster_69032dee2ed44.jpg', 'em_exibicao'),
 (5, 'Prisoners', 'Duas raparigas desaparecem durante um feriado em família e, enquanto a polícia investiga, o pai de uma delas decide assumir o caso sozinho, mergulhando numa espiral de desespero e vingança.', 153, 'M16', '2013-09-20', 'Inglês', 'Denis Villeneuve', 'https://www.youtube.com/watch?v=bpXfcTF6iVk', 'poster_69032e821fed0.jpg', 'em_exibicao'),
 (6, 'Zodiac', 'Um desenhador de cartoons de São Francisco torna-se obcecado em decifrar a identidade do assassino em série apelidado de “Zodíaco”, que aterroriza a área da baía com cartas cifradas, assassinatos e o troçar da polícia.', 157, 'M16', '2007-03-02', 'Inglês', 'David Fincher', 'https://www.youtube.com/watch?v=yNncHPl1UXg', 'poster_69032f4f900e9.jpg', 'terminado'),
-(7, 'Toy Story', 'Um brinquedo vê a sua posição ameaçada quando um novo boneco espacial chega ao quarto, desencadeando uma aventura onde ambos terão de superar rivalidades e trabalhar juntos para regressar a casa do dono.', 81, 'M6', '1996-03-29', 'Português', 'John Lasseter', 'https://www.youtube.com/watch?v=v-PjgYDrg70', 'poster_6910b61fbd2d6.jpg', 'brevemente'),
-(8, 'Cars', 'Um arrogante carro de competição fica preso numa pequena cidade e aprende que a verdadeira vitória vai além das pistas.', 117, 'M6', '2006-06-14', 'Português', 'John Lasseter', 'https://www.youtube.com/watch?v=W_H7_tDHFE8', 'poster_6910b6ad1f9ea.jpg', 'brevemente');
+(7, 'Toy Story', 'Um brinquedo vê a sua posição ameaçada quando um novo boneco espacial chega ao quarto, desencadeando uma aventura onde ambos terão de superar rivalidades e trabalhar juntos para regressar a casa do dono.', 81, 'M6', '1996-03-29', 'Português', 'John Lasseter', 'https://www.youtube.com/watch?v=v-PjgYDrg70', 'poster_6910b61fbd2d6.jpg', 'terminado'),
+(8, 'Cars 2', 'Um grande campeão das pistas é lançado numa corrida internacional enquanto o seu amigo Mate é apanhado num enredo de espionagem que põe à prova a amizade de ambos e mostra que coragem pode surgir dos lugares mais improváveis.', 106, 'M6', '2011-06-14', 'Português', 'John Lasseter', 'https://www.youtube.com/watch?v=oFTfAdauCOo', 'poster_6910b6ad1f9ea.jpg', 'em_exibicao');
 
 -- --------------------------------------------------------
 
@@ -334,14 +352,26 @@ INSERT INTO `filme_genero` (`filme_id`, `genero_id`) VALUES
 (1, 1),
 (1, 7),
 (1, 9),
-(6, 1),
-(6, 2),
 (7, 8),
 (7, 9),
 (7, 4),
 (8, 8),
 (8, 9),
-(8, 1);
+(8, 1),
+(2, 2),
+(2, 1),
+(2, 3),
+(3, 9),
+(3, 1),
+(3, 10),
+(4, 1),
+(4, 3),
+(6, 2),
+(6, 1),
+(6, 10),
+(5, 2),
+(5, 1),
+(5, 10);
 
 -- --------------------------------------------------------
 
@@ -417,7 +447,7 @@ CREATE TABLE IF NOT EXISTS `sala` (
   `estado` enum('ativa','encerrada') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   PRIMARY KEY (`id`),
   KEY `idx-sala-cinema_id` (`cinema_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `sala`
@@ -426,8 +456,8 @@ CREATE TABLE IF NOT EXISTS `sala` (
 INSERT INTO `sala` (`id`, `cinema_id`, `numero`, `num_filas`, `num_colunas`, `preco_bilhete`, `estado`) VALUES
 (1, 1, 1, 10, 12, 8.00, 'ativa'),
 (2, 1, 2, 10, 10, 10.00, 'ativa'),
-(3, 1, 3, 12, 10, 8.00, 'encerrada'),
-(4, 1, 4, 8, 10, 12.00, 'ativa'),
+(3, 1, 3, 12, 10, 8.00, 'ativa'),
+(4, 1, 4, 8, 10, 11.00, 'ativa'),
 (5, 1, 5, 10, 12, 6.00, 'ativa'),
 (6, 1, 6, 12, 10, 8.00, 'ativa'),
 (7, 2, 1, 10, 10, 12.00, 'ativa'),
@@ -438,7 +468,9 @@ INSERT INTO `sala` (`id`, `cinema_id`, `numero`, `num_filas`, `num_colunas`, `pr
 (12, 3, 2, 8, 10, 10.00, 'ativa'),
 (13, 3, 3, 12, 12, 6.00, 'ativa'),
 (14, 3, 4, 14, 10, 6.00, 'ativa'),
-(15, 3, 5, 12, 12, 8.00, 'ativa');
+(15, 3, 5, 12, 12, 8.00, 'ativa'),
+(16, 3, 6, 12, 12, 12.00, 'ativa'),
+(17, 2, 5, 12, 10, 14.00, 'ativa');
 
 -- --------------------------------------------------------
 
@@ -459,17 +491,20 @@ CREATE TABLE IF NOT EXISTS `sessao` (
   KEY `idx-sessao-filme_id` (`filme_id`),
   KEY `idx-sessao-sala_id` (`sala_id`),
   KEY `idx-sessao-cinema_id` (`cinema_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `sessao`
 --
 
 INSERT INTO `sessao` (`id`, `data`, `hora_inicio`, `hora_fim`, `filme_id`, `sala_id`, `cinema_id`) VALUES
-(1, '2025-11-09', '16:00:00', '18:33:00', 5, 1, 1),
+(1, '2025-11-12', '14:00:00', '18:33:00', 8, 1, 1),
 (2, '2025-11-12', '10:00:00', '15:00:00', 4, 7, 2),
-(3, '2025-11-04', '18:42:00', '21:15:00', 5, 2, 1),
-(4, '2025-11-20', '19:00:00', '21:37:00', 6, 8, 2);
+(3, '2025-11-22', '18:00:00', '19:46:00', 8, 2, 1),
+(4, '2025-11-21', '19:00:00', '21:37:00', 8, 8, 2),
+(5, '2025-11-13', '10:00:00', '11:43:00', 2, 9, 2),
+(6, '2025-11-12', '11:00:00', '13:19:00', 3, 5, 1),
+(7, '2025-11-13', '16:00:00', '17:46:00', 8, 1, 1);
 
 -- --------------------------------------------------------
 

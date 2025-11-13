@@ -5,6 +5,7 @@ namespace common\models;
 use Exception;
 use Yii;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 use yii\web\UploadedFile;
 
 /**

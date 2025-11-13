@@ -62,11 +62,18 @@ class SessaoController extends Controller
         // OBTER O USER ATUAL
         $currentUser = Yii::$app->user;
 
+        $userCinema = $currentUser->identity->profile->cinema;
+        $gerirCinemas = $currentUser->can('gerirCinemas');
+        $gerirSessoes = $currentUser->can('gerirSessoes');
+
         // CRIAR SEARCH MODEL E QUERY NA DB
         $searchModel = new SessaoSearch();
         $params = Yii::$app->request->queryParams;
 
+        // FILTRO POR CINEMA
         $cinemaFilterOptions = ArrayHelper::map(Cinema::find()->asArray()->all(), 'id', 'nome');
+
+        $actionColumnButtons = $gerirSessoes ? '{view} {update} {delete}' : '{view}';
 
         // SE FOR ADMIN --> VÊ TODOS OS UTILIZADORES
         if ($currentUser->can('admin')) {
@@ -104,6 +111,10 @@ class SessaoController extends Controller
             'cinemaSelecionado' => $cinemaSelecionado,
             'estadoFilterOptions' => Sessao::optsEstado(),
             'cinemaFilterOptions' => $cinemaFilterOptions,
+            'userCinema' => $userCinema,
+            'gerirCinemas' => $gerirCinemas,
+            'gerirSessoes' => $gerirSessoes,
+            'actionColumnButtons' => $actionColumnButtons,
         ]);
     }
 
@@ -143,6 +154,8 @@ class SessaoController extends Controller
         return $this->render('view', [
             'model' => $model,
             'comprasDataProvider' => $comprasDataProvider,
+            'gerirSessoes' => $currentUser->can('gerirSessoes'),
+            'gerirCinemas' => $currentUser->can('gerirCinemas'),
         ]);
     }
 
@@ -153,6 +166,8 @@ class SessaoController extends Controller
     {
         // OBTER O USER ATUAL
         $currentUser = Yii::$app->user;
+        $gerirCinemas = $currentUser->can('gerirCinemas');
+        $userCinemaId = $currentUser->identity->profile->cinema_id ?? null;
 
         // VERIFICAR PERMISSÃO
         if (!$currentUser->can('gerirSessoes')) {
@@ -165,7 +180,7 @@ class SessaoController extends Controller
 
         // SE FOR GERENTE --> FORÇAR ATRIBUIÇÃO CINEMA_ID DO GERENTE
         if ($currentUser->can('gerente') && !$currentUser->can('admin')) {
-            $model->cinema_id = $currentUser->identity->profile->cinema_id;
+            $model->cinema_id = $userCinemaId;
             $cinema_id = $model->cinema_id;
         }
 
@@ -283,6 +298,9 @@ class SessaoController extends Controller
             'filmesEmExibicao' => $filmesEmExibicao,
             'salasDropdown' => $salasDropdown,
             'cinema_id' => $cinema_id,
+            'gerirCinemas' => $gerirCinemas,
+            'userCinemaId' => $userCinemaId,
+            'temBilhetes' => false,
         ]);
     }
 
@@ -292,6 +310,8 @@ class SessaoController extends Controller
     {
         // OBTER O USER ATUAL
         $currentUser = Yii::$app->user;
+        $gerirCinemas = $currentUser->can('gerirCinemas');
+        $userCinemaId = $currentUser->identity->profile->cinema_id ?? null;
 
         // VERIFICAR PERMISSÃO
         if (!$currentUser->can('gerirSessoes')) {
@@ -301,6 +321,8 @@ class SessaoController extends Controller
 
         // OBTER A SESSÃO
         $model = $this->findModel($id);
+
+        $temBilhetes = !$model->isNewRecord && count($model->lugaresOcupados) > 0;
 
         // BLOQUEAR EDIÇÃO SE ESTIVER A DECORRER
         if (!$model->isEditable()) {
@@ -384,20 +406,13 @@ class SessaoController extends Controller
             }
 
             // VALIDAR HORÁRIO
-            if (!$model->validateHorario()) {
-                return $this->render('update', [
-                    'model' => $model,
-                    'cinemasAtivos' => $cinemasAtivos,
-                    'filmesEmExibicao' => $filmesEmExibicao,
-                    'salasDropdown' => $salasDropdown,
-                ]);
-            }
-
-            if ($model->save()) {
-                Yii::$app->session->setFlash('success', 'Sessão atualizada com sucesso.');
-                return $this->redirect(['view', 'id' => $model->id]);
-            } else {
-                Yii::$app->session->setFlash('error', 'Ocorreu um erro ao atualizar a sessão.');
+            if ($model->validateHorario()) {
+                if ($model->save()) {
+                    Yii::$app->session->setFlash('success', 'Sessão atualizada com sucesso.');
+                    return $this->redirect(['view', 'id' => $model->id]);
+                } else {
+                    Yii::$app->session->setFlash('error', 'Ocorreu um erro ao atualizar a sessão.');
+                }
             }
         }
 
@@ -406,6 +421,9 @@ class SessaoController extends Controller
             'cinemasAtivos' => $cinemasAtivos,
             'filmesEmExibicao' => $filmesEmExibicao,
             'salasDropdown' => $salasDropdown,
+            'gerirCinemas' => $gerirCinemas,
+            'userCinemaId' => $userCinemaId,
+            'temBilhetes' => $temBilhetes,
         ]);
     }
 

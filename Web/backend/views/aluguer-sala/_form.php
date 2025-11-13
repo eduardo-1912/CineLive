@@ -22,7 +22,7 @@ use yii\bootstrap4\ActiveForm;
     <?= $form->field($model, 'telemovel')->textInput(['value' => $telemovelCliente, 'disabled' => true,])->label('Telemóvel') ?>
 
     <!-- CAMPO CINEMA APENAS PARA ADMIN -->
-    <div class="<?= Yii::$app->user->can('admin') ? 'd-block' : 'd-none' ?> ">
+    <div class="<?= $isAdmin ? 'd-block' : 'd-none' ?> ">
         <?= $form->field($model, 'cinema_id')->textInput(['value' => $nomeCinema, 'disabled' => true]) ?>
     </div>
 

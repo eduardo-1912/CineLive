@@ -155,9 +155,14 @@ class SalaController extends Controller
     {
         // OBTER O USER ATUAL
         $currentUser = Yii::$app->user;
+        $isAdmin = $currentUser->can('admin');
+        $isGerente = $currentUser->can('gerente') && !$currentUser->can('admin');
+        $gerirCinemas = $currentUser->can('gerirCinemas');
+        $gerirSalas = $currentUser->can('gerirSalas');
+        $userCinema = $currentUser->identity->profile->cinema ?? null;
 
         // VERIFICAÇÃO DE PERMISSÕES
-        if (!$currentUser->can('admin') && !$currentUser->can('gerente')) {
+        if (!$gerirSalas) {
             throw new ForbiddenHttpException('Não tem permissão para criar salas.');
         }
 
@@ -168,7 +173,7 @@ class SalaController extends Controller
         $cinemasOptions = ArrayHelper::map(Cinema::find()->where(['estado' => Cinema::ESTADO_ATIVO])->orderBy('nome')->all(), 'id', 'nome');
 
         // SE FOR GERENTE --> FORÇAR ATRIBUIÇÃO CINEMA_ID DO GERENTE
-        if ($currentUser->can('gerente') && !$currentUser->can('admin')) {
+        if ($isGerente && !$gerirCinemas) {
             $model->cinema_id = $currentUser->identity->profile->cinema_id;
             $cinema_id = $model->cinema_id;
         }
@@ -210,7 +215,10 @@ class SalaController extends Controller
 
         return $this->render('create', [
             'model' => $model,
-            'proximoNumero' => $proximoNumero,
+            'proximoNumero' => $proximoNumero ?? null,
+            'gerirCinemas' => $gerirCinemas,
+            'gerirSalas' => $gerirSalas,
+            'userCinema' => $userCinema ?? null,
             'cinemasOptions' => $cinemasOptions,
         ]);
     }
@@ -222,9 +230,14 @@ class SalaController extends Controller
     {
         // OBTER USER ATUAL
         $currentUser = Yii::$app->user;
+        $isAdmin = $currentUser->can('admin');
+        $isGerente = $currentUser->can('gerente') && !$currentUser->can('admin');
+        $gerirCinemas = $currentUser->can('gerirCinemas');
+        $gerirSalas = $currentUser->can('gerirSalas');
+        $userCinema = $currentUser->identity->profile->cinema ?? null;
 
         // VERIFICAR PERMISSÕES
-        if (!$currentUser->can('admin') && !$currentUser->can('gerente')) {
+        if (!$gerirSalas) {
             Yii::$app->session->setFlash('error', 'Não tem permissão para editar salas.');
             return $this->redirect(['index']);
         }
@@ -244,7 +257,7 @@ class SalaController extends Controller
         $cinemasOptions = ArrayHelper::map($queryCinemas->orderBy('nome')->all(), 'id', 'nome');
 
         // SE É GERENTE --> SÓ PODE EDITAR SALAS DO SEU CINEMA
-        if ($currentUser->can('gerente') && !$currentUser->can('admin')) {
+        if ($isGerente) {
 
             // OBTER ID DO CINEMA DO USER
             $userCinemaId = $currentUser->identity->profile->cinema_id;
@@ -273,7 +286,7 @@ class SalaController extends Controller
             }
 
             // FORÇAR CINEMA_ID SE FOR GERENTE
-            if ($currentUser->can('gerente') && !$currentUser->can('admin')) {
+            if ($isGerente) {
                 $model->cinema_id = $currentUser->identity->profile->cinema_id;
             }
 
@@ -288,6 +301,9 @@ class SalaController extends Controller
 
         return $this->render('update', [
             'model' => $model,
+            'gerirCinemas' => $gerirCinemas,
+            'gerirSalas' => $gerirSalas,
+            'userCinema' => $userCinema ?? null,
             'cinemasOptions' => $cinemasOptions,
         ]);
     }

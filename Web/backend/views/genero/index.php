@@ -22,14 +22,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="card-body">
                     <div class="row">
                         <div class="col-lg">
-                            <?php $form = ActiveForm::begin(['action' => ['index'], 'method' => 'post']); ?>
-                            <div class="d-flex align-items-start gap-1">
-                                <?= $form->field($model, 'nome')
-                                    ->textInput(['maxlength' => true, 'placeholder' => 'Ex.: Ação, Comédia'])->label(false) ?>
-                                <?= Html::submitButton('Criar Género', ['class' => 'btn btn-success', 'style' => 'height: 38px']) ?>
-                            </div>
-
-                            <?php ActiveForm::end(); ?>
+                            <?= $this->render('_create', ['model' => $model]) ?>
                         </div>
                     </div>
 
@@ -47,19 +40,10 @@ $this->params['breadcrumbs'][] = $this->title;
                             'nome',
                             [
                                 'header' => 'Editar',
+                                'attribute' => 'nome',
                                 'class' => 'yii\grid\DataColumn',
                                 'format' => 'raw',
-                                'value' => function ($model) {
-                                    return
-                                        Html::beginForm(['genero/update', 'id' => $model->id], 'post',
-                                            ['class' => 'd-inline-flex gap-1',])
-                                        . Html::input('text', 'Genero[nome]', $model->nome,
-                                            ['class' => 'form-control form-control-sm', 'style' => 'width: 20rem'])
-                                        . Html::submitButton('<i class="fas fa-edit"></i>', [
-                                            'class' => 'btn btn-warning btn-sm'])
-                                        . Html::endForm();
-                                    },
-                                'filter' => Html::activeTextInput($searchModel, 'nome', ['class' => 'form-control']),
+                                'value' => fn($model) => $this->render('_update', ['model' => $model]),
                                 'headerOptions' => ['style' => 'width: 20rem'],
                             ],
                             [

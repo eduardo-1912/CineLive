@@ -21,6 +21,7 @@ $this->params['breadcrumbs'][] = $model->id;
                         'telemovelCliente' => $telemovelCliente,
                         'nomeCinema' => $nomeCinema,
                         'salasDisponiveis' => $salasDisponiveis,
+                        'isAdmin' => $isAdmin,
                     ]) ?>
 
                 </div>

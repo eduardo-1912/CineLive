@@ -14,11 +14,6 @@ use yii\helpers\Url;
 /* @var $searchModel backend\models\UserSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$currentUser = Yii::$app->user;
-$gerirFilmes = $currentUser->can('gerirFilmes');
-
-$actionColumnButtons = $gerirFilmes ? '{view} {update} {delete}' : '{view}';
-
 $this->title = 'Filmes';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -30,7 +25,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="card-body">
                     <div class="row mb-2">
                         <div class="col-md-12">
-                            <?php if (Yii::$app->user->can('gerirFilmes')): ?>
+                            <?php if ($gerirFilmes): ?>
                                 <?= Html::a('Criar Filme', ['create'], ['class' => 'btn btn-success']) ?>
                                 <?= Html::a('Géneros', ['genero/index'], ['class' => 'btn btn-primary']) ?>
                             <?php endif; ?>
@@ -48,7 +43,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'attribute' => 'poster_path',
                                 'format' => 'raw',
                                 'value' => fn($model) => Html::img($model->getPosterUrl(), [
-                                    'style' => 'width: 4rem; height: 31px; border-radius:4px; object-fit: cover;'
+                                    'style' => 'width: 4rem; height: 31px; object-fit: cover;',
+                                    'class' => 'rounded-1',
                                 ]),
                                 'headerOptions' => ['style' => 'width: 4rem;'],
                             ],
@@ -75,7 +71,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'attribute' => 'estado',
                                 'value' => fn($model) => ActionColumnButtonHelper::filmeEstadoDropdown($model),
                                 'format' => 'raw',
-                                'filter' => Filme::optsEstado(),
+                                'filter' => $estadoFilterOptions,
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos',],
                                 'headerOptions' => ['style' => 'width: 9rem;'],
                             ],

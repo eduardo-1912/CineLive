@@ -54,13 +54,17 @@ class AluguerSalaController extends Controller
     {
         // OBTER USER ATUAL
         $currentUser = Yii::$app->user;
+        $isAdmin = $currentUser->can('admin');
+        $gerirCinemas = $currentUser->can('gerirCinemas');
 
         // CRIAR SEARCH MODEL E RECEBER PARÂMETROS DA QUERY
         $searchModel = new AluguerSalaSearch();
         $params = Yii::$app->request->queryParams;
 
+        $actionColumnButtons = $isAdmin ? '{view} {delete}' : '{view}';
+
         // ADMIN --> VÊ TODOS OS ALUGUERES
-        if ($currentUser->can('admin')) {
+        if ($isAdmin) {
 
             // SE FOI PASSADO CINEMA_ID VIA PARÂMETRO --> APLICAR FILTRO
             if ($cinema_id !== null) {
@@ -95,6 +99,8 @@ class AluguerSalaController extends Controller
             'dataProvider' => $dataProvider,
             'cinemaFilterOptions' => AluguerSalaSearch::getCinemaFilterOptions(),
             'estadoFilterOptions' => AluguerSala::optsEstadoBD(),
+            'gerirCinemas' => $gerirCinemas,
+            'actionColumnButtons' => $actionColumnButtons,
         ]);
     }
 
@@ -106,12 +112,13 @@ class AluguerSalaController extends Controller
     {
         // OBTER O USER ATUAL
         $currentUser =Yii::$app->user;
+        $isAdmin = $currentUser->can('admin');
 
         // OBTER O ALUGUER
         $model = $this->findModel($id);
 
         // SE FOR GERENTE/FUNCIONÁRIIO --> SÓ VÊ COMPRAS DO SEU CINEMA
-        if (!$currentUser->can('admin')) {
+        if (!$isAdmin) {
 
             // OBTER CINEMA DO USER ATUAL
             $userCinemaId = $currentUser->identity->profile->cinema_id ?? null;
@@ -135,6 +142,8 @@ class AluguerSalaController extends Controller
         // SALAS DISPONÍVEIS
         $salasDisponiveis = Sala::getSalasDisponiveis($model->cinema_id, $model->data, $model->hora_inicio, $model->hora_fim, $model->sala_id);
         $salasDisponiveis = ArrayHelper::map($salasDisponiveis, 'id', 'nome');
+
+
 
         // SE ATUALIZAR SALA OU ESTADO
         if ($model->load(Yii::$app->request->post())) {
@@ -174,6 +183,7 @@ class AluguerSalaController extends Controller
             'telemovelCliente' => $telemovelCliente,
             'nomeCinema' => $nomeCinema,
             'salasDisponiveis' => $salasDisponiveis,
+            'isAdmin' => $isAdmin,
         ]);
     }
 

@@ -108,6 +108,8 @@ class CinemaController extends Controller
     // ADMIN --> CRIA CINEMA
     public function actionCreate()
     {
+        $gerirCinemas = Yii::$app->user->can('gerirCinemas');
+
         $model = new Cinema();
 
         if ($model->load(Yii::$app->request->post())) {
@@ -120,11 +122,10 @@ class CinemaController extends Controller
             }
         }
 
-        $dropdownEstados = $model::optsEstado();
-
         return $this->render('create', [
             'model' => $model,
-            'dropdownEstados' => $dropdownEstados,
+            'dropdownEstados' => $model::optsEstado(),
+            'gerirCinemas' => $gerirCinemas,
         ]);
     }
 
@@ -136,14 +137,15 @@ class CinemaController extends Controller
         // OBTER USER ATUAL
         $currentUser = Yii::$app->user;
         $userCinemaId = $currentUser->identity->profile->cinema_id ?? null;
+        $gerirCinemas = Yii::$app->user->can('gerirCinemas');
 
         // VERIFICAR PERMISSÕES
-        if (!$currentUser->can('gerirCinemas')) {
+        if (!$gerirCinemas) {
             throw new ForbiddenHttpException('Não tem permissão para editar cinemas.');
         }
 
-        // ADMIN --> PODE EDITAR QUALQUER CINEMA
-        if ($currentUser->can('admin')) {
+        // ADMIN (GERIR CINEMAS) --> PODE EDITAR QUALQUER CINEMA
+        if ($gerirCinemas) {
             $model = $this->findModel($id);
         }
 
@@ -215,6 +217,9 @@ class CinemaController extends Controller
 
         return $this->render('update', [
             'model' => $model,
+            'userCinemaId' => $userCinemaId,
+            'dropdownEstados' => $model::optsEstado(),
+            'gerirCinemas' => $gerirCinemas,
         ]);
     }
 

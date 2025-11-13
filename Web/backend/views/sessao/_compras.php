@@ -2,6 +2,7 @@
 
 use backend\components\ActionColumnButtonHelper;
 use backend\components\AppGridView;
+use backend\components\LinkHelper;
 use common\models\Cinema;
 use common\models\Compra;
 use common\models\Sessao;
@@ -27,25 +28,14 @@ use yii\grid\GridView;
         [
             'attribute' => 'nomeCliente',
             'label' => 'Cliente',
-            'value' => function ($model) {
-                return $model->cliente && $model->cliente->profile
-                    ? Html::a($model->cliente->profile->nome,
-                        ['user/view', 'id' => $model->cliente->id],
-                        ['class' => 'text-decoration-none text-primary'])
-                    : '<span class="text-muted">Conta eliminada</span>';
-            },
+            'value' => fn($model) => LinkHelper::cliente($model),
             'format' => 'raw',
         ],
         [
             'attribute' => 'cinema_id',
             'label' => 'Cinema',
             'format' => 'raw',
-            'value' => function ($model) {
-                return Html::a($model->cinema->nome,
-                    ['cinema/view', 'id' => $model->cinema->id],
-                    ['class' => 'text-decoration-none text-primary']
-                );
-            },
+            'value' => fn($model) => LinkHelper::cinema($model->sessao),
         ],
         [
             'attribute' => 'data',

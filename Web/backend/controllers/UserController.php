@@ -35,12 +35,8 @@ class UserController extends Controller
                     ],
                     [
                         'allow' => true,
-                        'roles' => ['gerente'],
-                    ],
-                    [
-                        'allow' => true,
                         'roles' => ['funcionario'],
-                        'actions' => ['index', 'change-status'],
+                        'actions' => ['view', 'change-status'],
                     ],
                 ],
             ],
@@ -54,10 +50,8 @@ class UserController extends Controller
         // OBTER USER ATUAL
         $currentUser = Yii::$app->user;
 
-        // VERIFICAR PERMISSÕES
-        if (!$currentUser->can('admin') && !$currentUser->can('gerente')) {
-            throw new ForbiddenHttpException('Não tem permissão para aceder a esta página.');
-        }
+        $gerirUtilizadores = $currentUser->can('gerirUtilizadores');
+        $gerirFuncionarios = $currentUser->can('gerirFuncionarios') && !$currentUser->can('gerirUtilizadores');
 
         // CRIAR SEARCH MODEL E QUERY NA DB
         $searchModel = new UserSearch();
@@ -66,8 +60,10 @@ class UserController extends Controller
         $cinemaFilterOptions = ArrayHelper::map(Cinema::find()->select(['id', 'nome'])->orderBy('nome')->all(), 'id', 'nome');
         $statusFilterOptions = $currentUser->can('gerirUtilizadores') ? User::optsStatus() : array_slice(User::optsStatus(), 0, 2, true);
 
+        $actionColumnButtons = $gerirUtilizadores ? '{view} {update} {hardDelete}' : '{view} {softDelete}';
+
         // ADMIN --> VÊ TODOS OS UTILIZADORES
-        if ($currentUser->can('admin')) {
+        if ($gerirUtilizadores) {
             $dataProvider = $searchModel->search($params);
         }
 
@@ -93,8 +89,11 @@ class UserController extends Controller
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'roleFilterOptions' => array_reverse(User::optsRoles(), true),
+            'gerirUtilizadores' => $gerirUtilizadores,
+            'gerirFuncionarios' => $gerirFuncionarios,
             'cinemaFilterOptions' => $cinemaFilterOptions,
             'statusFilterOptions' => $statusFilterOptions,
+            'actionColumnButtons' => $actionColumnButtons,
         ]);
     }
 
@@ -113,6 +112,10 @@ class UserController extends Controller
         // OBTER UTILIZADOR A VISUALIZAR
         $model = $this->findModel($id);
 
+        $isOwnAccount = ($currentUser->id === $model->id);
+        $gerirUtilizadores = $currentUser->can('gerirUtilizadores');
+        $gerirFuncionarios = $currentUser->can('gerirFuncionarios') && !$gerirUtilizadores;
+
         $comprasDataProvider = new ActiveDataProvider([
             'query' => $model->getCompras(),
             'pagination' => ['pageSize' => Yii::$app->params['pageSize']],
@@ -122,27 +125,43 @@ class UserController extends Controller
         ]);
 
         // SE FOR ADMIN --> PODE VER TODOS OS UTILIZADORES
-        if ($currentUser->can('admin')) {
+        if ($gerirUtilizadores) {
             return $this->render('view', [
                 'model' => $model,
                 'comprasDataProvider' => $comprasDataProvider,
+                'isOwnAccount' => $isOwnAccount,
+                'gerirUtilizadores' => $gerirUtilizadores,
+                'gerirFuncionarios' => $gerirFuncionarios,
+                'currentUser' => $currentUser,
             ]);
         }
 
         // SE FOR GERENTE --> PODE VER O SEU PERFIL E DOS FUNCIONÁRIOS DO SEU CINEMA
-        if ($currentUser->can('gerente')) {
+        if ($gerirFuncionarios) {
 
             // OBTER PERFIL DO GERENTE
             $gerenteProfile = $currentUser->identity->profile;
 
             // SE FOR O SEU PRÓPRIO PERFIL
             if ($id == $currentUser->id) {
-                return $this->render('view', ['model' => $model]);
+                return $this->render('view', [
+                    'model' => $model,
+                    'isOwnAccount' => $isOwnAccount,
+                    'gerirUtilizadores' => $gerirUtilizadores,
+                    'gerirFuncionarios' => $gerirFuncionarios,
+                    'currentUser' => $currentUser,
+                ]);
             }
 
             // SE FOR SEU FUNCIONÁRIO --> TEM ACESSO
             if ($gerenteProfile->cinema_id && $model->profile->cinema_id == $gerenteProfile->cinema_id && !$model->isStatusDeleted()) {
-                return $this->render('view', ['model' => $model]);
+                return $this->render('view', [
+                    'model' => $model,
+                    'isOwnAccount' => $isOwnAccount,
+                    'gerirUtilizadores' => $gerirUtilizadores,
+                    'gerirFuncionarios' => $gerirFuncionarios,
+                    'currentUser' => $currentUser,
+                ]);
             }
 
             // CASO CONTRÁRIO --> É REDIRECIONADO PARA O SEU PERFIL
@@ -156,7 +175,9 @@ class UserController extends Controller
 
         return $this->render('view', [
             'model' => $model,
-            'comprasDataProvider' => $comprasDataProvider,
+            'isOwnAccount' => $isOwnAccount,
+            'gerirUtilizadores' => $gerirUtilizadores,
+            'gerirFuncionarios' => $gerirFuncionarios,
         ]);
     }
 
@@ -167,6 +188,10 @@ class UserController extends Controller
     {
         // OBTER USER ATUAL
         $currentUser = Yii::$app->user;
+        $userCinemaId = $currentUser->identity->profile->cinema_id ?? null;
+
+        $gerirUtilizadores = $currentUser->can('gerirUtilizadores');
+        $gerirFuncionarios = $currentUser->can('gerirFuncionarios') && !$gerirUtilizadores;
 
         // CRIAR USER E USER_PROFILE
         $model = new User();
@@ -177,7 +202,7 @@ class UserController extends Controller
             ->orderBy('nome')->all(), 'id', 'nome');
 
         // SE NÃO FOR ADMIN NEM GERENTE --> SEM ACESSO
-        if (!$currentUser->can('admin') && !$currentUser->can('gerente')) {
+        if (!$gerirUtilizadores && !$gerirFuncionarios) {
             throw new ForbiddenHttpException('Não tem permissão para criar utilizadores.');
         }
 
@@ -266,6 +291,9 @@ class UserController extends Controller
             'model' => $model,
             'profile' => $profile,
             'cinemasOptions' => $cinemasOptions,
+            'userCinemaId' => $userCinemaId ?? null,
+            'gerirUtilizadores' => $gerirUtilizadores,
+            'gerirFuncionarios' => $gerirFuncionarios,
         ]);
     }
 
@@ -276,6 +304,10 @@ class UserController extends Controller
     {
         // OBTER USER ATUAL
         $currentUser = Yii::$app->user;
+        $userCinemaId = $currentUser->identity->profile->cinema_id ?? null;
+
+        $gerirUtilizadores = $currentUser->can('gerirUtilizadores');
+        $gerirFuncionarios = $currentUser->can('gerirFuncionarios') && !$gerirUtilizadores;
 
         // SE USER ATUAL NÃO FOR ADMIN --> APENAS PODE EDITAR O SEU PERFIL
         if (!$currentUser->can('admin')) {
@@ -340,6 +372,10 @@ class UserController extends Controller
             'model' => $model,
             'profile' => $profile,
             'cinemasOptions' => $cinemasOptions,
+            'currentUser' => $currentUser,
+            'userCinemaId' => $userCinemaId ?? null,
+            'gerirUtilizadores' => $gerirUtilizadores,
+            'gerirFuncionarios' => $gerirFuncionarios,
         ]);
     }
 

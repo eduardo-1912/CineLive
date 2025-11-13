@@ -1,6 +1,7 @@
 <?php
 
 use backend\components\ActionColumnButtonHelper;
+use backend\components\LinkHelper;
 use common\models\Compra;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
@@ -12,10 +13,6 @@ $this->title = 'Compra #' . $model->id;
 $this->params['breadcrumbs'][] = ['label' => 'Compras', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $model->id;
 \yii\web\YiiAsset::register($this);
-
-$currentUser = Yii::$app->user;
-$isAdmin = $currentUser->can('admin');
-$gerirCompras = $currentUser->can('gerirCompras');
 
 ?>
 
@@ -31,43 +28,28 @@ $gerirCompras = $currentUser->can('gerirCompras');
                             'id',
                             [
                                 'attribute' => 'cliente',
-                                'value' => fn($model) =>
-                                    $model->cliente && $model->cliente->profile
-                                        ? Html::a($model->cliente->profile->nome,
-                                            ['user/view', 'id' => $model->cliente->id],
-                                            ['class' => 'text-decoration-none text-primary'])
-                                        : '<span class="text-muted">Conta eliminada</span>',
+                                'value' => fn($model) => LinkHelper::cliente($model),
                                 'format' => 'raw',
                             ],
                             [
                                 'attribute' => 'sessao_id',
                                 'label' => 'Sessão',
                                 'format' => 'raw',
-                                'value' => fn($model) =>
-                                    Html::a($model->sessao->nome,
-                                        ['sessao/view', 'id' => $model->sessao->id],
-                                        ['class' => 'text-decoration-none text-primary']),
+                                'value' => fn($model) => LinkHelper::sessao($model),
                             ],
                             [
                                 'label' => 'Filme',
                                 'format' => 'raw',
-                                'value' => fn($model) =>
-                                    Html::a($model->sessao->filme->titulo,
-                                        ['filme/view', 'id' => $model->sessao->filme->id],
-                                        ['class' => 'text-decoration-none text-primary']),
+                                'value' => fn($model) => LinkHelper::filme($model->sessao),
                             ],
                             'dataFormatada',
                             'totalEmEuros',
                             'pagamentoFormatado',
-
                             [
                                 'attribute' => 'nomeCinema',
                                 'format' => 'raw',
-                                'value' => fn($model) =>
-                                    Html::a($model->cinema->nome,
-                                        ['cinema/view', 'id' => $model->cinema->id],
-                                        ['class' => 'text-decoration-none text-primary']),
-                                'visible' => $isAdmin,
+                                'value' => fn($model) => LinkHelper::cinema($model->sessao),
+                                'visible' => $gerirCinemas,
                             ],
                             [
                                 'attribute' => 'estado',

@@ -2,6 +2,7 @@
 
 use backend\components\ActionColumnButtonHelper;
 use backend\components\AppGridView;
+use backend\components\LinkHelper;
 use common\models\AluguerSala;
 use common\models\Cinema;
 use yii\helpers\ArrayHelper;
@@ -14,11 +15,6 @@ use yii\grid\GridView;
 
 $this->title = 'Alugueres';
 $this->params['breadcrumbs'][] = $this->title;
-
-$currentUser = Yii::$app->user;
-$isAdmin = $currentUser->can('admin');
-
-$actionColumnButtons = $isAdmin ? '{view} {delete}' : '{view}';
 
 ?>
 <div class="container-fluid">
@@ -40,12 +36,8 @@ $actionColumnButtons = $isAdmin ? '{view} {delete}' : '{view}';
                             ],
                             [
                                 'attribute' => 'cliente',
-                                'value' => fn($model) =>
-                                    $model->cliente && $model->cliente->profile
-                                        ? Html::a($model->cliente->profile->nome,
-                                            ['user/view', 'id' => $model->cliente->id],
-                                            ['class' => 'text-decoration-none text-primary'])
-                                        : '<span class="text-muted">Conta eliminada</span>',
+                                'value' => fn($model) => LinkHelper::cliente($model),
+
                                 'format' => 'raw',
                                 'filter' => Html::activeTextInput($searchModel, 'nomeCliente', ['class' => 'form-control',]),
                             ],
@@ -53,26 +45,16 @@ $actionColumnButtons = $isAdmin ? '{view} {delete}' : '{view}';
                                 'attribute' => 'cinema_id',
                                 'label' => 'Cinema',
                                 'format' => 'raw',
-                                'value' => function ($model) {
-                                    return Html::a($model->cinema->nome,
-                                        ['cinema/view', 'id' => $model->cinema->id],
-                                        ['class' => 'text-decoration-none text-primary']
-                                    );
-                                },
+                                'value' => fn($model) => LinkHelper::cinema($model),
                                 'filter' => $cinemaFilterOptions,
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
-                                'visible' => $isAdmin,
+                                'visible' => $gerirCinemas,
                             ],
                             [
                                 'attribute' => 'numeroSala',
                                 'label' => 'Sala',
                                 'format' => 'raw',
-                                'value' => function ($model) {
-                                    return Html::a($model->sala->nome ?? '-',
-                                        ['sala/view', 'id' => $model->sala_id],
-                                        ['class' => 'text-decoration-none text-primary']
-                                    );
-                                },
+                                'value' => fn($model) => LinkHelper::sala($model),
                                 'headerOptions' => ['style' => 'width: 8rem;'],
                             ],
                             [

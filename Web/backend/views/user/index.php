@@ -13,12 +13,7 @@ use backend\components\AppGridView;
 /* @var $searchModel backend\models\UserSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$currentUser = Yii::$app->user;
-$gerirUtilizadores = $currentUser->can('gerirUtilizadores');
-$gerirFuncionarios = $currentUser->can('gerirFuncionarios') && !$currentUser->can('gerirUtilizadores');
-
 $title = $gerirUtilizadores ? 'Utilizadores' : 'Funcionários';
-$actionColumnButtons = $gerirUtilizadores ? '{view} {update} {hardDelete}' : '{view} {update} {softDelete}';
 
 $this->title = $title;
 $this->params['breadcrumbs'][] = $this->title;

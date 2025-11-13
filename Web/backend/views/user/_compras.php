@@ -2,6 +2,7 @@
 
 use backend\components\ActionColumnButtonHelper;
 use backend\components\AppGridView;
+use backend\components\LinkHelper;
 use common\models\Cinema;
 use common\models\Compra;
 use common\models\Sessao;
@@ -28,22 +29,13 @@ use yii\grid\GridView;
             'attribute' => 'cinema_id',
             'label' => 'Cinema',
             'format' => 'raw',
-            'value' => function ($model) {
-                return Html::a($model->cinema->nome,
-                    ['cinema/view', 'id' => $model->cinema->id],
-                    ['class' => 'text-decoration-none text-primary']
-                );
-            },
+            'value' => fn($model) => LinkHelper::cinema($model->sessao),
         ],
         [
             'attribute' => 'sessao_id',
             'format' => 'raw',
-            'value' => function ($model) {
-                return Html::a($model->sessao->nome,
-                    ['sessao/view', 'id' => $model->sessao->id],
-                    ['class' => 'text-decoration-none text-primary']
-                );
-            },
+            'value' => fn($model) => LinkHelper::sessao($model),
+
         ],
         [
             'attribute' => 'data',

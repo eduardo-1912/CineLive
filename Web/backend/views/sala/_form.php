@@ -10,13 +10,6 @@ use common\models\Cinema;
 /* @var $form yii\bootstrap4\ActiveForm */
 /* @var $proximoNumero int|null */
 
-$currentUser = Yii::$app->user;
-$isAdmin = $currentUser->can('admin');
-$gerirSalas = $currentUser->can('gerirSalas');
-$userCinemaId = $currentUser->identity->profile->cinema_id ?? null;
-
-$proximoNumero = $proximoNumero ?? null;
-
 ?>
 
 <div class="sala-form">
@@ -25,7 +18,7 @@ $proximoNumero = $proximoNumero ?? null;
     <?php $form = ActiveForm::begin(['method' => 'get', 'action' => ['create']]); ?>
 
     <!-- SE É ADMIN -> PODE ESCOLHER O CINEMA -->
-    <?php if ($isAdmin): ?>
+    <?php if ($gerirCinemas): ?>
     
         <div class="form-group">
             <label for="cinema_id">Cinema</label>

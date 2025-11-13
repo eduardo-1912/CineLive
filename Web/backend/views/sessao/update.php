@@ -19,6 +19,9 @@ $this->params['breadcrumbs'][] = 'Editar';
                         'cinemasAtivos' => $cinemasAtivos,
                         'filmesEmExibicao' => $filmesEmExibicao,
                         'salasDropdown' => $salasDropdown,
+                        'gerirCinemas' => $gerirCinemas,
+                        'userCinemaId' => $userCinemaId,
+                        'temBilhetes' => $temBilhetes,
                     ]) ?>
                 </div>
             </div>

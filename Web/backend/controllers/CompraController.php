@@ -55,6 +55,7 @@ class CompraController extends Controller
     {
         // OBTER USER ATUAL
         $currentUser = Yii::$app->user;
+        $gerirCinemas = $currentUser->can('gerirCinemas');
 
         // CRIAR SEARCH MODEL E RECEBER PARÂMETROS DA QUERY
         $searchModel = new CompraSearch();
@@ -62,8 +63,8 @@ class CompraController extends Controller
 
         $cinemaFilterOptions = ArrayHelper::map(Cinema::find()->asArray()->all(), 'id', 'nome');
 
-        // ADMIN --> VÊ TODAS AS COMPRAS
-        if ($currentUser->can('admin')) {
+        // ADMIN (GERE CINEMAS) --> VÊ TODAS AS COMPRAS
+        if ($gerirCinemas) {
 
             // SE FOI PASSADO CINEMA_ID VIA PARÂMETRO
             if ($cinema_id !== null) {
@@ -99,6 +100,7 @@ class CompraController extends Controller
             'dataProvider' => $dataProvider,
             'cinemaFilterOptions' => $cinemaFilterOptions,
             'estadoFilterOptions' => Compra::optsEstado(),
+            'gerirCinemas' => $gerirCinemas,
         ]);
     }
 
@@ -109,6 +111,7 @@ class CompraController extends Controller
     {
         // OBTER USER ATUAL
         $currentUser = Yii::$app->user;
+        $gerirCinemas = $currentUser->can('gerirCinemas');
 
         // OBTER COMPRA
         $model = $this->findModel($id);
@@ -138,6 +141,7 @@ class CompraController extends Controller
         return $this->render('view', [
             'model' => $model,
             'bilhetesDataProvider' => $bilhetesDataProvider,
+            'gerirCinemas' => $gerirCinemas,
         ]);
     }
 

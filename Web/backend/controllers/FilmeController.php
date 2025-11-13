@@ -53,10 +53,18 @@ class FilmeController extends Controller
         $searchModel = new FilmeSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
 
+        $currentUser = Yii::$app->user;
+        $gerirFilmes = $currentUser->can('gerirFilmes');
+
+        $actionColumnButtons = $gerirFilmes ? '{view} {update} {delete}' : '{view}';
+
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'ratingFilterOptions' => FilmeSearch::getRatingFilterOptions(),
+            'estadoFilterOptions' => Filme::optsEstado(),
+            'gerirFilmes' => $gerirFilmes,
+            'actionColumnButtons' => $actionColumnButtons,
         ]);
     }
 
@@ -66,12 +74,16 @@ class FilmeController extends Controller
     {
         $model = $this->findModel($id);
 
+        $currentUser = Yii::$app->user;
+        $gerirFilmes = $currentUser->can('gerirFilmes');
+
         $generos = array_map(fn($g) => Html::encode($g->nome), $model->generos);
         $generos = !empty($generos) ? implode(', ', $generos) : '-';
 
         return $this->render('view', [
             'model' => $model,
             'generos' => $generos,
+            'gerirFilmes' => $gerirFilmes,
         ]);
     }
 

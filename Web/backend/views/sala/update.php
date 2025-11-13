@@ -17,7 +17,11 @@ $this->params['breadcrumbs'][] = 'Editar';
                 <div class="col-md-12">
                     <?=$this->render('_form', [
                         'model' => $model,
+                        'gerirCinemas' => $gerirCinemas,
+                        'gerirSalas' => $gerirSalas,
+                        'userCinemaId' => $userCinema->id ?? null,
                         'cinemasOptions' => $cinemasOptions,
+                        'proximoNumero' => $proximoNumero ?? null,
                     ]) ?>
                 </div>
             </div>

@@ -8,11 +8,6 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model common\models\User */
 
-$currentUser = Yii::$app->user;
-$isOwnAccount = ($currentUser->id == $model->id);
-$gerirUtilizadores = $currentUser->can('gerirUtilizadores');
-$gerirFuncionarios = $currentUser->can('gerirFuncionarios');
-
 $label = $gerirUtilizadores || $isOwnAccount ? 'Utilizadores' : 'Funcionários';
 $return_path = $gerirUtilizadores || $gerirFuncionarios && !$isOwnAccount ? 'index' : 'view?id=' . $currentUser->id;
 
@@ -78,7 +73,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
     <!--.card-->
 
-    <?php if ($model->compras && $model->roleName === 'cliente'): ?>
+    <?php if ($model->compras): ?>
         <h3 class="mt-4 mb-3">Compras</h3>
 
         <div class="card">
