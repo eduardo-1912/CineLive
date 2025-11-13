@@ -150,12 +150,34 @@ class SessaoController extends Controller
             ],
         ]);
 
+        $mapa = [];
+
+        $sala = $model->sala;
+        $lugaresConfirmados = $model->lugaresConfirmados;
+        $lugaresOcupados = $model->lugaresOcupados;
+        $mapaLugaresCompra = $model->mapaLugaresCompra;
+
+        for ($fila = 1; $fila <= $sala->num_filas; $fila++) {
+            for ($coluna = 1; $coluna <= $sala->num_colunas; $coluna++) {
+
+                $lugar = chr(64 + $fila) . $coluna;
+
+                $mapa[$fila][$coluna] = [
+                    'label' => $lugar,
+                    'ocupado' => in_array($lugar, $lugaresOcupados),
+                    'confirmado' => in_array($lugar, $lugaresConfirmados),
+                    'compraId' => $mapaLugaresCompra[$lugar] ?? null,
+                ];
+            }
+        }
+
         // SE É ADMIN OU UTILIZADOR É DO MESMO CINEMA DA SESSÃO --> TEM ACESSO
         return $this->render('view', [
             'model' => $model,
             'comprasDataProvider' => $comprasDataProvider,
             'gerirSessoes' => $currentUser->can('gerirSessoes'),
             'gerirCinemas' => $currentUser->can('gerirCinemas'),
+            'mapa' => $mapa,
         ]);
     }
 

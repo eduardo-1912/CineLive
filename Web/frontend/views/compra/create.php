@@ -41,11 +41,11 @@ $lugaresOcupados = $sessao->lugaresOcupados ?? [];
 
                         <!-- TÍTULO/RATING E DURAÇÃO -->
                         <div class="mb-4">
-                            <h2 class="fw-bold mb-0"><?= Html::encode($sessao->filme->titulo) ?></h2>
+                            <h2 class="fw-bold mb-0"><?= $sessao->filme->titulo ?></h2>
                             <span class="text-muted small">
-                                <?= Html::encode($sessao->filme->rating) ?>
+                                <?= $sessao->filme->rating ?>
                                 •
-                                <?= Html::encode($sessao->filme->duracaoEmHoras) ?>
+                                <?= $sessao->filme->duracaoEmHoras ?>
                             </span>
                         </div>
 
@@ -104,59 +104,39 @@ $lugaresOcupados = $sessao->lugaresOcupados ?? [];
                         <?php for ($fila = 1; $fila <= $sala->num_filas; $fila++): ?>
                             <div class="d-flex justify-content-center align-items-center mb-2 flex-nowrap">
 
-                                <!-- LETRA DA FILA -->
                                 <div class="fw-bold me-2" style="min-width: 20px;">
                                     <?= chr(64 + $fila) ?>
                                 </div>
 
-                                <!-- LUGARES -->
-                                <?php for ($coluna = 1; $coluna <= $sala->num_colunas; $coluna++): ?>
+                                <?php foreach ($mapa[$fila] as $info): ?>
+
                                     <?php
-
-                                    // CRIAR O LUGAR
-                                    $lugar = chr(64 + $fila) . $coluna;
-
-                                    // VER SE ESTÁ OCUPADO OU SELECIONADO
-                                    $ocupado = in_array($lugar, $lugaresOcupados);
-                                    $selecionado = in_array($lugar, $lugaresSelecionados);
-
-                                    // CRIAR CÓPIA DO ARRAY DE LUGARES SELECIONADOS
-                                    $novaSelecao = $lugaresSelecionados;
-
-                                    // SE CLICOU NUM LUGAR QUE JÁ TINHA SELECIONADO --> DESMARCAR O LUGAR
-                                    if ($selecionado) {
-                                        $novaSelecao = array_diff($novaSelecao, [$lugar]);
-                                    }
-
-                                    // CASO TENHA SELECIONADO OU LUGAR NOVO --> ADICIONAR À LISTA
-                                    else {
-                                        $novaSelecao[] = $lugar;
-                                    }
-
-                                    // CRIAR URL PARA QUANDO ESCOLHE LUGAR NOVO
-                                    $url = Url::to(['compra/create', 'sessao_id' => $sessao->id, 'lugares' => implode(',', $novaSelecao)]);
-
                                     $classes = 'd-flex align-items-center rounded-3 shadow-sm justify-content-center btn fw-semibold mx-1 border ';
-                                    if ($ocupado) { $classes .= 'btn-secondary disabled pe-none'; }
-                                    elseif ($selecionado) { $classes .= 'btn-danger'; }
-                                    else { $classes .= 'btn-light'; }
 
+                                    if ($info['ocupado']) {
+                                        $classes .= 'btn-secondary disabled pe-none';
+                                    }
+                                    elseif ($info['selecionado']) {
+                                        $classes .= 'btn-danger';
+                                    }
+                                    else {
+                                        $classes .= 'btn-light';
+                                    }
                                     ?>
 
-                                    <!-- CRIAR BOTÃO COM LUGAR -->
-                                    <?= Html::a($coluna, $url, [
+                                    <?= Html::a($info['label'], $info['url'], [
                                         'class' => $classes,
                                         'style' => 'min-width:45px; height:45px;',
-                                        'title' => $selecionado ? 'Lugar selecionado' : 'Clique para selecionar',
                                     ]) ?>
 
-                                <?php endfor; ?>
+                                <?php endforeach; ?>
+
                             </div>
                         <?php endfor; ?>
+
                     </div>
                 </div>
             </div>
-
 
             <div class="mt-4 box-white w-100 shadow-sm rounded-4 d-flex align-items-stretch align-items-sm-center justify-content-between flex-column gap-2 flex-sm-row">
 
@@ -164,11 +144,11 @@ $lugaresOcupados = $sessao->lugaresOcupados ?? [];
                 <div class="d-flex justify-content-between justify-content-sm-start gap-5">
                     <div class="d-flex flex-column text-start">
                         <span class="fw-medium fs-14">Lugares</span>
-                        <span class="text-muted fw-medium"><?= (!empty($lugaresSelecionados) ? implode(', ', $lugaresSelecionados) : '-') ?></span>
+                        <span class="text-muted fw-medium"><?= $lugaresImploded ?></span>
                     </div>
                     <div class="d-flex flex-column text-start">
                         <span class="fw-medium fs-14">Total</span>
-                        <span class="text-muted fw-medium"><?= $total > 0 ? number_format($total, 2) . '€' : '-' ?></span>
+                        <span class="text-muted fw-medium"><?= $total ?></span>
                     </div>
                 </div>
 
@@ -217,10 +197,7 @@ $lugaresOcupados = $sessao->lugaresOcupados ?? [];
                                     <?= Html::hiddenInput('lugares', implode(',', $lugaresSelecionados)) ?>
                                     <?= Html::hiddenInput('metodo', 'mbway') ?>
 
-
-                                    <button type="submit" class="btn btn-danger w-100 fw-medium rounded-3">
-                                        Pagar <?= number_format($total, 2) ?>€
-                                    </button>
+                                    <button type="submit" class="btn btn-danger w-100 fw-medium rounded-3">Pagar <?= $total ?></button>
 
                                 <?php ActiveForm::end(); ?>
 
@@ -259,10 +236,7 @@ $lugaresOcupados = $sessao->lugaresOcupados ?? [];
                                     <?= Html::hiddenInput('lugares', implode(',', $lugaresSelecionados)) ?>
                                     <?= Html::hiddenInput('metodo', 'cartao') ?>
 
-
-                                    <button type="submit" class="btn btn-danger w-100 fw-medium rounded-3">
-                                        Pagar <?= number_format($total, 2) ?>€
-                                    </button>
+                                    <button type="submit" class="btn btn-danger w-100 fw-medium rounded-3">Pagar <?= $total ?></button>
 
                                     <?php ActiveForm::end(); ?>
                                 </div>
@@ -287,10 +261,7 @@ $lugaresOcupados = $sessao->lugaresOcupados ?? [];
                                 <?= Html::hiddenInput('lugares', implode(',', $lugaresSelecionados)) ?>
                                 <?= Html::hiddenInput('metodo', 'multibanco') ?>
 
-
-                                <button type="submit" class="btn btn-danger w-100 fw-medium rounded-3">
-                                    Pagar <?= number_format($total, 2) ?>€
-                                </button>
+                                <button type="submit" class="btn btn-danger w-100 fw-medium rounded-3">Pagar <?= $total ?></button>
 
                                 <?php ActiveForm::end(); ?>
                             </div>

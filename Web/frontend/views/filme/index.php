@@ -51,7 +51,7 @@ $this->title = 'Filmes';
             <!-- DROPDOWN DE CINEMAS -->
             <div class="dropdown-center <?= ($estado === 'brevemente' ? 'd-block d-sm-none' : 'd-block') ?>">
                 <button class="btn btn-sm dropdown-toggle fw-medium" type="button" id="dropdownCinema" data-bs-toggle="dropdown" aria-expanded="false">
-                    <?= Html::encode(Cinema::findOne($cinema_id)->nome ?? 'Brevemente') ?>
+                    <?= $currentCinema ?? 'Brevemente' ?>
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="dropdownCinema">
                     <li class="d-block d-sm-none">
@@ -63,7 +63,7 @@ $this->title = 'Filmes';
                         <li>
                             <a class="dropdown-item <?= $cinema_id == $cinema->id ? 'active' : '' ?>"
                                href="<?= Url::to(['filme/index', 'cinema_id' => $cinema->id, 'q' => $q]) ?>">
-                                <?= Html::encode($cinema->nome) ?>
+                                <?= $cinema->nome ?>
                             </a>
                         </li>
                     <?php endforeach; ?>
@@ -86,7 +86,7 @@ $this->title = 'Filmes';
                                 'alt' => $filme->titulo,
                                 'style' => 'object-fit: cover; aspect-ratio: 2/3;'
                             ]) ?>
-                            <h5 class="fw-semibold fs-6"><?= Html::encode($filme->titulo) ?></h5>
+                            <h5 class="fw-semibold fs-6"><?= $filme->titulo ?></h5>
                         </a>
                     </div>
                 </div>

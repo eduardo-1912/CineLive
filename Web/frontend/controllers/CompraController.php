@@ -9,6 +9,7 @@ use DateTime;
 use Exception;
 use Yii;
 use yii\filters\VerbFilter;
+use yii\helpers\Url;
 use yii\web\Controller;
 
 class CompraController extends Controller
@@ -114,15 +115,50 @@ class CompraController extends Controller
 
 
         // CALCULAR TOTAL DA COMPRA
-        $total = 0;
+        $total = '-';
+        $lugaresImploded = '-';
         if (!empty($lugaresSelecionados)) {
-            $total = count($lugaresSelecionados) * (float)$sessao->sala->preco_bilhete;
+            $total =  number_format(count($lugaresSelecionados) * (float)$sessao->sala->preco_bilhete, 2) . '€';
+            $lugaresImploded = implode(', ', $lugaresSelecionados);
+        }
+
+        $mapa = [];
+
+        for ($fila = 1; $fila <= $sala->num_filas; $fila++) {
+            for ($coluna = 1; $coluna <= $sala->num_colunas; $coluna++) {
+
+                $lugar = chr(64 + $fila) . $coluna;
+
+                $ocupado = in_array($lugar, $lugaresOcupados);
+                $selecionado = in_array($lugar, $lugaresSelecionados);
+
+                $novaSelecao = $lugaresSelecionados;
+
+                if ($selecionado) {
+                    $novaSelecao = array_diff($novaSelecao, [$lugar]);
+                } else {
+                    $novaSelecao[] = $lugar;
+                }
+
+                $mapa[$fila][$coluna] = [
+                    'label' => $coluna,
+                    'url' => Url::to([
+                        'compra/create',
+                        'sessao_id' => $sessao->id,
+                        'lugares' => implode(',', $novaSelecao)
+                    ]),
+                    'ocupado' => $ocupado,
+                    'selecionado' => $selecionado,
+                ];
+            }
         }
 
         return $this->render('create', [
             'sessao' => $sessao,
             'lugaresSelecionados' => $lugaresSelecionados,
+            'lugaresImploded' => $lugaresImploded,
             'total' => $total,
+            'mapa' => $mapa,
         ]);
     }
 

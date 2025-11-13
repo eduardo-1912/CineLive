@@ -9,7 +9,6 @@ use yii\bootstrap5\ActiveForm;
 use yii\captcha\Captcha;
 use yii\helpers\Url;
 
-$currentUser = Yii::$app->user->identity;
 $iconsPath = '@webroot/icons/';
 $btnClasses = 'btn btn-dark fw-medium rounded-3 w-100 fs-15 py-2';
 
@@ -32,14 +31,8 @@ $this->params['breadcrumbs'][] = $this->title;
             ]); ?>
 
             <div class="row row-cols-md-2">
-                <?= $form->field($model, 'name')->textInput([
-                    'placeholder' => 'John Smith',
-                    'value' => !$currentUser ? '' : ($currentUser->profile->nome ?? $currentUser->username),
-                ]) ?>
-                <?= $form->field($model, 'email')->textInput([
-                    'placeholder' => 'john.smith@email.com',
-                    'value' => !$currentUser ? '' : ($currentUser->email),
-                ]) ?>
+                <?= $form->field($model, 'name')->textInput(['placeholder' => 'John Smith',]) ?>
+                <?= $form->field($model, 'email')->textInput(['placeholder' => 'john.smith@email.com',]) ?>
             </div>
 
             <?= $form->field($model, 'subject') ?>
@@ -60,7 +53,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     <p class="text-muted mb-0">Celebra com amigos e familiares.</p>
                 </div>
             </div>
-            <a href="<?= Url::to(['/aluguer-sala/create']) ?>" class="<?= $btnClasses ?>"><?= Yii::$app->user->isGuest ? 'Iniciar Sessão' : 'Fazer pedido' ?></a>
+            <a href="<?= Url::to(['/aluguer-sala/create']) ?>" class="<?= $btnClasses ?>"><?= $currentUser->isGuest ? 'Iniciar Sessão' : 'Fazer Pedido' ?></a>
         </div>
     </div>
 

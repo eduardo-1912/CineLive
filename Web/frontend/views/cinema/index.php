@@ -32,8 +32,8 @@ $this->title = 'Cinemas';
                 <div class="px-4 px-lg-2 py-4 d-flex flex-column justify-content-center">
                     <a href="<?= Url::to(['filme/index', 'cinema_id' => $cinema->id]) ?>" class="fw-bold fs-4 link-dark text-decoration-none mb-1"><?= $cinema->nome ?></a>
 
-                    <?php if ($cinema->gerente->profile->nome): ?>
-                        <p class="text-muted mb-4">Gerido por <span class="fw-medium"><?= $cinema->gerente->profile->nome ?></span></p>
+                    <?php if ($cinema->nomeGerente): ?>
+                        <p class="text-muted mb-4">Gerido por <span class="fw-medium"><?= $cinema->nomeGerente ?></span></p>
                     <?php endif; ?>
 
                     <div class="row row-cols-2 w-100 gy-3 mb-0 mb-lg-4">
@@ -56,7 +56,7 @@ $this->title = 'Cinemas';
                         </div>
                         <div class="d-flex flex-column text-start">
                             <span class="fw-medium fs-14">Capacidade</span>
-                            <span class="text-muted"><?= count($cinema->salas) ?> Salas<span class="d-none d-sm-inline"> • <?= $cinema->numeroLugares ?> Lugares</span></span>
+                            <span class="text-muted"><?= $cinema->totalSalas ?> Salas<span class="d-none d-sm-inline"> • <?= $cinema->numeroLugares ?> Lugares</span></span>
                         </div>
 
                     </div>

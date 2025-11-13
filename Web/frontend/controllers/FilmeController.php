@@ -16,6 +16,9 @@ class FilmeController extends Controller
         // OBTER TODOS OS CINEMAS ATIVOS
         $cinemas = Cinema::find()->where(['estado' => Cinema::ESTADO_ATIVO])->orderBy('nome')->all();
 
+        // CINEMA ATUAL
+        $currentCinema = Cinema::findOne($cinema_id)->nome ?? null;
+
         // SE ESTADO FOR BREVEMENTE --> NÃO PRECISA DE CINEMA
         if ($estado === 'brevemente') {
 
@@ -35,6 +38,7 @@ class FilmeController extends Controller
                 'cinema_id' => $cinema_id,
                 'cinemas' => $cinemas,
                 'estado' => $estado,
+                'currentCinema' => $currentCinema,
                 'q' => $q,
             ]);
         }
@@ -47,6 +51,7 @@ class FilmeController extends Controller
                     'index',
                     'cinema_id' => $cinemas[0]->id,
                     'estado' => $estado,
+                    'currentCinema' => $currentCinema,
                     'q' => $q
                 ]);
             }
@@ -99,9 +104,9 @@ class FilmeController extends Controller
             'cinema_id' => $cinema_id,
             'cinemas' => $cinemas,
             'estado' => $estado,
+            'currentCinema' => $currentCinema,
         ]);
     }
-
 
 
     public function actionView($id, $cinema_id = null)
@@ -195,6 +200,7 @@ class FilmeController extends Controller
         ]);
     }
 
+
     protected function findModel($id)
     {
         if (($model = Filme::findOne(['id' => $id])) !== null) {
@@ -203,6 +209,4 @@ class FilmeController extends Controller
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
-
-
 }

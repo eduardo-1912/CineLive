@@ -83,13 +83,13 @@ $this->title = $model->titulo;
                     <h2 class="fw-bold m-0"><?= $model->titulo ?></h2>
                     <h5 class="m-0 py-1 px-3 rounded-pill fw-semibold text-white
                         <?= $model->isRatingKids() ? 'bg-success' : 'bg-danger' ?>">
-                        <?= Html::encode($model->rating) ?>
+                        <?= $model->rating ?>
                     </h5>
                 </div>
                 <div class="d-flex mb-1 gap-1">
                     <?php if ($model->generos): ?>
                         <?php foreach ($model->generos as $genero): ?>
-                            <span class="badge-genero"><?= Html::encode($genero->nome) ?></span>
+                            <span class="badge-genero"><?= $genero->nome ?></span>
                         <?php endforeach; ?>
                     <?php endif; ?>
                 </div>
@@ -119,7 +119,7 @@ $this->title = $model->titulo;
             <!-- SINOPSE -->
             <div class="mt-3">
                 <h5>Sinopse</h5>
-                <p class="text-muted" style="min-height: 3lh"><?= nl2br(Html::encode($model->sinopse)) ?></p>
+                <p class="text-muted" style="min-height: 3lh"><?= nl2br($model->sinopse) ?></p>
             </div>
 
             <!-- TRAILER -->

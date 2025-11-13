@@ -181,6 +181,19 @@ class Cinema extends \yii\db\ActiveRecord
         return $lugares;
     }
 
+    // TOTAL DE SALAS
+    public function getTotalSalas()
+    {
+        return count($this->salas);
+    }
+
+    // OBTER O NOME DO GERENTE
+    public function getNomeGerente()
+    {
+        return $this->gerente->profile->nome ?? null;
+    }
+
+
     // HORA INÍCIO FORMATADA (HH:mm)
     public function getHoraInicioFormatada()
     {

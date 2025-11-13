@@ -93,7 +93,10 @@ $this->params['breadcrumbs'][] = $model->id;
             <div class="row">
 
                 <div class="col-md-12">
-                    <?= $this->render('_mapaLugares', ['model' => $model]) ?>
+                    <?= $this->render('_mapaLugares', [
+                        'model' => $model,
+                        'mapa' => $mapa,
+                    ]) ?>
                 </div>
             </div>
         </div>

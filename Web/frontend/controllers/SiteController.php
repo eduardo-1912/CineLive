@@ -119,8 +119,19 @@ class SiteController extends Controller
      */
     public function actionContact()
     {
+        // CRIAR MODEL
         $model = new ContactForm();
 
+        // OBTER USER ATUAL
+        $currentUser = Yii::$app->user;
+
+        // SE ESTIVER AUTENTICADO --> PREENCHER NOME E MAIL
+        if (!$currentUser->isGuest) {
+            $model->name = $currentUser->identity->profile->nome ?? $currentUser->identity->username;
+            $model->email = $currentUser->identity->email;
+        }
+
+        // GUARDAR
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             if ($model->sendEmail(Yii::$app->params['adminEmail'])) {
                 Yii::$app->session->setFlash('success', 'Obrigado pelo seu contacto! Iremos responder o mais breve possível.');
@@ -134,6 +145,7 @@ class SiteController extends Controller
 
         return $this->render('contact', [
             'model' => $model,
+            'currentUser' => $currentUser,
         ]);
     }
 

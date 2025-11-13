@@ -13,8 +13,16 @@ $this->title = 'Compras';
 
 <div class="container">
 
-    <div class="mb-4">
+    <div class="mb-4 d-flex justify-content-between">
         <h4 class="page-title m-0">As minhas compras</h4>
+        <?= Breadcrumbs::widget([
+            'links' => [
+                ['label' => 'Perfil', 'url' => ['perfil/index']],
+                ['label' => 'Compras'],
+            ],
+            'homeLink' => false,
+            'options' => ['class' => 'breadcrumb'],
+        ]) ?>
     </div>
 
     <div class="box-gray shadow-sm w-100">

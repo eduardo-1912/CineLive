@@ -17,33 +17,36 @@ $mapaLugaresCompra = $model->mapaLugaresCompra;
     </div>
 
     <div class="d-inline-block bg-light p-4 rounded-4 shadow-sm">
-        <?php for ($fila = 1; $fila <= $sala->num_filas; $fila++): ?>
+        <?php foreach ($mapa as $fila => $colunas): ?>
             <div class="d-flex justify-content-center mb-2 flex-wrap">
-                <?php for ($coluna = 1; $coluna <= $sala->num_colunas; $coluna++): ?>
+
+                <?php foreach ($colunas as $info): ?>
+
                     <?php
-
-                    // CRIAR LUGAR (EX.: A5, B6, C7)
-                    $lugar = chr(64 + $fila) . $coluna;
-                    $ocupado = in_array($lugar, $lugaresOcupados);
-                    $confirmado = in_array($lugar, $lugaresConfirmados);
-                    $compraId = $mapaLugaresCompra[$lugar] ?? null;
-
                     $classes = 'lugar fw-semibold text-center rounded-3 mx-2 my-0 d-flex align-items-center justify-content-center ';
-                    if ($confirmado) { $classes .= 'bg-success'; }
-                    elseif ($ocupado) { $classes .= 'bg-danger'; }
-                    else { $classes .= 'bg-secondary opacity-75'; }
+                    if ($info['confirmado']) {
+                        $classes .= 'bg-success';
+                    } elseif ($info['ocupado']) {
+                        $classes .= 'bg-danger';
+                    } else {
+                        $classes .= 'bg-secondary opacity-75';
+                    }
                     ?>
 
-                    <?php if ($compraId): ?>
-                        <?= Html::a($lugar, ['compra/view', 'id' => $compraId],
-                            ['class' => $classes . ' text-decoration-none', 'title' => "Compra #{$compraId}",]) ?>
+                    <?php if ($info['compraId']): ?>
+                        <?= Html::a($info['label'], ['compra/view', 'id' => $info['compraId']], [
+                            'class' => $classes . ' text-decoration-none',
+                        ]) ?>
                     <?php else: ?>
-                        <div class="<?= $classes ?>" title="Lugar livre">
-                            <?= $lugar ?>
+                        <div class="<?= $classes ?>">
+                            <?= $info['label'] ?>
                         </div>
                     <?php endif; ?>
-                <?php endfor; ?>
+
+                <?php endforeach; ?>
+
             </div>
-        <?php endfor; ?>
+        <?php endforeach; ?>
     </div>
+
 </div>
