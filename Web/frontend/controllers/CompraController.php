@@ -11,6 +11,7 @@ use Yii;
 use yii\filters\VerbFilter;
 use yii\helpers\Url;
 use yii\web\Controller;
+use yii\web\ForbiddenHttpException;
 
 class CompraController extends Controller
 {
@@ -53,6 +54,10 @@ class CompraController extends Controller
     {
         $currentUser = Yii::$app->user;
         $model = $this->findModel($id);
+
+        if ($currentUser->id != $model->cliente_id) {
+            return $this->redirect(Yii::$app->request->referrer ?: ['compra/index']);
+        }
 
         return $this->render('view', [
             'model' => $model,

@@ -50,24 +50,21 @@ $this->title = 'Perfil';
                                     ['class' => 'btn btn-light rounded-3 w-100',
                                     'style' => 'background-color: var(--gray-200);']
                                 ) ?>
-                                <?= Html::beginForm(['/site/logout'], 'post', ['class' => 'p-0 m-0 w-100']) ?>
-                                    <button type="submit" class="btn btn-danger rounded-3 w-100">Logout</button>
-                                <?= Html::endForm() ?>
+                                <a href="<?= Url::to(['/site/logout']) ?>" data-method="post" class="btn btn-danger rounded-3 w-100">Logout</a>
                             <?php endif; ?>
                         </div>
 
-                        <?php if ($edit): ?>
-                        <div class="mt-2">
-                            <?= Html::beginForm(['delete-account'], 'post', [
-                                'class' => 'w-100',
-                                'data-confirm' => 'Tem a certeza que deseja eliminar a sua conta? Esta ação é irreversível.',
-                            ]) ?>
-                            <button type="submit" class="btn btn-danger rounded-3 w-100">Eliminar Conta</button>
-                            <?= Html::endForm() ?>
-                        </div>
-                        <?php endif; ?>
-
                         <?php $form = ActiveForm::end(); ?>
+
+                        <?php if ($edit): ?>
+                            <div class="mt-2">
+                                <?= Html::a('Eliminar Conta', ['delete-account'], [
+                                    'class' => 'btn btn-danger rounded-3 w-100',
+                                    'data-method' => 'post',
+                                    'data-confirm' => 'Tem a certeza que deseja eliminar a sua conta? Esta ação é irreversível.',
+                                ]) ?>
+                            </div>
+                        <?php endif; ?>
 
                     </div>
                 </div>
@@ -77,8 +74,9 @@ $this->title = 'Perfil';
 
             <!-- COMPRAS -->
             <div class="box-gray rounded-4 shadow-sm"">
-                <h5 class="page-title mb-3">Histórico de Compras</h5>
-                <?php foreach($compras as $compra): ?>
+                <h5 class="page-title mb-3">Histórico de compras</h5>
+                <?php if ($compras): ?>
+                    <?php foreach($compras as $compra): ?>
                     <div class="box-white rounded-4 mb-2">
                         <div class="d-flex gap-0 gap-lg-3 w-100">
 
@@ -93,12 +91,12 @@ $this->title = 'Perfil';
                             <div class="w-100">
                                 <div class="d-flex align-items-center justify-content-between mb-3">
                                     <div>
-                                        <p class="mb-0 fw-semibold"><?= $compra->sessao->filme->titulo ?> • <?= $compra->labelBilhetes ?></p>
+                                        <p class="mb-0 fw-semibold"><?= $compra->sessao->filme->titulo ?> • <?= $compra->dataFormatada ?></p>
                                         <span class="fs-14 text-muted"><?= $compra->sessao->cinema->nome ?></span>
                                     </div>
                                     <div class="text-end">
-                                        <p class="mb-0 fw-semibold"><?= $compra->totalEmEuros ?></p>
-                                        <span class="fs-14 text-muted">Efetuada a <?= $compra->dataFormatada ?></span>
+                                        <p class="mb-0 fw-semibold"><?= $compra->estadoFormatado ?></p>
+                                        <span class="fs-14 text-muted"><?= $compra->totalEmEuros ?></span>
                                     </div>
                                 </div>
                                 <div class="d-flex align-items-center justify-content-between">
@@ -118,13 +116,21 @@ $this->title = 'Perfil';
                         </div>
                     </div>
                 <?php endforeach; ?>
-                <a href="<?= Url::to(['compra/index']) ?>" class="btn btn-dark rounded-3 mt-1 w-100">Ver todas</a>
+                    <a href="<?= Url::to(['compra/index']) ?>" class="btn btn-dark rounded-3 mt-1 w-100">Ver todas</a>
+                <?php else: ?>
+                    <div class="box-white">
+                        <div class="d-flex justify-content-center align-items-center w-100" style="height: 6.15rem;">
+                            <h5 class="text-muted text-center fw-semibold m-0">Nenhuma compra encontrada!</h5>
+                        </div>
+                    </div>
+                <?php endif; ?>
             </div>
 
             <!-- ALUGUERES -->
             <div class="box-gray rounded-4 shadow-sm"">
-                <h5 class="page-title mb-3">Alugueres de Sala</h5>
-                <?php foreach($alugueres as $aluguer): ?>
+                <h5 class="page-title mb-3">Alugueres de sala</h5>
+                <?php if ($alugueres): ?>
+                    <?php foreach($alugueres as $aluguer): ?>
                     <div class="box-white rounded-4 mb-2">
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <div>
@@ -152,7 +158,14 @@ $this->title = 'Perfil';
                     </div>
 
                 <?php endforeach; ?>
-                <a href="<?= Url::to(['aluguer-sala/index']) ?>" class="btn btn-dark rounded-3 px-3 mt-1 w-100">Ver todos</a>
+                    <a href="<?= Url::to(['aluguer-sala/index']) ?>" class="btn btn-dark rounded-3 px-3 mt-1 w-100">Ver todos</a>
+                <?php else: ?>
+                    <div class="box-white">
+                        <div class="d-flex justify-content-center align-items-center w-100" style="height: 6.15rem;">
+                            <h5 class="text-muted text-center fw-semibold m-0">Nenhum pedido encontrado!</h5>
+                        </div>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>

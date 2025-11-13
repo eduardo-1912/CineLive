@@ -115,12 +115,6 @@ class Compra extends \yii\db\ActiveRecord
         return count($this->bilhetes);
     }
 
-    public function getLabelBilhetes(): string
-    {
-        $total = $this->totalBilhetes;
-        return $total . ' ' . ($total == 1 ? 'Bilhete' : 'Bilhetes');
-    }
-
     // OBTER ESTADO FORMATADO
     public function getEstadoFormatado(): string
     {

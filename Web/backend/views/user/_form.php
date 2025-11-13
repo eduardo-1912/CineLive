@@ -18,7 +18,12 @@ use common\models\Cinema;
 
     <?= $form->field($model, 'id')->hiddenInput()->label(false) ?>
     <?= $form->field($model, 'username')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'password')->passwordInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'password')->passwordInput([
+        'maxlength' => true,
+        'placeholder' => $model->isNewRecord
+            ? ''
+            : '(opcional)',
+    ]) ?>
     <?= $form->field($profile, 'nome')->textInput(['maxlength' => true]) ?>
     <?= $form->field($profile, 'telemovel')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'email')->input('email') ?>

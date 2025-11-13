@@ -7,7 +7,6 @@ use Exception;
 use Yii;
 use yii\base\Model;
 use common\models\User;
-use yii\debug\models\search\Profile;
 
 
 /**
@@ -31,10 +30,10 @@ class SignupForm extends Model
             [['username', 'email', 'password', 'telemovel', 'nome'], 'required'],
             [['username', 'email'], 'trim'],
             ['username', 'string', 'min' => 2, 'max' => 255],
-            ['username', 'unique', 'targetClass' => 'User', 'message' => 'Este nome de utilizador já está registado.'],
+            ['username', 'unique', 'targetClass' => \common\models\User::class],
             ['email', 'email'],
             ['email', 'string', 'max' => 255],
-            ['email', 'unique', 'targetClass' => 'User', 'message' => 'Este email já está registado.'],
+            ['email', 'unique', 'targetClass' => \common\models\User::class],
             ['password', 'string', 'min' => Yii::$app->params['user.passwordMinLength']],
             ['telemovel', 'match', 'pattern' => '/^[0-9]{9}$/', 'message' => 'O telemóvel deve conter exatamente 9 dígitos.'],
         ];
@@ -95,7 +94,7 @@ class SignupForm extends Model
 
             return $user;
         }
-        catch (Exception $e) {
+        catch (\Exception $e) {
             $transaction->rollBack();
             Yii::error($e->getMessage());
             return null;

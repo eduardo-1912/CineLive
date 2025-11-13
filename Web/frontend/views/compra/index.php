@@ -27,7 +27,8 @@ $this->title = 'Compras';
 
     <div class="box-gray shadow-sm w-100">
         <div class="d-flex flex-column gap-2">
-            <?php foreach($compras as $compra): ?>
+            <?php if ($compras): ?>
+                <?php foreach($compras as $compra): ?>
                 <div class="box-white rounded-4">
                     <div class="d-flex gap-3 w-100">
 
@@ -41,15 +42,15 @@ $this->title = 'Compras';
 
                     <div class="w-100">
                         <div class="d-flex align-items-center justify-content-between mb-3">
-                        <div>
-                            <p class="mb-0 fw-semibold"><?= $compra->sessao->filme->titulo ?> • <?= $compra->labelBilhetes ?></p>
-                            <span class="fs-14 text-muted"><?= $compra->sessao->cinema->nome ?></span>
+                            <div>
+                                <p class="mb-0 fw-semibold"><?= $compra->sessao->filme->titulo ?> • <?= $compra->dataFormatada ?></p>
+                                <span class="fs-14 text-muted"><?= $compra->sessao->cinema->nome ?></span>
+                            </div>
+                            <div class="text-end">
+                                <p class="mb-0 fw-semibold"><?= $compra->estadoFormatado ?></p>
+                                <span class="fs-14 text-muted"><?= $compra->totalEmEuros ?></span>
+                            </div>
                         </div>
-                        <div class="text-end">
-                            <p class="mb-0 fw-semibold"><?= $compra->totalEmEuros ?></p>
-                            <span class="fs-14 text-muted">Efetuada a <?= $compra->dataFormatada ?></span>
-                        </div>
-                    </div>
                         <div class="d-flex align-items-center justify-content-between">
                         <div class="w-100 d-flex gap-5">
                             <div>
@@ -67,6 +68,13 @@ $this->title = 'Compras';
                     </div>
                 </div>
             <?php endforeach; ?>
+            <?php else: ?>
+                <div class="box-white">
+                    <div class="d-flex justify-content-center align-items-center w-100" style="height: 50vh;">
+                        <h5 class="text-muted text-center fw-semibold m-0">Nenhuma compra encontrada!</h5>
+                    </div>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>

@@ -70,10 +70,10 @@ class User extends ActiveRecord implements IdentityInterface
             ['role', 'safe'],
             ['password', 'string', 'min' => 8],
             [
-                'password', 'required',
-                'when' => fn($model) => $model->isNewRecord,
-                'whenClient' => "function() { return !$('#user-id').val(); }",
-                'message' => 'Password cannot be blank.'
+                'password',
+                'required',
+                'on' => 'backendCreate',
+                'message' => 'Password cannot be blank.',
             ],
         ];
     }
@@ -108,11 +108,20 @@ class User extends ActiveRecord implements IdentityInterface
 
     public function isDeletable(): bool { return true; }
 
-    // GUARDAR A PASSWORD E AUTH_KEY/TOKEN
+    // GUARDAR A PASSWORD E AUTH_KEY/TOKEN (SE NÃO EXISTIR)
     public function beforeSave($insert)
     {
         if ($this->password) {
             $this->setPassword($this->password);
+        }
+
+        if ($insert) {
+            if (empty($this->auth_key)) {
+                $this->generateAuthKey();
+            }
+            if (empty($this->verification_token)) {
+                $this->generateEmailVerificationToken();
+            }
         }
 
         return parent::beforeSave($insert);

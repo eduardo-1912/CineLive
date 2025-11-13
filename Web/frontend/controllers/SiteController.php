@@ -162,7 +162,6 @@ class SiteController extends Controller
             $user = $model->signup();
 
             if ($user) {
-                // LOGIN AUTOMÁTICO
                 Yii::$app->user->login($user);
 
                 Yii::$app->session->setFlash('success', 'Conta criada com sucesso!');

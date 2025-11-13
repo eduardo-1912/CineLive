@@ -194,7 +194,7 @@ class UserController extends Controller
         $gerirFuncionarios = $currentUser->can('gerirFuncionarios') && !$gerirUtilizadores;
 
         // CRIAR USER E USER_PROFILE
-        $model = new User();
+        $model = new User(['scenario' => 'backendCreate']);
         $profile = new UserProfile();
 
         // GERAR LISTA DE CINEMAS

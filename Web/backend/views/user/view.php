@@ -28,7 +28,8 @@ $this->params['breadcrumbs'][] = $this->title;
                         <?php endif; ?>
 
                         <?php if ($gerirUtilizadores && !$isOwnAccount): ?>
-                            <?= Html::a('Eliminar', ['delete', 'id' => $model->id], ['class' => 'btn btn-danger', 'data' => ['method' => 'post']]); ?>
+                            <?= Html::a('Eliminar', ['delete', 'id' => $model->id], ['class' => 'btn btn-danger',
+                                'data' => ['method' => 'post']]); ?>
                         <?php endif; ?>
                     </p>
 

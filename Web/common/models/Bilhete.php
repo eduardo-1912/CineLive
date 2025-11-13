@@ -79,6 +79,22 @@ class Bilhete extends \yii\db\ActiveRecord
         return $this->isEstadoPendente() && !$this->compra->sessao->isEstadoTerminada();
     }
 
+    // OBTER ESTADO FORMATADO
+    public function getEstadoFormatado(): string
+    {
+        $labels = self::optsEstado();
+        $label = $labels[$this->estado] ?? '-';
+
+        $colors = [
+            self::ESTADO_CONFIRMADO => '',
+            self::ESTADO_PENDENTE => 'text-secondary',
+            self::ESTADO_CANCELADO => 'text-danger',
+        ];
+
+        $class = $colors[$this->estado] ?? 'text-secondary';
+        return "<span class='{$class}'>{$label}</span>";
+    }
+
     /**
      * Gets query for [[Compra]].
      *

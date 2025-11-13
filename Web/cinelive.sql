@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Nov 13, 2025 at 10:51 AM
+-- Generation Time: Nov 13, 2025 at 05:08 PM
 -- Server version: 9.1.0
--- PHP Version: 8.4.13
+-- PHP Version: 8.4.0
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -30,7 +30,7 @@ SET time_zone = "+00:00";
 DROP TABLE IF EXISTS `aluguer_sala`;
 CREATE TABLE IF NOT EXISTS `aluguer_sala` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `cliente_id` int NOT NULL,
+  `cliente_id` int DEFAULT NULL,
   `cinema_id` int NOT NULL,
   `sala_id` int DEFAULT NULL,
   `data` date NOT NULL,
@@ -61,8 +61,8 @@ INSERT INTO `aluguer_sala` (`id`, `cliente_id`, `cinema_id`, `sala_id`, `data`, 
 
 DROP TABLE IF EXISTS `auth_assignment`;
 CREATE TABLE IF NOT EXISTS `auth_assignment` (
-  `item_name` varchar(64) COLLATE utf8mb3_unicode_ci NOT NULL,
-  `user_id` varchar(64) COLLATE utf8mb3_unicode_ci NOT NULL,
+  `item_name` varchar(64) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
+  `user_id` varchar(64) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
   `created_at` int DEFAULT NULL,
   PRIMARY KEY (`item_name`,`user_id`),
   KEY `idx-auth_assignment-user_id` (`user_id`)
@@ -97,10 +97,10 @@ INSERT INTO `auth_assignment` (`item_name`, `user_id`, `created_at`) VALUES
 
 DROP TABLE IF EXISTS `auth_item`;
 CREATE TABLE IF NOT EXISTS `auth_item` (
-  `name` varchar(64) COLLATE utf8mb3_unicode_ci NOT NULL,
+  `name` varchar(64) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
   `type` smallint NOT NULL,
-  `description` text COLLATE utf8mb3_unicode_ci,
-  `rule_name` varchar(64) COLLATE utf8mb3_unicode_ci DEFAULT NULL,
+  `description` text CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci,
+  `rule_name` varchar(64) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci DEFAULT NULL,
   `data` blob,
   `created_at` int DEFAULT NULL,
   `updated_at` int DEFAULT NULL,
@@ -142,8 +142,8 @@ INSERT INTO `auth_item` (`name`, `type`, `description`, `rule_name`, `data`, `cr
 
 DROP TABLE IF EXISTS `auth_item_child`;
 CREATE TABLE IF NOT EXISTS `auth_item_child` (
-  `parent` varchar(64) COLLATE utf8mb3_unicode_ci NOT NULL,
-  `child` varchar(64) COLLATE utf8mb3_unicode_ci NOT NULL,
+  `parent` varchar(64) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
+  `child` varchar(64) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
   PRIMARY KEY (`parent`,`child`),
   KEY `child` (`child`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
@@ -179,7 +179,7 @@ INSERT INTO `auth_item_child` (`parent`, `child`) VALUES
 
 DROP TABLE IF EXISTS `auth_rule`;
 CREATE TABLE IF NOT EXISTS `auth_rule` (
-  `name` varchar(64) COLLATE utf8mb3_unicode_ci NOT NULL,
+  `name` varchar(64) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
   `data` blob,
   `created_at` int DEFAULT NULL,
   `updated_at` int DEFAULT NULL,
@@ -271,7 +271,7 @@ INSERT INTO `cinema` (`id`, `nome`, `rua`, `codigo_postal`, `cidade`, `latitude`
 DROP TABLE IF EXISTS `compra`;
 CREATE TABLE IF NOT EXISTS `compra` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `cliente_id` int NOT NULL,
+  `cliente_id` int DEFAULT NULL,
   `sessao_id` int NOT NULL,
   `data` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `pagamento` enum('mbway','cartao','multibanco') NOT NULL,
@@ -515,15 +515,15 @@ INSERT INTO `sessao` (`id`, `data`, `hora_inicio`, `hora_fim`, `filme_id`, `sala
 DROP TABLE IF EXISTS `user`;
 CREATE TABLE IF NOT EXISTS `user` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `username` varchar(255) COLLATE utf8mb3_unicode_ci NOT NULL,
-  `auth_key` varchar(32) COLLATE utf8mb3_unicode_ci NOT NULL,
-  `password_hash` varchar(255) COLLATE utf8mb3_unicode_ci NOT NULL,
-  `password_reset_token` varchar(255) COLLATE utf8mb3_unicode_ci DEFAULT NULL,
-  `email` varchar(255) COLLATE utf8mb3_unicode_ci NOT NULL,
+  `username` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
+  `auth_key` varchar(32) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
+  `password_hash` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
+  `password_reset_token` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci DEFAULT NULL,
+  `email` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
   `status` smallint NOT NULL DEFAULT '10',
   `created_at` int NOT NULL,
   `updated_at` int NOT NULL,
-  `verification_token` varchar(255) COLLATE utf8mb3_unicode_ci DEFAULT NULL,
+  `verification_token` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `email` (`email`),
@@ -599,7 +599,7 @@ INSERT INTO `user_profile` (`id`, `user_id`, `cinema_id`, `nome`, `telemovel`) V
 --
 ALTER TABLE `aluguer_sala`
   ADD CONSTRAINT `aluguer_sala_ibfk_1` FOREIGN KEY (`cinema_id`) REFERENCES `cinema` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  ADD CONSTRAINT `fk-aluguer_sala-cliente_id` FOREIGN KEY (`cliente_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  ADD CONSTRAINT `fk-aluguer_sala-cliente_id` FOREIGN KEY (`cliente_id`) REFERENCES `user` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
   ADD CONSTRAINT `fk-aluguer_sala-sala_id` FOREIGN KEY (`sala_id`) REFERENCES `sala` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 --
@@ -638,7 +638,7 @@ ALTER TABLE `cinema`
 --
 ALTER TABLE `compra`
   ADD CONSTRAINT `compra_ibfk_1` FOREIGN KEY (`sessao_id`) REFERENCES `sessao` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  ADD CONSTRAINT `fk-compra-cliente_id` FOREIGN KEY (`cliente_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
+  ADD CONSTRAINT `compra_ibfk_2` FOREIGN KEY (`cliente_id`) REFERENCES `user` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT;
 
 --
 -- Constraints for table `filme_genero`
