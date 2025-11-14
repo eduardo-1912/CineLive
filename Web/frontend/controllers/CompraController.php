@@ -12,6 +12,7 @@ use yii\filters\VerbFilter;
 use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
+use yii\web\NotFoundHttpException;
 
 class CompraController extends Controller
 {
@@ -43,7 +44,7 @@ class CompraController extends Controller
     public function actionIndex()
     {
         $currentUser = Yii::$app->user->identity;
-        $compras = $currentUser->compras;
+        $compras = $currentUser->getCompras()->orderBy(['id' => SORT_DESC])->all();
 
         return $this->render('index', [
             'compras' => $compras,

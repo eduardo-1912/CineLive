@@ -39,6 +39,32 @@ class AluguerSalaController extends Controller
         ];
     }
 
+    public function actionIndex()
+    {
+        // OBTER USER ATUAL
+        $currentUser = Yii::$app->user->identity;
+
+        $alugueres = $currentUser->getAlugueres()->orderBy(['id' => SORT_DESC])->all();
+
+        return $this->render('index', [
+            'alugueres' => $alugueres,
+        ]);
+    }
+
+    public function actionView($id)
+    {
+        $currentUser = Yii::$app->user;
+        $model = $this->findModel($id);
+
+        if ($currentUser->id != $model->cliente_id) {
+            return $this->redirect(Yii::$app->request->referrer ?: ['aluguer-sala/index']);
+        }
+
+        return $this->render('view', [
+            'model' => $model,
+        ]);
+    }
+
     public function actionCreate(){
 
         $model = new AluguerSala();
@@ -94,5 +120,15 @@ class AluguerSalaController extends Controller
         return $this->render('index', [
             'model' => $model,
         ]);
+    }
+
+
+    protected function findModel($id)
+    {
+        if (($model = AluguerSala::findOne(['id' => $id])) !== null) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException('The requested page does not exist.');
     }
 }

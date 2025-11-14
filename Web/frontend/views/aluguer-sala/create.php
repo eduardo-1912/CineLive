@@ -14,13 +14,14 @@ use yii\bootstrap4\ActiveForm;
 
 ?>
 
-<div class="aluguer-sala-form">
-    <?php $form = ActiveForm::begin(['id' => 'aluguer-sala-form',
-        'action' => ['AluguerSala/AluguerSalaForm'],
-        'method' => 'post'
-]); ?>
 
-    <div class="container my-5">
+
+    <div class="container">
+        <div class="aluguer-sala-form">
+            <?php $form = ActiveForm::begin(['id' => 'aluguer-sala-form',
+                'action' => ['AluguerSala/AluguerSalaForm'],
+                'method' => 'post'
+            ]); ?>
         <div class="row min-vh-50">
             <div class="col-md-8">
                 <h4 class="fw-bold">Preencha seus dados</h4>

@@ -84,40 +84,16 @@ $perfilPath = '/perfil/index';
             <div class="input-group nav-search overflow-hidden">
                 <?= Html::input('search', 'q', Yii::$app->request->get('q'), [
                     'class' => 'form-control border-0 bg-light shadow-none',
+                    'style' => 'height: 34px;',
                     'placeholder' => 'Pesquisar filmes...',
                     'aria-label' => 'Pesquisar filmes',
                 ]) ?>
 
-                <!-- HIDDEN-INPUT DE CINEMA -->
-                <?= Html::hiddenInput('cinema_id', '', ['id' => 'navbar-cinema-id']) ?>
-
-                <button class="btn bg-light border-0 d-inline-flex" type="submit">
+                <button class="btn bg-light border-0 d-inline-flex" type="submit" style="height: 34px">
                     <?= file_get_contents(Yii::getAlias($iconsPath . 'search.svg')) ?>
                 </button>
             </div>
             <?php ActiveForm::end(); ?>
-
-            <!-- OBTER CINEMA DA LOCAL-STORAGE -->
-            <script>
-
-                // OBTER ÚLTIMO CINEMA ESCOLHIDO DA LOCAL STORAGE
-                const savedCinema = localStorage.getItem('cinema_id');
-
-                // ATUALIZAR INPUT DA BARRA DE PESQUISA
-                const cinemaInput = document.getElementById('navbar-cinema-id');
-                if (savedCinema && cinemaInput) {
-                    cinemaInput.value = savedCinema;
-                }
-
-                // ATUALIZAR O NAV-LINK 'Filmes'
-                const filmesLink = document.querySelector('a.nav-link[href$="/filme/index"]');
-                if (savedCinema && filmesLink) {
-                    const url = new URL(filmesLink.href, window.location.origin);
-                    url.searchParams.set('cinema_id', savedCinema);
-                    filmesLink.href = url.toString();
-                }
-
-            </script>
 
             <!-- LINK LOGIN -->
             <?php if (Yii::$app->user->isGuest): ?>

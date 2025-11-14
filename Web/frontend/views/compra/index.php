@@ -69,7 +69,7 @@ $this->title = 'Compras';
                 </div>
             <?php endforeach; ?>
             <?php else: ?>
-                <div class="box-white">
+                <div class="box-white rounded-4">
                     <div class="d-flex justify-content-center align-items-center w-100" style="height: 50vh;">
                         <h5 class="text-muted text-center fw-semibold m-0">Nenhuma compra encontrada!</h5>
                     </div>

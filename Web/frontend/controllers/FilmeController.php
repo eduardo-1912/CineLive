@@ -8,6 +8,7 @@ use common\models\Filme;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\Cookie;
 
 class FilmeController extends Controller
 {
@@ -15,9 +16,6 @@ class FilmeController extends Controller
     {
         // OBTER TODOS OS CINEMAS ATIVOS
         $cinemas = Cinema::find()->where(['estado' => Cinema::ESTADO_ATIVO])->orderBy('nome')->all();
-
-        // CINEMA ATUAL
-        $currentCinema = Cinema::findOne($cinema_id)->nome ?? null;
 
         // SE ESTADO FOR BREVEMENTE --> NÃO PRECISA DE CINEMA
         if ($estado === 'brevemente') {
@@ -35,7 +33,7 @@ class FilmeController extends Controller
 
             return $this->render('index', [
                 'filmes' => $filmes,
-                'cinema_id' => $cinema_id,
+                'cinema_id' => null,
                 'cinemas' => $cinemas,
                 'estado' => $estado,
                 'currentCinema' => $currentCinema,
@@ -43,19 +41,28 @@ class FilmeController extends Controller
             ]);
         }
 
-        // SE ESTADO FOR 'EM EXIBIÇÃO' OU 'KIDS' --> PRECISA DE CINEMA
-        // SE NENHUM CINEMA ESTIVER SELECIONADO --> REDIRECIONAR PARA O PRIMEIRO DISPONÍVEL
-        if (!$cinema_id && !empty($cinemas)) {
-            if (!$cinema_id && !empty($cinemas)) {
-                return $this->redirect([
-                    'index',
-                    'cinema_id' => $cinemas[0]->id,
-                    'estado' => $estado,
-                    'currentCinema' => $currentCinema,
-                    'q' => $q
-                ]);
-            }
+        // SE UM CINEMA FOI PASSADO POR PARÂMETRO --> CRIAR COOKIE
+        if ($cinema_id !== null) {
+            Yii::$app->response->cookies->add(new Cookie([
+                'name' => 'cinema_id',
+                'value' => $cinema_id,
+                'expire' => time() + 3600 * 24 * 180, // 180 DIAS
+            ]));
         }
+
+        // SE A QUERY NA TIVER CINEMA ID --> USAR O COOKIE
+        if ($cinema_id === null) {
+            $cinema_id = Yii::$app->request->cookies->getValue('cinema_id', null);
+        }
+
+        // SE MESMO ASSIM FOR NULL --> ESCOLHER O PRIMEIRO CINEMA ATIVO
+        if ($cinema_id === null) {
+            $cinema_id = $cinemas[0]->id;
+        }
+
+        // CINEMA ATUAL
+        $currentCinema = Cinema::findOne($cinema_id)->nome ?? null;
+
 
         // OBTER TODOS OS FILMES COM SESSÕES FUTURAS (EM EXIBIÇÃO)
         $query = Filme::find()

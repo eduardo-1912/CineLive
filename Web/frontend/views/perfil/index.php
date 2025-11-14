@@ -118,7 +118,7 @@ $this->title = 'Perfil';
                 <?php endforeach; ?>
                     <a href="<?= Url::to(['compra/index']) ?>" class="btn btn-dark rounded-3 mt-1 w-100">Ver todas</a>
                 <?php else: ?>
-                    <div class="box-white">
+                    <div class="box-white rounded-4">
                         <div class="d-flex justify-content-center align-items-center w-100" style="height: 6.15rem;">
                             <h5 class="text-muted text-center fw-semibold m-0">Nenhuma compra encontrada!</h5>
                         </div>
@@ -134,8 +134,8 @@ $this->title = 'Perfil';
                     <div class="box-white rounded-4 mb-2">
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <div>
-                                <p class="mb-0 fw-semibold"><?= $aluguer->cinema->nome ?></p>
-                                <span class="fs-14 text-muted"><?= $aluguer->sala->nome ?></span>
+                                <p class="mb-0 fw-semibold"><?= $aluguer->cinema->nome  . ' • ' . $aluguer->sala->nome ?></p>
+                                <span class="fs-14 text-muted"><?= $aluguer->tipo_evento ?></span>
                             </div>
                             <div class="text-end">
                                 <p class="mb-0 fw-semibold"><?= $aluguer->estadoFormatado ?></p>
@@ -160,7 +160,7 @@ $this->title = 'Perfil';
                 <?php endforeach; ?>
                     <a href="<?= Url::to(['aluguer-sala/index']) ?>" class="btn btn-dark rounded-3 px-3 mt-1 w-100">Ver todos</a>
                 <?php else: ?>
-                    <div class="box-white">
+                    <div class="box-white rounded-4">
                         <div class="d-flex justify-content-center align-items-center w-100" style="height: 6.15rem;">
                             <h5 class="text-muted text-center fw-semibold m-0">Nenhum pedido encontrado!</h5>
                         </div>
