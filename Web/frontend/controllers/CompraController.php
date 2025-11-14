@@ -93,8 +93,13 @@ class CompraController extends Controller
             Yii::$app->session->setFlash('warning', "A sessão começa dentro de {$minutosRestantes} minutos!");
         }
 
+        // OBTER SALA DA SESSÃO
         $sala = $sessao->sala;
+
+        // OBTER ARRAY COM TODOS OS LUGARES POSSÍVEIS DA SALA
         $lugaresSala = $sala->getArrayLugares();
+
+        // OBTER OS LUGARES QUE JÁ FORAM OCUPADOS DA SESSÃO
         $lugaresOcupados = $sessao->lugaresOcupados ?? [];
 
         // LER LUGARES DO URL
@@ -128,30 +133,37 @@ class CompraController extends Controller
             $lugaresImploded = implode(', ', $lugaresSelecionados);
         }
 
+        // GERAR MAPA DA SALA
         $mapa = [];
-
         for ($fila = 1; $fila <= $sala->num_filas; $fila++) {
             for ($coluna = 1; $coluna <= $sala->num_colunas; $coluna++) {
 
+                // FAZER LUGAR (EX.: A1)
                 $lugar = chr(64 + $fila) . $coluna;
 
+                // SE LUGAR ESTÁ OCUPADO
                 $ocupado = in_array($lugar, $lugaresOcupados);
+
+                // SE LUGAR ESTÁ SELECIONADO
                 $selecionado = in_array($lugar, $lugaresSelecionados);
 
+                // FAZER CÓPIA DA SELEÇÃO ATUAL
                 $novaSelecao = $lugaresSelecionados;
 
+                // CASO O UTILIZADOR CLIQUE NUM LUGAR QUE JÁ TINHA SELECIONADO --> TIRAR DA SELEÇÃO
                 if ($selecionado) {
                     $novaSelecao = array_diff($novaSelecao, [$lugar]);
-                } else {
+                }
+                // CASO CONTRÁRIO --> ADICIONAR LUGAR À NOVA SELEÇÃO DE LUGARES
+                else {
                     $novaSelecao[] = $lugar;
                 }
 
+                // CRIAR URL DO BOTÃO DE LUGAR
                 $mapa[$fila][$coluna] = [
                     'label' => $coluna,
                     'url' => Url::to([
-                        'compra/create',
-                        'sessao_id' => $sessao->id,
-                        'lugares' => implode(',', $novaSelecao)
+                        'compra/create', 'sessao_id' => $sessao->id, 'lugares' => implode(',', $novaSelecao)
                     ]),
                     'ocupado' => $ocupado,
                     'selecionado' => $selecionado,

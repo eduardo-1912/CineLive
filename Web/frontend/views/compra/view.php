@@ -41,31 +41,31 @@ $this->title = 'Compra #' . $model->id;
 
             <!-- INFO -->
             <div class="w-100 d-flex flex-column gap-2">
-                <h4 class="mb-1"><?= $model->sessao->filme->titulo ?></h4>
+                <h4 class="mb-1"><?= $model->sessao->filme->titulo  . ' • ' . $model->dataFormatada ?></h4>
 
                 <div class="row row-cols-2 row-cols-md-3 w-100 gy-3">
                     <div class="d-flex flex-column text-start">
-                        <span class="fw-medium fs-14">Cinema</span>
+                        <span class="fw-medium fs-14 fw-semibold">Cinema</span>
                         <span class="text-muted"><?= $model->sessao->cinema->nome ?></span>
                     </div>
                     <div class="d-flex flex-column text-start">
-                        <span class="fw-medium fs-14">Efetuada a</span>
-                        <span class="text-muted"><?= $model->dataFormatada ?></span>
+                        <span class="fw-medium fs-14 fw-semibold">Sala</span>
+                        <span class="text-muted"><?= $model->sessao->sala->nome ?></span>
                     </div>
                     <div class="d-flex flex-column text-start">
-                        <span class="fw-medium fs-14">Estado</span>
+                        <span class="fw-medium fs-14 fw-semibold">Estado</span>
                         <span class="text-muted"><?= $model->estadoFormatado ?></span>
                     </div>
                     <div class="d-flex flex-column text-start">
-                        <span class="fw-medium fs-14">Data da Sessão</span>
+                        <span class="fw-medium fs-14 fw-semibold">Data da Sessão</span>
                         <span class="text-muted"><?= $model->sessao->dataFormatada ?></span>
                     </div>
                     <div class="d-flex flex-column text-start">
-                        <span class="fw-medium fs-14">Horário</span>
+                        <span class="fw-medium fs-14 fw-semibold">Horário</span>
                         <span class="text-muted"><?= $model->sessao->horaInicioFormatada . ' - ' . $model->sessao->horaFimFormatada ?></span>
                     </div>
                     <div class="d-flex flex-column text-start">
-                        <span class="fw-medium fs-14">Total</span>
+                        <span class="fw-medium fs-14 fw-semibold">Total</span>
                         <span class="text-muted"><?= $model->totalEmEuros ?></span>
                     </div>
                 </div>

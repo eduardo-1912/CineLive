@@ -36,7 +36,6 @@ class FilmeController extends Controller
                 'cinema_id' => null,
                 'cinemas' => $cinemas,
                 'estado' => $estado,
-                'currentCinema' => $currentCinema,
                 'q' => $q,
             ]);
         }
@@ -65,12 +64,7 @@ class FilmeController extends Controller
 
 
         // OBTER TODOS OS FILMES COM SESSÕES FUTURAS (EM EXIBIÇÃO)
-        $query = Filme::find()
-            ->alias('f')
-            ->joinWith(['sessaos s'])
-            ->where(['s.cinema_id' => $cinema_id])
-            ->andWhere(['>=', 's.data', date('Y-m-d')])
-            ->distinct();
+        $query = Filme::findComSessoesFuturas($cinema_id);
 
         // PESQUISA POR TÍTULO
         if ($q) {

@@ -52,19 +52,19 @@ $lugaresOcupados = $sessao->lugaresOcupados ?? [];
                         <!-- DETALHES DA SESSÃO -->
                         <div class="row row-cols-2 row-cols-md-4 row-cols-lg-2 w-100 gy-3 mb-3">
                             <div class="d-flex flex-column text-start">
-                                <span class="fw-medium fs-14">Cinema</span>
+                                <span class="fw-semibold fs-14">Cinema</span>
                                 <span class="text-muted"><?= $sessao->cinema->nome ?></span>
                             </div>
                             <div class="d-flex flex-column text-start">
-                                <span class="fw-medium fs-14">Data</span>
+                                <span class="fw-semibold fs-14">Data</span>
                                 <span class="text-muted"><?= $sessao->dataFormatada ?></span>
                             </div>
                             <div class="d-flex flex-column text-start">
-                                <span class="fw-medium fs-14">Hora Início</span>
+                                <span class="fw-semibold fs-14">Hora Início</span>
                                 <span class="text-muted"><?= $sessao->horaInicioFormatada ?></span>
                             </div>
                             <div class="d-flex flex-column text-start">
-                                <span class="fw-medium fs-14">Hora Fim</span>
+                                <span class="fw-semibold fs-14">Hora Fim</span>
                                 <span class="text-muted"><?= $sessao->horaFimFormatada ?></span>
                             </div>
                         </div>
@@ -108,15 +108,16 @@ $lugaresOcupados = $sessao->lugaresOcupados ?? [];
                                     <?= chr(64 + $fila) ?>
                                 </div>
 
-                                <?php foreach ($mapa[$fila] as $info): ?>
+                                <?php foreach ($mapa[$fila] as $lugar): ?>
 
                                     <?php
+                                    // CLASSES DOS BUTÕES
                                     $classes = 'd-flex align-items-center rounded-3 shadow-sm justify-content-center btn fw-semibold mx-1 border ';
 
-                                    if ($info['ocupado']) {
+                                    if ($lugar['ocupado']) {
                                         $classes .= 'btn-secondary disabled pe-none';
                                     }
-                                    elseif ($info['selecionado']) {
+                                    elseif ($lugar['selecionado']) {
                                         $classes .= 'btn-danger';
                                     }
                                     else {
@@ -124,7 +125,7 @@ $lugaresOcupados = $sessao->lugaresOcupados ?? [];
                                     }
                                     ?>
 
-                                    <?= Html::a($info['label'], $info['url'], [
+                                    <?= Html::a($lugar['label'], $lugar['url'], [
                                         'class' => $classes,
                                         'style' => 'min-width:45px; height:45px;',
                                     ]) ?>

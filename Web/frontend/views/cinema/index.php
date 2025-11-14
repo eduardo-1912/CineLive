@@ -39,23 +39,23 @@ $this->title = 'Cinemas';
                     <div class="row row-cols-2 w-100 gy-3 mb-0 mb-lg-4">
 
                         <div class="col-12 d-flex flex-column text-start">
-                            <span class="fw-medium fs-14">Morada</span>
+                            <span class="fw-medium fs-14 fw-semibold">Morada</span>
                             <span class="text-muted"><?= $cinema->moradaCompleta ?></span>
                         </div>
                         <div class="d-flex flex-column text-start">
-                            <span class="fw-medium fs-14">Telefone</span>
+                            <span class="fw-medium fs-14 fw-semibold">Telefone</span>
                             <span class="text-muted"><?= $cinema->telefone ?></span>
                         </div>
                         <div class="d-flex flex-column text-start">
-                            <span class="fw-medium fs-14">Horário</span>
+                            <span class="fw-medium fs-14 fw-semibold">Horário</span>
                             <span class="text-muted"><?= $cinema->horario ?></span>
                         </div>
                         <div class="d-flex flex-column text-start">
-                            <span class="fw-medium fs-14">Email</span>
+                            <span class="fw-medium fs-14 fw-semibold">Email</span>
                             <a href="mailto:<?= $cinema->email ?>" target="_blank" class="text-decoration-none"><?= $cinema->email ?></a>
                         </div>
                         <div class="d-flex flex-column text-start">
-                            <span class="fw-medium fs-14">Capacidade</span>
+                            <span class="fw-medium fs-14 fw-semibold">Capacidade</span>
                             <span class="text-muted"><?= $cinema->totalSalas ?> Salas<span class="d-none d-sm-inline"> • <?= $cinema->numeroLugares ?> Lugares</span></span>
                         </div>
 

@@ -54,12 +54,12 @@ $this->title = 'Compras';
                         <div class="d-flex align-items-center justify-content-between">
                         <div class="w-100 d-flex gap-5">
                             <div>
-                                <p class="mb-0 fw-semibold">Sessão</p>
-                                <span class="fs-14 text-muted"><?= $compra->sessao->dataFormatada . ' - ' . $compra->sessao->horaInicioFormatada ?></span>
+                                <p class="mb-0 fs-14 fw-semibold">Sessão</p>
+                                <span class="text-muted"><?= $compra->sessao->dataFormatada . ' - ' . $compra->sessao->horaInicioFormatada ?></span>
                             </div>
                             <div class="d-none d-sm-block">
-                                <p class="mb-0 fw-semibold">Lugares</p>
-                                <span class="fs-14 text-muted"><?= $compra->listaLugares ?></span>
+                                <p class="mb-0 fs-14 fw-semibold">Lugares</p>
+                                <span class="text-muted"><?= $compra->listaLugares ?></span>
                             </div>
                         </div>
                         <a href="<?= Url::to(['compra/view', 'id' => $compra->id]) ?>" class="btn btn-dark px-3 rounded-3">Detalhes</a>

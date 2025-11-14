@@ -61,7 +61,7 @@ class AluguerSalaController extends Controller
         }
 
         return $this->render('view', [
-            'model' => $model,
+            'model' => $model
         ]);
     }
 
@@ -102,6 +102,33 @@ class AluguerSalaController extends Controller
             'cinemasOptions'=>$cinemasOptions,
         ]);
 
+    }
+
+
+    public function actionDelete($id)
+    {
+        $currentUser = Yii::$app->user;
+        $model = $this->findModel($id);
+
+        if ($currentUser->id != $model->cliente_id) {
+            Yii::$app->session->setFlash('error', 'Não tem permissão para eliminar este pedido de aluguer de sala.');
+            return $this->redirect(Yii::$app->request->referrer ?: ['aluguer-sala/index']);
+        }
+
+        if ($model->isDeletable())
+        {
+            if ($model->delete()) {
+                Yii::$app->session->setFlash('success', 'Pedido de aluguer eliminado com sucesso.');
+            }
+            else {
+                Yii::$app->session->setFlash('error', 'Ocorreu um erro ao eliminar o pedido de aluguer.');
+            }
+        }
+        else {
+            Yii::$app->session->setFlash('error', 'Não pode eliminar pedidos de aluguer já confirmados.');
+        }
+
+        return $this->redirect(Yii::$app->request->referrer ?: ['aluguer-sala/index']);
     }
 
     public function actionAluguerSalaForm()

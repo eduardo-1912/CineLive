@@ -20,26 +20,26 @@ $mapaLugaresCompra = $model->mapaLugaresCompra;
         <?php foreach ($mapa as $fila => $colunas): ?>
             <div class="d-flex justify-content-center mb-2 flex-wrap">
 
-                <?php foreach ($colunas as $info): ?>
+                <?php foreach ($colunas as $lugar): ?>
 
                     <?php
                     $classes = 'lugar fw-semibold text-center rounded-3 mx-2 my-0 d-flex align-items-center justify-content-center ';
-                    if ($info['confirmado']) {
+                    if ($lugar['confirmado']) {
                         $classes .= 'bg-success';
-                    } elseif ($info['ocupado']) {
+                    } elseif ($lugar['ocupado']) {
                         $classes .= 'bg-danger';
                     } else {
                         $classes .= 'bg-secondary opacity-75';
                     }
                     ?>
 
-                    <?php if ($info['compraId']): ?>
-                        <?= Html::a($info['label'], ['compra/view', 'id' => $info['compraId']], [
+                    <?php if ($lugar['compraId']): ?>
+                        <?= Html::a($lugar['label'], ['compra/view', 'id' => $lugar['compraId']], [
                             'class' => $classes . ' text-decoration-none',
                         ]) ?>
                     <?php else: ?>
                         <div class="<?= $classes ?>">
-                            <?= $info['label'] ?>
+                            <?= $lugar['label'] ?>
                         </div>
                     <?php endif; ?>
 

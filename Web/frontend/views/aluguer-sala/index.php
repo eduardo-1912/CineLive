@@ -43,12 +43,12 @@ $this->title = 'Alugueres';
                         <div class="d-flex align-items-center justify-content-between">
                             <div class="w-100 d-flex gap-2 gap-sm-5">
                                 <div>
-                                    <p class="mb-0 fw-semibold">Data</p>
-                                    <span class="fs-14 text-muted"><?= $aluguer->dataFormatada ?></span>
+                                    <p class="mb-0 fs-14 fw-semibold">Data</p>
+                                    <span class="text-muted"><?= $aluguer->dataFormatada ?></span>
                                 </div>
                                 <div>
-                                    <p class="mb-0 fw-semibold">Horário</p>
-                                    <span class="fs-14 text-muted"><?= $aluguer->horaInicioFormatada . ' - ' . $aluguer->horaFimFormatada ?></span>
+                                    <p class="mb-0 fs-14 fw-semibold">Horário</p>
+                                    <span class="text-muted"><?= $aluguer->horaInicioFormatada . ' - ' . $aluguer->horaFimFormatada ?></span>
                                 </div>
                             </div>
                             <a href="<?= Url::to(['aluguer-sala/view', 'id' => $aluguer->id]) ?>" class="btn btn-dark px-3 rounded-3">Detalhes</a>

@@ -57,7 +57,7 @@ class CompraSearch extends Compra
                 'pageSize' => Yii::$app->params['pageSize'],
             ],
             'sort' => [
-                'defaultOrder' => ['estado' => SORT_ASC],
+                'defaultOrder' => ['data' => SORT_DESC],
             ],
         ]);
 
