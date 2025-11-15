@@ -1,85 +1,87 @@
 <?php
 
-use common\models\AluguerSala;
-use common\models\Cinema;
-use common\models\Sala;
-use common\models\User;
-use yii\helpers\ArrayHelper;
+use yii\bootstrap5\ActiveForm;
+use yii\bootstrap4\Breadcrumbs;
 use yii\helpers\Html;
-use yii\bootstrap4\ActiveForm;
+use yii\helpers\Url;
 
-/* @var $this yii\web\View */
-/* @var $model common\models\AluguerSala */
-/* @var $form yii\bootstrap4\ActiveForm */
+/** @var yii\web\View $this */
+
+$iconsPath = '@webroot/icons/';
+$btnClasses = 'btn btn-dark fw-medium rounded-3 w-100 fs-15 py-2';
+
+$this->title = 'Alugar Sala';
 
 ?>
 
+<div class="container">
 
-
-    <div class="container">
-        <div class="aluguer-sala-form">
-            <?php $form = ActiveForm::begin(['id' => 'aluguer-sala-form',
-                'action' => ['AluguerSala/AluguerSalaForm'],
-                'method' => 'post'
-            ]); ?>
-        <div class="row min-vh-50">
-            <div class="col-md-8">
-                <h4 class="fw-bold">Preencha seus dados</h4>
-                <p class="text-muted mb-4">
-                    Faça seu pedido de Aluguer de sala aqui.
-                </p>
-                <?= $form->field($model, 'cliente_id')->textInput(['value' => $nomeCliente, 'disabled' => true]) ?>
-                <?= $form->field($model, 'email')->textInput(['value' => $emailCliente, 'disabled' => true,])->label('Email') ?>
-                <?= $form->field($model, 'telemovel')->textInput(['value' => $telemovelCliente, 'disabled' => true,])->label('Telemóvel') ?>
-            </div>
-
-            <!-- FORMULARIO 'GET' PARA SELECIONAR O CINEMA -->
-            <?php $form = ActiveForm::begin(['method' => 'get', 'action' => ['create']]); ?>
-            <div class="form-group">
-                <label for="cinema_id">Cinema</label>
-                <?= Html::dropDownList('cinema_id', $model->cinema_id, $cinemasOptions, [
-                        'prompt' => 'Selecione o cinema',
-                        'class' => 'form-control',
-                        'onchange' => 'this.form.submit()',
-                        'disabled' => !$model->isNewRecord,
-                ]) ?>
-            </div>
-            <?php ActiveForm::end(); ?>
-
-            <!-- FORM 'POST' PARA CRIAR PEDIDO -->
-
-            <?php $form = ActiveForm::begin(); ?>
-
-            <?php if ($model->cinema_id): ?>
-                <?= $form->field($model, 'cinema_id')->hiddenInput(['value' => $model->cinema_id])->label(false) ?>
-            <?php endif; ?>
-
-            <?= $form->field($model, 'data')->Input('date')->label('Data') ?>
-
-            <!-- HORA INÍCIO/FIM -->
-            <?= $form->field($model, 'hora_inicio')->Input('time')->label('Horário de Inicio') ?>
-            <?= $form->field($model, 'hora_fim')->Input('time')->label('Horário de Encerramento') ?>
-
-            <!-- TIPO DE EVENTO -->
-            <?= $form->field($model, 'tipo_evento')->textInput(['maxlength' => true]) ?>
-
-            <!-- OBSERVAÕES -->
-            <?= $form->field($model, 'observacoes')->textarea(['rows' => 4]) ?>
-
-            <!-- SALA -->
-            <?= $form->field($model, 'sala_id')->dropDownList($salasDisponiveis,
-                [
-                    'prompt' => 'Selecione uma sala',
-                    'disabled' => in_array($model->estado, [
-                        $model::ESTADO_A_DECORRER,
-                        $model::ESTADO_TERMINADO,
-                    ]),
-                ]
-            ) ?>
-
-    <div class="form-group mt-4">
-        <?= Html::submitButton('Enviar Pedido', ['class' => 'btn btn-success']) ?>
+    <div class="mb-4">
+        <h4 class="page-title m-0">Aluga uma Sala</h4>
+        <p class="text-muted">Envia-nos um pedido de aluguer de sala privada e um gerente entrará em contacto consigo.</p>
     </div>
 
-    <?php ActiveForm::end(); ?>
+
+    <div>
+
+        <!-- FORM GET PARA MOSTRAR APENAS AS SALAS DISPONÍVEIS PARA O CINEMA E HORÁRIO SELECIONADO -->
+        <?php $formGet = ActiveForm::begin([
+            'method' => 'get', 'action' => ['aluguer-sala/create'],
+            'id' => 'aluguersala-form-get'
+        ]); ?>
+
+        <div class="row row-cols-sm-3">
+            <?= $formGet->field($model, 'data')->input('date', [
+                'value' => $model->data ?: date('Y-m-d'),
+                'min' => date('Y-m-d'), 'name' => 'data',
+            ]) ?>
+            <?= $formGet->field($model, 'hora_inicio')->input('time', ['name' => 'hora_inicio',]) ?>
+            <?= $formGet->field($model, 'hora_fim')->input('time', ['name' => 'hora_fim',]) ?>
+        </div>
+
+        <?= $formGet->field($model, 'cinema_id')->dropDownList(
+            $cinemasOptions, ['prompt' => 'Selecione o cinema', 'name' => 'cinema_id', 'onchange' => 'this.form.submit()']
+        ) ?>
+
+        <?php ActiveForm::end(); ?>
+
+        <?php $form = ActiveForm::begin(['method' => 'post']); ?>
+
+        <!-- CAMPOS OCULTOS (TRAZIDOS PELO GET) -->
+        <?= $form->field($model, 'data')->hiddenInput()->label(false) ?>
+        <?= $form->field($model, 'hora_inicio')->hiddenInput()->label(false) ?>
+        <?= $form->field($model, 'hora_fim')->hiddenInput()->label(false) ?>
+        <?= $form->field($model, 'cinema_id')->hiddenInput()->label(false) ?>
+
+        <?= $formGet->field($model, 'sala_id')->dropDownList($salasOptions, ['prompt' => 'Selecione a sala',]) ?>
+
+        <?= $form->field($model, 'tipo_evento') ?>
+        <?= $form->field($model, 'observacoes')->textarea(['rows' => 6]) ?>
+
+        <div class="form-group">
+            <?= Html::submitButton('Enviar Pedido', ['class' => 'btn btn-dark fw-medium rounded-3 py-2 w-100']) ?>
+        </div>
+
+        <?php ActiveForm::end(); ?>
+    </div>
+
 </div>
+
+<?php
+$script = <<<JS
+$(function() {
+    
+    var timer;
+    
+    // QUANDO HORÁRIO MUDAR --> DAR UM DELAY ANTES DE RECARREGAR A PÁGINA
+    $('#aluguersala-data, #aluguersala-hora_inicio, #aluguersala-hora_fim').on('input change', function() {
+        clearTimeout(timer);
+        timer = setTimeout(function() {
+            $('#aluguersala-form-get').submit();
+        }, 400);
+    });
+    
+});
+JS;
+$this->registerJs($script);
+?>

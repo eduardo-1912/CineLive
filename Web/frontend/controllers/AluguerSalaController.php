@@ -65,44 +65,59 @@ class AluguerSalaController extends Controller
         ]);
     }
 
-    public function actionCreate(){
-
+    public function actionCreate($cinema_id = null, $data = null, $hora_inicio = null, $hora_fim = null)
+    {
         $model = new AluguerSala();
 
-        $currentUser = Yii::$app->user->identity;
+        // preenche o model (para repor valores no formulário)
+        $model->cinema_id = $cinema_id ?? Yii::$app->request->cookies->getValue('cinema_id', null);
+        $model->data = $data ?? date('Y-m-d');
+        $model->hora_inicio = $hora_inicio;
+        $model->hora_fim = $hora_fim;
 
-        $nomeCliente = $currentUser->profile->nome ?? '-';
-        $emailCliente = $currentUser->email ?? '-';
-        $telemovelCliente = $currentUser->profile->telemovel ?? '-';
-        $nomeCinema = $model->cinema->nome ?? '-';
-
-        //OBTER CINEMAS DISPONIVEIS
-        $cinemasOptions = ArrayHelper::map(Cinema::Find()->where(['estado' => Cinema::ESTADO_ATIVO])->orderBy('nome')->all(), 'id', 'nome');
-        $cinemaId = Yii::$app->request->get('cinema_id');
-
-        if ($cinemaId !== null) {
-            $model->cinema_id = $cinemaId;  // <-- ESSENCIAL
-        }
+        // CINEMAS
+        $cinemas = Cinema::find()->where(['estado' => Cinema::ESTADO_ATIVO])->all();
+        $cinemasOptions = ArrayHelper::map($cinemas, 'id', 'nome');
 
         // SALAS DISPONÍVEIS
-        $salasDisponiveis = Sala::getSalasDisponiveis($model->cinema_id, $model->data, $model->hora_inicio, $model->hora_fim, $model->sala_id);
-        $salasDisponiveis = ArrayHelper::map($salasDisponiveis, 'id', function ($sala){
-            $lugares = $sala->num_filas * $sala->num_colunas;
-            return "{$sala->nome} - {$lugares} lugares";
-        });
+        $salasOptions = [];
 
+        if ($cinema_id && $data && $hora_inicio && $hora_fim) {
+            $salas = Sala::getSalasDisponiveis($cinema_id, $data, $hora_inicio, $hora_fim);
+
+            foreach ($salas as $sala) {
+                $salasOptions[$sala->id] = "{$sala->nome}  • {$sala->lugares} Lugares";
+            }
+        }
+
+        if ($model->load(Yii::$app->request->post())) {
+
+            $model->cliente_id = Yii::$app->user->id;
+            $model->estado = AluguerSala::ESTADO_PENDENTE;
+
+            if ($model->validateHorario()) {
+                if ($model->save()) {
+                    Yii::$app->session->setFlash('success', 'Pedido de aluguer enviado com sucesso!');
+                    return $this->redirect(['aluguer-sala/view', 'id' => $model->id]);
+                }
+                else {
+                    Yii::$app->session->setFlash('error', 'Ocorreu um erro ao enviar o pedido.');
+
+                }
+            }
+            else {
+                Yii::$app->session->setFlash('error', 'O horário selecionado é inválido.');
+            }
+
+        }
 
         return $this->render('create', [
             'model' => $model,
-            'nomeCliente'=>$nomeCliente,
-            'emailCliente'=>$emailCliente,
-            'telemovelCliente'=>$telemovelCliente,
-            'nomeCinema'=>$nomeCinema,
-            'salasDisponiveis'=>$salasDisponiveis,
-            'cinemasOptions'=>$cinemasOptions,
+            'cinemasOptions' => $cinemasOptions,
+            'salasOptions' => $salasOptions,
         ]);
-
     }
+
 
 
     public function actionDelete($id)
@@ -129,24 +144,6 @@ class AluguerSalaController extends Controller
         }
 
         return $this->redirect(Yii::$app->request->referrer ?: ['aluguer-sala/index']);
-    }
-
-    public function actionAluguerSalaForm()
-    {
-        $model = new ContactForm();
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            if ($model->sendEmail(Yii::$app->params['adminEmail'])) {
-                Yii::$app->session->setFlash('success', 'Thank you for contacting us. We will respond to you as soon as possible.');
-            } else {
-                Yii::$app->session->setFlash('error', 'There was an error sending your message.');
-            }
-
-            return $this->refresh();
-        }
-
-        return $this->render('index', [
-            'model' => $model,
-        ]);
     }
 
 

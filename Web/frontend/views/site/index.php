@@ -115,15 +115,16 @@ $this->title = 'Home';
                 <h4 class="page-title m-0">Filmes Mais Vistos</h4>
             </div>
 
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 gx-2">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
                 <?php foreach ($filmesMaisVistos as $filme): ?>
-                    <a href="<?= Url::to(['filme/view', 'id' => $filme->id]) ?>" class="card-filme text-center text-decoration-none text-black">
+                    <a href="<?= Url::to(['filme/view', 'id' => $filme->id]) ?>"
+                       class="card-filme text-center text-decoration-none text-black d-flex flex-column gap-1">
                         <?= Html::img($filme->getPosterUrl(), [
-                            'class' => 'img-fluid rounded-4 shadow-sm',
-                            'style' => 'aspect-ratio: 2/3;',
+                            'class' => 'card-img-top shadow-sm rounded-4',
                             'alt' => $filme->titulo,
+                            'style' => 'object-fit: cover; aspect-ratio: 2/3;'
                         ]) ?>
-                        <h5 class="mb-4 mb-lg-0 mt-1 fw-semibold fs-6"><?= $filme->titulo ?></h5>
+                        <h5 class="fw-semibold fs-6"><?= $filme->titulo ?></h5>
                     </a>
                 <?php endforeach; ?>
             </div>

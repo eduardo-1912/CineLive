@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use common\models\Sala;
 use common\models\User;
 use common\models\UserProfile;
 use Yii;
@@ -196,13 +197,13 @@ class CinemaController extends Controller
                         }
 
                         // DESATIVAR UTILIZADORES
-                        $this->atualizarEstadoUtilizadores($model);
-                        Yii::$app->session->setFlash('success', 'Cinema encerrado. Gerente e funcionários foram desativados.');
+                        $this->atualizarStaffSalas($model);
+                        Yii::$app->session->setFlash('success', 'Cinema encerrado. Staff e salas foram desativados.');
                     }
                     elseif ($model->isEstadoAtivo()) {
                         // ATIVAR UTILIZADORES
-                        $this->atualizarEstadoUtilizadores($model);
-                        Yii::$app->session->setFlash('success', 'Cinema reativado com sucesso. Gerente e funcionários voltaram a estar ativos.');
+                        $this->atualizarStaffSalas($model);
+                        Yii::$app->session->setFlash('success', 'Cinema reativado com sucesso. Staff e salas voltaram a estar ativos.');
                     }
 
                 }
@@ -265,11 +266,11 @@ class CinemaController extends Controller
 
             // DESATIVAR GERENTE E FUNCIONÁRIOS
             if ($model->save(false, ['estado'])) {
-                $this->atualizarEstadoUtilizadores($model);
-                Yii::$app->session->setFlash('success', 'Cinema encerrado. Gerente e funcionários foram desativados.');
+                $this->atualizarStaffSalas($model);
+                Yii::$app->session->setFlash('success', 'Cinema encerrado. Staff e salas foram desativados.');
             }
             else {
-                Yii::$app->session->setFlash('error', 'Erro ao encerrar o cinema.');
+                Yii::$app->session->setFlash('error', 'Ocorreu um erro ao encerrar o cinema.');
             }
         }
 
@@ -281,11 +282,11 @@ class CinemaController extends Controller
 
             // REATIVAR GERENTE E FUNCIONÁRIOS
             if ($model->save(false, ['estado'])) {
-                $this->atualizarEstadoUtilizadores($model);
-                Yii::$app->session->setFlash('success', 'Cinema reativado. Gerente e funcionários voltaram a estar ativos.');
+                $this->atualizarStaffSalas($model);
+                Yii::$app->session->setFlash('success', 'Cinema reativado com sucesso. Staff e salas voltaram a estar ativos.');
             }
             else {
-                Yii::$app->session->setFlash('error', 'Erro ao ativar o cinema.');
+                Yii::$app->session->setFlash('error', 'Ocorreu um erro ao ativar o cinema.');
             }
         }
 
@@ -294,11 +295,18 @@ class CinemaController extends Controller
 
 
     // ATIVAR/DESATIVAR STAFF CONSOANTE O ESTADO DO CINEMA
-    private function atualizarEstadoUtilizadores(Cinema $cinema)
+    private function atualizarStaffSalas(Cinema $cinema)
     {
+        // ATIVAR/DESATIVAR STAFF CONSOANTE O ESTADO DO CINEMA
         User::updateAll(
             ['status' => ($cinema->estado === Cinema::ESTADO_ATIVO) ? User::STATUS_ACTIVE : User::STATUS_INACTIVE],
             ['id' => UserProfile::find()->select('user_id')->where(['cinema_id' => $cinema->id])]
+        );
+
+        // ATIVAR/DESATIVAR SALAS DO CINEMA
+        Sala::updateAll(
+            ['estado' => ($cinema->estado === Cinema::ESTADO_ATIVO) ? Sala::ESTADO_ATIVA : Sala::ESTADO_ENCERRADA],
+            ['cinema_id' => $cinema->id]
         );
     }
 

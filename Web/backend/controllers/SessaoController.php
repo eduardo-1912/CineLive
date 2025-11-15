@@ -295,6 +295,8 @@ class SessaoController extends Controller
 
                 // VALIDAR HORÁRIO
                 if (!$model->validateHorario()) {
+                    Yii::$app->session->setFlash('error', 'O horário selecionado é inválido.');
+
                     return $this->render('create', [
                         'model' => $model,
                         'cinemasAtivos' => $cinemasAtivos,

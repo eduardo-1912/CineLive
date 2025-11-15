@@ -13,8 +13,9 @@ $iconsPath = '@webroot/icons/';
 $btnClasses = 'btn btn-dark fw-medium rounded-3 w-100 fs-15 py-2';
 
 $this->title = 'Serviços';
-$this->params['breadcrumbs'][] = $this->title;
+
 ?>
+
 <div class="site-contact container">
 
     <div class="mb-4">
@@ -49,7 +50,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="box-gray rounded-4 mb-3 flex-grow-1 d-flex flex-column justify-content-between">
                 <div class="d-flex h-100 flex-column justify-content-center align-items-center text-center">
                     <?= file_get_contents(Yii::getAlias($iconsPath . 'calendar.svg')) ?>
-                    <h5 class="fw-semibold mt-2 mb-1" style="font-size: 18px; color: var(--gray-800);">Aluga uma sala</h5>
+                    <h5 class="fw-semibold mt-2 mb-1" style="font-size: 18px; color: var(--gray-800);">Aluga uma Sala</h5>
                     <p class="text-muted mb-0">Celebra com amigos e familiares.</p>
                 </div>
             </div>

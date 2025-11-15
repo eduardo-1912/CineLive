@@ -214,7 +214,7 @@ class Sala extends \yii\db\ActiveRecord
     // VERIFICAR SE PODE SER ATIVADA
     public function isActivatable(): bool
     {
-        return $this->estado === self::ESTADO_ENCERRADA;
+        return $this->estado === self::ESTADO_ENCERRADA && $this->cinema->isEstadoAtivo();
     }
 
     // VERIFICAR SE PODE SER ENCERRADA

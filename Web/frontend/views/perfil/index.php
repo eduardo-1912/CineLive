@@ -13,7 +13,7 @@ $this->title = 'Perfil';
 <div class="container">
 
     <div class="mb-4">
-        <h4 class="page-title m-0">O meu perfil</h4>
+        <h4 class="page-title m-0">O meu Perfil</h4>
     </div>
 
     <div class="row g-3">
