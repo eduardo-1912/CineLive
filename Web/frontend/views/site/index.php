@@ -41,7 +41,7 @@ $this->title = 'Home';
                                 <!-- DETALHES -->
                                 <div class="col-lg p-0">
 
-                                    <p class="text-50 fs-14 mb-1 fw-medium"><?= $filme->rating ?> • <?= $filme->idioma ?> • <?= $filme->duracao ?>min</p>
+                                    <p class="text-50 fs-14 mb-1 fw-medium"><?= $filme->rating ?> • <?= $filme->idioma ?> • <?= $filme->duracaoEmHoras ?></p>
 
                                     <h1 class="text-white fw-bold display-5 mb-3"><?= $filme->titulo ?></h1>
 

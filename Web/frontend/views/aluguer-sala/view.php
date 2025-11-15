@@ -51,7 +51,7 @@ $this->title = 'Aluguer #' . $model->id;
                     </div>
                     <div class="d-flex flex-column text-start">
                         <span class="fw-semibold fs-14">Horário</span>
-                        <span class="text-muted"><?= $model->horaInicioFormatada . ' - ' . $model->horaFimFormatada ?></span>
+                        <span class="text-muted"><?= "{$model->horaInicioFormatada} - {$model->horaFimFormatada}" ?></span>
                     </div>
                     <div class="d-flex flex-column text-start">
                         <span class="fw-semibold fs-14">Estado</span>

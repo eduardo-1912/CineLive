@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Nov 13, 2025 at 05:08 PM
+-- Generation Time: Nov 15, 2025 at 07:21 PM
 -- Server version: 9.1.0
--- PHP Version: 8.4.0
+-- PHP Version: 8.4.13
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -43,15 +43,16 @@ CREATE TABLE IF NOT EXISTS `aluguer_sala` (
   KEY `idx-aluguer_sala-cliente_id` (`cliente_id`),
   KEY `idx-aluguer_sala-sala_id` (`sala_id`),
   KEY `cinema_id` (`cinema_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `aluguer_sala`
 --
 
 INSERT INTO `aluguer_sala` (`id`, `cliente_id`, `cinema_id`, `sala_id`, `data`, `hora_inicio`, `hora_fim`, `estado`, `tipo_evento`, `observacoes`) VALUES
-(1, 14, 1, 4, '2025-11-09', '10:00:00', '19:00:00', 'confirmado', 'Festa de anos', 'fsdfs'),
-(2, 15, 2, 9, '2025-11-19', '10:00:00', '15:00:00', 'pendente', 'fs', 'fds');
+(1, 14, 1, 4, '2025-11-14', '10:00:00', '19:00:00', 'confirmado', 'Festa de anos', 'fsdfs'),
+(2, 14, 2, 9, '2025-11-19', '10:00:00', '15:00:00', 'confirmado', 'Evento de empresa', 'fds'),
+(3, 14, 2, 8, '2025-11-15', '20:00:00', '21:00:00', 'pendente', 'rwe543534', 'rewrwerwe');
 
 -- --------------------------------------------------------
 
@@ -76,6 +77,7 @@ INSERT INTO `auth_assignment` (`item_name`, `user_id`, `created_at`) VALUES
 ('admin', '1', 1761852169),
 ('cliente', '14', 1762016693),
 ('cliente', '15', 1762352864),
+('cliente', '16', 1763066569),
 ('funcionario', '10', 1762528324),
 ('funcionario', '11', 1761899669),
 ('funcionario', '12', 1761899704),
@@ -203,7 +205,7 @@ CREATE TABLE IF NOT EXISTS `bilhete` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `codigo` (`codigo`),
   KEY `idx-bilhete-compra_id` (`compra_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `bilhete`
@@ -226,7 +228,10 @@ INSERT INTO `bilhete` (`id`, `compra_id`, `lugar`, `preco`, `codigo`, `estado`) 
 (14, 6, 'E6', 8.00, '8GHIEA', 'pendente'),
 (15, 7, 'F7', 8.00, 'G6QK9O', 'pendente'),
 (16, 7, 'F8', 8.00, '6NCRJA', 'pendente'),
-(17, 7, 'F9', 8.00, 'NVLBRC', 'pendente');
+(17, 7, 'F9', 8.00, 'NVLBRC', 'pendente'),
+(18, 8, 'E3', 8.00, 'HFIT8Z', 'pendente'),
+(19, 8, 'E4', 8.00, 'BH4BP9', 'pendente'),
+(20, 8, 'E5', 8.00, 'URU89R', 'pendente');
 
 -- --------------------------------------------------------
 
@@ -279,7 +284,7 @@ CREATE TABLE IF NOT EXISTS `compra` (
   PRIMARY KEY (`id`),
   KEY `idx-compra-cliente_id` (`cliente_id`),
   KEY `sessao_id` (`sessao_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `compra`
@@ -292,7 +297,8 @@ INSERT INTO `compra` (`id`, `cliente_id`, `sessao_id`, `data`, `pagamento`, `est
 (4, 14, 4, '2025-11-11 19:21:26', 'mbway', 'confirmada'),
 (5, 14, 3, '2025-11-11 21:42:16', 'cartao', 'confirmada'),
 (6, 14, 7, '2025-11-12 22:04:46', 'mbway', 'confirmada'),
-(7, 14, 7, '2025-11-12 22:05:00', 'cartao', 'confirmada');
+(7, 14, 7, '2025-11-12 22:05:00', 'cartao', 'confirmada'),
+(8, 14, 1, '2025-11-14 10:15:41', 'cartao', 'confirmada');
 
 -- --------------------------------------------------------
 
@@ -314,7 +320,7 @@ CREATE TABLE IF NOT EXISTS `filme` (
   `poster_path` varchar(255) NOT NULL,
   `estado` enum('brevemente','em_exibicao','terminado') NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `filme`
@@ -328,7 +334,11 @@ INSERT INTO `filme` (`id`, `titulo`, `sinopse`, `duracao`, `rating`, `estreia`, 
 (5, 'Prisoners', 'Duas raparigas desaparecem durante um feriado em família e, enquanto a polícia investiga, o pai de uma delas decide assumir o caso sozinho, mergulhando numa espiral de desespero e vingança.', 153, 'M16', '2013-09-20', 'Inglês', 'Denis Villeneuve', 'https://www.youtube.com/watch?v=bpXfcTF6iVk', 'poster_69032e821fed0.jpg', 'em_exibicao'),
 (6, 'Zodiac', 'Um desenhador de cartoons de São Francisco torna-se obcecado em decifrar a identidade do assassino em série apelidado de “Zodíaco”, que aterroriza a área da baía com cartas cifradas, assassinatos e o troçar da polícia.', 157, 'M16', '2007-03-02', 'Inglês', 'David Fincher', 'https://www.youtube.com/watch?v=yNncHPl1UXg', 'poster_69032f4f900e9.jpg', 'terminado'),
 (7, 'Toy Story', 'Um brinquedo vê a sua posição ameaçada quando um novo boneco espacial chega ao quarto, desencadeando uma aventura onde ambos terão de superar rivalidades e trabalhar juntos para regressar a casa do dono.', 81, 'M6', '1996-03-29', 'Português', 'John Lasseter', 'https://www.youtube.com/watch?v=v-PjgYDrg70', 'poster_6910b61fbd2d6.jpg', 'terminado'),
-(8, 'Cars 2', 'Um grande campeão das pistas é lançado numa corrida internacional enquanto o seu amigo Mate é apanhado num enredo de espionagem que põe à prova a amizade de ambos e mostra que coragem pode surgir dos lugares mais improváveis.', 106, 'M6', '2011-06-14', 'Português', 'John Lasseter', 'https://www.youtube.com/watch?v=oFTfAdauCOo', 'poster_6910b6ad1f9ea.jpg', 'em_exibicao');
+(8, 'Carros 2', 'Um grande campeão das pistas é lançado numa corrida internacional enquanto o seu amigo Mate é apanhado num enredo de espionagem que põe à prova a amizade de ambos e mostra que coragem pode surgir dos lugares mais improváveis.', 106, 'M6', '2011-06-14', 'Português', 'John Lasseter', 'https://www.youtube.com/watch?v=oFTfAdauCOo', 'poster_6910b6ad1f9ea.jpg', 'em_exibicao'),
+(9, 'The Prestige', 'Dois mágicos rivais da era vitoriana competem obsessivamente para superar-se — à medida que o truque se torna cada vez mais perigoso, ambos descobrem que o preço da obsessão pode ser a própria identidade.', 130, 'M14', '2006-12-28', 'Inglês', 'Christopher Nolan', 'https://www.youtube.com/watch?v=RLtaA9fFNXU', 'poster_6918b2d190384.jpg', 'em_exibicao'),
+(10, 'Seven', 'Dois detetives perseguem um serial killer cujos crimes representam os sete pecados capitais numa investigação sombria que descobre o horror nas mais triviais escolhas humanas.', 127, 'M16', '1996-02-02', 'Inglês', 'David Fincher', 'https://www.youtube.com/watch?v=znmZoVkCjpI', 'poster_6918b3d09bd73.jpg', 'em_exibicao'),
+(11, 'Divertida-Mente', 'Riley tem 11 anos e muda-se com a família para São Francisco. No quartel-general da sua mente vivem as emoções Alegria, Tristeza, Medo, Raiva e Repulsa, que tentam orientar-na, mas quando os sentimentos entram em conflito, Riley afronta uma nova vida, nova escola e a incerteza de crescer.', 94, 'Todos', '2015-06-18', 'Potuguês', 'Pete Docter', 'https://www.youtube.com/watch?v=yRUAzGQ3nSY', 'poster_6918b4c3cf56d.jpg', 'em_exibicao'),
+(12, 'Monstros e Companhia', 'Na fábrica Monstros S.A., os monstros recolhem gritos de crianças para gerar energia, mas tudo muda quando uma menina humana entra no mundo dos monstros, obrigando Sulley e Mike a enfrentarem medos, conspirações e a descobrir que a amizade pode ser a força mais poderosa de todas.', 92, 'M3', '2002-03-14', 'Português', 'Pete Docter', 'https://www.youtube.com/watch?v=CGbgaHoapFM', 'poster_6918b5ace5025.jpg', 'em_exibicao');
 
 -- --------------------------------------------------------
 
@@ -355,9 +365,6 @@ INSERT INTO `filme_genero` (`filme_id`, `genero_id`) VALUES
 (7, 8),
 (7, 9),
 (7, 4),
-(8, 8),
-(8, 9),
-(8, 1),
 (2, 2),
 (2, 1),
 (2, 3),
@@ -371,7 +378,22 @@ INSERT INTO `filme_genero` (`filme_id`, `genero_id`) VALUES
 (6, 10),
 (5, 2),
 (5, 1),
-(5, 10);
+(5, 10),
+(9, 2),
+(9, 1),
+(9, 3),
+(10, 2),
+(10, 10),
+(10, 3),
+(11, 8),
+(11, 9),
+(11, 4),
+(8, 8),
+(8, 9),
+(8, 1),
+(12, 2),
+(12, 8),
+(12, 4);
 
 -- --------------------------------------------------------
 
@@ -464,12 +486,12 @@ INSERT INTO `sala` (`id`, `cinema_id`, `numero`, `num_filas`, `num_colunas`, `pr
 (8, 2, 2, 10, 10, 8.00, 'ativa'),
 (9, 2, 3, 8, 10, 12.00, 'ativa'),
 (10, 2, 4, 12, 10, 6.00, 'ativa'),
-(11, 3, 1, 12, 10, 8.00, 'ativa'),
-(12, 3, 2, 8, 10, 10.00, 'ativa'),
-(13, 3, 3, 12, 12, 6.00, 'ativa'),
-(14, 3, 4, 14, 10, 6.00, 'ativa'),
-(15, 3, 5, 12, 12, 8.00, 'ativa'),
-(16, 3, 6, 12, 12, 12.00, 'ativa'),
+(11, 3, 1, 12, 10, 8.00, 'encerrada'),
+(12, 3, 2, 8, 10, 10.00, 'encerrada'),
+(13, 3, 3, 12, 12, 6.00, 'encerrada'),
+(14, 3, 4, 14, 10, 6.00, 'encerrada'),
+(15, 3, 5, 12, 12, 8.00, 'encerrada'),
+(16, 3, 6, 12, 12, 12.00, 'encerrada'),
 (17, 2, 5, 12, 10, 14.00, 'ativa');
 
 -- --------------------------------------------------------
@@ -498,13 +520,13 @@ CREATE TABLE IF NOT EXISTS `sessao` (
 --
 
 INSERT INTO `sessao` (`id`, `data`, `hora_inicio`, `hora_fim`, `filme_id`, `sala_id`, `cinema_id`) VALUES
-(1, '2025-11-12', '14:00:00', '18:33:00', 8, 1, 1),
-(2, '2025-11-12', '10:00:00', '15:00:00', 4, 7, 2),
-(3, '2025-11-22', '18:00:00', '19:46:00', 8, 2, 1),
-(4, '2025-11-21', '19:00:00', '21:37:00', 8, 8, 2),
-(5, '2025-11-13', '10:00:00', '11:43:00', 2, 9, 2),
-(6, '2025-11-12', '11:00:00', '13:19:00', 3, 5, 1),
-(7, '2025-11-13', '16:00:00', '17:46:00', 8, 1, 1);
+(1, '2025-11-19', '14:00:00', '18:33:00', 8, 1, 1),
+(2, '2025-11-21', '10:00:00', '15:00:00', 4, 7, 2),
+(3, '2025-11-22', '18:00:00', '19:46:00', 2, 2, 1),
+(4, '2025-11-21', '19:00:00', '21:37:00', 11, 8, 2),
+(5, '2025-11-29', '10:00:00', '11:43:00', 9, 9, 2),
+(6, '2025-11-25', '11:00:00', '13:19:00', 3, 5, 1),
+(7, '2025-11-19', '16:00:00', '17:46:00', 7, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -528,7 +550,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `email` (`email`),
   UNIQUE KEY `password_reset_token` (`password_reset_token`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
 
 --
 -- Dumping data for table `user`
@@ -549,7 +571,8 @@ INSERT INTO `user` (`id`, `username`, `auth_key`, `password_hash`, `password_res
 (12, 'funcionario2_porto', 'wmqDy7TILwqyTMGL8oLX4SpLs0nEVogZ', '$2y$13$tfkNqWtTTnjgqbhyyy2qmOOvIrP5ky.lzywbuzumhZ/eFw8s7taty', NULL, 'pedro.santos@cinelive.pt', 9, 1761899704, 1761899704, 'W0IOZCEoEOeTpipvqhcN-qimarrNRFXH_1761899704'),
 (13, 'funcionario3_porto', 'ltOPHO_e-vKwB_aC3NuDy9nvJRRJH23W', '$2y$13$2oYlbWTxZuKmX2OdixSh3.mYvhWng6.4QBmzKd.tYTGdhV1o9RFia', NULL, 'ana.oliveira@cinelive.pt', 9, 1761899749, 1761899749, 'cmvPY0EH0N_XgTKdIZC0JaxQt_fGvfrG_1761899749'),
 (14, 'cliente1', 'B3BmNn_leTEb-maw16V0vOqZIYABiY54', '$2y$13$7GePk56MTJ1DK3DfO0PTZuWn2yNyJRmdixpa2J2fnR0IJRkSC3KbC', NULL, 'miguel.ribeiro@email.com', 10, 1761946487, 1762016693, NULL),
-(15, 'cliente2', 'IJ-FKJHB-gSpimHW-5ZLOY6AYvJ7jyBr', '$2y$13$7fRnpp8QrtknA0wG1DJtb.DbzPcVXv6Srcx2a892HP2escoVA.ugu', NULL, 'joao.carlos@email.com', 10, 1762172285, 1762352864, '-tXBt3LUMsyD_TEtHVK5egrQXakQlEvg_1762172285');
+(15, 'cliente2', 'IJ-FKJHB-gSpimHW-5ZLOY6AYvJ7jyBr', '$2y$13$7fRnpp8QrtknA0wG1DJtb.DbzPcVXv6Srcx2a892HP2escoVA.ugu', NULL, 'joao.carlos@email.com', 10, 1762172285, 1762352864, '-tXBt3LUMsyD_TEtHVK5egrQXakQlEvg_1762172285'),
+(16, 'cliente3', 'DepulWzcZxHOdh0v4uZx4X7Zaf8V-FMc', '$2y$13$M63ViX6IcOtLY7Kl9OX0QutEobs0rl5gG71q3Z6AnEB6r1jPFnWnK', NULL, 'carlos.pereira@email.com', 10, 1763066569, 1763066569, 'ZAMpvN6EfMtKQFNJkzZm-HoDd59T9pLa_1763066569');
 
 -- --------------------------------------------------------
 
@@ -567,7 +590,7 @@ CREATE TABLE IF NOT EXISTS `user_profile` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx-user_profile-user_id` (`user_id`),
   KEY `idx-user_profile-cinema_id` (`cinema_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `user_profile`
@@ -588,7 +611,8 @@ INSERT INTO `user_profile` (`id`, `user_id`, `cinema_id`, `nome`, `telemovel`) V
 (12, 12, 3, 'Pedro Santos', '934325345'),
 (13, 13, 3, 'Ana Oliveira', '911345788'),
 (14, 14, NULL, 'Miguel Ribeiro', '912345678'),
-(16, 15, NULL, 'João Carlos', '913432432');
+(16, 15, NULL, 'João Carlos', '913432432'),
+(17, 16, NULL, 'Carlos Pereira', '963244034');
 
 --
 -- Constraints for dumped tables

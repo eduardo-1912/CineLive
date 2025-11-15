@@ -15,7 +15,6 @@ use Yii;
  * @property string $estado
  *
  * @property Compra $compra
- * @property Sessao $sessao
  */
 class Bilhete extends \yii\db\ActiveRecord
 {
@@ -62,8 +61,7 @@ class Bilhete extends \yii\db\ActiveRecord
             'id' => 'ID',
             'compra_id' => 'Compra',
             'lugar' => 'Lugar',
-            'preco' => 'Preço',
-            'precoEmEuros' => 'Preço',
+            'preco', 'precoEmEuros' => 'Preço',
             'codigo' => 'Código',
             'estado' => 'Estado',
         ];
@@ -71,19 +69,12 @@ class Bilhete extends \yii\db\ActiveRecord
 
     public function getPrecoEmEuros(): string
     {
-        return number_format($this->preco, 2, '.', '') . '€';
+        return number_format($this->preco, 2) . '€';
     }
 
-    public function isEditable(): bool
-    {
-        return $this->isEstadoPendente() && !$this->compra->sessao->isEstadoTerminada();
-    }
-
-    // OBTER ESTADO FORMATADO
     public function getEstadoFormatado(): string
     {
-        $labels = self::optsEstado();
-        $label = $labels[$this->estado] ?? '-';
+        $label = self::optsEstado()[$this->estado] ?? '-';
 
         $colors = [
             self::ESTADO_CONFIRMADO => '',
@@ -93,6 +84,14 @@ class Bilhete extends \yii\db\ActiveRecord
 
         $class = $colors[$this->estado] ?? 'text-secondary';
         return "<span class='{$class}'>{$label}</span>";
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEditable(): bool
+    {
+        return $this->isEstadoPendente() && !$this->compra->sessao->isEstadoTerminada();
     }
 
     /**

@@ -28,6 +28,10 @@ class SiteController extends Controller
      */
     public function behaviors()
     {
+        if (Yii::$app->controller->module->id === 'api') {
+            return [];
+        }
+
         return [
             'access' => [
                 'class' => AccessControl::class,

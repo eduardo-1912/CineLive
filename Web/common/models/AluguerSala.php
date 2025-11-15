@@ -72,14 +72,12 @@ class AluguerSala extends \yii\db\ActiveRecord
             'cliente_id' => 'Cliente',
             'cinema_id' => 'Cinema',
             'sala_id' => 'Sala',
-            'data' => 'Data',
-            'hora_inicio' => 'Hora Início',
-            'hora_fim' => 'Hora Fim',
+            'data', 'dataFormatada' => 'Data',
+            'hora_inicio', 'horaInicioFormatada' => 'Hora Início',
+            'hora_fim', 'horaFimFormatada' => 'Hora Fim',
             'estado' => 'Estado',
             'tipo_evento' => 'Tipo de Evento',
             'observacoes' => 'Observações',
-            'horaInicioFormatada' => 'Hora Início',
-            'horaFimFormatada' => 'Hora Fim',
         ];
     }
 
@@ -131,37 +129,33 @@ class AluguerSala extends \yii\db\ActiveRecord
         return $estados;
     }
 
-    // OBTER DATA FORMATADA (DD/MM/AAAA)
     public function getDataFormatada()
     {
         return Yii::$app->formatter->asDate($this->data, 'php:d/m/Y');
     }
 
-    // HORA INÍCIO FORMATADA (HH:mm)
     public function getHoraInicioFormatada()
     {
         return Yii::$app->formatter->asTime($this->hora_inicio, 'php:H:i');
     }
 
-    // HORA FIM FORMATADA (HH:mm)
     public function getHoraFimFormatada()
     {
         return Yii::$app->formatter->asTime($this->hora_fim, 'php:H:i');
     }
 
-    // OBTER ESTADO FORMATADO
     public function getEstadoFormatado()
     {
         $label = self::optsEstado()[$this->estado] ?? '-';
+
         $cores = [
-            self::ESTADO_PENDENTE => 'text-secondary',
             self::ESTADO_CONFIRMADO => '',
             self::ESTADO_A_DECORRER => 'text-danger',
-            self::ESTADO_TERMINADO => 'text-secondary font-italic',
-            self::ESTADO_CANCELADO => 'text-secondary font-italic',
+            self::ESTADO_TERMINADO, self::ESTADO_CANCELADO => 'text-secondary font-italic',
         ];
-        $classe = $cores[$this->estado] ?? 'text-secondary';
-        return "<span class='{$classe}'>{$label}</span>";
+
+        $class = $cores[$this->estado] ?? 'text-secondary';
+        return "<span class='{$class}'>{$label}</span>";
     }
 
     // VALIDAR O HORÁRIO DO ALUGUER
@@ -280,6 +274,9 @@ class AluguerSala extends \yii\db\ActiveRecord
         return true;
     }
 
+    /**
+     * @return bool
+     */
     public function isDeletable(): bool
     {
         return $this->estado === self::ESTADO_CANCELADO || $this->estado === self::ESTADO_PENDENTE;
@@ -315,9 +312,8 @@ class AluguerSala extends \yii\db\ActiveRecord
         return $this->hasOne(Sala::class, ['id' => 'sala_id']);
     }
 
-
     /**
-     * column estado ENUM value labels
+     * column estado value labels
      * @return string[]
      */
     public static function optsEstado()
@@ -331,6 +327,10 @@ class AluguerSala extends \yii\db\ActiveRecord
         ];
     }
 
+    /**
+     * column estado ENUM value labels
+     * @return string[]
+     */
     public static function optsEstadoBD()
     {
         return [
