@@ -85,6 +85,8 @@ class SiteController extends Controller
             ->where(['estado' => Cinema::ESTADO_ATIVO])
             ->orderBy('nome')
             ->all();
+        $cinemas = array_filter($cinemas, function ($cinema) {return $cinema->hasSessoesAtivas();});
+
 
         $listaCinemas = \yii\helpers\ArrayHelper::map($cinemas, 'id', 'nome');
 
@@ -104,6 +106,11 @@ class SiteController extends Controller
          * ============================================================ */
         if ($cinema_id === null) {
             $cinema_id = Yii::$app->request->cookies->getValue('cinema_id', null);
+        }
+
+        // SE MESMO ASSIM FOR NULL --> ESCOLHER O PRIMEIRO CINEMA ATIVO
+        if ($cinema_id === null) {
+            $cinema_id = $cinemas[0]->id;
         }
 
         /* ============================================================

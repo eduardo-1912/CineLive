@@ -10,25 +10,36 @@ use yii\bootstrap5\ActiveForm;
 $this->title = 'Criar Conta';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+
 <div class="site-signup container">
-    <h1><?= Html::encode($this->title) ?></h1>
 
-    <p>Por favor, preencha os seguintes campos para se registar:</p>
+    <div class="d-flex justify-content-center align-items-center" style="min-height: 65vh;">
+        <div class="w-100" style="max-width: 420px;">
 
-    <div class="row">
-        <div class="col-lg-5">
+            <div class="mb-4">
+                <h5 class="fw-semibold mb-0">Crie um conta</h5>
+                <p class="text-muted">Preencha os seguintes campos para se registar.</p>
+            </div>
+
             <?php $form = ActiveForm::begin(['id' => 'form-signup']); ?>
+
             <?= $form->field($model, 'username')->textInput(['autofocus' => true]) ?>
             <?= $form->field($model, 'password')->passwordInput() ?>
             <?= $form->field($model, 'nome') ?>
             <?= $form->field($model, 'telemovel') ?>
             <?= $form->field($model, 'email') ?>
 
-            <div class="form-group">
-                <?= Html::submitButton('Criar Conta', ['class' => 'btn btn-primary', 'name' => 'signup-button']) ?>
+            <div class="form-group mt-3">
+                <?= Html::submitButton('Criar Conta', ['class' => 'btn btn-dark w-100', 'name' => 'signup-button']) ?>
+            </div>
+
+            <div class="mt-3 text-center" style="color:#999;">
+                Já tem uma conta? <?= Html::a('Iniciar Sessão', ['site/login']) ?>
             </div>
 
             <?php ActiveForm::end(); ?>
+
         </div>
     </div>
+
 </div>

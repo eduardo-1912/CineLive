@@ -11,7 +11,7 @@ class CinemaController extends Controller
 {
     public function actionIndex(){
 
-        $cinemas = Cinema::find()->all();
+        $cinemas = Cinema::find()->where(['estado' => Cinema::ESTADO_ATIVO])->all();
 
 
         return $this->render('index', [

@@ -40,7 +40,7 @@ $this->title = 'Dashboard';
                     <p><?= ($isGerente || $isAdmin ? 'Pedidos de aluguer pendentes' : 'Alugueres agendados para hoje') ?></p>
                 </div>
                 <div class="icon">
-                    <i class="fas fa-film"></i>
+                    <i class="fas fa-clock"></i>
                 </div>
                 <a href="<?= Url::to(['/aluguer-sala/index']) ?>" class="small-box-footer">
                     Ver Alugueres <i class="fas fa-arrow-circle-right"></i>

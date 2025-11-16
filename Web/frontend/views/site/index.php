@@ -10,7 +10,7 @@ $iconsPath = '@webroot/icons/';
 $this->title = 'Home';
 ?>
 <div class="site-index">
-    <section id="filmeCarousel" class="carousel slide" data-bs-ride="carousel">
+    <section id="filmeCarousel" class="carousel slide bg-black" data-bs-ride="carousel">
 
         <!-- INDICADORES -->
         <div class="carousel-indicators">
@@ -26,37 +26,35 @@ $this->title = 'Home';
         <div class="carousel-inner">
             <?php foreach ($carouselFilmes as $i => $filme): ?>
                 <div class="carousel-item <?= $i === 0 ? 'active' : '' ?>">
-                    <div class="bg-black">
-                        <div class="container py-5">
+                    <div class="container py-5">
 
-                            <div class="d-flex flex-column flex-lg-row text-start align-items-center" style="gap: 5rem;">
+                        <div class="d-flex flex-column flex-lg-row text-start align-items-center" style="gap: 5rem;">
 
-                                <!-- POSTER -->
-                                <div class="col-lg-4 p-0">
-                                    <img class="img-fluid rounded-4 shadow-lg" style="aspect-ratio: 2/3"
-                                         src="<?= $filme->getPosterUrl() ?>"
-                                         alt="<?= $filme->titulo ?>">
-                                </div>
+                            <!-- POSTER -->
+                            <div class="col-lg-4 p-0">
+                                <img class="img-fluid rounded-4 shadow-lg" style="aspect-ratio: 2/3"
+                                     src="<?= $filme->getPosterUrl() ?>"
+                                     alt="<?= $filme->titulo ?>">
+                            </div>
 
-                                <!-- DETALHES -->
-                                <div class="col-lg p-0">
+                            <!-- DETALHES -->
+                            <div class="col-lg p-0">
 
-                                    <p class="text-50 fs-14 mb-1 fw-medium"><?= $filme->rating ?> • <?= $filme->idioma ?> • <?= $filme->duracaoEmHoras ?></p>
+                                <p class="text-50 fs-14 mb-1 fw-medium"><?= $filme->rating ?> • <?= $filme->idioma ?> • <?= $filme->duracaoEmHoras ?></p>
 
-                                    <h1 class="text-white fw-bold display-5 mb-3"><?= $filme->titulo ?></h1>
+                                <h1 class="text-white fw-bold display-5 mb-3"><?= $filme->titulo ?></h1>
 
-                                    <p class="text-50 mb-4" style="height: 3lh; overflow: hidden"><?= $filme->sinopse ?></p>
+                                <p class="text-50 mb-4" style="height: 3lh; overflow: hidden"><?= $filme->sinopse ?></p>
 
-                                    <a href="<?= Url::to(['filme/view', 'id' => $filme->id]) ?>"
-                                       class="btn btn-light fs-15 rounded-3 fw-medium">
-                                        Comprar Bilhetes
-                                    </a>
-
-                                </div>
+                                <a href="<?= Url::to(['filme/view', 'id' => $filme->id]) ?>"
+                                   class="btn btn-light fs-15 rounded-3 fw-medium">
+                                    Comprar Bilhetes
+                                </a>
 
                             </div>
 
                         </div>
+
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -137,7 +135,7 @@ $this->title = 'Home';
                     <!-- DROPDOWN DE CINEMAS -->
                     <div class="dropdown-center">
                         <button class="btn btn-sm dropdown-toggle fw-medium" type="button" id="dropdownCinema" data-bs-toggle="dropdown" aria-expanded="false">
-                            <?= $currentCinema ?? 'Selecione o cinema' ?>
+                            <?= $currentCinema ?? 'Nenhum cinema disponível' ?>
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="dropdownCinema">
                             <?php foreach ($cinemas as $cinema): ?>

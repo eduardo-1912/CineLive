@@ -41,6 +41,7 @@ use yii\bootstrap4\ActiveForm;
             'disabled' => in_array($model->estado, [
                 $model::ESTADO_A_DECORRER,
                 $model::ESTADO_TERMINADO,
+                $model::ESTADO_CANCELADO,
             ]),
         ]
     ) ?>

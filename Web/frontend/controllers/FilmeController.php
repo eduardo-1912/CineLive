@@ -16,6 +16,7 @@ class FilmeController extends Controller
     {
         // OBTER TODOS OS CINEMAS ATIVOS
         $cinemas = Cinema::find()->where(['estado' => Cinema::ESTADO_ATIVO])->orderBy('nome')->all();
+        $cinemas = array_filter($cinemas, function ($cinema) {return $cinema->hasSessoesAtivas();});
 
         // SE ESTADO FOR BREVEMENTE --> NÃO PRECISA DE CINEMA
         if ($estado === 'brevemente') {
