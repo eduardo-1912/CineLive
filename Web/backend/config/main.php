@@ -64,6 +64,7 @@ return [
                     'class' => 'yii\rest\UrlRule',
                     'controller' => [
                         'api/filme',
+                        'api/cinema',
                     ],
                 ],
 

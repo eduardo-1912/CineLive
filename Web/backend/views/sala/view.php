@@ -89,7 +89,7 @@ $this->params['breadcrumbs'][] = $model->numero;
                     <div class="col-md-12">
                         <p>
                             <?php if ($gerirSessoes): ?>
-                                <?= Html::a('Criar Sessão', ['sessao/create', 'cinema_id' => $model->id], ['class' => 'btn btn-success']) ?>
+                                <?= Html::a('Criar Sessão', ['sessao/create', 'cinema_id' => $model->cinema_id], ['class' => 'btn btn-success']) ?>
                             <?php endif; ?>
                         </p>
                         <?= $this->render('_sessoes', [

@@ -12,7 +12,7 @@ use yii\web\Cookie;
 
 class FilmeController extends Controller
 {
-    public function actionIndex($q = null, $cinema_id = null, $estado = null)
+    public function actionIndex($q = null, $cinema_id = null, $estado = null, $kids = null)
     {
         // OBTER TODOS OS CINEMAS ATIVOS
         $cinemas = Cinema::find()->where(['estado' => Cinema::ESTADO_ATIVO])->orderBy('nome')->all();
@@ -73,7 +73,7 @@ class FilmeController extends Controller
         }
 
         // SE ESTADO FOR 'KIDS' --> ADICIONA QUERY COM RATINGS PARA CRIANÇAS
-        if ($estado === 'kids') {
+        if ($kids) {
             $query->andWhere(['f.rating' => Filme::ratingsKids()]);
         }
 
@@ -106,6 +106,7 @@ class FilmeController extends Controller
             'cinema_id' => $cinema_id,
             'cinemas' => $cinemas,
             'estado' => $estado,
+            'kids' => $kids,
             'currentCinema' => $currentCinema,
         ]);
     }

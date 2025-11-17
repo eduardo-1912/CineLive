@@ -25,8 +25,8 @@ $this->title = 'Filmes';
                             <?= Html::hiddenInput('cinema_id', $cinema_id) ?>
 
                             <div class="form-check form-switch m-0 ps-0">
-                                <?= Html::checkbox('estado', $estado === 'kids', [
-                                    'value' => 'kids',
+                                <?= Html::checkbox('kids', $kids, [
+                                    'value' => '1',
                                     'class' => 'form-check-input',
                                     'id' => 'kidsSwitch',
                                     'onchange' => 'this.form.submit()'
