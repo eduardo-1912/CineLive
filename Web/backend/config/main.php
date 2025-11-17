@@ -59,18 +59,31 @@ return [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
-
+                [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => ['api/auth'],
+                    'pluralize' => false,
+                ],
+                [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => ['api/perfil'],
+                    'pluralize' => false,
+                    'extraPatterns' => [
+                        'GET'     => 'index',
+                        'PUT'     => 'update',
+                        'DELETE'  => 'delete',
+                    ],
+                ],
                 [
                     'class' => 'yii\rest\UrlRule',
                     'controller' => [
                         'api/filme',
                         'api/cinema',
+                        'api/compra'
                     ],
                 ],
-
             ],
         ],
-
     ],
     'params' => $params,
 ];
