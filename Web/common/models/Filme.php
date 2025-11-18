@@ -199,7 +199,6 @@ class Filme extends \yii\db\ActiveRecord
     public static function findComSessoesFuturas($cinemaId)
     {
         return self::find()
-            ->alias('f')
             ->joinWith(['sessaos s'])
             ->where(['s.cinema_id' => $cinemaId])
             ->andWhere(['>=', 's.data', date('Y-m-d')])

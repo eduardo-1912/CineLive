@@ -76,10 +76,23 @@ return [
                 ],
                 [
                     'class' => 'yii\rest\UrlRule',
+                    'controller' => ['api/cinema'],
+                    'extraPatterns' => [
+                        'GET {id}/filmes' => 'filmes',
+                    ],
+                ],
+                [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => ['api/filme'],
+                    'extraPatterns' => [
+                        'GET {id}/sessaos' => 'sessaos',
+                    ],
+                ],
+                [
+                    'class' => 'yii\rest\UrlRule',
                     'controller' => [
-                        'api/filme',
-                        'api/cinema',
-                        'api/compra'
+                        'api/compra',
+                        'api/sessao',
                     ],
                 ],
             ],

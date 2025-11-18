@@ -82,7 +82,7 @@ class CompraController extends Controller
             'estado' => $compra->displayEstado(),
 
             'filme_id' => $compra->sessao->filme_id,
-            'filme_nome' => $compra->sessao->filme->titulo,
+            'filme_titulo' => $compra->sessao->filme->titulo,
 
             'cinema_id' => $compra->sessao->cinema_id,
             'cinema_nome' => $compra->sessao->cinema->nome,

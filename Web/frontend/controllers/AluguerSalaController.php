@@ -10,7 +10,7 @@ use common\models\AluguerSala;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
-
+use yii\web\NotFoundHttpException;
 
 
 class AluguerSalaController extends Controller
@@ -143,7 +143,7 @@ class AluguerSalaController extends Controller
             Yii::$app->session->setFlash('error', 'Não pode eliminar pedidos de aluguer já confirmados.');
         }
 
-        return $this->redirect(Yii::$app->request->referrer ?: ['aluguer-sala/index']);
+        return $this->redirect(['aluguer-sala/index']);
     }
 
 

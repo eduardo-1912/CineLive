@@ -110,7 +110,7 @@ class Compra extends \yii\db\ActiveRecord
     }
 
     // OBTER O NÚMERO DE BILHETES
-    public function getTotalBilhetes(): int
+    public function getNumeroBilhetes(): int
     {
         return count($this->bilhetes);
     }

@@ -68,7 +68,7 @@ $this->title = 'Dashboard';
 
     <!-- GRÁFICO DE VENDAS POR CINEMA PARA ADMIN -->
     <?php if ($isAdmin): ?>
-        <div class="row mt-4">
+        <div class="d-none d-lg-flex row mt-4">
             <div>
                 <div class="card card-primary shadow-sm">
                     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
@@ -95,7 +95,7 @@ $this->title = 'Dashboard';
                     </h5>
                 </div>
                 <div class="card-body p-0">
-                    <table class="table table-striped mb-0">
+                    <table class="table table-responsive-md table-striped mb-0">
                         <thead>
                         <tr>
                             <th>ID</th>
@@ -136,7 +136,7 @@ $this->title = 'Dashboard';
 
     <div class="row">
 
-        <!-- FILMES EX EXIBIÇÃO -->
+        <!-- FILMES EM EXIBIÇÃO -->
         <div>
             <div class="card card-info shadow-sm">
                 <div class="card-header bg-info text-white">

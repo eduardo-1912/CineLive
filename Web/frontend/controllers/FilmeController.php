@@ -69,16 +69,16 @@ class FilmeController extends Controller
 
         // PESQUISA POR TÍTULO
         if ($q) {
-            $query->andWhere(['like', 'f.titulo', $q]);
+            $query->andWhere(['like', 'titulo', $q]);
         }
 
         // SE ESTADO FOR 'KIDS' --> ADICIONA QUERY COM RATINGS PARA CRIANÇAS
         if ($kids) {
-            $query->andWhere(['f.rating' => Filme::ratingsKids()]);
+            $query->andWhere(['rating' => Filme::ratingsKids()]);
         }
 
         // ORDERNAR POR TÍTULO
-        $filmes = $query->orderBy(['f.titulo' => SORT_ASC])->all();
+        $filmes = $query->orderBy(['titulo' => SORT_ASC])->all();
 
         // APENAS MOSTRAR FILMES QUE TENHAM SESSÕES ATIVAS (NÃO ESTEJAM A DECORRER OU ESGOTADAS)
         $filmes = array_filter($filmes, fn($filme) => $filme->hasSessoesAtivas());

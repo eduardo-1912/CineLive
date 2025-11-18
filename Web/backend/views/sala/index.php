@@ -1,5 +1,6 @@
 <?php
 
+use backend\components\LinkHelper;
 use common\models\Cinema;
 use common\models\Sala;
 use yii\helpers\ArrayHelper;
@@ -77,7 +78,8 @@ $this->params['breadcrumbs'][] = 'Salas';
                             ],
                             [
                                 'attribute' => 'cinema_id',
-                                'value' => 'cinema.nome',
+                                'format' => 'raw',
+                                'value' => fn($model) => LinkHelper::cinema($model),
                                 'filter' => $cinemaFilterOptions,
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
                                 'headerOptions' => ['style' => 'width: 12rem;'],

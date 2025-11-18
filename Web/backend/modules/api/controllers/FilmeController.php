@@ -6,6 +6,7 @@ use common\models\Filme;
 use Yii;
 use yii\rest\ActiveController;
 use yii\web\MethodNotAllowedHttpException;
+use yii\web\NotFoundHttpException;
 
 class FilmeController extends ActiveController
 {
@@ -73,4 +74,18 @@ class FilmeController extends ActiveController
         return $query->all();
     }
 
+    public function actionSessaos($id)
+    {
+        $cinemaId = Yii::$app->request->get('cinema_id');
+
+        $filme = Filme::findOne($id);
+
+        if (!$filme || !$filme->sessaos || $filme->isEstadoBrevemente()) {
+            throw new NotFoundHttpException;
+        }
+
+        $sessaos = $filme->sessaos;
+
+        return $sessaos;
+    }
 }
