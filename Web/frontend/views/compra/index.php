@@ -30,7 +30,7 @@ $this->title = 'Compras';
             <?php if ($compras): ?>
                 <?php foreach($compras as $compra): ?>
                 <div class="box-white rounded-4">
-                    <div class="d-flex gap-3 w-100">
+                    <div class="d-flex gap-0 gap-lg-3 w-100">
 
                     <div>
                         <?= Html::img($compra->sessao->filme->getPosterUrl(), [

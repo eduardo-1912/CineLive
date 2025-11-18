@@ -231,16 +231,12 @@ class CompraController extends Controller
             // CRIAR BILHETES
             foreach ($lugares as $lugar) {
 
-                // GERAR CÓDIGO ÚNICO
-                do { $codigo = strtoupper(Yii::$app->security->generateRandomString(6)); }
-                while (Bilhete::find()->where(['codigo' => $codigo])->exists());
-
                 // CRIAR BILHETE
                 $bilhete = new Bilhete();
                 $bilhete->compra_id = $compra->id;
                 $bilhete->lugar = $lugar;
                 $bilhete->preco = $sessao->sala->preco_bilhete;
-                $bilhete->codigo = $codigo;
+                $bilhete->codigo = Bilhete::gerarCodigo();
                 $bilhete->estado = 'pendente';
 
                 // GUARDAR

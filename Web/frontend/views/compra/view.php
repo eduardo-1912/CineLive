@@ -62,7 +62,7 @@ $this->title = 'Compra #' . $model->id;
                     </div>
                     <div class="d-flex flex-column text-start">
                         <span class="fw-medium fs-14 fw-semibold">Horário</span>
-                        <span class="text-muted"><?= $model->sessao->horaInicioFormatada . ' - ' . $model->sessao->horaFimFormatada ?></span>
+                        <span class="text-muted"><?= $model->sessao->horario ?></span>
                     </div>
                     <div class="d-flex flex-column text-start">
                         <span class="fw-medium fs-14 fw-semibold">Total</span>

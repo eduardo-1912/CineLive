@@ -61,6 +61,7 @@ class Sessao extends \yii\db\ActiveRecord
             'data' => 'Data',
             'hora_inicio' => 'Hora Início',
             'hora_fim' => 'Hora Fim',
+            'horario' => 'Horário',
             'filme_id' => 'Filme',
             'sala_id' => 'Sala',
             'cinema_id' => 'Cinema',
@@ -166,7 +167,7 @@ class Sessao extends \yii\db\ActiveRecord
     }
 
     // OBTER HORA JUNTA
-    public function getHora()
+    public function getHorario()
     {
         return Yii::$app->formatter->asTime($this->hora_inicio, 'php:H:i')
         . ' - ' .

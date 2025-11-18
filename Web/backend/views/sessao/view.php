@@ -62,7 +62,7 @@ $this->params['breadcrumbs'][] = $model->id;
                                 'label' => 'Data',
                                 'attribute' => 'dataFormatada',
                             ],
-                            'hora',
+                            'horario',
                             [
                                 'label' => 'Lugares Disponíveis',
                                 'attribute' => 'lugaresDisponiveis',

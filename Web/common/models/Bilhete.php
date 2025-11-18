@@ -86,6 +86,15 @@ class Bilhete extends \yii\db\ActiveRecord
         return "<span class='{$class}'>{$label}</span>";
     }
 
+    public static function gerarCodigo()
+    {
+        do {
+            $codigo = strtoupper(Yii::$app->security->generateRandomString(6));
+        } while (self::find()->where(['codigo' => $codigo])->exists());
+
+        return $codigo;
+    }
+
     /**
      * @return bool
      */
