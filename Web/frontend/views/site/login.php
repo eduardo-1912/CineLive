@@ -28,7 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'template' => '
                     <div class="d-flex justify-content-between">
                         <label class="form-label mb-0">{label}</label>
-                        <a href="' . Url::to(['site/request-password-reset']) . '" class="fs-14 text-decoration-none">
+                        <a href="' . Url::to(['site/request-password-reset']) . '" class="fs-14 text-muted text-decoration-none">
                             Esqueceu-se da password?
                         </a>
                     </div>
@@ -42,8 +42,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?= Html::submitButton('Iniciar Sessão', ['class' => 'btn btn-dark w-100', 'name' => 'login-button']) ?>
             </div>
 
-            <div class="mt-3 text-center" style="color:#999;">
-                Ainda não tem conta? <?= Html::a('Criar Conta', ['site/signup']) ?>
+            <div class="mt-3 text-center fs-15" style="color:#999;">
+                Ainda não tem conta? <a href="<?= Url::to(['site/signup']) ?>" class="fs-15">Criar Conta</a>
             </div>
 
             <?php ActiveForm::end(); ?>

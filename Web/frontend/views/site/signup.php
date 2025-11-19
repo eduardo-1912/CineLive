@@ -6,6 +6,7 @@
 
 use yii\bootstrap5\Html;
 use yii\bootstrap5\ActiveForm;
+use yii\helpers\Url;
 
 $this->title = 'Criar Conta';
 $this->params['breadcrumbs'][] = $this->title;
@@ -33,8 +34,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?= Html::submitButton('Criar Conta', ['class' => 'btn btn-dark w-100', 'name' => 'signup-button']) ?>
             </div>
 
-            <div class="mt-3 text-center" style="color:#999;">
-                Já tem uma conta? <?= Html::a('Iniciar Sessão', ['site/login']) ?>
+            <div class="mt-3 text-center fs-15" style="color:#999;">
+                Já tem uma conta? <a href="<?= Url::to(['site/login']) ?>" class="fs-15">Iniciar Sessão</a>
             </div>
 
             <?php ActiveForm::end(); ?>

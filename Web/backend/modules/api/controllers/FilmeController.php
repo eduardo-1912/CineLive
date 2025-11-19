@@ -86,7 +86,6 @@ class FilmeController extends ActiveController
             throw new NotFoundHttpException("Filme não encontrado ou ainda não disponível.");
         }
 
-        // Base query
         $query = Sessao::find()
             ->where(['filme_id' => $id])
             ->andWhere(['>=', 'data', date('Y-m-d')])
@@ -101,15 +100,11 @@ class FilmeController extends ActiveController
         $sessoes = $query->all();
 
         if (!$sessoes) {
-            throw new NotFoundHttpException(
-                $cinemaId
-                    ? "Não existem sessões deste filme neste cinema."
-                    : "Não existem sessões disponíveis para este filme."
-            );
+            throw new NotFoundHttpException($cinemaId ? "Não existem sessões deste filme neste cinema." : "Não existem sessões disponíveis para este filme.");
         }
 
         // AGRUPAR POR DATA
-        $agrupado = [];
+        $sessoesPorData = [];
 
         foreach ($sessoes as $sessao) {
 
@@ -118,7 +113,7 @@ class FilmeController extends ActiveController
             $data = $sessao->dataFormatada;
 
             // Base da sessão
-            $sessaoArray = [
+            $dadosSessao = [
                 'id' => $sessao->id,
                 'hora_inicio' => $sessao->horaInicioFormatada,
                 'hora_fim' => $sessao->horaFimFormatada,
@@ -126,13 +121,13 @@ class FilmeController extends ActiveController
 
             // ADICIONAR cinena APENAS SE cinema_id não veio no request
             if (!$cinemaId) {
-                $sessaoArray['cinema_id'] = $sessao->cinema_id;
-                $sessaoArray['cinema_nome'] = $sessao->cinema->nome;
+                $dadosSessao['cinema_id'] = $sessao->cinema_id;
+                $dadosSessao['cinema_nome'] = $sessao->cinema->nome;
             }
 
-            $agrupado[$data][] = $sessaoArray;
+            $sessoesPorData[$data][] = $dadosSessao;
         }
 
-        return $agrupado;
+        return $sessoesPorData;
     }
 }
