@@ -16,7 +16,7 @@ import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivitySelecionarCinemaBi
 
 public class SelecionarCinemaActivity extends AppCompatActivity {
 
-    private ListView lvCinemas;
+    ActivitySelecionarCinemaBinding binding;
 
     // TODO: ELIMINAR ISTO
     private String[] cinemas = {
@@ -29,6 +29,7 @@ public class SelecionarCinemaActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
 
         // Obter as preferências do utilizador
         SharedPreferences prefs = getSharedPreferences("UserPreferences", MODE_PRIVATE);
@@ -41,10 +42,9 @@ public class SelecionarCinemaActivity extends AppCompatActivity {
         }
 
         // Se não tem cinema --> mostrar activity de seleção
-        ActivitySelecionarCinemaBinding binding = ActivitySelecionarCinemaBinding.inflate(getLayoutInflater());
+        binding = ActivitySelecionarCinemaBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        EdgeToEdge.enable(this);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);

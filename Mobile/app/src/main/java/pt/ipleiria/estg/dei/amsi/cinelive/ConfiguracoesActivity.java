@@ -1,6 +1,5 @@
 package pt.ipleiria.estg.dei.amsi.cinelive;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -9,19 +8,19 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityLoginBinding;
-import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityMainBinding;
+import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityConfiguracoesBinding;
+import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivitySignupBinding;
 
-public class LoginActivity extends AppCompatActivity {
+public class ConfiguracoesActivity extends AppCompatActivity {
 
-    ActivityLoginBinding binding;
+    ActivityConfiguracoesBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
 
-        binding = ActivityLoginBinding.inflate(getLayoutInflater());
+        binding = ActivityConfiguracoesBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -34,11 +33,7 @@ public class LoginActivity extends AppCompatActivity {
         setSupportActionBar(binding.includeToolbar.topAppBar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        binding.linkSignup.setOnClickListener(v -> {
-            startActivity(new Intent(LoginActivity.this, SignupActivity.class));
-            finish();
-        });
-
+        getSupportActionBar().setTitle("Configurações");
 
     }
 
@@ -48,5 +43,4 @@ public class LoginActivity extends AppCompatActivity {
         finish();
         return true;
     }
-
 }

@@ -2,22 +2,22 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/nav_filmes"
+        android:id="@+id/navFilmes"
         android:icon="@drawable/ic_filmes"
         android:title="@string/nav_filmes" />
 
     <item
-        android:id="@+id/nav_cinemas"
+        android:id="@+id/navCinemas"
         android:icon="@drawable/ic_cinemas"
         android:title="@string/nav_cinemas" />
 
     <item
-        android:id="@+id/nav_bilhetes"
+        android:id="@+id/navBilhetes"
         android:icon="@drawable/ic_bilhetes"
         android:title="@string/nav_bilhetes" />
 
     <item
-        android:id="@+id/nav_perfil"
+        android:id="@+id/navPerfil"
         android:icon="@drawable/ic_perfil"
         android:title="@string/nav_perfil" />
 

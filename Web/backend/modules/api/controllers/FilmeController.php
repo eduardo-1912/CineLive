@@ -56,7 +56,6 @@ class FilmeController extends ActiveController
                 ->andWhere(['>=', 's.data', date('Y-m-d')])
                 ->distinct();
         }
-        // TODO: NÃO MOSTRAR SESSÕES ESGOTADAS
 
         // Filtrar para crianças
         if ($kids) {
@@ -73,7 +72,10 @@ class FilmeController extends ActiveController
             $query->andWhere(['like', 'filme.titulo', $q]);
         }
 
-        return $query->all();
+        // Ordernar por título
+        $filmes = $query->orderBy(['titulo' => SORT_ASC])->all();
+
+        return $filmes;
     }
 
     public function actionSessaos($id)

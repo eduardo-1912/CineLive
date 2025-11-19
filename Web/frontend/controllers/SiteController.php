@@ -213,6 +213,9 @@ class SiteController extends Controller
         $novasEstreias = Filme::findComSessoesFuturas($cinema_id)
             ->orderBy(['id' => SORT_DESC])->limit(8)->all();
 
+        $novasEstreias = array_filter($novasEstreias, fn($filme) => $filme->hasSessoesAtivas());
+
+
 
         $currentCinema = Cinema::findOne($cinema_id)->nome ?? null;
 

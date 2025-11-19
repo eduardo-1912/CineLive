@@ -63,7 +63,6 @@ class FilmeController extends Controller
         // CINEMA ATUAL
         $currentCinema = Cinema::findOne($cinema_id)->nome ?? null;
 
-
         // OBTER TODOS OS FILMES COM SESSÕES FUTURAS (EM EXIBIÇÃO)
         $query = Filme::findComSessoesFuturas($cinema_id);
 

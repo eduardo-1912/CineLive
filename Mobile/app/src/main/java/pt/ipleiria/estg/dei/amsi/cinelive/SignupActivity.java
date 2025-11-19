@@ -10,18 +10,18 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityLoginBinding;
-import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityMainBinding;
+import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivitySignupBinding;
 
-public class LoginActivity extends AppCompatActivity {
+public class SignupActivity extends AppCompatActivity {
 
-    ActivityLoginBinding binding;
+    ActivitySignupBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
 
-        binding = ActivityLoginBinding.inflate(getLayoutInflater());
+        binding = ActivitySignupBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -34,12 +34,10 @@ public class LoginActivity extends AppCompatActivity {
         setSupportActionBar(binding.includeToolbar.topAppBar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        binding.linkSignup.setOnClickListener(v -> {
-            startActivity(new Intent(LoginActivity.this, SignupActivity.class));
+        binding.linkLogin.setOnClickListener(v -> {
+            startActivity(new Intent(SignupActivity.this, LoginActivity.class));
             finish();
         });
-
-
     }
 
     // Voltar atrás

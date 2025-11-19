@@ -5,6 +5,7 @@
     <string name="nav_filmes">Filmes</string>
     <string name="nav_cinemas">Cinemas</string>
     <string name="nav_bilhetes">Bilhetes</string>
+    <string name="nav_entrar">Entrar</string>
     <string name="nav_perfil">Perfil</string>
 
     <!-- layout/activity_selecionar_cinema -->
@@ -19,14 +20,14 @@
     <string name="login_link_signup">Ainda não tem conta? Criar conta</string>
 
     <!-- layout/activity_signup -->
-    <string name="signup_titulo">Criar conta</string>
+    <string name="signup_titulo">Criar Conta</string>
     <string name="signup_subtitulo">Preencha os seguintes campos para se registar</string>
-    <string name="signup_hint_username">Username</string>
-    <string name="signup_hint_password">Password</string>
     <string name="signup_hint_nome">Nome</string>
     <string name="signup_hint_telemovel">Telemóvel</string>
     <string name="signup_hint_email">Email</string>
-
     <string name="signup_link_login">Já tem uma conta? Iniciar Sessão</string>
+
+    <!-- menu/menu_perfil -->
+    <string name="configuracoes">Configurações</string>
 
 </resources>

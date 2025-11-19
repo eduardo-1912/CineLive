@@ -2,26 +2,26 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/nav_filmes">
+    app:startDestination="@id/navFilmes">
 
     <fragment
-        android:id="@+id/nav_filmes"
+        android:id="@+id/navFilmes"
         android:name="pt.ipleiria.estg.dei.amsi.cinelive.FilmesFragment"
-        android:label="Filmes" />
+        android:label="@string/nav_filmes" />
 
     <fragment
-        android:id="@+id/nav_cinemas"
+        android:id="@+id/navCinemas"
         android:name="pt.ipleiria.estg.dei.amsi.cinelive.CinemasFragment"
-        android:label="Cinemas" />
+        android:label="@string/nav_cinemas" />
 
     <fragment
-        android:id="@+id/nav_bilhetes"
+        android:id="@+id/navBilhetes"
         android:name="pt.ipleiria.estg.dei.amsi.cinelive.BilhetesFragment"
-        android:label="Bilhetes" />
+        android:label="@string/nav_bilhetes" />
 
     <fragment
-        android:id="@+id/nav_perfil"
+        android:id="@+id/navPerfil"
         android:name="pt.ipleiria.estg.dei.amsi.cinelive.PerfilFragment"
-        android:label="Perfil" />
+        android:label="@string/nav_perfil" />
 
 </navigation>

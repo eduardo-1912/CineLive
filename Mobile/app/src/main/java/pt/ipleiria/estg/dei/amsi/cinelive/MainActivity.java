@@ -1,6 +1,8 @@
 package pt.ipleiria.estg.dei.amsi.cinelive;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,7 +25,6 @@ public class MainActivity extends AppCompatActivity {
     private NavController navController;
     private AppBarConfiguration appBarConfiguration;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         navController = navHostFragment.getNavController();
 
         appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_filmes, R.id.nav_cinemas, R.id.nav_bilhetes, R.id.nav_perfil).build();
+                R.id.navFilmes, R.id.navCinemas, R.id.navBilhetes, R.id.navPerfil).build();
 
         // Toolbar + NavController
         setSupportActionBar(binding.includeToolbar.topAppBar);
@@ -45,6 +46,30 @@ public class MainActivity extends AppCompatActivity {
 
         // BottomNavigation + NavController
         NavigationUI.setupWithNavController(binding.bottomNav, navController);
+
+
+        boolean isLoggedIn = true; // depois substitui por SharedPreferences/token
+
+        // Mostrar 'Entrar' ou 'Perfil'
+        binding.bottomNav.getMenu().findItem(R.id.navPerfil)
+                .setTitle(isLoggedIn ? R.string.nav_perfil : R.string.nav_entrar);
+
+        binding.bottomNav.setOnItemSelectedListener(item -> {
+
+            if (item.getItemId() == R.id.navPerfil) {
+
+                if (!isLoggedIn) {
+                    // Redirecionar para LoginActivity
+                    startActivity(new Intent(this, LoginActivity.class));
+                    return false; // NÃO selecionar o item no bottom nav
+                }
+            }
+
+            // Comportamento normal do NavigationUI
+            NavigationUI.onNavDestinationSelected(item, navController);
+            return true;
+        });
+
     }
 
     @Override
