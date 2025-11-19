@@ -118,8 +118,7 @@ class AluguerSalaController extends Controller
         ]);
     }
 
-
-
+    
     public function actionDelete($id)
     {
         $currentUser = Yii::$app->user;
