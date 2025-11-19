@@ -2,7 +2,7 @@
     <!-- Brand Logo -->
     <a href="<?= Yii::$app->homeUrl ?>" class="brand-link d-flex justify-content-center align-items-center margin-auto">
         <img src="<?= Yii::getAlias('@web/favicon-dark.svg') ?>" alt="CineLive" style="width:24px; padding-block: 3px;">
-        <span class="brand-text fw-bold ms-1"><?= Yii::$app->user->identity->profile->cinema->nome ?? Yii::$app->name ?></span>
+        <span class="brand-text fw-bold ms-1"><?= Yii::$app->user->identity->profile->cinema->nome ?? 'CineLive' ?></span>
     </a>
 
     <!-- Sidebar -->
@@ -11,18 +11,12 @@
         <nav class="mt-2">
             <?php
 
-            $currentUser = Yii::$app->user;
-            $profile = $currentUser->identity->profile;
-            $userCinemaId = $profile->cinema_id;
-
-            $gerirUtilizadores = $currentUser->can('gerirUtilizadores');
-            $gerirFuncionarios = $currentUser->can('gerirFuncionarios');
-            $gerirCinemas = $currentUser->can('gerirCinemas');
-            $gerirFilmes = $currentUser->can('gerirFilmes');
-
-            use common\models\AluguerSala;
-            $alugueresPendentes = AluguerSala::find()->where(
-            ['estado' => AluguerSala::ESTADO_PENDENTE, 'cinema_id' => $userCinemaId])->exists();
+            $profile = $data['profile'];
+            $gerirUtilizadores = $data['gerirUtilizadores'];
+            $gerirFuncionarios = $data['gerirFuncionarios'];
+            $gerirCinemas = $data['gerirCinemas'];
+            $gerirFilmes = $data['gerirFilmes'];
+            $alugueresPendentes = $data['alugueresPendentes'];
 
             echo \hail812\adminlte\widgets\Menu::widget([
                 'items' => [

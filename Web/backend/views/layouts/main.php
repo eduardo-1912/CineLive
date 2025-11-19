@@ -3,6 +3,7 @@
 /* @var $this \yii\web\View */
 /* @var $content string */
 
+use backend\components\SidebarHelper;
 use common\components\ToastWidget;
 use yii\bootstrap4\ActiveForm;
 use yii\helpers\Html;
@@ -31,7 +32,7 @@ $this->registerJsFile($publishedRes[1].'/control_sidebar.js', ['depends' => '\ha
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/x-icon" href="../web/favicon.ico">
     <?php $this->registerCsrfMetaTags() ?>
-    <title><?= Yii::$app->user->identity->profile->cinema->nome ?? Yii::$app->name ?> | <?= Html::encode($this->title) ?></title>
+    <title><?= Yii::$app->user->identity->profile->cinema->nome ?? 'CineLive' ?> | <?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
 
     <!-- FAVICON (LIGHT-MODE) -->
@@ -50,7 +51,7 @@ $this->registerJsFile($publishedRes[1].'/control_sidebar.js', ['depends' => '\ha
     <!-- /.navbar -->
 
     <!-- Main Sidebar Container -->
-    <?= $this->render('sidebar', ['assetDir' => $assetDir]) ?>
+    <?= $this->render('sidebar', ['assetDir' => $assetDir, 'data' => SidebarHelper::getSidebarData(),]) ?>
 
     <!-- Content Wrapper. Contains page content -->
     <?= $this->render('content', ['content' => $content, 'assetDir' => $assetDir]) ?>
