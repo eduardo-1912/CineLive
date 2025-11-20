@@ -8,26 +8,36 @@
     <string name="nav_entrar">Entrar</string>
     <string name="nav_perfil">Perfil</string>
 
+    <!-- Toolbar Actions -->
+    <string name="pesquisar_filmes">Pesquisar filmes...</string>
+    <string name="configuracoes">Configurações</string>
+
     <!-- layout/activity_selecionar_cinema -->
     <string name="selecionar_cinema_titulo">Selecione um cinema</string>
     <string name="selecionar_cinema_subtitulo">Pode alterar esta escolha a qualquer momento</string>
 
     <!-- layout/activity_login -->
-    <string name="login_titulo">Iniciar Sessão</string>
+    <string name="login_titulo">Entre na sua conta</string>
     <string name="login_subtitulo">Preencha os seguintes campos para iniciar sessão</string>
     <string name="login_hint_username">Username</string>
     <string name="login_hint_password">Password</string>
-    <string name="login_link_signup">Ainda não tem conta? Criar conta</string>
+
+    <string name="btn_login">Iniciar Sessão</string>
+    <string name="btn_signup">Criar Conta</string>
 
     <!-- layout/activity_signup -->
-    <string name="signup_titulo">Criar Conta</string>
+    <string name="signup_titulo">Crie uma Conta</string>
     <string name="signup_subtitulo">Preencha os seguintes campos para se registar</string>
     <string name="signup_hint_nome">Nome</string>
     <string name="signup_hint_telemovel">Telemóvel</string>
     <string name="signup_hint_email">Email</string>
-    <string name="signup_link_login">Já tem uma conta? Iniciar Sessão</string>
 
-    <!-- menu/menu_perfil -->
-    <string name="configuracoes">Configurações</string>
+    <!-- layout/activity_configuracoes -->
+    <string name="configuracoes_titulo">Configurações da API</string>
+    <string name="configuracoes_subtitulo">Defina o URL da API utilizada pela aplicação.</string>
+    <string name="configuracoes_hint_ip_api">IP da API</string>
+    <string name="configuracoes_hint_path_api">Path da API</string>
+    <string name="configuracoes_btn_guardar">Guardar</string>
+    <string name="configuracoes_btn_restaurar">Restaurar</string>
 
 </resources>

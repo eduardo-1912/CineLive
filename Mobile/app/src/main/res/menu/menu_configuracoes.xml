@@ -4,8 +4,9 @@
 
     <item
         android:id="@+id/itemConfiguracoes"
-        android:icon="@drawable/ic_settings"
+        android:icon="@drawable/ic_configuracoes"
         android:title="@string/configuracoes"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="ifRoom"
+        app:iconTint="?attr/colorOnSurface" />
 
 </menu>

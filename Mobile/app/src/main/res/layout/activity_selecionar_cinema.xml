@@ -5,38 +5,43 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
     android:orientation="vertical"
     tools:context=".SelecionarCinemaActivity">
 
-    <include android:id="@+id/includeToolbar" layout="@layout/toolbar" />
+    <!-- TOOLBAR -->
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/toolbar" />
 
+    <!-- CONTENT -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:paddingHorizontal="18dp"
-        android:paddingVertical="72dp">
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="48dp">
 
-        <!-- Título -->
+        <!-- TÍTULO -->
         <TextView
             android:id="@+id/tvTitulo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/selecionar_cinema_titulo"
-            android:textColor="?attr/colorOnBackground"
-            android:textSize="24sp"
-            android:textStyle="bold" />
+            android:textAppearance="@style/TextAppearance.Material3.DisplaySmall"
+            android:textColor="?attr/colorOnBackground" />
 
-        <!-- Subtítulo -->
+        <!-- SUBTÍTULO -->
         <TextView
             android:id="@+id/tvSubtitulo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/selecionar_cinema_subtitulo" />
+            android:layout_marginTop="8dp"
+            android:text="@string/selecionar_cinema_subtitulo"
+            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+            android:textColor="?attr/colorOnSurfaceVariant" />
 
-        <!-- Lista de cinemas -->
+        <!-- LISTA DE CINEMAS -->
         <ListView
             android:id="@+id/lvCinemas"
             android:layout_width="match_parent"

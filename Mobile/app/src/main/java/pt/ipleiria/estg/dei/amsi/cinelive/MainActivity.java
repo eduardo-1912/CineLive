@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(binding.bottomNav, navController);
 
 
-        boolean isLoggedIn = true; // depois substitui por SharedPreferences/token
+        boolean isLoggedIn = true; // TODO: depois substituir por SharedPreferences/token
 
         // Mostrar 'Entrar' ou 'Perfil'
         binding.bottomNav.getMenu().findItem(R.id.navPerfil)
