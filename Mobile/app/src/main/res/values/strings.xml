@@ -16,6 +16,8 @@
     <string name="btn_login">Iniciar Sessão</string>
     <string name="btn_signup">Criar Conta</string>
     <string name="btn_editar_perfil">Editar Perfil</string>
+    <string name="btn_logout">Logout</string>
+    <string name="btn_eliminar_conta">Eliminar Conta</string>
     <string name="btn_guardar">Guardar</string>
     <string name="btn_restaurar">Restaurar</string>
     <string name="btn_cancelar">Cancelar</string>
@@ -34,7 +36,7 @@
 
     <!-- layout/activity_signup -->
     <string name="editar_perfil_titulo">Edite o seu perfil</string>
-    <string name="editar_perfil_subtitulo">Pode alterar qualquer um destes campos</string>
+    <string name="editar_perfil_subtitulo">Pode alterar qualquer um destes dados</string>
 
     <!-- Form -->
     <string name="form_hint_username">Username</string>
@@ -43,6 +45,8 @@
     <string name="form_hint_nome">Nome</string>
     <string name="form_hint_telemovel">Telemóvel</string>
     <string name="form_hint_email">Email</string>
+
+    <string name="message_eliminar_conta">Tem a certeza de que pretende eliminar a sua conta? Esta ação é irreversível.</string>
 
     <!-- layout/activity_configuracoes -->
     <string name="configuracoes_titulo">Configurações da API</string>

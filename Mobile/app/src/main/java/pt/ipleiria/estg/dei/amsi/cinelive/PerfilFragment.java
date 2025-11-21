@@ -65,6 +65,30 @@ public class PerfilFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
+        // TODO: CHANGE THIS
+        binding.etUsername.setText("john.smith");
+        binding.etNome.setText("John Smith");
+        binding.etEmail.setText("john.smith@email.com");
+        binding.etTelemovel.setText("912345678");
+
+        binding.btnEditarPerfil.setOnClickListener(v -> {
+            startActivity(new Intent(getActivity(), EditarPerfilActivity.class));
+        });
+
+        binding.btnEliminarConta.setOnClickListener(v -> {
+            new com.google.android.material.dialog.MaterialAlertDialogBuilder(v.getContext())
+                    .setTitle(R.string.btn_eliminar_conta)
+                    .setMessage(R.string.message_eliminar_conta)
+                    .setPositiveButton(R.string.btn_eliminar_conta, (dialog, which) -> {
+
+                        // TODO: chamar API para apagar conta
+
+                    })
+                    .setNegativeButton(R.string.btn_cancelar, null)
+                    .show();
+        });
+
     }
 
     @Override

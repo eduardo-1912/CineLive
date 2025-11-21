@@ -30,9 +30,25 @@
         <item name="android:layout_marginBottom">8dp</item>
     </style>
 
+    <style name="TextInputLayoutDisabled" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:enabled">false</item>
+        <item name="android:textColorHint">?attr/colorPrimary</item>
+        <item name="android:layout_marginBottom">8dp</item>
+    </style>
+
     <style name="Button.Primary" parent="Widget.Material3.Button">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="Button.Primary.Full" parent="Widget.Material3.Button">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">12dp</item>
+        <item name="android:paddingVertical">16dp</item>
         <item name="android:textSize">16sp</item>
     </style>
 
@@ -42,10 +58,10 @@
         <item name="android:textSize">16sp</item>
     </style>
 
-    <style name="Button.Primary.Full" parent="Widget.Material3.Button">
+    <style name="Button.Secondary.Full" parent="Widget.Material3.Button.TonalButton">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:layout_marginTop">12dp</item>
         <item name="android:paddingVertical">16dp</item>
         <item name="android:textSize">16sp</item>
     </style>

@@ -31,7 +31,7 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         // Seta voltar atrás
-        setSupportActionBar(binding.includeToolbar.topAppBar);
+        setSupportActionBar(binding.toolbar.topAppBar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         binding.btnSignup.setOnClickListener(v -> {

@@ -9,7 +9,7 @@
     tools:context=".SignupActivity">
 
     <!-- Toolbar -->
-    <include android:id="@+id/includeToolbar" layout="@layout/toolbar" />
+    <include android:id="@+id/toolbar" layout="@layout/toolbar" />
 
     <!-- Container -->
     <LinearLayout style="@style/Container">
@@ -27,17 +27,17 @@
             android:text="@string/editar_perfil_subtitulo" />
 
         <!-- Form Utilizador -->
-        <include layout="@layout/form_utilizador" />
+        <include android:id="@+id/form" layout="@layout/form_utilizador" />
 
-        <!-- Botão Signup -->
+        <!-- Botão Guardar -->
         <Button
-            android:id="@+id/btnSignup"
+            android:id="@+id/btnGuardar"
             style="@style/Button.Primary.Full"
             android:text="@string/btn_guardar" />
 
-        <!-- Botão Login -->
+        <!-- Botão Cancelar -->
         <Button
-            android:id="@+id/btnLogin"
+            android:id="@+id/btnCancelar"
             style="@style/Button.Text"
             android:text="@string/btn_cancelar" />
 

@@ -30,7 +30,7 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
         });
 
         // Seta voltar atrás
-        setSupportActionBar(binding.includeToolbar.topAppBar);
+        setSupportActionBar(binding.toolbar.topAppBar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         getSupportActionBar().setTitle("TÍTULO DO FILME......");

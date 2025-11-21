@@ -30,7 +30,7 @@ public class ConfiguracoesActivity extends AppCompatActivity {
         });
 
         // Seta voltar atrás
-        setSupportActionBar(binding.includeToolbar.topAppBar);
+        setSupportActionBar(binding.toolbar.topAppBar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         getSupportActionBar().setTitle(R.string.configuracoes);

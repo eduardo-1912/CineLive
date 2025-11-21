@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
                 R.id.navFilmes, R.id.navCinemas, R.id.navBilhetes, R.id.navPerfil).build();
 
         // Toolbar + NavController
-        setSupportActionBar(binding.includeToolbar.topAppBar);
+        setSupportActionBar(binding.toolbar.topAppBar);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
 
         // BottomNavigation + NavController
