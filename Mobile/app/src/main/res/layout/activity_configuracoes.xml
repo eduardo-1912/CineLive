@@ -9,94 +9,46 @@
     tools:context=".ConfiguracoesActivity">
 
     <!-- Toolbar -->
-    <include
-        android:id="@+id/includeToolbar"
-        layout="@layout/toolbar" />
+    <include android:id="@+id/includeToolbar" layout="@layout/toolbar" />
 
-    <!-- CONTENT -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:orientation="vertical"
-        android:paddingHorizontal="24dp"
-        android:paddingVertical="48dp">
+    <!-- Container -->
+    <LinearLayout style="@style/Container">
 
         <!-- Título -->
         <TextView
             android:id="@+id/tvTitulo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/configuracoes_titulo"
-            android:textAppearance="@style/TextAppearance.Material3.DisplaySmall"
-            android:textColor="?attr/colorOnBackground" />
+            style="@style/Title"
+            android:text="@string/configuracoes_titulo" />
 
         <!-- Subtítulo -->
         <TextView
             android:id="@+id/tvSubtitulo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="@string/configuracoes_subtitulo"
-            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-            android:textColor="?attr/colorOnSurfaceVariant" />
+            style="@style/Subtitle"
+            android:text="@string/configuracoes_subtitulo" />
 
-        <!-- IP DA API -->
+        <!-- URL da API -->
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilApiIp"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:hint="@string/configuracoes_hint_ip_api">
+            style="@style/TextInputLayout"
+            android:hint="@string/configuracoes_hint_url_api">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etApiBaseUrl"
+                android:id="@+id/etUrlApi"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textUri" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- PATH DA API -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilApiPath"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:hint="@string/configuracoes_hint_path_api">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etApiPath"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text"
-                android:maxLines="1" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- BOTÃO GUARDAR -->
-        <com.google.android.material.button.MaterialButton
+        <!-- Botão Guardar -->
+        <Button
             android:id="@+id/btnGuardar"
-            style="@style/Widget.Material3.Button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
-            android:textSize="16sp"
-            android:text="@string/configuracoes_btn_guardar"
-            android:textAllCaps="false"
-            android:paddingVertical="16dp" />
+            style="@style/Button.Primary.Full"
+            android:text="@string/btn_guardar" />
 
-        <!-- BOTÃO RESTAURAR -->
-        <com.google.android.material.button.MaterialButton
+        <!-- Botão Restaurar -->
+        <Button
             android:id="@+id/btnRestaurar"
-            style="@style/Widget.Material3.Button.TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/configuracoes_btn_restaurar"
-            android:textAllCaps="false"
-            android:textColor="?attr/colorPrimary"
-            android:textSize="16sp" />
+            style="@style/Button.Text"
+            android:text="@string/btn_restaurar" />
 
     </LinearLayout>
 

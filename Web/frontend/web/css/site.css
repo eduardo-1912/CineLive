@@ -230,6 +230,16 @@ main {
     border: 1px solid #dcdcdc;
 }
 
+.trailer-box {
+    height: 160px;
+}
+
+@media (min-width: 768px) { /* md */
+    .trailer-box {
+        height: 374px;
+    }
+}
+
 
 
 

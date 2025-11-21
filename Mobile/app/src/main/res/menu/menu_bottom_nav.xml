@@ -14,7 +14,8 @@
     <item
         android:id="@+id/navBilhetes"
         android:icon="@drawable/ic_bilhetes"
-        android:title="@string/nav_bilhetes" />
+        android:title="@string/nav_bilhetes"
+        android:visible="false" />
 
     <item
         android:id="@+id/navPerfil"

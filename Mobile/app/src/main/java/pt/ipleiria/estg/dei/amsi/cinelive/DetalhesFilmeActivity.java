@@ -1,6 +1,5 @@
 package pt.ipleiria.estg.dei.amsi.cinelive;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -9,19 +8,19 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityLoginBinding;
+import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityDetalhesFilmeBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivitySignupBinding;
 
-public class SignupActivity extends AppCompatActivity {
+public class DetalhesFilmeActivity extends AppCompatActivity {
 
-    ActivitySignupBinding binding;
+    ActivityDetalhesFilmeBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
 
-        binding = ActivitySignupBinding.inflate(getLayoutInflater());
+        binding = ActivityDetalhesFilmeBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -34,10 +33,8 @@ public class SignupActivity extends AppCompatActivity {
         setSupportActionBar(binding.includeToolbar.topAppBar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        binding.btnLogin.setOnClickListener(v -> {
-            startActivity(new Intent(SignupActivity.this, LoginActivity.class));
-            finish();
-        });
+        getSupportActionBar().setTitle("TÍTULO DO FILME......");
+
     }
 
     // Voltar atrás

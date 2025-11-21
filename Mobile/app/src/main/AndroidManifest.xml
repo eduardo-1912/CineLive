@@ -12,6 +12,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CineLive">
         <activity
+            android:name=".EditarPerfilActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SelecionarLugaresActivity"
+            android:exported="false" />
+        <activity
+            android:name=".DetalhesFilmeActivity"
+            android:exported="false" />
+        <activity
             android:name=".ConfiguracoesActivity"
             android:exported="false" />
         <activity

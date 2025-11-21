@@ -54,6 +54,11 @@ public class MainActivity extends AppCompatActivity {
         binding.bottomNav.getMenu().findItem(R.id.navPerfil)
                 .setTitle(isLoggedIn ? R.string.nav_perfil : R.string.nav_entrar);
 
+        // Mostrar 'Bilhetes' se estiver logged in
+        binding.bottomNav.getMenu().findItem(R.id.navBilhetes)
+                .setVisible(isLoggedIn);
+
+
         binding.bottomNav.setOnItemSelectedListener(item -> {
 
             if (item.getItemId() == R.id.navPerfil) {

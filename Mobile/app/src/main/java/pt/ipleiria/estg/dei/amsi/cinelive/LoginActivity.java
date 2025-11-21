@@ -34,7 +34,7 @@ public class LoginActivity extends AppCompatActivity {
         setSupportActionBar(binding.includeToolbar.topAppBar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        binding.linkSignup.setOnClickListener(v -> {
+        binding.btnSignup.setOnClickListener(v -> {
             startActivity(new Intent(LoginActivity.this, SignupActivity.class));
             finish();
         });

@@ -29,7 +29,6 @@ public class CinemasFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        binding.textTitle.setText("Cinemas");
     }
 
     @Override

@@ -229,7 +229,7 @@ class FilmeController extends Controller
     // GUARDAR POSTER DE UM FILME
     private function guardarPoster(Filme $model, ?string $oldPoster = null): void
     {
-        // SE NÃO FOI ENVIADO NENHUM POSTER → MANTER ANTIGO
+        // SE NÃO FOI ENVIADO NENHUM POSTER --> MANTER ANTIGO
         if (!$model->posterFile) {
             if ($oldPoster) {
                 $model->poster_path = $oldPoster;

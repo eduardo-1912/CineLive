@@ -8,44 +8,28 @@
     android:orientation="vertical"
     tools:context=".LoginActivity">
 
-    <!-- TOOLBAR -->
+    <!-- Toolbar -->
     <include android:id="@+id/includeToolbar" layout="@layout/toolbar" />
 
-    <!-- CONTENT -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingHorizontal="24dp"
-        android:paddingVertical="48dp"
-        android:gravity="center_horizontal">
+    <!-- Container -->
+    <LinearLayout style="@style/Container">
 
-        <!-- TÍTULO -->
+        <!-- Título -->
         <TextView
             android:id="@+id/tvTitulo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/login_titulo"
-            android:textAppearance="@style/TextAppearance.Material3.DisplaySmall"
-            android:textColor="?attr/colorOnBackground" />
+            style="@style/Title"
+            android:text="@string/login_titulo" />
 
-        <!-- SUBTÍTULO -->
+        <!-- Subtítulo -->
         <TextView
             android:id="@+id/tvSubtitulo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/login_subtitulo"
-            android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-            android:textColor="?attr/colorOnSurfaceVariant" />
+            style="@style/Subtitle"
+            android:text="@string/login_subtitulo" />
 
-        <!-- USERNAME -->
+        <!-- Username -->
         <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/login_hint_username"
-            android:layout_marginTop="36dp"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+            style="@style/TextInputLayout"
+            android:hint="@string/form_hint_username">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etUsername"
@@ -54,13 +38,10 @@
                 android:inputType="text" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- PASSWORD -->
+        <!-- Password -->
         <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/login_hint_password"
-            android:layout_marginTop="16dp"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            style="@style/TextInputLayout"
+            android:hint="@string/form_hint_password"
             app:endIconMode="password_toggle">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -70,28 +51,17 @@
                 android:inputType="textPassword" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- BOTÃO LOGIN -->
-        <com.google.android.material.button.MaterialButton
+        <!-- Botão Login -->
+        <Button
             android:id="@+id/btnLogin"
-            style="@style/Widget.Material3.Button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
-            android:text="@string/btn_login"
-            android:textAllCaps="false"
-            android:textSize="16sp"
-            android:paddingVertical="16dp" />
+            style="@style/Button.Primary.Full"
+            android:text="@string/btn_login" />
 
-        <!-- LINK CRIAR CONTA -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/linkSignup"
-            style="@style/Widget.Material3.Button.TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/btn_signup"
-            android:textAllCaps="false"
-            android:textSize="16sp" />
+        <!-- Botão Signup -->
+        <Button
+            android:id="@+id/btnSignup"
+            style="@style/Button.Text"
+            android:text="@string/btn_signup" />
 
     </LinearLayout>
 

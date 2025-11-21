@@ -28,7 +28,6 @@ public class BilhetesFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        binding.textTitle.setText("Bilhetes");
     }
 
     @Override

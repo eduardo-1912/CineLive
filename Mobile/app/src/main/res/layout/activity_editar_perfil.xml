@@ -18,13 +18,13 @@
         <TextView
             android:id="@+id/tvTitulo"
             style="@style/Title"
-            android:text="@string/signup_titulo" />
+            android:text="@string/editar_perfil_titulo" />
 
         <!-- Subtítulo -->
         <TextView
             android:id="@+id/tvSubtitulo"
             style="@style/Subtitle"
-            android:text="@string/signup_subtitulo" />
+            android:text="@string/editar_perfil_subtitulo" />
 
         <!-- Form Utilizador -->
         <include layout="@layout/form_utilizador" />
@@ -33,13 +33,13 @@
         <Button
             android:id="@+id/btnSignup"
             style="@style/Button.Primary.Full"
-            android:text="@string/btn_signup" />
+            android:text="@string/btn_guardar" />
 
         <!-- Botão Login -->
         <Button
             android:id="@+id/btnLogin"
             style="@style/Button.Text"
-            android:text="@string/btn_login" />
+            android:text="@string/btn_cancelar" />
 
     </LinearLayout>
 

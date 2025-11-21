@@ -12,6 +12,14 @@
     <string name="pesquisar_filmes">Pesquisar filmes...</string>
     <string name="configuracoes">Configurações</string>
 
+    <!-- Botões -->
+    <string name="btn_login">Iniciar Sessão</string>
+    <string name="btn_signup">Criar Conta</string>
+    <string name="btn_editar_perfil">Editar Perfil</string>
+    <string name="btn_guardar">Guardar</string>
+    <string name="btn_restaurar">Restaurar</string>
+    <string name="btn_cancelar">Cancelar</string>
+
     <!-- layout/activity_selecionar_cinema -->
     <string name="selecionar_cinema_titulo">Selecione um cinema</string>
     <string name="selecionar_cinema_subtitulo">Pode alterar esta escolha a qualquer momento</string>
@@ -19,25 +27,26 @@
     <!-- layout/activity_login -->
     <string name="login_titulo">Entre na sua conta</string>
     <string name="login_subtitulo">Preencha os seguintes campos para iniciar sessão</string>
-    <string name="login_hint_username">Username</string>
-    <string name="login_hint_password">Password</string>
-
-    <string name="btn_login">Iniciar Sessão</string>
-    <string name="btn_signup">Criar Conta</string>
 
     <!-- layout/activity_signup -->
-    <string name="signup_titulo">Crie uma Conta</string>
+    <string name="signup_titulo">Crie uma conta</string>
     <string name="signup_subtitulo">Preencha os seguintes campos para se registar</string>
-    <string name="signup_hint_nome">Nome</string>
-    <string name="signup_hint_telemovel">Telemóvel</string>
-    <string name="signup_hint_email">Email</string>
+
+    <!-- layout/activity_signup -->
+    <string name="editar_perfil_titulo">Edite o seu perfil</string>
+    <string name="editar_perfil_subtitulo">Pode alterar qualquer um destes campos</string>
+
+    <!-- Form -->
+    <string name="form_hint_username">Username</string>
+    <string name="form_hint_password">Password</string>
+    <string name="form_hint_password_opcional">Password (opcional)</string>
+    <string name="form_hint_nome">Nome</string>
+    <string name="form_hint_telemovel">Telemóvel</string>
+    <string name="form_hint_email">Email</string>
 
     <!-- layout/activity_configuracoes -->
     <string name="configuracoes_titulo">Configurações da API</string>
     <string name="configuracoes_subtitulo">Defina o URL da API utilizada pela aplicação.</string>
-    <string name="configuracoes_hint_ip_api">IP da API</string>
-    <string name="configuracoes_hint_path_api">Path da API</string>
-    <string name="configuracoes_btn_guardar">Guardar</string>
-    <string name="configuracoes_btn_restaurar">Restaurar</string>
+    <string name="configuracoes_hint_url_api">URL da API</string>
 
 </resources>

@@ -126,8 +126,8 @@ $this->title = $model->titulo;
             <?php if ($model->trailer_url): ?>
                 <div class="mt-4">
                     <h5>Trailer</h5>
-                    <div class="rounded-3 overflow-hidden shadow-sm" style="height: 374px">
-                        <iframe width="100%" height="374" allowfullscreen
+                    <div class="rounded-3 trailer-box overflow-hidden shadow-sm">
+                        <iframe width="100%" class="trailer-box" allowfullscreen
                                 src="<?= str_replace('watch?v=', 'embed/', $model->trailer_url) ?>">
                         </iframe>
                     </div>

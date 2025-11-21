@@ -33,10 +33,10 @@ class RbacController extends Controller
         ];
 
         foreach ($permissoes as $nome => $descricao) {
-            $perm = $auth->createPermission($nome);
-            $perm->description = $descricao;
-            $auth->add($perm);
-            $$nome = $perm;
+            $perm = $auth->createPermission($nome); // Criar a permissão com o nome
+            $perm->description = $descricao; // Associar a descrição
+            $auth->add($perm); // Adicionar a permissão ao AuthManager
+            $$nome = $perm; // Criar uma variável com nome da permissão (Ex.: $gerirUtilizadores = $perm)
         }
 
         // ROLES

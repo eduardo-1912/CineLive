@@ -178,6 +178,7 @@ class UserController extends Controller
             'isOwnAccount' => $isOwnAccount,
             'gerirUtilizadores' => $gerirUtilizadores,
             'gerirFuncionarios' => $gerirFuncionarios,
+            'currentUser' => $currentUser,
         ]);
     }
 

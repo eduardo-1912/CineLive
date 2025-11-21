@@ -81,7 +81,7 @@ class Filme extends \yii\db\ActiveRecord
 
     public function getPosterUrl(): string
     {
-        // CAMINHOS DEFINIDOS EM xommon/config/params.php
+        // CAMINHOS DEFINIDOS EM common/config/params.php
         $posterDir = Yii::getAlias(Yii::$app->params['posterPath']); // CAMINHO FÍSICO ABSOLUTO
         $posterUrlBase = Yii::$app->params['posterUrl']; // URL PÚBLICO ACESSÍVEL VIA BROWSER
 

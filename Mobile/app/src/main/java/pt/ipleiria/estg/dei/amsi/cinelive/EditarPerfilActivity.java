@@ -8,39 +8,17 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityConfiguracoesBinding;
-import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivitySignupBinding;
-
-public class ConfiguracoesActivity extends AppCompatActivity {
-
-    ActivityConfiguracoesBinding binding;
+public class EditarPerfilActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-
-        binding = ActivityConfiguracoesBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
-
+        setContentView(R.layout.activity_editar_perfil);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
-        // Seta voltar atrás
-        setSupportActionBar(binding.includeToolbar.topAppBar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        getSupportActionBar().setTitle(R.string.configuracoes);
-
-    }
-
-    // Voltar atrás
-    @Override
-    public boolean onSupportNavigateUp() {
-        finish();
-        return true;
     }
 }
