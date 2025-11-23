@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginBottom="36dp"
+    android:orientation="vertical">
+
+    <!-- Nome -->
+    <TextView
+        android:id="@+id/tvNome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="CineLive Leiria"
+        android:textColor="?attr/colorOnBackground"
+        android:textSize="32sp"
+        android:textStyle="bold" />
+
+    <Space style="@style/Space_20" />
+
+    <!-- Morada -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/morada"
+        style="@style/Label" />
+
+    <TextView
+        android:id="@+id/tvMorada"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Rua das Flores N5, 1125-435 Leiria"
+        android:textSize="18sp" />
+
+    <Space style="@style/Space_16" />
+
+    <!-- Telefone e Email -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/telefone"
+                android:textColor="?attr/colorOnBackground"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvTelefone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="244123456"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/email"
+                android:textColor="?attr/colorOnBackground"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvEmail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="leiria@cinelive.pt"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <Space style="@style/Space_16" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/horario"
+                android:textColor="?attr/colorOnBackground"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvHorario"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="10:00 - 23:00"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/capacidade"
+                android:textColor="?attr/colorOnBackground"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvCapacidade"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="8 Salas • 420 Lugares"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <Space style="@style/Space_16" />
+
+    <Button
+        style="@style/Button.Primary.Full"
+        android:text="Selecionar Cinema"/>
+
+</LinearLayout>

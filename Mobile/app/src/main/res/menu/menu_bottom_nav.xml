@@ -12,9 +12,9 @@
         android:title="@string/nav_cinemas" />
 
     <item
-        android:id="@+id/navBilhetes"
-        android:icon="@drawable/ic_bilhetes"
-        android:title="@string/nav_bilhetes"
+        android:id="@+id/navCompras"
+        android:icon="@drawable/ic_compras"
+        android:title="@string/nav_compras"
         android:visible="false" />
 
     <item

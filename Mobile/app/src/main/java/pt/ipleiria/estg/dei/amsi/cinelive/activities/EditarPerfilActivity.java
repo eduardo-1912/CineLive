@@ -1,6 +1,5 @@
-package pt.ipleiria.estg.dei.amsi.cinelive;
+package pt.ipleiria.estg.dei.amsi.cinelive.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -9,19 +8,19 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityLoginBinding;
-import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityMainBinding;
+import pt.ipleiria.estg.dei.amsi.cinelive.R;
+import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityEditarPerfilBinding;
 
-public class LoginActivity extends AppCompatActivity {
+public class EditarPerfilActivity extends AppCompatActivity {
 
-    ActivityLoginBinding binding;
+    ActivityEditarPerfilBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
 
-        binding = ActivityLoginBinding.inflate(getLayoutInflater());
+        binding = ActivityEditarPerfilBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -32,21 +31,24 @@ public class LoginActivity extends AppCompatActivity {
 
         // Seta voltar atrás
         setSupportActionBar(binding.toolbar.topAppBar);
+        getSupportActionBar().setTitle(R.string.btn_editar_perfil);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        binding.btnSignup.setOnClickListener(v -> {
-            startActivity(new Intent(LoginActivity.this, SignupActivity.class));
+
+        // Colocar hint password com (opcional)
+        binding.form.tilPassword.setHint(R.string.form_hint_password_opcional);
+
+        // TODO: PASSWORD COM MINIMO DE 8 CHAR
+
+        binding.btnCancelar.setOnClickListener(v -> {
             finish();
         });
 
-
     }
 
-    // Voltar atrás
     @Override
     public boolean onSupportNavigateUp() {
         finish();
         return true;
     }
-
 }

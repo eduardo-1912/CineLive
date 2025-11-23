@@ -1,4 +1,4 @@
-package pt.ipleiria.estg.dei.amsi.cinelive;
+package pt.ipleiria.estg.dei.amsi.cinelive.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,6 +14,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import pt.ipleiria.estg.dei.amsi.cinelive.activities.ConfiguracoesActivity;
+import pt.ipleiria.estg.dei.amsi.cinelive.activities.EditarPerfilActivity;
+import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.FragmentPerfilBinding;
 
 /**

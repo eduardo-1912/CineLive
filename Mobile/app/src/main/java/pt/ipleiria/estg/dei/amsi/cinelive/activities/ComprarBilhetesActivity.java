@@ -1,4 +1,4 @@
-package pt.ipleiria.estg.dei.amsi.cinelive;
+package pt.ipleiria.estg.dei.amsi.cinelive.activities;
 
 import android.os.Bundle;
 
@@ -8,19 +8,19 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityConfiguracoesBinding;
-import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityEditarPerfilBinding;
+import pt.ipleiria.estg.dei.amsi.cinelive.R;
+import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityComprarBilhetesBinding;
 
-public class EditarPerfilActivity extends AppCompatActivity {
+public class ComprarBilhetesActivity extends AppCompatActivity {
 
-    ActivityEditarPerfilBinding binding;
+    ActivityComprarBilhetesBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
 
-        binding = ActivityEditarPerfilBinding.inflate(getLayoutInflater());
+        binding = ActivityComprarBilhetesBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -29,24 +29,11 @@ public class EditarPerfilActivity extends AppCompatActivity {
             return insets;
         });
 
-        // Seta voltar atrás
         setSupportActionBar(binding.toolbar.topAppBar);
+        getSupportActionBar().setTitle(R.string.comprar_bilhetes);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        getSupportActionBar().setTitle(R.string.btn_editar_perfil);
-
-        // Colocar hint password com (opcional)
-        binding.form.tilPassword.setHint(R.string.form_hint_password_opcional);
-
-        // TODO: PASSWORD COM MINIMO DE 8 CHAR
-
-        binding.btnCancelar.setOnClickListener(v -> {
-            finish();
-        });
-
     }
 
-    // Voltar atrás
     @Override
     public boolean onSupportNavigateUp() {
         finish();

@@ -1,4 +1,4 @@
-package pt.ipleiria.estg.dei.amsi.cinelive;
+package pt.ipleiria.estg.dei.amsi.cinelive.activities;
 
 import android.os.Bundle;
 
@@ -8,19 +8,19 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityConfiguracoesBinding;
-import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivitySignupBinding;
+import pt.ipleiria.estg.dei.amsi.cinelive.R;
+import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityDetalhesFilmeBinding;
 
-public class ConfiguracoesActivity extends AppCompatActivity {
+public class DetalhesFilmeActivity extends AppCompatActivity {
 
-    ActivityConfiguracoesBinding binding;
+    ActivityDetalhesFilmeBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
 
-        binding = ActivityConfiguracoesBinding.inflate(getLayoutInflater());
+        binding = ActivityDetalhesFilmeBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -33,7 +33,7 @@ public class ConfiguracoesActivity extends AppCompatActivity {
         setSupportActionBar(binding.toolbar.topAppBar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        getSupportActionBar().setTitle(R.string.configuracoes);
+        getSupportActionBar().setTitle("TÍTULO DO FILME......");
 
     }
 
@@ -43,4 +43,5 @@ public class ConfiguracoesActivity extends AppCompatActivity {
         finish();
         return true;
     }
+
 }

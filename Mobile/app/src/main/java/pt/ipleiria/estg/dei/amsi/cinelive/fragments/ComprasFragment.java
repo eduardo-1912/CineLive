@@ -1,4 +1,4 @@
-package pt.ipleiria.estg.dei.amsi.cinelive;
+package pt.ipleiria.estg.dei.amsi.cinelive.fragments;
 
 import android.os.Bundle;
 
@@ -10,20 +10,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import pt.ipleiria.estg.dei.amsi.cinelive.databinding.FragmentCinemasBinding;
-import pt.ipleiria.estg.dei.amsi.cinelive.databinding.FragmentFilmesBinding;
+import pt.ipleiria.estg.dei.amsi.cinelive.databinding.FragmentComprasBinding;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link CinemasFragment#newInstance} factory method to
+ * Use the {@link ComprasFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class CinemasFragment extends Fragment {
-    private FragmentCinemasBinding binding;
+public class ComprasFragment extends Fragment {
+    private FragmentComprasBinding binding;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        binding = FragmentCinemasBinding.inflate(inflater, container, false);
+        binding = FragmentComprasBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 

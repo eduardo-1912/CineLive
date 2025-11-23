@@ -4,10 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingTop="?attr/actionBarSize"
-    tools:context=".PerfilFragment">
+    tools:context=".fragments.PerfilFragment">
 
     <LinearLayout style="@style/Container">
+
+        <TextView
+            style="@style/Title"
+            android:text="@string/perfil_titulo"/>
+
+        <Space style="@style/Space_32" />
 
         <!-- Username -->
         <com.google.android.material.textfield.TextInputLayout
@@ -71,13 +76,15 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal" >
 
+            <!-- Botão Editar Perfil -->
             <Button style="@style/Button.Primary.Full"
                 android:id="@+id/btnEditarPerfil"
                 android:layout_weight="0.5"
                 android:text="@string/btn_editar_perfil" />
 
-            <Space android:layout_width="4dp" android:layout_height="match_parent" />
+            <Space android:layout_width="6dp" android:layout_height="match_parent" />
 
+            <!-- Botão Logout -->
             <Button style="@style/Button.Secondary.Full"
                 android:id="@+id/btnLogout"
                 android:layout_weight="0.5"
@@ -85,10 +92,11 @@
 
         </LinearLayout>
 
-        <Button style="@style/Button.Primary"
+        <!-- Botão Eliminar Conta -->
+        <Button style="@style/Button.Text"
             android:id="@+id/btnEliminarConta"
-            android:layout_width="match_parent"
-            android:backgroundTint="?attr/colorError"
+            android:textColor="?attr/colorError"
+            android:layout_marginTop="8dp"
             android:text="@string/btn_eliminar_conta" />
 
     </LinearLayout>

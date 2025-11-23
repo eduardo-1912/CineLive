@@ -6,22 +6,22 @@
 
     <fragment
         android:id="@+id/navFilmes"
-        android:name="pt.ipleiria.estg.dei.amsi.cinelive.FilmesFragment"
+        android:name="pt.ipleiria.estg.dei.amsi.cinelive.fragments.FilmesFragment"
         android:label="@string/nav_filmes" />
 
     <fragment
         android:id="@+id/navCinemas"
-        android:name="pt.ipleiria.estg.dei.amsi.cinelive.CinemasFragment"
+        android:name="pt.ipleiria.estg.dei.amsi.cinelive.fragments.CinemasFragment"
         android:label="@string/nav_cinemas" />
 
     <fragment
-        android:id="@+id/navBilhetes"
-        android:name="pt.ipleiria.estg.dei.amsi.cinelive.BilhetesFragment"
-        android:label="@string/nav_bilhetes" />
+        android:id="@+id/navCompras"
+        android:name="pt.ipleiria.estg.dei.amsi.cinelive.fragments.ComprasFragment"
+        android:label="@string/nav_compras" />
 
     <fragment
         android:id="@+id/navPerfil"
-        android:name="pt.ipleiria.estg.dei.amsi.cinelive.PerfilFragment"
+        android:name="pt.ipleiria.estg.dei.amsi.cinelive.fragments.PerfilFragment"
         android:label="@string/nav_perfil" />
 
 </navigation>

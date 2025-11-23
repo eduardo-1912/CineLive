@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".SignupActivity">
+    tools:context=".activities.SignupActivity">
 
     <!-- Toolbar -->
     <include android:id="@+id/toolbar" layout="@layout/toolbar" />
@@ -16,13 +16,11 @@
 
         <!-- Título -->
         <TextView
-            android:id="@+id/tvTitulo"
             style="@style/Title"
             android:text="@string/editar_perfil_titulo" />
 
         <!-- Subtítulo -->
         <TextView
-            android:id="@+id/tvSubtitulo"
             style="@style/Subtitle"
             android:text="@string/editar_perfil_subtitulo" />
 

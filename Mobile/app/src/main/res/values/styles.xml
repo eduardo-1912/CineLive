@@ -4,8 +4,20 @@
     <style name="Container">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:paddingHorizontal">24dp</item>
-        <item name="android:paddingVertical">48dp</item>
+        <item name="android:paddingStart">24dp</item>
+        <item name="android:paddingEnd">24dp</item>
+        <item name="android:paddingTop">24dp</item>
+        <item name="android:paddingBottom">24dp</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:gravity">center_horizontal</item>
+    </style>
+
+    <style name="ContainerForList">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingStart">24dp</item>
+        <item name="android:paddingEnd">24dp</item>
+        <item name="android:paddingTop">24dp</item>
         <item name="android:orientation">vertical</item>
         <item name="android:gravity">center_horizontal</item>
     </style>
@@ -22,6 +34,14 @@
         <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
         <item name="android:layout_marginTop">4dp</item>
         <item name="android:layout_marginBottom">32dp</item>
+    </style>
+
+    <style name="Label">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">?attr/colorOnBackground</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
     <style name="TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
@@ -48,7 +68,8 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginTop">12dp</item>
-        <item name="android:paddingVertical">16dp</item>
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingBottom">16dp</item>
         <item name="android:textSize">16sp</item>
     </style>
 
@@ -62,7 +83,8 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginTop">12dp</item>
-        <item name="android:paddingVertical">16dp</item>
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingBottom">16dp</item>
         <item name="android:textSize">16sp</item>
     </style>
 
@@ -71,6 +93,23 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">16sp</item>
         <item name="android:textColor">?attr/colorPrimary</item>
+    </style>
+
+    <style name="Button.Toggle" parent="Widget.Material3.Button">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:checkable">true</item>
+        <item name="android:textColor">@color/toggle_button_text</item>
+        <item name="android:backgroundTint">@color/toggle_button_background</item>
+    </style>
+
+    <style name="Grid">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:clipToPadding">false</item>
+        <item name="android:paddingStart">18dp</item>
+        <item name="android:paddingEnd">18dp</item>
+        <item name="android:paddingBottom">64dp</item>
     </style>
 
     <style name="Space_4">

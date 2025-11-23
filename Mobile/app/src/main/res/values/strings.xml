@@ -4,13 +4,17 @@
     <!-- menu/menu_bottom_nav-->
     <string name="nav_filmes">Filmes</string>
     <string name="nav_cinemas">Cinemas</string>
-    <string name="nav_bilhetes">Bilhetes</string>
+    <string name="nav_compras">Compras</string>
     <string name="nav_entrar">Entrar</string>
     <string name="nav_perfil">Perfil</string>
 
-    <!-- Toolbar Actions -->
+    <!-- Toolbar -->
     <string name="pesquisar_filmes">Pesquisar filmes...</string>
     <string name="configuracoes">Configurações</string>
+    <string name="comprar_bilhetes">Comprar Bilhetes</string>
+
+    <!-- Messages -->
+    <string name="message_eliminar_conta">Tem a certeza de que pretende eliminar a sua conta? Esta ação é irreversível.</string>
 
     <!-- Botões -->
     <string name="btn_login">Iniciar Sessão</string>
@@ -25,6 +29,21 @@
     <!-- layout/activity_selecionar_cinema -->
     <string name="selecionar_cinema_titulo">Selecione um cinema</string>
     <string name="selecionar_cinema_subtitulo">Pode alterar esta escolha a qualquer momento</string>
+
+    <!-- layout/fragment_filmes -->
+    <string name="em_exibicao">Em exibição</string>
+    <string name="kids">Kids</string>
+    <string name="brevemente">Brevemente</string>
+
+    <!-- layout/fragment_cinemas -->
+    <string name="morada">Morada</string>
+    <string name="telefone">Telefone</string>
+    <string name="email">Email</string>
+    <string name="horario">Horário</string>
+    <string name="capacidade">Capacidade</string>
+
+    <!-- layout/fragment_perfil -->
+    <string name="perfil_titulo">Os meus dados</string>
 
     <!-- layout/activity_login -->
     <string name="login_titulo">Entre na sua conta</string>
@@ -45,8 +64,6 @@
     <string name="form_hint_nome">Nome</string>
     <string name="form_hint_telemovel">Telemóvel</string>
     <string name="form_hint_email">Email</string>
-
-    <string name="message_eliminar_conta">Tem a certeza de que pretende eliminar a sua conta? Esta ação é irreversível.</string>
 
     <!-- layout/activity_configuracoes -->
     <string name="configuracoes_titulo">Configurações da API</string>

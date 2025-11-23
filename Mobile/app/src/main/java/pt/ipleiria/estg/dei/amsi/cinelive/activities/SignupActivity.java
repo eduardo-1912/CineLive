@@ -1,4 +1,4 @@
-package pt.ipleiria.estg.dei.amsi.cinelive;
+package pt.ipleiria.estg.dei.amsi.cinelive.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,7 +9,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityLoginBinding;
+import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivitySignupBinding;
 
 public class SignupActivity extends AppCompatActivity {

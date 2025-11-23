@@ -1,10 +1,9 @@
-package pt.ipleiria.estg.dei.amsi.cinelive;
+package pt.ipleiria.estg.dei.amsi.cinelive.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,6 +11,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivitySelecionarCinemaBinding;
 
 public class SelecionarCinemaActivity extends AppCompatActivity {

@@ -12,28 +12,31 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CineLive">
         <activity
-            android:name=".EditarPerfilActivity"
+            android:name=".activities.DetalhesCompraActivity"
             android:exported="false" />
         <activity
-            android:name=".SelecionarLugaresActivity"
+            android:name=".activities.ComprarBilhetesActivity"
             android:exported="false" />
         <activity
-            android:name=".DetalhesFilmeActivity"
+            android:name=".activities.EditarPerfilActivity"
             android:exported="false" />
         <activity
-            android:name=".ConfiguracoesActivity"
+            android:name=".activities.DetalhesFilmeActivity"
             android:exported="false" />
         <activity
-            android:name=".SignupActivity"
+            android:name=".activities.ConfiguracoesActivity"
             android:exported="false" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".activities.SignupActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".activities.LoginActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.MainActivity"
             android:exported="true" />
         <activity
-            android:name=".SelecionarCinemaActivity"
+            android:name=".activities.SelecionarCinemaActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -1,4 +1,4 @@
-package pt.ipleiria.estg.dei.amsi.cinelive;
+package pt.ipleiria.estg.dei.amsi.cinelive.activities;
 
 import android.os.Bundle;
 
@@ -8,17 +8,35 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-public class SelecionarLugaresActivity extends AppCompatActivity {
+import pt.ipleiria.estg.dei.amsi.cinelive.R;
+import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityDetalhesCompraBinding;
+
+public class DetalhesCompraActivity extends AppCompatActivity {
+
+    ActivityDetalhesCompraBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_selecionar_lugares);
+
+        binding = ActivityDetalhesCompraBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        setSupportActionBar(binding.toolbar.topAppBar);
+        getSupportActionBar().setTitle(R.string.btn_editar_perfil);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return true;
     }
 }

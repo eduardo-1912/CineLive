@@ -1,8 +1,7 @@
-package pt.ipleiria.estg.dei.amsi.cinelive;
+package pt.ipleiria.estg.dei.amsi.cinelive.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.MenuItem;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,36 +14,37 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-
+import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
+    private NavHostFragment navHostFragment;
     private NavController navController;
-    private AppBarConfiguration appBarConfiguration;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-
-        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
+        // Obter o NavController
+        navHostFragment = (NavHostFragment)getSupportFragmentManager()
                 .findFragmentById(R.id.nav_host_fragment);
         navController = navHostFragment.getNavController();
 
-        appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navFilmes, R.id.navCinemas, R.id.navBilhetes, R.id.navPerfil).build();
+        // Configurar
+        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder
+                (R.id.navFilmes, R.id.navCinemas, R.id.navCompras, R.id.navPerfil).build();
 
-        // Toolbar + NavController
+        // Toolbar integrada com o Navigation Component
         setSupportActionBar(binding.toolbar.topAppBar);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
 
-        // BottomNavigation + NavController
+        // BottomNavigation ligado ao NavController
         NavigationUI.setupWithNavController(binding.bottomNav, navController);
 
 
@@ -54,8 +54,8 @@ public class MainActivity extends AppCompatActivity {
         binding.bottomNav.getMenu().findItem(R.id.navPerfil)
                 .setTitle(isLoggedIn ? R.string.nav_perfil : R.string.nav_entrar);
 
-        // Mostrar 'Bilhetes' se estiver logged in
-        binding.bottomNav.getMenu().findItem(R.id.navBilhetes)
+        // Mostrar 'Compras' se estiver logged in
+        binding.bottomNav.getMenu().findItem(R.id.navCompras)
                 .setVisible(isLoggedIn);
 
 
@@ -75,10 +75,5 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
-    }
-
-    @Override
-    public boolean onSupportNavigateUp() {
-        return navController.navigateUp() || super.onSupportNavigateUp();
     }
 }
