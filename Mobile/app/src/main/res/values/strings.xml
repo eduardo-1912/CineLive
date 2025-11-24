@@ -1,22 +1,22 @@
 <resources>
     <string name="app_name">CineLive</string>
 
-    <!-- menu/menu_bottom_nav-->
+    <!-- menu_bottom_nav-->
     <string name="nav_filmes">Filmes</string>
     <string name="nav_cinemas">Cinemas</string>
     <string name="nav_compras">Compras</string>
     <string name="nav_entrar">Entrar</string>
     <string name="nav_perfil">Perfil</string>
 
-    <!-- Toolbar -->
+    <!-- toolbar -->
     <string name="pesquisar_filmes">Pesquisar filmes...</string>
     <string name="configuracoes">Configurações</string>
     <string name="comprar_bilhetes">Comprar Bilhetes</string>
 
-    <!-- Messages -->
+    <!-- messages -->
     <string name="message_eliminar_conta">Tem a certeza de que pretende eliminar a sua conta? Esta ação é irreversível.</string>
 
-    <!-- Botões -->
+    <!-- buttons -->
     <string name="btn_login">Iniciar Sessão</string>
     <string name="btn_signup">Criar Conta</string>
     <string name="btn_editar_perfil">Editar Perfil</string>
@@ -26,38 +26,68 @@
     <string name="btn_restaurar">Restaurar</string>
     <string name="btn_cancelar">Cancelar</string>
 
-    <!-- layout/activity_selecionar_cinema -->
+    <!-- activity_selecionar_cinema -->
     <string name="selecionar_cinema_titulo">Selecione um cinema</string>
     <string name="selecionar_cinema_subtitulo">Pode alterar esta escolha a qualquer momento</string>
 
-    <!-- layout/fragment_filmes -->
+    <!-- fragment_filmes -->
     <string name="em_exibicao">Em exibição</string>
     <string name="kids">Kids</string>
     <string name="brevemente">Brevemente</string>
 
-    <!-- layout/fragment_cinemas -->
-    <string name="morada">Morada</string>
-    <string name="telefone">Telefone</string>
-    <string name="email">Email</string>
-    <string name="horario">Horário</string>
-    <string name="capacidade">Capacidade</string>
+    <!-- activity_detalhes_filme -->
+    <string name="label_estreia">Estreia</string>
+    <string name="label_duracao">Duração</string>
+    <string name="label_idioma">Idioma</string>
+    <string name="label_realizacao">Realização</string>
+    <string name="label_sinopse">Sinopse</string>
+    <string name="label_trailer">Trailer</string>
 
-    <!-- layout/fragment_perfil -->
+    <!-- activity_comprar_bilhetes -->
+    <string name="label_cinema">Cinema</string>
+    <string name="label_data">Data</string>
+    <string name="label_hora_inicio">Hora Início</string>
+    <string name="label_hora_fim">Hora Fim</string>
+    <string name="badge_disponivel">Disponível</string>
+    <string name="badge_selecionado">Selecionado</string>
+    <string name="badge_ocupado">Ocupado</string>
+    <string name="label_ecra">Ecrã</string>
+    <string name="label_lugares">Lugares</string>
+    <string name="label_total">Total</string>
+
+    <!-- fragment_cinemas -->
+    <string name="label_morada">Morada</string>
+    <string name="label_telefone">Telefone</string>
+    <string name="label_email">Email</string>
+    <string name="label_horario">Horário</string>
+    <string name="label_capacidade">Capacidade</string>
+    <string name="btn_selecionar_cinema">Selecionar Cinema</string>
+    <string name="btn_cinema_selecionado">Cinema Selecionado</string>
+
+    <!-- fragment_compras -->
+    <string name="label_data_e_hora">Data e Hora</string>
+    <string name="btn_detalhes">Detalhes</string>
+
+    <!-- activity_detalhes_compra -->
+    <string name="label_sala">Sala</string>
+    <string name="label_estado">Estado</string>
+
+    <!-- fragment_perfil -->
     <string name="perfil_titulo">Os meus dados</string>
 
-    <!-- layout/activity_login -->
+    <!-- activity_login -->
     <string name="login_titulo">Entre na sua conta</string>
     <string name="login_subtitulo">Preencha os seguintes campos para iniciar sessão</string>
 
-    <!-- layout/activity_signup -->
+    <!-- activity_signup -->
     <string name="signup_titulo">Crie uma conta</string>
     <string name="signup_subtitulo">Preencha os seguintes campos para se registar</string>
 
-    <!-- layout/activity_signup -->
+    <!-- activity_signup -->
     <string name="editar_perfil_titulo">Edite o seu perfil</string>
     <string name="editar_perfil_subtitulo">Pode alterar qualquer um destes dados</string>
 
-    <!-- Form -->
+    <!-- form_utilizador -->
     <string name="form_hint_username">Username</string>
     <string name="form_hint_password">Password</string>
     <string name="form_hint_password_opcional">Password (opcional)</string>
@@ -65,7 +95,7 @@
     <string name="form_hint_telemovel">Telemóvel</string>
     <string name="form_hint_email">Email</string>
 
-    <!-- layout/activity_configuracoes -->
+    <!-- activity_configuracoes -->
     <string name="configuracoes_titulo">Configurações da API</string>
     <string name="configuracoes_subtitulo">Defina o URL da API utilizada pela aplicação.</string>
     <string name="configuracoes_hint_url_api">URL da API</string>

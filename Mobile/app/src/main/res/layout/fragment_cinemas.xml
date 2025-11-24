@@ -6,13 +6,18 @@
     android:orientation="vertical"
     tools:context=".fragments.CinemasFragment">
 
-    <LinearLayout style="@style/Container">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-        <include layout="@layout/item_cinema" />
+        <!-- Cinemas -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvCinemas"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/ContainerForList"
+            tools:listitem="@layout/item_cinema" />
 
-        <include layout="@layout/item_cinema" />
-
-
-    </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>
