@@ -9,13 +9,11 @@
     <!-- Container -->
     <LinearLayout style="@style/Container">
 
-        <TextView
-            android:id="@+id/text_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Compras"
-            android:textSize="24sp"
-            android:layout_gravity="center"/>
+        <include layout="@layout/item_compra" />
+
+        <include layout="@layout/item_compra" />
+
+        <include layout="@layout/item_compra" />
 
     </LinearLayout>
 

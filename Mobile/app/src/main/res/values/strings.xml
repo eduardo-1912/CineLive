@@ -65,7 +65,7 @@
     <string name="btn_cinema_selecionado">Cinema Selecionado</string>
 
     <!-- fragment_compras -->
-    <string name="label_data_e_hora">Data e Hora</string>
+    <string name="label_sessao">Sessão</string>
     <string name="btn_detalhes">Detalhes</string>
 
     <!-- activity_detalhes_compra -->

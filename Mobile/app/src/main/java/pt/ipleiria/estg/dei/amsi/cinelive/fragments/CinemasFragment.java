@@ -1,9 +1,5 @@
 package pt.ipleiria.estg.dei.amsi.cinelive.fragments;
 
-import static android.content.Context.MODE_PRIVATE;
-
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -18,6 +14,7 @@ import android.view.ViewGroup;
 import java.util.Arrays;
 import java.util.List;
 
+import pt.ipleiria.estg.dei.amsi.cinelive.managers.PreferencesManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.adapters.CinemasAdapter;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.FragmentCinemasBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Cinema;
@@ -40,25 +37,17 @@ public class CinemasFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
         List<Cinema> listaFake = Arrays.asList(
-                new Cinema(1, "Cinema Leiria", "Rua das Flores N5, Leiria", 123456789, "leiria@cinelive.pt", "10:00 - 23:00", "12 Salas • 800 Lugares"),
-                new Cinema(2, "Cinema Coimbra", "Av. Fernão Magalhães, Coimbra", 123456789, "coimbra@cinelive.pt", "10:00 - 23:00", "12 Salas • 800 Lugares"),
-                new Cinema(3, "Cinema Lisboa", "Rua Augusta 115, Lisboa", 123456789, "lisboa@cinelive.pt", "10:00 - 23:00", "12 Salas • 800 Lugares")
+                new Cinema(1, "Cinema Leiria", "Rua das Flores N5, Leiria", "123456789", "leiria@cinelive.pt", "10:00 - 23:00", "12 Salas • 800 Lugares"),
+                new Cinema(2, "Cinema Coimbra", "Av. Fernão Magalhães, Coimbra", "123456789", "coimbra@cinelive.pt", "10:00 - 23:00", "12 Salas • 800 Lugares"),
+                new Cinema(3, "Cinema Lisboa", "Rua Augusta 115, Lisboa", "123456789", "lisboa@cinelive.pt", "10:00 - 23:00", "12 Salas • 800 Lugares")
         );
 
-        binding.rvCinemas.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        SharedPreferences prefs = requireContext().getSharedPreferences("UserPreferences", Context.MODE_PRIVATE);
-        int cinemaSelecionado = prefs.getInt("cinema_id", -1);
-
-        // Cria o adapter
-        CinemasAdapter adapter = new CinemasAdapter(listaFake, cinemaSelecionado, cinemaId -> {
-            // Guardar nas SharedPreferences
-            prefs.edit().putInt("cinema_id", cinemaId).apply();
-        });
+        CinemasAdapter adapter = new CinemasAdapter(requireContext(), listaFake);
 
         binding.rvCinemas.setAdapter(adapter);
-    }
+        binding.rvCinemas.setLayoutManager(new LinearLayoutManager(getContext()));
 
+    }
 
     @Override
     public void onDestroyView() {

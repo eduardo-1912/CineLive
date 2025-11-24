@@ -10,8 +10,7 @@
         android:id="@+id/tvNome"
         style="@style/Title"
         android:textSize="28sp"
-        android:textStyle="bold"
-        android:text="CineLive Leiria" />
+        android:textStyle="bold" />
 
     <Space style="@style/Space_12" />
 
@@ -19,8 +18,7 @@
     <TextView style="@style/Label" android:text="@string/label_morada" />
     <TextView
         android:id="@+id/tvMorada"
-        style="@style/Value"
-        android:text="Rua das Flores N5, 1125-435 Leiria" />
+        style="@style/Value" />
 
     <Space style="@style/Space_16" />
 
@@ -39,8 +37,7 @@
             <TextView style="@style/Label" android:text="@string/label_telefone" />
             <TextView
                 android:id="@+id/tvTelefone"
-                style="@style/Value"
-                android:text="244123456" />
+                style="@style/Value" />
 
             <Space style="@style/Space_16" />
 
@@ -48,8 +45,7 @@
             <TextView style="@style/Label" android:text="@string/label_horario" />
             <TextView
                 android:id="@+id/tvHorario"
-                style="@style/Value"
-                android:text="10:00 - 23:00" />
+                style="@style/Value" />
 
         </LinearLayout>
 
@@ -63,8 +59,7 @@
             <TextView style="@style/Label" android:text="@string/label_email" />
             <TextView
                 android:id="@+id/tvEmail"
-                style="@style/Value"
-                android:text="leiria@cinelive.pt" />
+                style="@style/Value" />
 
             <Space style="@style/Space_16" />
 
@@ -72,8 +67,7 @@
             <TextView style="@style/Label" android:text="@string/label_capacidade" />
             <TextView
                 android:id="@+id/tvCapacidade"
-                style="@style/Value"
-                android:text="8 Salas • 420 Lugares" />
+                style="@style/Value" />
 
         </LinearLayout>
 
@@ -81,6 +75,7 @@
 
     <Space style="@style/Space_16" />
 
+    <!-- Botão Selecionar Cinema -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnSelecionar"
         style="@style/Button.Toggle"

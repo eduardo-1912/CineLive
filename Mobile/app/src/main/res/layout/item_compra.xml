@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="32dp"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:baselineAligned="false"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="0.6"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <!-- Título Filme -->
+                <TextView
+                    android:id="@+id/tvTituloFilme"
+                    style="@style/Value.Bold"
+                    android:text="Interstellar" />
+
+                <TextView style="@style/Value.Bold" android:text=" • " />
+
+                <!-- Data da Compra -->
+                <TextView
+                    android:id="@+id/tvDataCompra"
+                    style="@style/Value.Bold"
+                    android:text="24/11/2025" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvNomeCinema"
+                style="@style/Value"
+                android:textSize="16sp"
+                android:text="CineLive Leiria" />
+
+            <Space style="@style/Space_16" />
+
+            <TextView style="@style/Label" android:text="@string/label_sessao" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <!-- Data Sessão -->
+                <TextView
+                    android:id="@+id/tvDataSessao"
+                    style="@style/Value"
+                    android:text="25/11/2025" />
+
+                <TextView style="@style/Value" android:text=" - " />
+
+                <TextView
+                    android:id="@+id/tvHoraInicioSessao"
+                    style="@style/Value"
+                    android:text="10:00" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.4"
+            android:gravity="end"
+            android:orientation="vertical">
+
+            <!-- Estado -->
+            <TextView
+                android:id="@+id/tvEstado"
+                style="@style/Value.Bold"
+                android:textAlignment="textEnd"
+                android:text="Confirmada" />
+
+            <!-- Total -->
+            <TextView
+                android:id="@+id/tvTotal"
+                style="@style/Value"
+                android:text="18.00€"
+                android:textSize="16sp"
+                android:textAlignment="textEnd" />
+
+            <Space style="@style/Space_16" />
+
+            <!-- Lugares -->
+            <TextView
+                style="@style/Label"
+                android:textAlignment="textEnd"
+                android:text="@string/label_lugares" />
+            <TextView
+                android:id="@+id/tvLugares"
+                style="@style/Value"
+                android:text="A5, A6, A7, A8"
+                android:textAlignment="textEnd" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <Space style="@style/Space_16" />
+
+    <!-- Botão Detalhes -->
+    <Button
+        android:id="@+id/btnDetalhes"
+        style="@style/Button.Secondary"
+        android:layout_width="match_parent"
+        android:text="@string/btn_detalhes" />
+
+</LinearLayout>
