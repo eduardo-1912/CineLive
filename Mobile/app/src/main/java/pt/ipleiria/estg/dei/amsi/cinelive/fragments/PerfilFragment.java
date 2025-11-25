@@ -1,5 +1,7 @@
 package pt.ipleiria.estg.dei.amsi.cinelive.fragments;
 
+import static android.view.View.GONE;
+
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -13,15 +15,17 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import pt.ipleiria.estg.dei.amsi.cinelive.activities.ConfiguracoesActivity;
 import pt.ipleiria.estg.dei.amsi.cinelive.activities.EditarPerfilActivity;
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.FragmentPerfilBinding;
+import pt.ipleiria.estg.dei.amsi.cinelive.utils.NetworkUtils;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link PerfilFragment#newInstance} factory method to
+ * Use the {@link PerfilFragment} factory method to
  * create an instance of this fragment.
  */
 public class PerfilFragment extends Fragment {
@@ -50,8 +54,10 @@ public class PerfilFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_configuracoes, menu);
-        super.onCreateOptionsMenu(menu, inflater);
+        if (NetworkUtils.hasInternet(requireContext())) {
+            inflater.inflate(R.menu.menu_configuracoes, menu);
+            super.onCreateOptionsMenu(menu, inflater);
+        }
     }
 
     @Override
@@ -68,6 +74,11 @@ public class PerfilFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
+        if (!NetworkUtils.hasInternet(requireContext())) {
+            binding.btnEditarPerfil.setVisibility(GONE);
+            binding.btnEliminarConta.setVisibility(GONE);
+        }
 
         // TODO: CHANGE THIS
         binding.etUsername.setText("john.smith");

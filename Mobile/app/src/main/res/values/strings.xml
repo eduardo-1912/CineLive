@@ -100,4 +100,8 @@
     <string name="configuracoes_subtitulo">Defina o URL da API utilizada pela aplicação.</string>
     <string name="configuracoes_hint_url_api">URL da API</string>
 
+    <!-- layout_erro_internet -->
+    <string name="erro_internet_titulo">Sem ligação à Internet</string>
+    <string name="erro_internet_subtitulo">Verifique a sua ligação e tente novamente.</string>
+
 </resources>

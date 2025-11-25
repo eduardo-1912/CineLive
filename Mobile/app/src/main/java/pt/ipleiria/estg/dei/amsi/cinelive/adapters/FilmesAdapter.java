@@ -3,62 +3,89 @@ package pt.ipleiria.estg.dei.amsi.cinelive.adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
+import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ItemCinemaBinding;
+import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ItemFilmeBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Filme;
 
-public class FilmesAdapter extends RecyclerView.Adapter<FilmesAdapter.FilmeViewHolder> {
+public class FilmesAdapter extends RecyclerView.Adapter<FilmesAdapter.ViewHolder> {
 
-    private List<Filme> filmes;
-    private OnFilmeClickListener listener;
+    private final List<Filme> filmesOriginais;
+    private List<Filme> filmesVisiveis;
+    private final OnFilmeClickListener listener;
 
+    // Notifica o fragment quando um filme é escolhido
     public interface OnFilmeClickListener {
-        void onFilmeClick(Filme filme);
+        void onFilmeSelected(Filme filme);
     }
 
     public FilmesAdapter(List<Filme> filmes, OnFilmeClickListener listener) {
-        this.filmes = filmes;
+        this.filmesOriginais = filmes;
+        this.filmesVisiveis = filmes;
         this.listener = listener;
+    }
+
+    public void filtrar(String q) {
+        String query = q.toLowerCase();
+
+        filmesVisiveis = new ArrayList<>();
+        for (Filme filme : filmesOriginais) {
+            if (filme.titulo.toLowerCase().contains(query)) {
+                filmesVisiveis.add(filme);
+            }
+        }
+
+        notifyDataSetChanged();
     }
 
     @NonNull
     @Override
-    public FilmeViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_filme, parent, false);
-        return new FilmeViewHolder(v);
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        ItemFilmeBinding binding = ItemFilmeBinding.inflate(
+                LayoutInflater.from(parent.getContext()), parent, false
+        );
+        return new ViewHolder(binding);
     }
 
+    // Associa os dados do cinema à posição correspondente no RecyclerView.
     @Override
-    public void onBindViewHolder(@NonNull FilmeViewHolder holder, int position) {
-        Filme filme = filmes.get(position);
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        Filme filme = filmesVisiveis.get(position);
 
-        holder.tvTitulo.setText(filme.titulo);
-        holder.imgPoster.setImageResource(filme.posterRes);
+        holder.binding.tvTitulo.setText(filme.titulo);
 
-        holder.itemView.setOnClickListener(v -> listener.onFilmeClick(filme));
+        Glide.with(holder.itemView.getContext())
+                .load(filme.posterUrl)
+                .placeholder(R.drawable.poster_placeholder)
+                .into(holder.binding.ivPoster);
+
+        holder.itemView.setOnClickListener(v -> listener.onFilmeSelected(filme));
     }
 
     @Override
     public int getItemCount() {
-        return filmes.size();
+        return filmesVisiveis.size();
     }
 
-    static class FilmeViewHolder extends RecyclerView.ViewHolder {
-        ImageView imgPoster;
-        TextView tvTitulo;
+    // O ViewHolder representa 1 item da lista
+    static class ViewHolder extends RecyclerView.ViewHolder {
+        ItemFilmeBinding binding;
 
-        public FilmeViewHolder(@NonNull View itemView) {
-            super(itemView);
-            imgPoster = itemView.findViewById(R.id.imgPoster);
-            tvTitulo = itemView.findViewById(R.id.tvTituloFilme);
+        public ViewHolder(ItemFilmeBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
         }
     }
 }

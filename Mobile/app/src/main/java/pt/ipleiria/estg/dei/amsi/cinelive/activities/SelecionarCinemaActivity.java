@@ -11,37 +11,51 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivitySelecionarCinemaBinding;
+import pt.ipleiria.estg.dei.amsi.cinelive.managers.PreferencesManager;
+import pt.ipleiria.estg.dei.amsi.cinelive.models.Cinema;
 
 public class SelecionarCinemaActivity extends AppCompatActivity {
 
     ActivitySelecionarCinemaBinding binding;
-
-    // TODO: ELIMINAR ISTO
-    private String[] cinemas = {
-            "CineLive Leiria",
-            "CineLive Lisboa",
-            "CineLive Porto",
-    };
-    private int[] cinemaIDs = {1, 2, 3, 4}; // IDs fake temporários
+    private PreferencesManager preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
 
-        // Obter as preferências do utilizador
-        SharedPreferences prefs = getSharedPreferences("UserPreferences", MODE_PRIVATE);
+        // Aceder às preferences
+        preferences = new PreferencesManager(this);
 
-        // Se já tenha cinema --> ir para homepage
-        if (prefs.contains("cinema_id")) {
+        // Lista de cinemas
+        List<Cinema> cinemas = Arrays.asList(
+                new Cinema(1, "Cinema Leiria"),
+                new Cinema(2, "Cinema Coimbra"),
+                new Cinema(3, "Cinema Lisboa")
+        );
+
+        // Verificar que o cinema existe e é válido
+        boolean cinemaExists = false;
+        for (Cinema cinema: cinemas) {
+            if (cinema.getId() == preferences.getCinemaId()) {
+                cinemaExists = true;
+                break;
+            }
+        }
+
+        // Se já tiver cinema definido --> MainActivity
+        if (cinemaExists) {
             startActivity(new Intent(this, MainActivity.class));
             finish();
             return;
         }
 
-        // Se não tem cinema --> mostrar activity de seleção
         binding = ActivitySelecionarCinemaBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -51,21 +65,15 @@ public class SelecionarCinemaActivity extends AppCompatActivity {
             return insets;
         });
 
-
-        // Adicionar os cinemas à lista
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-            this, android.R.layout.simple_list_item_1, cinemas
-        );
+        ArrayAdapter<Cinema> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, cinemas);
         binding.lvCinemas.setAdapter(adapter);
 
         // Clique num item da lista
         binding.lvCinemas.setOnItemClickListener((parent, view, position, id) -> {
-            int cinemaId = cinemaIDs[position]; // fake por agora
+            Cinema cinemaSelecionado = cinemas.get(position);
 
-            // Guardar na SharedPreferences
-            prefs.edit().putInt("cinema_id", cinemaId).apply();
+            preferences.setCinemaId(cinemaSelecionado.getId());
 
-            // Ir para homepage
             startActivity(new Intent(this, MainActivity.class));
             finish();
         });

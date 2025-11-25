@@ -6,15 +6,19 @@
     android:orientation="vertical"
     tools:context=".fragments.ComprasFragment">
 
-    <!-- Container -->
-    <LinearLayout style="@style/Container">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-        <include layout="@layout/item_compra" />
+        <!-- Compras -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvCompras"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/ContainerForList"
+            android:paddingBottom="16dp"
+            tools:listitem="@layout/item_compra" />
 
-        <include layout="@layout/item_compra" />
-
-        <include layout="@layout/item_compra" />
-
-    </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

@@ -25,5 +25,4 @@ public class PreferencesManager {
         preferences.edit().putInt(KEY_CINEMA_ID, id).apply();
     }
 
-
 }

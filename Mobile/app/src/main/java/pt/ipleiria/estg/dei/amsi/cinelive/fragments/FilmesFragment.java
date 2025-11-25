@@ -24,14 +24,21 @@ import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.adapters.FilmesAdapter;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.FragmentFilmesBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Filme;
+import pt.ipleiria.estg.dei.amsi.cinelive.utils.NetworkUtils;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link FilmesFragment#newInstance} factory method to
+ * Use the {@link FilmesFragment} factory method to
  * create an instance of this fragment.
  */
 public class FilmesFragment extends Fragment {
     private FragmentFilmesBinding binding;
+
+    private List<Filme> listaEmExibicao;
+    private List<Filme> listaKids;
+    private List<Filme> listaBrevemente;
+
+    private FilmesAdapter adapter;
     private SearchView searchView;
 
     @Override
@@ -51,77 +58,98 @@ public class FilmesFragment extends Fragment {
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
-        inflater.inflate(R.menu.menu_pesquisa, menu);
+        if (NetworkUtils.hasInternet(requireContext())) {
+            inflater.inflate(R.menu.menu_pesquisa, menu);
 
-        // Obter item
-        MenuItem itemPesquisa = menu.findItem(R.id.itemPesquisa);
+            // Obter item
+            MenuItem itemPesquisa = menu.findItem(R.id.itemPesquisa);
 
-        // Obter SearchView
-        searchView = (SearchView) itemPesquisa.getActionView();
-        searchView.setQueryHint(getString(R.string.pesquisar_filmes));
+            // Obter SearchView
+            searchView = (SearchView) itemPesquisa.getActionView();
+            searchView.setQueryHint(getString(R.string.pesquisar_filmes));
+
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    adapter.filtrar(query);
+                    return true;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String query) {
+                    adapter.filtrar(query);
+                    return true;
+                }
+            });
+        }
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
+        if (!NetworkUtils.hasInternet(requireContext())) {
+            binding.viewFlipper.setDisplayedChild(1);
+            return;
+        }
+
+        binding.viewFlipper.setDisplayedChild(0);
+
+        listaEmExibicao = Arrays.asList(
+            new Filme(1, "The Truman Show", "http://10.0.2.2/CineLive/Web/frontend/web/uploads/posters/poster_68fa080f7e03f.jpg"),
+            new Filme(2, "The Social Network", "http://10.0.2.2/CineLive/Web/frontend/web/uploads/posters/poster_69032dee2ed44.jpg"),
+            new Filme(3, "Carros 2", "http://10.0.2.2/CineLive/Web/frontend/web/uploads/posters/poster_6910b6ad1f9ea.jpg"),
+            new Filme(4, "Inside Out 2", "http://10.0.2.2/CineLive/Web/frontend/web/uploads/posters/poster_6918b4c3cf56d.jpg")
+        );
+
+        listaKids = Arrays.asList(
+            new Filme(3, "Carros 2", "http://10.0.2.2/CineLive/Web/frontend/web/uploads/posters/poster_6910b6ad1f9ea.jpg"),
+            new Filme(4, "Inside Out 2", "http://10.0.2.2/CineLive/Web/frontend/web/uploads/posters/poster_6918b4c3cf56d.jpg")
+        );
+
+        listaBrevemente = Arrays.asList(
+            new Filme(5, "Interstellar", "http://10.0.2.2/CineLive/Web/frontend/web/uploads/posters/poster_68fa01aecd6d2.jpg"),
+            new Filme(6, "The Prestige", "http://10.0.2.2/CineLive/Web/frontend/web/uploads/posters/poster_6918b2d190384.jpg")
+        );
+
+        binding.rvFilmes.setLayoutManager(new GridLayoutManager(getContext(), 3));
+
+        binding.btnEmExibicao.setChecked(true);
+        atualizarLista(listaEmExibicao);
+
         View.OnClickListener filterClickListener = v -> {
-            // Atualiza estado checked (só um ativo)
             binding.btnEmExibicao.setChecked(v.getId() == R.id.btnEmExibicao);
             binding.btnKids.setChecked(v.getId() == R.id.btnKids);
             binding.btnBrevemente.setChecked(v.getId() == R.id.btnBrevemente);
 
-            int id = v.getId();
-            if (id == R.id.btnEmExibicao) {
-                // TODO: DO SOMETHING
+            if (v.getId() == R.id.btnEmExibicao) {
+                atualizarLista(listaEmExibicao);
             }
-            else if (id == R.id.btnKids) {
-                // TODO: DO SOMETHING
+            else if (v.getId() == R.id.btnKids) {
+                atualizarLista(listaKids);
             }
-            else if (id == R.id.btnBrevemente) {
-                // TODO: DO SOMETHING
+            else if (v.getId() == R.id.btnBrevemente) {
+                atualizarLista(listaBrevemente);
             }
         };
 
         binding.btnEmExibicao.setOnClickListener(filterClickListener);
         binding.btnKids.setOnClickListener(filterClickListener);
         binding.btnBrevemente.setOnClickListener(filterClickListener);
+    }
 
-        // Opcional: definir um default
-        binding.btnEmExibicao.setChecked(true);
-
-
-        // Grelha 2 colunas
-        binding.rvFilmes.setLayoutManager(new GridLayoutManager(getContext(), 3));
-
-        // Dados fake (temporário)
-        List<Filme> listaFake = Arrays.asList(
-                new Filme("Interstellar", R.drawable.poster_placeholder),
-                new Filme("Dune: Part Two", R.drawable.poster_placeholder),
-                new Filme("Inside Out 2", R.drawable.poster_placeholder),
-                new Filme("Moana 2", R.drawable.poster_placeholder),
-                new Filme("Oppenheimer", R.drawable.poster_placeholder),
-                new Filme("Interstellar", R.drawable.poster_placeholder),
-                new Filme("Dune: Part Two", R.drawable.poster_placeholder),
-                new Filme("Inside Out 2", R.drawable.poster_placeholder),
-                new Filme("Moana 2", R.drawable.poster_placeholder),
-                new Filme("Oppenheimer", R.drawable.poster_placeholder),
-                new Filme("Interstellar", R.drawable.poster_placeholder),
-                new Filme("Dune: Part Two", R.drawable.poster_placeholder),
-                new Filme("Inside Out 2", R.drawable.poster_placeholder),
-                new Filme("Moana 2", R.drawable.poster_placeholder),
-                new Filme("Oppenheimer", R.drawable.poster_placeholder)
-        );
-
-        // Adapter
-        FilmesAdapter adapter = new FilmesAdapter(listaFake, filme -> {
-            // Clicar no filme -> ir para detalhes
-            startActivity(new Intent(getActivity(), DetalhesFilmeActivity.class));
+    private void atualizarLista(List<Filme> lista) {
+        adapter = new FilmesAdapter(lista, filme -> {
+            Intent intent = new Intent(getActivity(), DetalhesFilmeActivity.class);
+            intent.putExtra("filme_id", filme.id);
+            startActivity(intent);
         });
 
         binding.rvFilmes.setAdapter(adapter);
 
+        if (searchView != null) {
+            adapter.filtrar(searchView.getQuery().toString());
+        }
     }
-
 
     @Override
     public void onDestroyView() {

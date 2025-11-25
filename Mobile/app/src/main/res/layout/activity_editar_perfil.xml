@@ -25,7 +25,7 @@
             android:text="@string/editar_perfil_subtitulo" />
 
         <!-- Form Utilizador -->
-        <include android:id="@+id/form" layout="@layout/form_utilizador" />
+        <include android:id="@+id/form" layout="@layout/layout_form_utilizador" />
 
         <!-- Botão Guardar -->
         <Button

@@ -1,14 +1,13 @@
 package pt.ipleiria.estg.dei.amsi.cinelive.models;
 
 public class Cinema {
-
     public int id;
-    public String nome;
-    public String morada;
-    public String telefone;
-    public String email;
-    public String horario;
-    public String capacidade;
+    public String nome, morada, telefone, email, horario, capacidade;
+
+    public Cinema(int id, String nome) {
+        this.id = id;
+        this.nome = nome;
+    }
 
     public Cinema(int id, String nome, String morada, String telefone, String email, String horario, String capacidade) {
         this.id = id;
@@ -30,5 +29,4 @@ public class Cinema {
 
     @Override
     public String toString() {return nome;}
-
 }

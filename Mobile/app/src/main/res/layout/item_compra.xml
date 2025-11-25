@@ -24,24 +24,21 @@
                 <!-- Título Filme -->
                 <TextView
                     android:id="@+id/tvTituloFilme"
-                    style="@style/Value.Bold"
-                    android:text="Interstellar" />
+                    style="@style/Value.Bold" />
 
                 <TextView style="@style/Value.Bold" android:text=" • " />
 
                 <!-- Data da Compra -->
                 <TextView
                     android:id="@+id/tvDataCompra"
-                    style="@style/Value.Bold"
-                    android:text="24/11/2025" />
+                    style="@style/Value.Bold" />
 
             </LinearLayout>
 
             <TextView
                 android:id="@+id/tvNomeCinema"
                 style="@style/Value"
-                android:textSize="16sp"
-                android:text="CineLive Leiria" />
+                android:textSize="16sp" />
 
             <Space style="@style/Space_16" />
 
@@ -54,15 +51,13 @@
                 <!-- Data Sessão -->
                 <TextView
                     android:id="@+id/tvDataSessao"
-                    style="@style/Value"
-                    android:text="25/11/2025" />
+                    style="@style/Value" />
 
                 <TextView style="@style/Value" android:text=" - " />
 
                 <TextView
                     android:id="@+id/tvHoraInicioSessao"
-                    style="@style/Value"
-                    android:text="10:00" />
+                    style="@style/Value" />
 
             </LinearLayout>
 
@@ -79,14 +74,12 @@
             <TextView
                 android:id="@+id/tvEstado"
                 style="@style/Value.Bold"
-                android:textAlignment="textEnd"
-                android:text="Confirmada" />
+                android:textAlignment="textEnd" />
 
             <!-- Total -->
             <TextView
                 android:id="@+id/tvTotal"
                 style="@style/Value"
-                android:text="18.00€"
                 android:textSize="16sp"
                 android:textAlignment="textEnd" />
 
@@ -100,7 +93,6 @@
             <TextView
                 android:id="@+id/tvLugares"
                 style="@style/Value"
-                android:text="A5, A6, A7, A8"
                 android:textAlignment="textEnd" />
 
         </LinearLayout>

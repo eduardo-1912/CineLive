@@ -53,4 +53,7 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment:2.9.5")
     implementation("androidx.navigation:navigation-ui:2.9.5")
 
+    // Glide
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+
 }
