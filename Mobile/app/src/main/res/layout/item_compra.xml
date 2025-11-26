@@ -28,9 +28,9 @@
 
                 <TextView style="@style/Value.Bold" android:text=" • " />
 
-                <!-- Data da Compra -->
+                <!-- Estado -->
                 <TextView
-                    android:id="@+id/tvDataCompra"
+                    android:id="@+id/tvEstado"
                     style="@style/Value.Bold" />
 
             </LinearLayout>
@@ -72,7 +72,7 @@
 
             <!-- Estado -->
             <TextView
-                android:id="@+id/tvEstado"
+                android:id="@+id/tvDataCompra"
                 style="@style/Value.Bold"
                 android:textAlignment="textEnd" />
 

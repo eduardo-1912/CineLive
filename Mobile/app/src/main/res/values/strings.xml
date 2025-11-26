@@ -12,6 +12,7 @@
     <string name="pesquisar_filmes">Pesquisar filmes...</string>
     <string name="configuracoes">Configurações</string>
     <string name="comprar_bilhetes">Comprar Bilhetes</string>
+    <string name="detalhes_compra">Detalhes da Compra</string>
 
     <!-- messages -->
     <string name="message_eliminar_conta">Tem a certeza de que pretende eliminar a sua conta? Esta ação é irreversível.</string>
@@ -41,7 +42,7 @@
     <string name="label_idioma">Idioma</string>
     <string name="label_realizacao">Realização</string>
     <string name="label_sinopse">Sinopse</string>
-    <string name="label_trailer">Trailer</string>
+    <string name="label_hora">Hora</string>
 
     <!-- activity_comprar_bilhetes -->
     <string name="label_cinema">Cinema</string>
@@ -71,6 +72,8 @@
     <!-- activity_detalhes_compra -->
     <string name="label_sala">Sala</string>
     <string name="label_estado">Estado</string>
+    <string name="label_lugar">Lugar</string>
+    <string name="label_preco">Preço</string>
 
     <!-- fragment_perfil -->
     <string name="perfil_titulo">Os meus dados</string>

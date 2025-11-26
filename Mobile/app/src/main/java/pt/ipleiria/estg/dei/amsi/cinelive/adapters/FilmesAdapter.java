@@ -1,22 +1,18 @@
 package pt.ipleiria.estg.dei.amsi.cinelive.adapters;
 
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Filterable;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
-import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ItemCinemaBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ItemFilmeBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Filme;
 
@@ -69,6 +65,7 @@ public class FilmesAdapter extends RecyclerView.Adapter<FilmesAdapter.ViewHolder
         Glide.with(holder.itemView.getContext())
                 .load(filme.posterUrl)
                 .placeholder(R.drawable.poster_placeholder)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(holder.binding.ivPoster);
 
         holder.itemView.setOnClickListener(v -> listener.onFilmeSelected(filme));

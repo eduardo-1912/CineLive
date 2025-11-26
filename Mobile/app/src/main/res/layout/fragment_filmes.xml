@@ -7,67 +7,69 @@
     android:orientation="vertical"
     tools:context=".fragments.FilmesFragment">
 
-
     <ViewFlipper
         android:id="@+id/viewFlipper"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:fillViewport="true">
 
-            <!-- Container -->
-            <LinearLayout style="@style/ContainerForList">
-
-                <!-- Toggle de filmes -->
-                <com.google.android.material.button.MaterialButtonToggleGroup
-                    android:id="@+id/toggleGroup"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:singleSelection="true">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnEmExibicao"
-                        style="@style/Button.Toggle"
-                        android:layout_weight="0.35"
-                        android:text="@string/em_exibicao" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnKids"
-                        style="@style/Button.Toggle"
-                        android:layout_weight="0.3"
-                        android:text="@string/kids" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnBrevemente"
-                        style="@style/Button.Toggle"
-                        android:layout_weight="0.35"
-                        android:text="@string/brevemente" />
-                </com.google.android.material.button.MaterialButtonToggleGroup>
-
-            </LinearLayout>
-
-            <Space style="@style/Space_8" />
-
-            <!-- Filmes -->
-            <ScrollView
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
+                <!-- Container -->
+                <LinearLayout style="@style/ContainerForList">
+
+                    <!-- Toggle de filmes -->
+                    <com.google.android.material.button.MaterialButtonToggleGroup
+                        android:id="@+id/toggleGroup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:singleSelection="true">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnEmExibicao"
+                            style="@style/Button.Toggle"
+                            android:layout_weight="0.35"
+                            android:text="@string/em_exibicao" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnKids"
+                            style="@style/Button.Toggle"
+                            android:layout_weight="0.3"
+                            android:text="@string/kids" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnBrevemente"
+                            style="@style/Button.Toggle"
+                            android:layout_weight="0.35"
+                            android:text="@string/brevemente" />
+                    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                </LinearLayout>
+
+                <Space style="@style/Space_8" />
+
+                <!-- Filmes -->
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvFilmes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    android:overScrollMode="never"
                     style="@style/Grid"
                     tools:listitem="@layout/item_filme" />
 
-            </ScrollView>
-
-        </LinearLayout>
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
 
         <include layout="@layout/layout_erro_internet" />
 
     </ViewFlipper>
-
 
 </LinearLayout>

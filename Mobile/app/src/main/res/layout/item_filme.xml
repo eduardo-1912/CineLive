@@ -13,7 +13,8 @@
         android:layout_weight="1"
         android:adjustViewBounds="true"
         android:layout_marginBottom="2dp"
-        android:background="@drawable/poster_shape"
+        android:background="@drawable/poster_bg_shape"
+        android:src="@drawable/poster_placeholder"
         android:clipToOutline="true"
         android:scaleType="centerCrop" />
 

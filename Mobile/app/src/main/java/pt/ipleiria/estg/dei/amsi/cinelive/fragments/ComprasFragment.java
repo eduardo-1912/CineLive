@@ -43,10 +43,10 @@ public class ComprasFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
         List<Compra> compras = Arrays.asList(
-            new Compra(1, "Interstellar", "05/11/2025", "CineLive Leiria", "Confirmada", "10.00€", "07/11/2025", "10:00", "A5, A6, A7"),
-            new Compra(2, "Interstellar", "05/11/2025", "CineLive Leiria", "Confirmada", "10.00€", "07/11/2025", "10:00", "A5, A6, A7"),
-            new Compra(3, "Interstellar", "05/11/2025", "CineLive Leiria", "Confirmada", "10.00€", "07/11/2025", "10:00", "A5, A6, A7"),
-            new Compra(4, "Interstellar", "05/11/2025", "CineLive Leiria", "Confirmada", "10.00€", "07/11/2025", "10:00", "A5, A6, A7")
+            new Compra(1, "Interstellar", "05/11/2025", "CineLive Leiria", "Sala 3", "Confirmada", "10.00€", "07/11/2025", "10:00", "12:00", "A5, A6, A7"),
+            new Compra(2, "Interstellar", "05/11/2025", "CineLive Leiria", "Sala 3", "Confirmada", "10.00€", "07/11/2025", "10:00", "12:00", "A5, A6, A7"),
+            new Compra(3, "Interstellar", "05/11/2025", "CineLive Leiria", "Sala 3", "Confirmada", "10.00€", "07/11/2025", "10:00", "12:00", "A5, A6, A7"),
+            new Compra(4, "Interstellar", "05/11/2025", "CineLive Leiria", "Sala 3", "Confirmada", "10.00€", "07/11/2025", "10:00", "12:00", "A5, A6, A7")
         );
 
         adapter = new ComprasAdapter(

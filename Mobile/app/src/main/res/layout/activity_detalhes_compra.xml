@@ -11,11 +11,151 @@
     <!-- Toolbar -->
     <include android:id="@+id/toolbar" layout="@layout/toolbar" />
 
-    <!-- Container -->
-    <LinearLayout style="@style/Container">
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
+            <!-- Container -->
+            <LinearLayout style="@style/Container">
 
-    </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:baselineAligned="false"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_height="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="0.6"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <!-- Título Filme -->
+                            <TextView
+                                android:id="@+id/tvTituloFilme"
+                                style="@style/Value.Bold" />
+
+                            <TextView style="@style/Value.Bold" android:text=" • " />
+
+                            <!-- Data da Compra -->
+                            <TextView
+                                android:id="@+id/tvEstado"
+                                style="@style/Value.Bold" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <!-- Nome do Cinema -->
+                            <TextView
+                                android:id="@+id/tvNomeCinema"
+                                style="@style/Value"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                style="@style/Value"
+                                android:text=" - "
+                                android:textSize="16sp" />
+
+                            <!-- Nome da Sala -->
+                            <TextView
+                                android:id="@+id/tvNomeSala"
+                                style="@style/Value"
+                                android:textSize="16sp" />
+
+                        </LinearLayout>
+
+                        <Space style="@style/Space_16" />
+
+                        <!-- Data Sessão -->
+                        <TextView style="@style/Label" android:text="@string/label_sessao" />
+                        <TextView
+                            android:id="@+id/tvDataSessao"
+                            style="@style/Value" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.4"
+                        android:gravity="end"
+                        android:orientation="vertical">
+
+                        <!-- Estado -->
+                        <TextView
+                            android:id="@+id/tvDataCompra"
+                            style="@style/Value.Bold"
+                            android:textAlignment="textEnd" />
+
+                        <!-- Total -->
+                        <TextView
+                            android:id="@+id/tvTotal"
+                            style="@style/Value"
+                            android:textSize="16sp"
+                            android:textAlignment="textEnd" />
+
+                        <Space style="@style/Space_16" />
+
+                        <TextView
+                            style="@style/Label"
+                            android:textAlignment="textEnd"
+                            android:text="@string/label_horario" />
+                        <!-- Horário -->
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <!-- Hora Início -->
+                            <TextView
+                                android:id="@+id/tvHoraInicioSessao"
+                                style="@style/Value" />
+
+                            <TextView style="@style/Value" android:text=" - " />
+
+                            <TextView
+                                android:id="@+id/tvHoraFimSessao"
+                                style="@style/Value" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <Space style="@style/Space_8" />
+
+            </LinearLayout>
+
+            <View style="@style/Divider"/>
+
+            <Space style="@style/Space_8" />
+
+            <!-- Bilhetes -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvBilhetes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:overScrollMode="never"
+                style="@style/ContainerForList"
+                tools:listitem="@layout/item_bilhete" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
 
 </LinearLayout>

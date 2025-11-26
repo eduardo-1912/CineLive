@@ -8,10 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-import pt.ipleiria.estg.dei.amsi.cinelive.R;
-import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ItemCinemaBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ItemCompraBinding;
-import pt.ipleiria.estg.dei.amsi.cinelive.models.Cinema;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Compra;
 
 public class ComprasAdapter extends RecyclerView.Adapter<ComprasAdapter.ViewHolder> {

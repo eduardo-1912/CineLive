@@ -11,15 +11,178 @@
     <!-- Toolbar -->
     <include android:id="@+id/toolbar" layout="@layout/toolbar" />
 
-    <!-- Container -->
+    <!-- Dados do Filme -->
     <LinearLayout style="@style/Container">
 
-        <!-- Título -->
-        <TextView
-            android:id="@+id/tvTitulo"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Interstellar" />
+            android:orientation="horizontal">
+
+            <!-- Poster -->
+            <ImageView
+                android:id="@+id/ivPoster"
+                android:layout_width="56dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2dp"
+                android:adjustViewBounds="true"
+                android:background="@drawable/poster_bg_shape"
+                android:clipToOutline="true"
+                android:scaleType="centerCrop"
+                android:src="@drawable/poster_placeholder" />
+
+            <Space
+                android:layout_width="12dp"
+                android:layout_height="match_parent" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <!-- Título -->
+                    <TextView
+                        android:id="@+id/tvTitulo"
+                        style="@style/Title.Bold"
+                        android:text="Interstellar" />
+
+                    <Space
+                        android:layout_width="10dp"
+                        android:layout_height="match_parent" />
+
+                    <!-- Rating -->
+                    <LinearLayout style="@style/BadgeContainer">
+
+                        <TextView
+                            android:id="@+id/tvRating"
+                            style="@style/BadgeText"
+                            android:text="M3" />
+                    </LinearLayout>
+
+
+                </LinearLayout>
+
+                <!-- Géneros -->
+                <TextView
+                    android:id="@+id/tvGeneros"
+                    style="@style/Text"
+                    android:text="Ação, Aventura" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <Space style="@style/Space_24" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="1">
+
+                <!-- Estreia -->
+                <TextView style="@style/Label" android:text="@string/label_estreia" />
+                <TextView
+                    android:id="@+id/tvEstreia"
+                    style="@style/Value"
+                    android:text="13/02/2025" />
+
+                <Space style="@style/Space_16" />
+
+                <!-- Idioma -->
+                <TextView style="@style/Label" android:text="@string/label_idioma" />
+                <TextView
+                    android:id="@+id/tvIdioma"
+                    style="@style/Value"
+                    android:text="Inglês" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="1">
+
+                <!-- Estreia -->
+                <TextView style="@style/Label" android:text="@string/label_duracao" />
+                <TextView
+                    android:id="@+id/tvDuracao"
+                    style="@style/Value"
+                    android:text="2h 32min" />
+
+                <Space style="@style/Space_16" />
+
+                <!-- Realização -->
+                <TextView style="@style/Label" android:text="@string/label_realizacao" />
+                <TextView
+                    android:id="@+id/tvRealizacao"
+                    style="@style/Value"
+                    android:text="John Lasseter" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <Space style="@style/Space_24" />
+
+        <!-- Sinopse -->
+        <TextView style="@style/Label.Large" android:text="@string/label_sinopse"/>
+        <TextView
+            android:id="@+id/tvSinopse"
+            style="@style/Text"
+            android:text="Um grande campeão das pistas é lançado numa corrida internacional enquanto o seu amigo Mate é apanhado num enredo de espionagem que põe à prova a amizade de ambos e mostra que coragem pode surgir dos lugares mais improváveis." />
+
+    </LinearLayout>
+
+    <View style="@style/Divider" />
+
+    <!-- Comprar Bilhetes -->
+    <LinearLayout style="@style/Container">
+
+        <TextView
+            style="@style/Title.Bold"
+            android:textSize="24sp"
+            android:layout_width="match_parent"
+            android:text="@string/comprar_bilhetes"/>
+
+        <Space style="@style/Space_16" />
+
+        <!-- Escolher Data da Sessão -->
+        <TextView style="@style/Label" android:text="@string/label_data" />
+        <Spinner
+            android:id="@+id/spinnerData"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <Space style="@style/Space_20" />
+
+        <!-- Escolher Hora da Sessão -->
+        <TextView style="@style/Label" android:text="@string/label_hora" />
+        <Spinner
+            android:id="@+id/spinnerHora"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <Space style="@style/Space_8" />
+
+        <!-- Botão Comprar Bilhetes -->
+        <Button
+            android:id="@+id/btnComprarBilhetes"
+            style="@style/Button.Primary.Full"
+            android:text="@string/comprar_bilhetes"
+            android:enabled="false" />
 
     </LinearLayout>
 
