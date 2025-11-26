@@ -12,7 +12,7 @@
     <include android:id="@+id/toolbar" layout="@layout/toolbar" />
 
     <!-- Container -->
-    <LinearLayout style="@style/Container">
+    <LinearLayout style="@style/Container.Main">
 
         <!-- Título -->
         <TextView

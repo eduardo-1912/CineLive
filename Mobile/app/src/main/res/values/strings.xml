@@ -55,6 +55,7 @@
     <string name="label_ecra">Ecrã</string>
     <string name="label_lugares">Lugares</string>
     <string name="label_total">Total</string>
+    <string name="btn_pagar">Proceder ao pagamento</string>
 
     <!-- fragment_cinemas -->
     <string name="label_morada">Morada</string>

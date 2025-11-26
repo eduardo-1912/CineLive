@@ -54,16 +54,21 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
         Intent intentFilmes = getIntent();
         int idFilme = intentFilmes.getIntExtra("filme_id", -1);
 
-        getSupportActionBar().setTitle("TÍTULO DO FILME......");
+        getSupportActionBar().setTitle("TÍTULO DO FILME......"); // TODO: REPLACE THIS
 
-        Filme filme = new Filme(1, "Interstellar", "M3", "Ação, Aventura", "sinopse", "2h 32min", "25/11/2025", "Inglês", "John Lasseter", "http://10.0.2.2/CineLive/Web/frontend/web/uploads/posters/poster_6910b6ad1f9ea.jpg", "Em exibição");
+        // TODO: REPLACE MOCK-DATA
+        Filme filme = new Filme(1, "Carros 2", "M3", "Ação, Aventura",
+                "Um grande campeão das pistas é lançado numa corrida internacional enquanto o seu amigo Mate é apanhado num enredo de espionagem que põe à prova a amizade de ambos e mostra que coragem pode surgir dos lugares mais improváveis.",
+                "2h 32min", "25/11/2025", "Português", "John Lasseter", "http://10.0.2.2/CineLive/Web/frontend/web/uploads/posters/poster_6910b6ad1f9ea.jpg", "Em exibição");
 
+        // Poster
         Glide.with(this)
                 .load(filme.posterUrl)
                 .placeholder(R.drawable.poster_placeholder)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(binding.ivPoster);
 
+        // Dados do filmes
         binding.tvTitulo.setText(filme.getTitulo());
         binding.tvRating.setText(filme.getRating());
         binding.tvGeneros.setText(filme.getGeneros());
@@ -86,10 +91,8 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
                 new Sessao(11, "29/11/2025", "22:00", "23:46")
         ));
 
-
         List<String> datas = new ArrayList<>(sessoesPorData.keySet());
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, datas);
-        binding.spinnerData.setAdapter(dataAdapter);
+        binding.spinnerData.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, datas));
 
         binding.spinnerData.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -98,40 +101,21 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
                 List<Sessao> sessoes = sessoesPorData.get(data);
 
                 List<String> horas = new ArrayList<>();
-                for (Sessao s : sessoes) {
-                    horas.add(s.getHoraInicio());
-                }
+                for (Sessao sessao : sessoes) horas.add(sessao.getHoraInicio());
 
-                ArrayAdapter<String> horaAdapter = new ArrayAdapter<>(DetalhesFilmeActivity.this, android.R.layout.simple_spinner_item, horas);
-                binding.spinnerHora.setAdapter(horaAdapter);
+                binding.lvHoras.setAdapter(new ArrayAdapter<>(DetalhesFilmeActivity.this, android.R.layout.simple_list_item_1, horas));
+
+                binding.lvHoras.setOnItemClickListener((p, v, pos, i) -> {
+                    Sessao sessao = sessoes.get(pos);
+                    Intent intentSessao = new Intent(DetalhesFilmeActivity.this, ComprarBilhetesActivity.class);
+                    intentSessao.putExtra("sessao_id", sessao.getId());
+                    startActivity(intentSessao);
+                });
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
         });
-
-        binding.spinnerHora.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                Sessao sessaoSelecionada = sessoesPorData
-                        .get(binding.spinnerData.getSelectedItem().toString())
-                        .get(position);
-
-                binding.btnComprarBilhetes.setEnabled(true);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
-        });
-
-        binding.btnComprarBilhetes.setOnClickListener(v -> {
-            Intent intentSessao = new Intent(this, ComprarBilhetesActivity.class);
-            intentSessao.putExtra("sessao_id", sessaoSelecionada.getId());
-            startActivity(intentSessao);
-        });
-
-
     }
 
     @Override

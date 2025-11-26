@@ -17,13 +17,10 @@
             android:layout_height="match_parent"
             android:fillViewport="true">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+            <LinearLayout style="@style/VerticalLayout">
 
                 <!-- Container -->
-                <LinearLayout style="@style/ContainerForList">
+                <LinearLayout style="@style/Container.ForList">
 
                     <!-- Toggle de filmes -->
                     <com.google.android.material.button.MaterialButtonToggleGroup
@@ -53,7 +50,7 @@
 
                 </LinearLayout>
 
-                <Space style="@style/Space_8" />
+                <Space style="@style/VerticalSpace.8" />
 
                 <!-- Filmes -->
                 <androidx.recyclerview.widget.RecyclerView
@@ -62,7 +59,9 @@
                     android:layout_height="wrap_content"
                     android:nestedScrollingEnabled="false"
                     android:overScrollMode="never"
-                    style="@style/Grid"
+                    android:clipToPadding="false"
+                    android:paddingHorizontal="18dp"
+                    android:paddingBottom="64dp"
                     tools:listitem="@layout/item_filme" />
 
             </LinearLayout>

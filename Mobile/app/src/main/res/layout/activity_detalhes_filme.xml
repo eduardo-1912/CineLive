@@ -12,177 +12,150 @@
     <include android:id="@+id/toolbar" layout="@layout/toolbar" />
 
     <!-- Dados do Filme -->
-    <LinearLayout style="@style/Container">
+    <LinearLayout style="@style/Container.Main">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+        <LinearLayout style="@style/HorizontalLayout.Full">
 
             <!-- Poster -->
             <ImageView
                 android:id="@+id/ivPoster"
+                style="@style/MoviePoster"
                 android:layout_width="56dp"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="2dp"
-                android:adjustViewBounds="true"
-                android:background="@drawable/poster_bg_shape"
-                android:clipToOutline="true"
-                android:scaleType="centerCrop"
-                android:src="@drawable/poster_placeholder" />
+                android:layout_height="wrap_content" />
 
-            <Space
-                android:layout_width="12dp"
-                android:layout_height="match_parent" />
+            <Space style="@style/HorizontalSpace.12" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+            <LinearLayout style="@style/VerticalLayout">
 
                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    style="@style/HorizontalLayout.Full"
+                    android:gravity="center_vertical">
 
                     <!-- Título -->
                     <TextView
                         android:id="@+id/tvTitulo"
-                        style="@style/Title.Bold"
-                        android:text="Interstellar" />
+                        style="@style/Title.Bold" />
 
-                    <Space
-                        android:layout_width="10dp"
-                        android:layout_height="match_parent" />
+                    <Space style="@style/HorizontalSpace.8" />
 
                     <!-- Rating -->
-                    <LinearLayout style="@style/BadgeContainer">
-
+                    <LinearLayout style="@style/PillContainer">
                         <TextView
                             android:id="@+id/tvRating"
-                            style="@style/BadgeText"
-                            android:text="M3" />
+                            style="@style/PillText" />
                     </LinearLayout>
-
 
                 </LinearLayout>
 
                 <!-- Géneros -->
                 <TextView
                     android:id="@+id/tvGeneros"
-                    style="@style/Text"
-                    android:text="Ação, Aventura" />
+                    style="@style/Text.Small" />
 
             </LinearLayout>
 
         </LinearLayout>
 
-        <Space style="@style/Space_24" />
+        <Space style="@style/VerticalSpace.24" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+        <LinearLayout style="@style/HorizontalLayout.Full">
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_weight="1">
+                android:layout_weight="1"
+                style="@style/VerticalLayout">
 
                 <!-- Estreia -->
                 <TextView style="@style/Label" android:text="@string/label_estreia" />
                 <TextView
                     android:id="@+id/tvEstreia"
-                    style="@style/Value"
-                    android:text="13/02/2025" />
+                    style="@style/Text" />
 
-                <Space style="@style/Space_16" />
+                <Space style="@style/VerticalSpace.16" />
 
                 <!-- Idioma -->
                 <TextView style="@style/Label" android:text="@string/label_idioma" />
                 <TextView
                     android:id="@+id/tvIdioma"
-                    style="@style/Value"
-                    android:text="Inglês" />
+                    style="@style/Text" />
 
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_weight="1">
+                android:layout_weight="1"
+                style="@style/VerticalLayout">
 
                 <!-- Estreia -->
                 <TextView style="@style/Label" android:text="@string/label_duracao" />
                 <TextView
                     android:id="@+id/tvDuracao"
-                    style="@style/Value"
-                    android:text="2h 32min" />
+                    style="@style/Text" />
 
-                <Space style="@style/Space_16" />
+                <Space style="@style/VerticalSpace.16" />
 
                 <!-- Realização -->
                 <TextView style="@style/Label" android:text="@string/label_realizacao" />
                 <TextView
                     android:id="@+id/tvRealizacao"
-                    style="@style/Value"
-                    android:text="John Lasseter" />
+                    style="@style/Text" />
 
             </LinearLayout>
 
         </LinearLayout>
 
-        <Space style="@style/Space_24" />
+        <Space style="@style/VerticalSpace.24" />
 
         <!-- Sinopse -->
         <TextView style="@style/Label.Large" android:text="@string/label_sinopse"/>
+
+        <Space style="@style/VerticalSpace.4" />
+
         <TextView
             android:id="@+id/tvSinopse"
             style="@style/Text"
-            android:text="Um grande campeão das pistas é lançado numa corrida internacional enquanto o seu amigo Mate é apanhado num enredo de espionagem que põe à prova a amizade de ambos e mostra que coragem pode surgir dos lugares mais improváveis." />
+            android:layout_width="match_parent" />
+
+        <Space style="@style/VerticalSpace.24" />
+
+        <!-- Trailer -->
+        <TextView style="@style/Label.Large" android:text="@string/label_sinopse"/>
+
+        <Space style="@style/VerticalSpace.4" />
+
 
     </LinearLayout>
 
     <View style="@style/Divider" />
 
     <!-- Comprar Bilhetes -->
-    <LinearLayout style="@style/Container">
+    <LinearLayout style="@style/Container.Main">
 
         <TextView
             style="@style/Title.Bold"
-            android:textSize="24sp"
+            android:textSize="28sp"
             android:layout_width="match_parent"
             android:text="@string/comprar_bilhetes"/>
 
-        <Space style="@style/Space_16" />
+        <Space style="@style/VerticalSpace.20" />
 
         <!-- Escolher Data da Sessão -->
-        <TextView style="@style/Label" android:text="@string/label_data" />
+
         <Spinner
             android:id="@+id/spinnerData"
+            android:layout_marginStart="5dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-        <Space style="@style/Space_20" />
+        <View
+            style="@style/Divider"
+            android:layout_marginVertical="10dp"/>
 
         <!-- Escolher Hora da Sessão -->
-        <TextView style="@style/Label" android:text="@string/label_hora" />
-        <Spinner
-            android:id="@+id/spinnerHora"
+        <ListView
+            android:id="@+id/lvHoras"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-        <Space style="@style/Space_8" />
-
-        <!-- Botão Comprar Bilhetes -->
-        <Button
-            android:id="@+id/btnComprarBilhetes"
-            style="@style/Button.Primary.Full"
-            android:text="@string/comprar_bilhetes"
-            android:enabled="false" />
+        <Space style="@style/VerticalSpace.8" />
 
     </LinearLayout>
 

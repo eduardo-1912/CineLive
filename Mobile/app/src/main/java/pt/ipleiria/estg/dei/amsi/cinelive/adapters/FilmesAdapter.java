@@ -24,7 +24,7 @@ public class FilmesAdapter extends RecyclerView.Adapter<FilmesAdapter.ViewHolder
 
     // Notifica o fragment quando um filme é escolhido
     public interface OnFilmeClickListener {
-        void onFilmeSelected(Filme filme);
+        void onFilmeClick(Filme filme);
     }
 
     public FilmesAdapter(List<Filme> filmes, OnFilmeClickListener listener) {
@@ -68,7 +68,7 @@ public class FilmesAdapter extends RecyclerView.Adapter<FilmesAdapter.ViewHolder
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(holder.binding.ivPoster);
 
-        holder.itemView.setOnClickListener(v -> listener.onFilmeSelected(filme));
+        holder.itemView.setOnClickListener(v -> listener.onFilmeClick(filme));
     }
 
     @Override

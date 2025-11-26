@@ -12,7 +12,7 @@
     <include android:id="@+id/toolbar" layout="@layout/toolbar" />
 
     <!-- Container -->
-    <LinearLayout style="@style/Container">
+    <LinearLayout style="@style/Container.Main">
 
         <!-- Título -->
         <TextView
@@ -52,14 +52,14 @@
         <!-- Botão Login -->
         <Button
             android:id="@+id/btnLogin"
-            style="@style/Button.Primary.Full"
-            android:text="@string/btn_login" />
+            android:text="@string/btn_login"
+            style="@style/Button.Primary.Full" />
 
         <!-- Botão Signup -->
         <Button
             android:id="@+id/btnSignup"
-            style="@style/Button.Text"
-            android:text="@string/btn_signup" />
+            android:text="@string/btn_signup"
+            style="@style/Button.Text" />
 
     </LinearLayout>
 

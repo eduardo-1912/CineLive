@@ -1,29 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:gravity="center"
-    android:orientation="vertical"
+    style="@style/Container"
     android:padding="6dp">
 
     <ImageView
         android:id="@+id/ivPoster"
+        style="@style/MoviePoster"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:adjustViewBounds="true"
-        android:layout_marginBottom="2dp"
-        android:background="@drawable/poster_bg_shape"
-        android:src="@drawable/poster_placeholder"
-        android:clipToOutline="true"
-        android:scaleType="centerCrop" />
+        android:layout_marginBottom="2dp" />
 
     <TextView
         android:id="@+id/tvTitulo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:maxLines="2"
-        android:textColor="?attr/colorOnBackground"
-        android:textSize="12sp" />
+        style="@style/Text"
+        android:textSize="12sp"
+        android:textAlignment="center"
+        android:maxLines="1" />
 
 </LinearLayout>

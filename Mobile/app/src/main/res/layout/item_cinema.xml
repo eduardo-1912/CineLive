@@ -8,79 +8,66 @@
     <!-- Nome -->
     <TextView
         android:id="@+id/tvNome"
-        style="@style/Title"
-        android:textSize="28sp"
-        android:textStyle="bold" />
+        style="@style/Title.Bold"
+        android:textSize="28sp" />
 
-    <Space style="@style/Space_12" />
+    <Space style="@style/VerticalSpace.12" />
 
     <!-- Morada -->
     <TextView style="@style/Label" android:text="@string/label_morada" />
     <TextView
         android:id="@+id/tvMorada"
-        style="@style/Value" />
+        style="@style/Text" />
 
-    <Space style="@style/Space_16" />
+    <Space style="@style/VerticalSpace.16" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+    <LinearLayout style="@style/HorizontalLayout.Full" android:baselineAligned="false">
 
-        <LinearLayout
-            android:layout_height="wrap_content"
-            android:layout_width="0dp"
-            android:layout_weight="0.5"
-            android:orientation="vertical">
+        <LinearLayout android:layout_weight="1" style="@style/VerticalLayout">
 
             <!-- Telefone -->
-            <TextView style="@style/Label" android:text="@string/label_telefone" />
+            <TextView android:text="@string/label_telefone" style="@style/Label" />
             <TextView
                 android:id="@+id/tvTelefone"
-                style="@style/Value" />
+                style="@style/Text" />
 
-            <Space style="@style/Space_16" />
+            <Space style="@style/VerticalSpace.16" />
 
             <!-- Horário -->
-            <TextView style="@style/Label" android:text="@string/label_horario" />
+            <TextView android:text="@string/label_horario" style="@style/Label" />
             <TextView
                 android:id="@+id/tvHorario"
-                style="@style/Value" />
+                style="@style/Text" />
 
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_height="wrap_content"
-            android:layout_width="0dp"
-            android:layout_weight="0.5"
-            android:orientation="vertical">
+        <LinearLayout android:layout_weight="1" style="@style/VerticalLayout">
 
             <!-- Email -->
-            <TextView style="@style/Label" android:text="@string/label_email" />
+            <TextView android:text="@string/label_email" style="@style/Label" />
             <TextView
                 android:id="@+id/tvEmail"
-                style="@style/Value" />
+                style="@style/Text" />
 
-            <Space style="@style/Space_16" />
+            <Space style="@style/VerticalSpace.16" />
 
             <!-- Capacidade -->
-            <TextView style="@style/Label" android:text="@string/label_capacidade" />
+            <TextView android:text="@string/label_capacidade" style="@style/Label" />
             <TextView
                 android:id="@+id/tvCapacidade"
-                style="@style/Value" />
+                style="@style/Text" />
 
         </LinearLayout>
 
     </LinearLayout>
 
-    <Space style="@style/Space_16" />
+    <Space style="@style/VerticalSpace.16" />
 
     <!-- Botão Selecionar Cinema -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnSelecionar"
         style="@style/Button.Toggle"
         android:layout_width="match_parent"
-        android:checkable="true"
         android:text="@string/btn_selecionar_cinema"/>
 
 </LinearLayout>

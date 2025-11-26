@@ -12,19 +12,19 @@
     <include android:id="@+id/toolbar" layout="@layout/toolbar" />
 
     <!-- Container -->
-    <LinearLayout style="@style/Container">
+    <LinearLayout style="@style/Container.Main">
 
         <!-- Título -->
         <TextView
             android:id="@+id/tvTitulo"
-            style="@style/Title"
-            android:text="@string/configuracoes_titulo" />
+            android:text="@string/configuracoes_titulo"
+            style="@style/Title" />
 
         <!-- Subtítulo -->
         <TextView
             android:id="@+id/tvSubtitulo"
-            style="@style/Subtitle"
-            android:text="@string/configuracoes_subtitulo" />
+            android:text="@string/configuracoes_subtitulo"
+            style="@style/Subtitle" />
 
         <!-- URL da API -->
         <com.google.android.material.textfield.TextInputLayout
