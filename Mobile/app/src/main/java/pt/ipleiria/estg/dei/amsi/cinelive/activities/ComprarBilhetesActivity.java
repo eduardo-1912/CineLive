@@ -1,9 +1,7 @@
 package pt.ipleiria.estg.dei.amsi.cinelive.activities;
 
-import android.graphics.Color;
+import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Button;
-import android.widget.TableLayout;
 import android.widget.TableRow;
 
 import androidx.activity.EdgeToEdge;
@@ -18,13 +16,13 @@ import java.util.List;
 
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityComprarBilhetesBinding;
-import pt.ipleiria.estg.dei.amsi.cinelive.models.Lugar;
+import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ItemLugarBinding;
 
 public class ComprarBilhetesActivity extends AppCompatActivity {
 
-    ActivityComprarBilhetesBinding binding;
-    private List<Lugar> lugaresSelecionados = new ArrayList<>();
-
+    private ActivityComprarBilhetesBinding binding;
+    private final List<String> lugaresSelecionados = new ArrayList<>();
+    private double precoBilhete, total;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,122 +33,105 @@ public class ComprarBilhetesActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            Insets sb = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(sb.left, sb.top, sb.right, sb.bottom);
             return insets;
         });
 
         setSupportActionBar(binding.toolbar.topAppBar);
-        getSupportActionBar().setTitle(R.string.comprar_bilhetes);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle(R.string.comprar_bilhetes);
 
+        // Obter dados da sessão/filme
+        Intent intent = getIntent();
+        int idSessao = intent.getIntExtra("sessao_id", -1);
+
+        // Preencher dados da sessão
+        binding.tvTitulo.setText(intent.getStringExtra("titulo"));
+        binding.tvRating.setText(intent.getStringExtra("rating"));
+        binding.tvDuracao.setText(intent.getStringExtra("duracao"));
+
+        // TODO: REPLACE MOCK DATA
+        binding.tvNomeCinema.setText("CineLive Leiria");
+        binding.tvNomeSala.setText("Sala 3");
+        binding.tvDataSessao.setText("29/11/2025");
+        binding.tvHorario.setText("10:00 - 12:32");
+
+        // TODO: REPLACE MOCK DATA
+        precoBilhete = 8;
         int numFilas = 10;
         int numColunas = 12;
         List<String> ocupados = Arrays.asList("A5", "A6", "A7", "C3", "E4");
 
-        gerarMapaTableLayout(numFilas, numColunas, ocupados);
+        // Mapa de lugares
+        gerarMapaLugares(numFilas, numColunas, ocupados);
         atualizarResumo();
 
-
+        // Botão Pagar
+        binding.btnPagar.setOnClickListener(v -> {
+            // TODO: DO SOMETHING
+        });
     }
 
-    private void gerarMapaTableLayout(int numFilas, int numColunas, List<String> ocupados) {
+    private void gerarMapaLugares(int numFilas, int numColunas, List<String> ocupados) {
 
-        TableLayout tabela = binding.tableMapaLugares;
-        tabela.removeAllViews(); // limpar antes
-
+        // Criar fila
         for (int i = 0; i < numFilas; i++) {
+            TableRow fila = new TableRow(this);
+            char letra = (char)('A' + i);
 
-            char letra = (char) ('A' + i);
-            TableRow row = new TableRow(this);
-
+            // Criar lugar da fila
             for (int col = 1; col <= numColunas; col++) {
 
-                String codigo = letra + String.valueOf(col);
+                // Inflate do item_lugar.xml
+                ItemLugarBinding lugarBinding = ItemLugarBinding.inflate(getLayoutInflater(), fila, false);
 
-                Button btn = new Button(this);
-                btn.setText(codigo);
+                // Atribuir valor ao lugar
+                String lugar = letra + String.valueOf(col);
+                lugarBinding.btnLugar.setText(lugar);
 
-                // tamanho fixo
-                TableRow.LayoutParams params = new TableRow.LayoutParams(
-                        110, // largura px
-                        110  // altura px
-                );
-                params.setMargins(8, 8, 8, 8);
-                btn.setLayoutParams(params);
-
-                // Estado ocupado
-                if (ocupados.contains(codigo)) {
-                    btn.setBackgroundColor(Color.parseColor("#888888")); // cinzento
-                    btn.setEnabled(false);
+                // Bloquear lugares ocupados
+                if (ocupados.contains(lugar)) {
+                    lugarBinding.btnLugar.setEnabled(false);
+                    lugarBinding.btnLugar.setChecked(false);
                 }
-                // Estado livre
-                else {
-                    btn.setBackgroundColor(com.google.android.material.R.attr.colorSurfaceContainer); // verde
 
-                    btn.setOnClickListener(v -> {
-                        alternarSelecionado(btn, codigo);
+                // Atualizar seleção de lugares e resumo
+                else {
+                    lugarBinding.btnLugar.setOnClickListener(v -> {
+                        if (lugarBinding.btnLugar.isChecked()) {
+                            lugaresSelecionados.add(lugar);
+                        } else {
+                            lugaresSelecionados.remove(lugar);
+                        }
+
                         atualizarResumo();
                     });
                 }
 
-                row.addView(btn);
+                // Adicionar o lugar à fila
+                fila.addView(lugarBinding.getRoot());
             }
 
-            tabela.addView(row);
+            // Adicionar fila à tabela
+            binding.mapaLugares.addView(fila);
         }
     }
-
-
-    private void alternarSelecionado(Button btn, String codigo) {
-
-        boolean selecionado = btn.getTag() != null;
-
-        if (selecionado) {
-            btn.setTag(null);
-            btn.setBackgroundColor(Color.parseColor("#4CAF50")); // verde
-            removerLugarSelecionado(codigo);
-        } else {
-            btn.setTag("sel");
-            btn.setBackgroundColor(Color.parseColor("#FFEB3B")); // amarelo
-            adicionarLugarSelecionado(codigo);
-        }
-    }
-
-    private void adicionarLugarSelecionado(String codigo) {
-        lugaresSelecionados.add(new Lugar(
-                String.valueOf(codigo.charAt(0)),
-                Integer.parseInt(codigo.substring(1)),
-                1
-        ));
-    }
-
-    private void removerLugarSelecionado(String codigo) {
-        lugaresSelecionados.removeIf(l ->
-                (l.fila + l.numero).equals(codigo)
-        );
-    }
-
 
     private void atualizarResumo() {
+        boolean hasLugares = !lugaresSelecionados.isEmpty();
 
-        // gerar "A5, A6, A7"
-        StringBuilder sb = new StringBuilder();
-        double total = 0;
+        // Lugares
+        binding.tvLugares.setText(hasLugares ? String.join(", ", lugaresSelecionados) : "-");
 
-        for (Lugar l : lugaresSelecionados) {
-            sb.append(l.fila).append(l.numero).append(", ");
-            total += 4.00; // TODO: preço falso
-        }
+        // Total
+        total = lugaresSelecionados.size() * precoBilhete;
+        binding.tvTotal.setText(String.format("%.2f€", total));
 
-        String lista = sb.length() > 0 ? sb.substring(0, sb.length() - 2) : "-";
-
-        binding.tvLugares.setText(lista);
-        binding.tvTotal.setText(String.format("%.2f€", total)); //TODO: APENAS STRING
-
-        binding.btnPagar.setEnabled(!lugaresSelecionados.isEmpty());
+        // Botão Pagar
+        binding.btnPagar.setEnabled(hasLugares);
+        binding.btnPagar.setText(hasLugares ? R.string.btn_pagar : R.string.btn_selecione_lugares);
     }
-
 
     @Override
     public boolean onSupportNavigateUp() {

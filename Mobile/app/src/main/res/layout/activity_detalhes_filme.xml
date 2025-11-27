@@ -39,10 +39,10 @@
                     <Space style="@style/HorizontalSpace.8" />
 
                     <!-- Rating -->
-                    <LinearLayout style="@style/PillContainer">
+                    <LinearLayout style="@style/BadgeContainer">
                         <TextView
                             android:id="@+id/tvRating"
-                            style="@style/PillText" />
+                            style="@style/BadgeText" />
                     </LinearLayout>
 
                 </LinearLayout>
@@ -65,7 +65,7 @@
                 style="@style/VerticalLayout">
 
                 <!-- Estreia -->
-                <TextView style="@style/Label" android:text="@string/label_estreia" />
+                <TextView android:text="@string/label_estreia" style="@style/Label" />
                 <TextView
                     android:id="@+id/tvEstreia"
                     style="@style/Text" />
@@ -73,7 +73,7 @@
                 <Space style="@style/VerticalSpace.16" />
 
                 <!-- Idioma -->
-                <TextView style="@style/Label" android:text="@string/label_idioma" />
+                <TextView android:text="@string/label_idioma" style="@style/Label" />
                 <TextView
                     android:id="@+id/tvIdioma"
                     style="@style/Text" />
@@ -85,7 +85,7 @@
                 style="@style/VerticalLayout">
 
                 <!-- Estreia -->
-                <TextView style="@style/Label" android:text="@string/label_duracao" />
+                <TextView android:text="@string/label_duracao" style="@style/Label" />
                 <TextView
                     android:id="@+id/tvDuracao"
                     style="@style/Text" />
@@ -93,7 +93,7 @@
                 <Space style="@style/VerticalSpace.16" />
 
                 <!-- Realização -->
-                <TextView style="@style/Label" android:text="@string/label_realizacao" />
+                <TextView android:text="@string/label_realizacao" style="@style/Label" />
                 <TextView
                     android:id="@+id/tvRealizacao"
                     style="@style/Text" />
@@ -105,7 +105,7 @@
         <Space style="@style/VerticalSpace.24" />
 
         <!-- Sinopse -->
-        <TextView style="@style/Label.Large" android:text="@string/label_sinopse"/>
+        <TextView android:text="@string/label_sinopse" style="@style/Label.Large" />
 
         <Space style="@style/VerticalSpace.4" />
 
@@ -113,14 +113,6 @@
             android:id="@+id/tvSinopse"
             style="@style/Text"
             android:layout_width="match_parent" />
-
-        <Space style="@style/VerticalSpace.24" />
-
-        <!-- Trailer -->
-        <TextView style="@style/Label.Large" android:text="@string/label_sinopse"/>
-
-        <Space style="@style/VerticalSpace.4" />
-
 
     </LinearLayout>
 
@@ -131,23 +123,20 @@
 
         <TextView
             style="@style/Title.Bold"
-            android:textSize="28sp"
+            android:textSize="24sp"
             android:layout_width="match_parent"
             android:text="@string/comprar_bilhetes"/>
 
-        <Space style="@style/VerticalSpace.20" />
+        <Space style="@style/VerticalSpace.12" />
 
         <!-- Escolher Data da Sessão -->
-
         <Spinner
             android:id="@+id/spinnerData"
             android:layout_marginStart="5dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-        <View
-            style="@style/Divider"
-            android:layout_marginVertical="10dp"/>
+        <View android:layout_marginVertical="4dp" style="@style/Divider" />
 
         <!-- Escolher Hora da Sessão -->
         <ListView

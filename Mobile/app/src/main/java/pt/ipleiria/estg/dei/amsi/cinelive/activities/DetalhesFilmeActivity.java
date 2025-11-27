@@ -1,7 +1,5 @@
 package pt.ipleiria.estg.dei.amsi.cinelive.activities;
 
-import static androidx.core.content.ContentProviderCompat.requireContext;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -61,7 +59,7 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
                 "Um grande campeão das pistas é lançado numa corrida internacional enquanto o seu amigo Mate é apanhado num enredo de espionagem que põe à prova a amizade de ambos e mostra que coragem pode surgir dos lugares mais improváveis.",
                 "2h 32min", "25/11/2025", "Português", "John Lasseter", "http://10.0.2.2/CineLive/Web/frontend/web/uploads/posters/poster_6910b6ad1f9ea.jpg", "Em exibição");
 
-        // Poster
+        // Carregar Poster
         Glide.with(this)
                 .load(filme.posterUrl)
                 .placeholder(R.drawable.poster_placeholder)
@@ -78,37 +76,51 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
         binding.tvRealizacao.setText(filme.getRealizacao());
         binding.tvSinopse.setText(filme.getSinopse());
 
+        // Array associativo de sessões por data
         Map<String, List<Sessao>> sessoesPorData = new LinkedHashMap<>();
 
+        // TODO: REPLACE MOCK DATA
         sessoesPorData.put("28/11/2025", Arrays.asList(
                 new Sessao(7, "28/11/2025", "16:00", "19:46"),
                 new Sessao(8, "28/11/2025", "21:30", "21:16")
         ));
-
         sessoesPorData.put("29/11/2025", Arrays.asList(
                 new Sessao(9, "29/11/2025", "14:00", "15:46"),
                 new Sessao(10, "29/11/2025", "18:00", "19:46"),
                 new Sessao(11, "29/11/2025", "22:00", "23:46")
         ));
 
+        // Array de datas
         List<String> datas = new ArrayList<>(sessoesPorData.keySet());
-        binding.spinnerData.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, datas));
 
+        binding.spinnerData.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, datas));
         binding.spinnerData.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                // Obter data selecionada
                 String data = datas.get(position);
+
+                // Obter sessões da data selecionada
                 List<Sessao> sessoes = sessoesPorData.get(data);
 
+                // Adicionar todas as sessões à lista
                 List<String> horas = new ArrayList<>();
                 for (Sessao sessao : sessoes) horas.add(sessao.getHoraInicio());
 
                 binding.lvHoras.setAdapter(new ArrayAdapter<>(DetalhesFilmeActivity.this, android.R.layout.simple_list_item_1, horas));
 
+                // Selecionou uma sessão
                 binding.lvHoras.setOnItemClickListener((p, v, pos, i) -> {
                     Sessao sessao = sessoes.get(pos);
                     Intent intentSessao = new Intent(DetalhesFilmeActivity.this, ComprarBilhetesActivity.class);
+
+                    // Passar dados do filme e a sessão
                     intentSessao.putExtra("sessao_id", sessao.getId());
+                    intentSessao.putExtra("titulo", filme.getTitulo());
+                    intentSessao.putExtra("rating", filme.getRating());
+                    intentSessao.putExtra("duracao", filme.getDuracao());
+
                     startActivity(intentSessao);
                 });
             }

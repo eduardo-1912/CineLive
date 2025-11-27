@@ -39,8 +39,8 @@ public class DetalhesCompraActivity extends AppCompatActivity {
         });
 
         setSupportActionBar(binding.toolbar.topAppBar);
-        getSupportActionBar().setTitle(R.string.detalhes_compra);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle(R.string.detalhes_compra);
 
         // Obter ID da compra
         Intent intent = getIntent();

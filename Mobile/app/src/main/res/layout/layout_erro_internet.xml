@@ -6,26 +6,33 @@
     android:orientation="vertical"
     android:gravity="center">
 
-    <!-- Container -->
-    <LinearLayout style="@style/Container.Main">
+    <ViewFlipper
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        <ImageView
-            android:src="@drawable/ic_wifi_off"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            app:tint="?attr/colorOutline" />
+        <!-- Erro Internet -->
+        <LinearLayout style="@style/Container.Main">
 
-        <Space style="@style/VerticalSpace.20" />
+            <ImageView
+                android:src="@drawable/ic_wifi_off"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                app:tint="?attr/colorOutline" />
 
-        <TextView
-            style="@style/Title"
-            android:textSize="28sp"
-            android:text="@string/erro_internet_titulo" />
+            <Space style="@style/VerticalSpace.20" />
 
-        <TextView
-            style="@style/Subtitle"
-            android:text="@string/erro_internet_subtitulo" />
+            <TextView
+                style="@style/Title"
+                android:textSize="28sp"
+                android:text="@string/erro_internet_titulo" />
 
-    </LinearLayout>
+            <TextView
+                style="@style/Subtitle"
+                android:text="@string/erro_internet_subtitulo" />
+
+        </LinearLayout>
+
+    </ViewFlipper>
+
 
 </LinearLayout>

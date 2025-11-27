@@ -4,12 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -48,26 +43,21 @@ public class MainActivity extends AppCompatActivity {
         // BottomNavigation ligado ao NavController
         NavigationUI.setupWithNavController(binding.bottomNav, navController);
 
-
         boolean isLoggedIn = true; // TODO: depois substituir por SharedPreferences/token
 
         // Mostrar 'Entrar' ou 'Perfil'
-        binding.bottomNav.getMenu().findItem(R.id.navPerfil)
-                .setTitle(isLoggedIn ? R.string.nav_perfil : R.string.nav_entrar);
+        binding.bottomNav.getMenu().findItem(R.id.navPerfil).setTitle(isLoggedIn ? R.string.nav_perfil : R.string.nav_entrar);
 
         // Mostrar 'Compras' se estiver logged in
-        binding.bottomNav.getMenu().findItem(R.id.navCompras)
-                .setVisible(isLoggedIn);
-
+        binding.bottomNav.getMenu().findItem(R.id.navCompras).setVisible(isLoggedIn);
 
         binding.bottomNav.setOnItemSelectedListener(item -> {
 
             if (item.getItemId() == R.id.navPerfil) {
-
                 if (!isLoggedIn) {
                     // Redirecionar para LoginActivity
                     startActivity(new Intent(this, LoginActivity.class));
-                    return false; // NÃO selecionar o item no bottom nav
+                    return false;
                 }
             }
 

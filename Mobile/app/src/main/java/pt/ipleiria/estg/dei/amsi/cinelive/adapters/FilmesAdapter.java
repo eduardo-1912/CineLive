@@ -62,6 +62,7 @@ public class FilmesAdapter extends RecyclerView.Adapter<FilmesAdapter.ViewHolder
 
         holder.binding.tvTitulo.setText(filme.titulo);
 
+        // Carregar Poster
         Glide.with(holder.itemView.getContext())
                 .load(filme.posterUrl)
                 .placeholder(R.drawable.poster_placeholder)

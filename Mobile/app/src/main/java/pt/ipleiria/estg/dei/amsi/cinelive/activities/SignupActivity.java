@@ -30,9 +30,12 @@ public class SignupActivity extends AppCompatActivity {
             return insets;
         });
 
-        // Seta voltar atrás
         setSupportActionBar(binding.toolbar.topAppBar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        binding.btnSignup.setOnClickListener(v -> {
+            // TODO: DO SIGNUP
+        });
 
         binding.btnLogin.setOnClickListener(v -> {
             startActivity(new Intent(SignupActivity.this, LoginActivity.class));

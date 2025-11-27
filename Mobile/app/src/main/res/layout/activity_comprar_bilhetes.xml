@@ -16,42 +16,28 @@
         android:layout_height="match_parent"
         android:fillViewport="true">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+        <LinearLayout style="@style/VerticalLayout">
 
             <!-- Dados do filmes -->
             <LinearLayout style="@style/Container.Main">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                <LinearLayout style="@style/VerticalLayout">
 
                     <!-- Título -->
                     <TextView
                         android:id="@+id/tvTitulo"
                         style="@style/Title.Bold"
-                        android:textSize="28sp"
-                        android:text="Interstellar"/>
-
+                        android:textSize="28sp" />
 
                     <LinearLayout style="@style/HorizontalLayout">
 
                         <!-- Rating -->
-                        <TextView
-                            android:id="@+id/tvRating"
-                            style="@style/Text"
-                            android:text="M3"/>
+                        <TextView android:id="@+id/tvRating" style="@style/Text" />
 
                         <TextView style="@style/Text" android:text=" • " />
 
                         <!-- Duração -->
-                        <TextView
-                            android:id="@+id/tvDuracao"
-                            style="@style/Text"
-                            android:text="2h 32min"/>
+                        <TextView android:id="@+id/tvDuracao" style="@style/Text" />
 
                     </LinearLayout>
 
@@ -61,16 +47,13 @@
 
                 <LinearLayout style="@style/HorizontalLayout.Full">
 
-                    <LinearLayout
-                        style="@style/VerticalLayout"
-                        android:layout_weight="1">
+                    <LinearLayout android:layout_weight="1" style="@style/VerticalLayout">
 
                         <!-- Cinema -->
                         <TextView style="@style/Label" android:text="@string/label_cinema" />
                         <TextView
                             android:id="@+id/tvNomeCinema"
-                            style="@style/Text"
-                            android:text="CineLive Leiria" />
+                            style="@style/Text" />
 
                         <Space style="@style/VerticalSpace.16" />
 
@@ -78,21 +61,17 @@
                         <TextView style="@style/Label" android:text="@string/label_data" />
                         <TextView
                             android:id="@+id/tvDataSessao"
-                            style="@style/Text"
-                            android:text="29/11/2025" />
+                            style="@style/Text" />
 
                     </LinearLayout>
 
-                    <LinearLayout
-                        style="@style/VerticalLayout"
-                        android:layout_weight="1">
+                    <LinearLayout android:layout_weight="1" style="@style/VerticalLayout" >
 
                         <!-- Sala -->
                         <TextView style="@style/Label" android:text="@string/label_sala" />
                         <TextView
                             android:id="@+id/tvNomeSala"
-                            style="@style/Text"
-                            android:text="Sala 3" />
+                            style="@style/Text" />
 
                         <Space style="@style/VerticalSpace.16" />
 
@@ -100,8 +79,7 @@
                         <TextView style="@style/Label" android:text="@string/label_horario" />
                         <TextView
                             android:id="@+id/tvHorario"
-                            style="@style/Text"
-                            android:text="10:00 - 12:00" />
+                            style="@style/Text" />
 
                     </LinearLayout>
 
@@ -114,36 +92,32 @@
             <!-- Escolha de lugares -->
             <LinearLayout style="@style/Container.Main">
 
-                <LinearLayout
-                    style="@style/HorizontalLayout.Full"
-                    android:gravity="center">
+                <LinearLayout android:gravity="center" style="@style/HorizontalLayout.Full" >
 
                     <!-- Disponível -->
-                    <LinearLayout style="@style/BadgeContainer">
-                        <TextView
-                            style="@style/BadgeText"
-                            android:layout_weight="1"
-                            android:text="@string/badge_disponivel" />
+                    <LinearLayout android:backgroundTint="?attr/colorSecondaryContainer"
+                        style="@style/BadgeContainer">
+                        <TextView android:text="@string/badge_disponivel" style="@style/BadgeText"
+                            android:textColor="?attr/colorOnSecondaryContainer" />
+
                     </LinearLayout>
 
                     <Space style="@style/HorizontalSpace.6" />
 
                     <!-- Selecionado -->
-                    <LinearLayout style="@style/BadgeContainer">
-                        <TextView
-                            style="@style/BadgeText"
-                            android:layout_weight="1"
-                            android:text="@string/badge_selecionado" />
+                    <LinearLayout android:backgroundTint="?attr/colorPrimary"
+                        style="@style/BadgeContainer">
+                        <TextView android:text="@string/badge_selecionado" style="@style/BadgeText"/>
+
                     </LinearLayout>
 
                     <Space style="@style/HorizontalSpace.6" />
 
                     <!-- Ocupado -->
-                    <LinearLayout style="@style/BadgeContainer">
-                        <TextView
-                            style="@style/BadgeText"
-                            android:layout_weight="1"
-                            android:text="@string/badge_ocupado" />
+                    <LinearLayout android:backgroundTint="?attr/colorOutline"
+                        style="@style/BadgeContainer">
+                        <TextView android:text="@string/badge_ocupado" style="@style/BadgeText" />
+
                     </LinearLayout>
 
                 </LinearLayout>
@@ -164,63 +138,55 @@
                 <Space style="@style/VerticalSpace.12" />
 
                 <!-- Mapa de Lugares -->
-                <HorizontalScrollView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fillViewport="true"
-                    android:scrollbars="horizontal">
+                <HorizontalScrollView style="@style/HorizontalLayout.Full">
 
-                    <!-- Mapa de Lugares -->
                     <TableLayout
-                        android:id="@+id/tableMapaLugares"
+                        android:id="@+id/mapaLugares"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:stretchColumns="*" />
+                        android:stretchColumns="*"
+                        android:layout_marginBottom="6dp" />
 
                 </HorizontalScrollView>
 
-
                 <Space style="@style/VerticalSpace.24" />
 
-                <LinearLayout style="@style/HorizontalLayout.Full">
+                <LinearLayout style="@style/VerticalLayout"
+                    android:padding="16dp"
+                    android:background="@drawable/container_shape_light">
 
-                    <LinearLayout android:layout_weight="0.35" style="@style/VerticalLayout">
+                    <LinearLayout style="@style/HorizontalLayout.Full">
 
-                        <!-- Lugares -->
-                        <TextView android:text="@string/label_lugares" style="@style/Label" />
-                        <TextView
-                            android:id="@+id/tvLugares"
-                            style="@style/Text"
-                            android:text="A5, A6, A7" />
+                        <LinearLayout android:layout_weight="0.35" style="@style/VerticalLayout">
+
+                            <!-- Lugares -->
+                            <TextView android:text="@string/label_lugares" style="@style/Label" />
+                            <TextView android:id="@+id/tvLugares" style="@style/Text" />
+
+                        </LinearLayout>
+
+                        <LinearLayout android:layout_weight="0.65" style="@style/VerticalLayout">
+
+                            <!-- Total -->
+                            <TextView android:text="@string/label_total" style="@style/Label" android:textAlignment="textEnd"/>
+                            <TextView android:id="@+id/tvTotal" style="@style/Text" android:textAlignment="textEnd" />
+
+                        </LinearLayout>
 
                     </LinearLayout>
 
-                    <LinearLayout android:layout_weight="0.65" style="@style/VerticalLayout">
+                    <Space style="@style/VerticalSpace.8" />
 
-                        <!-- Total -->
-                        <TextView android:text="@string/label_total" style="@style/Label" android:textAlignment="textEnd"/>
-                        <TextView
-                            android:id="@+id/tvTotal"
-                            style="@style/Text"
-                            android:textAlignment="textEnd"
-                            android:text="8.00€" />
-
-                    </LinearLayout>
+                    <!-- Botão Pagar -->
+                    <Button
+                        android:id="@+id/btnPagar"
+                        style="@style/Button.Primary"
+                        android:layout_width="match_parent"
+                        android:text="@string/btn_selecione_lugares"/>
 
                 </LinearLayout>
 
-                <Space style="@style/VerticalSpace.4" />
-
-                <!-- Botão Pagar -->
-                <Button
-                    android:id="@+id/btnPagar"
-                    style="@style/Button.Primary"
-                    android:layout_width="match_parent"
-                    android:backgroundTint="?attr/colorError"
-                    android:text="@string/btn_pagar"/>
-
             </LinearLayout>
-
 
         </LinearLayout>
 

@@ -30,8 +30,8 @@ public class ConfiguracoesActivity extends AppCompatActivity {
         });
 
         setSupportActionBar(binding.toolbar.topAppBar);
-        getSupportActionBar().setTitle(R.string.configuracoes);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle(R.string.configuracoes);
 
     }
 

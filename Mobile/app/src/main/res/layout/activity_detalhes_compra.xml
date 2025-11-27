@@ -18,7 +18,7 @@
 
         <LinearLayout style="@style/VerticalLayout">
 
-            <!-- Container -->
+            <!-- Dados da Compra -->
             <LinearLayout style="@style/Container.Main">
 
                 <LinearLayout style="@style/HorizontalLayout.Full" android:baselineAligned="false">
@@ -127,17 +127,28 @@
 
             <View style="@style/Divider"/>
 
-            <Space style="@style/VerticalSpace.8" />
+            <!-- Bilhetes da Compra -->
+            <LinearLayout style="@style/Container.ForList">
 
-            <!-- Bilhetes -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvBilhetes"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false"
-                android:overScrollMode="never"
-                style="@style/Container.ForList"
-                tools:listitem="@layout/item_bilhete" />
+                <TextView
+                    style="@style/Title.Bold"
+                    android:textSize="28sp"
+                    android:layout_width="match_parent"
+                    android:text="@string/label_bilhetes" />
+
+                <Space style="@style/VerticalSpace.16" />
+
+                <!-- Bilhetes -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvBilhetes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    android:overScrollMode="never"
+                    tools:listitem="@layout/item_bilhete" />
+
+            </LinearLayout>
+
 
         </LinearLayout>
 

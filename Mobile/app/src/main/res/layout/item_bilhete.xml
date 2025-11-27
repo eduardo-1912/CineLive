@@ -2,10 +2,13 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="32dp"
+    android:layout_marginBottom="16dp"
     android:orientation="vertical">
 
-    <LinearLayout style="@style/HorizontalLayout.Full">
+    <LinearLayout style="@style/HorizontalLayout.Full"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="12dp"
+        android:background="@drawable/container_shape_light">
 
         <!-- Lugar -->
         <LinearLayout android:layout_weight="1" style="@style/VerticalLayout">
@@ -21,12 +24,12 @@
         <LinearLayout android:layout_weight="1" style="@style/VerticalLayout">
 
             <TextView
-                android:text="@string/label_preco"
+                android:text="@string/label_estado"
                 style="@style/Label"
                 android:textAlignment="center" />
 
             <TextView
-                android:id="@+id/tvPreco"
+                android:id="@+id/tvEstado"
                 style="@style/Text"
                 android:textAlignment="center" />
         </LinearLayout>
@@ -35,12 +38,12 @@
         <LinearLayout android:layout_weight="1" style="@style/VerticalLayout">
 
             <TextView
-                android:text="@string/label_estado"
+                android:text="@string/label_preco"
                 style="@style/Label"
                 android:textAlignment="textEnd" />
 
             <TextView
-                android:id="@+id/tvEstado"
+                android:id="@+id/tvPreco"
                 style="@style/Text"
                 android:textAlignment="textEnd" />
         </LinearLayout>
@@ -52,7 +55,7 @@
     <LinearLayout
         style="@style/VerticalLayout"
         android:paddingVertical="16dp"
-        android:background="@drawable/codigo_bg_shape">
+        android:background="@drawable/container_shape_medium">
 
         <!-- Código -->
         <TextView

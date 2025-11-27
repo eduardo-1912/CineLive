@@ -29,16 +29,15 @@ public class EditarPerfilActivity extends AppCompatActivity {
             return insets;
         });
 
-        // Seta voltar atrás
         setSupportActionBar(binding.toolbar.topAppBar);
-        getSupportActionBar().setTitle(R.string.btn_editar_perfil);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+        getSupportActionBar().setTitle(R.string.btn_editar_perfil);
 
         // Colocar hint password com (opcional)
         binding.form.tilPassword.setHint(R.string.form_hint_password_opcional);
 
         // TODO: PASSWORD COM MINIMO DE 8 CHAR
+
 
         binding.btnCancelar.setOnClickListener(v -> {
             finish();

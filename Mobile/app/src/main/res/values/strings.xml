@@ -55,6 +55,7 @@
     <string name="label_ecra">Ecrã</string>
     <string name="label_lugares">Lugares</string>
     <string name="label_total">Total</string>
+    <string name="btn_selecione_lugares">Selecione lugares</string>
     <string name="btn_pagar">Proceder ao pagamento</string>
 
     <!-- fragment_cinemas -->
@@ -75,6 +76,7 @@
     <string name="label_estado">Estado</string>
     <string name="label_lugar">Lugar</string>
     <string name="label_preco">Preço</string>
+    <string name="label_bilhetes">Bilhetes</string>
 
     <!-- fragment_perfil -->
     <string name="perfil_titulo">Os meus dados</string>

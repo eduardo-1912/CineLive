@@ -20,6 +20,7 @@
         <item name="android:orientation">horizontal</item>
     </style>
 
+
     <!-- Containers -->
     <style name="Container">
         <item name="android:layout_width">match_parent</item>
@@ -28,13 +29,13 @@
     </style>
 
     <style name="Container.ForList" parent="Container">
-        <item name="android:paddingStart">24dp</item>
-        <item name="android:paddingEnd">24dp</item>
-        <item name="android:paddingTop">24dp</item>
+        <item name="android:paddingStart">@dimen/container_padding_horizontal</item>
+        <item name="android:paddingEnd">@dimen/container_padding_horizontal</item>
+        <item name="android:paddingTop">@dimen/container_padding_vertical</item>
     </style>
 
     <style name="Container.Main" parent="Container.ForList">
-        <item name="android:paddingBottom">24dp</item>
+        <item name="android:paddingBottom">@dimen/container_padding_vertical</item>
         <item name="android:gravity">center_horizontal</item>
     </style>
 
@@ -88,32 +89,15 @@
     </style>
 
 
-    <style name="PillContainer">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:background">@drawable/pill_bg_shape</item>
-        <item name="android:paddingTop">4dp</item>
-        <item name="android:paddingBottom">4dp</item>
-        <item name="android:paddingStart">14dp</item>
-        <item name="android:paddingEnd">14dp</item>
-    </style>
-
-    <style name="PillText">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:textSize">16sp</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">?attr/colorOnSurfaceInverse</item>
-    </style>
-
+    <!-- Badges -->
     <style name="BadgeContainer">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:background">@drawable/pill_bg_shape</item>
-        <item name="android:paddingTop">4dp</item>
-        <item name="android:paddingBottom">4dp</item>
-        <item name="android:paddingStart">14dp</item>
-        <item name="android:paddingEnd">14dp</item>
+        <item name="android:background">@drawable/badge_shape</item>
+        <item name="android:paddingTop">@dimen/badge_padding_vertical</item>
+        <item name="android:paddingBottom">@dimen/badge_padding_vertical</item>
+        <item name="android:paddingStart">@dimen/badge_padding_horizontal</item>
+        <item name="android:paddingEnd">@dimen/badge_padding_horizontal</item>
     </style>
 
     <style name="BadgeText">
@@ -123,6 +107,7 @@
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">?attr/colorOnSurfaceInverse</item>
     </style>
+
 
     <style name="Divider">
         <item name="android:layout_width">match_parent</item>
@@ -152,8 +137,8 @@
     <style name="Button.Primary.Full" parent="Button.Primary">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_marginTop">12dp</item>
-        <item name="android:paddingTop">16dp</item>
-        <item name="android:paddingBottom">16dp</item>
+        <item name="android:paddingTop">@dimen/button_full_padding</item>
+        <item name="android:paddingBottom">@dimen/button_full_padding</item>
     </style>
 
     <style name="Button.Secondary" parent="Widget.Material3.Button.TonalButton">
@@ -165,8 +150,8 @@
     <style name="Button.Secondary.Full" parent="Button.Secondary">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_marginTop">12dp</item>
-        <item name="android:paddingTop">16dp</item>
-        <item name="android:paddingBottom">16dp</item>
+        <item name="android:paddingTop">@dimen/button_full_padding</item>
+        <item name="android:paddingBottom">@dimen/button_full_padding</item>
     </style>
 
     <style name="Button.Text" parent="Widget.Material3.Button.TextButton">
@@ -184,11 +169,13 @@
         <item name="android:backgroundTint">@color/toggle_button_background</item>
     </style>
 
+
+    <!-- Images -->
     <style name="MoviePoster">
         <item name="android:adjustViewBounds">true</item>
         <item name="android:clipToOutline" tools:targetApi="31">true</item>
         <item name="android:scaleType">centerCrop</item>
-        <item name="android:background">@drawable/poster_bg_shape</item>
+        <item name="android:background">@drawable/poster_shape</item>
         <item name="android:src">@drawable/poster_placeholder</item>
     </style>
 

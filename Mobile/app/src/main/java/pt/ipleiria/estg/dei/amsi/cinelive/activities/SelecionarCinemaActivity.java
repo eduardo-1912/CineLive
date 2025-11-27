@@ -1,7 +1,6 @@
 package pt.ipleiria.estg.dei.amsi.cinelive.activities;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 
@@ -13,7 +12,6 @@ import androidx.core.view.WindowInsetsCompat;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivitySelecionarCinemaBinding;
