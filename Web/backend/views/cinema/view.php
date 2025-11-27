@@ -78,7 +78,7 @@ $this->params['breadcrumbs'][] = $model->nome;
                             'telefone',
                             [
                                 'attribute' => 'morada',
-                                'value' => $model->moradaCompleta,
+                                'value' => $model->morada,
                             ],
                             'horario',
                             [

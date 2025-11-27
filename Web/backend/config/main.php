@@ -79,6 +79,7 @@ return [
                     'controller' => ['api/cinema'],
                     'extraPatterns' => [
                         'GET {id}/filmes' => 'filmes',
+                        'GET simple' => 'simple',
                     ],
                 ],
                 [

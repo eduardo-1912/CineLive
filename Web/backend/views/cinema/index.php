@@ -39,7 +39,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                             [
                                 'attribute' => 'morada',
-                                'value' => 'moradaCompleta',
+                                'value' => 'morada',
                                 'headerOptions' => ['style' => 'width: 28rem;'],
                             ],
                             'email:email',

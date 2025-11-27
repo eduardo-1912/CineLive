@@ -40,7 +40,7 @@ $this->title = 'Cinemas';
 
                         <div class="col-12 d-flex flex-column text-start">
                             <span class="fw-medium fs-14 fw-semibold">Morada</span>
-                            <span class="text-muted"><?= $cinema->moradaCompleta ?></span>
+                            <span class="text-muted"><?= $cinema->morada ?></span>
                         </div>
                         <div class="d-flex flex-column text-start">
                             <span class="fw-medium fs-14 fw-semibold">Telefone</span>

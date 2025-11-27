@@ -2,6 +2,7 @@ package pt.ipleiria.estg.dei.amsi.cinelive.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,6 +12,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivitySignupBinding;
+import pt.ipleiria.estg.dei.amsi.cinelive.utils.NetworkUtils;
 
 public class SignupActivity extends AppCompatActivity {
 
@@ -43,11 +45,18 @@ public class SignupActivity extends AppCompatActivity {
         });
     }
 
-    // Voltar atrás
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        if (!NetworkUtils.hasInternet(this)) {
+            Toast.makeText(this, R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
+        }
+    }
+
     @Override
     public boolean onSupportNavigateUp() {
         finish();
         return true;
     }
-
 }

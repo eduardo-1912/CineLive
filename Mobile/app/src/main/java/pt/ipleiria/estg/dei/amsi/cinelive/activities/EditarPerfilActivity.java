@@ -1,6 +1,8 @@
 package pt.ipleiria.estg.dei.amsi.cinelive.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,6 +12,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityEditarPerfilBinding;
+import pt.ipleiria.estg.dei.amsi.cinelive.utils.NetworkUtils;
 
 public class EditarPerfilActivity extends AppCompatActivity {
 
@@ -33,16 +36,34 @@ public class EditarPerfilActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(R.string.btn_editar_perfil);
 
-        // Colocar hint password com (opcional)
         binding.form.tilPassword.setHint(R.string.form_hint_password_opcional);
+
+        Intent intent = getIntent();
+
+        binding.form.etUsername.setText(intent.getStringExtra("username"));
+        binding.form.etNome.setText(intent.getStringExtra("nome"));
+        binding.form.etEmail.setText(intent.getStringExtra("email"));
+        binding.form.etTelemovel.setText(intent.getStringExtra("telemovel"));
+
 
         // TODO: PASSWORD COM MINIMO DE 8 CHAR
 
+        // Guardar alterações
+        binding.btnGuardar.setOnClickListener(v -> {
 
-        binding.btnCancelar.setOnClickListener(v -> {
-            finish();
         });
 
+        // Cancelar
+        binding.btnCancelar.setOnClickListener(v -> {finish();});
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        if (!NetworkUtils.hasInternet(this)) {
+            Toast.makeText(this, R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

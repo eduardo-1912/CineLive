@@ -5,40 +5,13 @@ namespace backend\modules\api\controllers;
 use common\models\Filme;
 use common\models\Sessao;
 use Yii;
-use yii\rest\ActiveController;
-use yii\web\BadRequestHttpException;
+use yii\rest\Controller;
 use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
 
-class FilmeController extends ActiveController
+class FilmeController extends Controller
 {
     public $modelClass = 'common\models\Filme';
-
-    /*public function actions()
-    {
-        $actions = parent::actions();
-
-        unset($actions['create'], $actions['update'], $actions['delete'],);
-
-        return $actions;
-    }*/
-
-    public function actions()
-    {
-        $actions = parent::actions();
-
-        // Bloquear métodos não autorizados
-        $notAllowedActions = ['create', 'update', 'delete'];
-
-        foreach ($notAllowedActions as $action) {
-            $actions[$action] = fn() => throw new MethodNotAllowedHttpException;
-        }
-
-        // Remover index default para usar filtros
-        unset($actions['index']);
-
-        return $actions;
-    }
 
     public function actionIndex()
     {
@@ -49,33 +22,43 @@ class FilmeController extends ActiveController
 
         $query = Filme::find();
 
-        // Filtrar por cinema (apenas com sessões futuras)
         if ($cinemaId) {
-            $query->joinWith('sessaos s')
-                ->andWhere(['s.cinema_id' => $cinemaId])
-                ->andWhere(['>=', 's.data', date('Y-m-d')])
-                ->distinct();
+            Filme::findComSessoesFuturas($cinemaId);
         }
 
-        // Filtrar para crianças
         if ($kids) {
             $query->andWhere(['filme.rating' => Filme::ratingsKids()]);
         }
 
-        // Filtrar por estado
         if ($estado) {
             $query->andWhere(['filme.estado' => $estado]);
         }
 
-        // Filtrar por título
         if ($q) {
             $query->andWhere(['like', 'filme.titulo', $q]);
         }
 
-        // Ordernar por título
         $filmes = $query->orderBy(['titulo' => SORT_ASC])->all();
 
         return $filmes;
+    }
+
+    public function actionView($id)
+    {
+        $filme = Filme::findOne($id);
+
+        return [
+            'id' => $filme->id,
+            'titulo' => $filme->titulo,
+            'poster_url' => $filme->posterUrl,
+            'rating' => $filme->rating,
+            'generos' => implode(', ', array_map(fn($g) => $g->nome, $filme->generos)),
+            'estreia' => $filme->estreia,
+            'duracao' => $filme->duracao,
+            'idioma' => $filme->idioma,
+            'realizacao' => $filme->realizacao,
+            'sinopse' => $filme->sinopse,
+        ];
     }
 
     public function actionSessaos($id)

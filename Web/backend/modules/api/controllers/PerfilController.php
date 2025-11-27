@@ -31,10 +31,6 @@ class PerfilController extends Controller
     {
         $user = Yii::$app->user->identity;
 
-        if (!$user) {
-            throw new UnauthorizedHttpException("Token inválido.");
-        }
-
         return [
             'id' => $user->id,
             'username' => $user->username,
@@ -54,70 +50,56 @@ class PerfilController extends Controller
 
         $body = Yii::$app->request->bodyParams;
 
-        $transaction = Yii::$app->db->beginTransaction();
+        // 1. Atualizar user
+        if (isset($body['username'])) {
+            $user->username = $body['username'];
+        }
 
-        try {
-            // 1. Atualizar user
-            if (isset($body['username'])) {
-                $user->username = $body['username'];
-            }
+        if (isset($body['email'])) {
+            $user->email = $body['email'];
+        }
 
-            if (isset($body['email'])) {
-                $user->email = $body['email'];
-            }
+        // Password é opcional
+        if (!empty($body['password'])) {
+            $user->password = $body['password'];
+        }
 
-            // Password é opcional
-            if (!empty($body['password'])) {
-                $user->setPassword($body['password']);
-            }
-
-            if (!$user->save()) {
-                $transaction->rollBack();
-                return [
-                    'status' => 'error',
-                    'errors' => $user->errors
-                ];
-            }
-
-            // 2. Atualizar profile
-            $profile = $user->profile;
-
-            if (isset($body['nome'])) {
-                $profile->nome = $body['nome'];
-            }
-
-            if (isset($body['telemovel'])) {
-                $profile->telemovel = $body['telemovel'];
-            }
-
-            if (!$profile->save()) {
-                $transaction->rollBack();
-                return [
-                    'status' => 'error',
-                    'errors' => $profile->errors
-                ];
-            }
-
-            // Commit se tudo correu bem
-            $transaction->commit();
-
+        if (!$user->save()) {
             return [
-                'status' => 'success',
-                'message' => "Perfil atualizado com sucesso.",
-                'user' => [
-                    'id' => $user->id,
-                    'username' => $user->username,
-                    'nome' => $profile->nome,
-                    'email' => $user->email,
-                    'telemovel' => $profile->telemovel,
-                ]
+                'status' => 'error',
+                'errors' => $user->errors
             ];
+        }
 
+        // 2. Atualizar profile
+        $profile = $user->profile;
+
+        if (isset($body['nome'])) {
+            $profile->nome = $body['nome'];
         }
-        catch (Throwable $e) {
-            $transaction->rollBack();
-            throw $e;
+
+        if (isset($body['telemovel'])) {
+            $profile->telemovel = $body['telemovel'];
         }
+
+        if (!$profile->save()) {
+            return [
+                'status' => 'error',
+                'errors' => $profile->errors
+            ];
+        }
+
+        return [
+            'status' => 'success',
+            'message' => "Perfil atualizado com sucesso.",
+            'user' => [
+                'id' => $user->id,
+                'username' => $user->username,
+                'nome' => $profile->nome,
+                'email' => $user->email,
+                'telemovel' => $profile->telemovel,
+            ]
+        ];
     }
 
     public function actionDelete()
@@ -128,41 +110,28 @@ class PerfilController extends Controller
             throw new UnauthorizedHttpException("Token inválido.");
         }
 
-        $transaction = Yii::$app->db->beginTransaction();
+        // Remover RBAC assignments
+        Yii::$app->authManager->revokeAll($user->id);
 
-        try {
-            // Remover RBAC assignments
-            Yii::$app->authManager->revokeAll($user->id);
-
-            // Remover profile
-            if ($user->profile && !$user->profile->delete()) {
-                $transaction->rollBack();
-                return [
-                    'status' => 'error',
-                    'message' => 'Erro ao eliminar o perfil.'
-                ];
-            }
-
-            // Remover user
-            if (!$user->delete()) {
-                $transaction->rollBack();
-                return [
-                    'status' => 'error',
-                    'message' => 'Erro ao eliminar utilizador.'
-                ];
-            }
-
-            $transaction->commit();
-
+        // Remover profile
+        if ($user->profile && !$user->profile->delete()) {
             return [
-                'status' => 'success',
-                'message' => 'Conta eliminada com sucesso.'
+                'status' => 'error',
+                'message' => 'Erro ao eliminar o perfil.'
             ];
+        }
 
+        // Remover user
+        if (!$user->delete()) {
+            return [
+                'status' => 'error',
+                'message' => 'Erro ao eliminar utilizador.'
+            ];
         }
-        catch (Throwable $e) {
-            $transaction->rollBack();
-            throw $e;
-        }
+
+        return [
+            'status' => 'success',
+            'message' => 'Conta eliminada com sucesso.'
+        ];
     }
 }

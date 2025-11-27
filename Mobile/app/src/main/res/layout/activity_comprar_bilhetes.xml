@@ -24,8 +24,7 @@
                 <LinearLayout style="@style/VerticalLayout">
 
                     <!-- Título -->
-                    <TextView
-                        android:id="@+id/tvTitulo"
+                    <TextView android:id="@+id/tvTitulo"
                         style="@style/Title.Bold"
                         android:textSize="28sp" />
 
@@ -51,17 +50,13 @@
 
                         <!-- Cinema -->
                         <TextView style="@style/Label" android:text="@string/label_cinema" />
-                        <TextView
-                            android:id="@+id/tvNomeCinema"
-                            style="@style/Text" />
+                        <TextView android:id="@+id/tvNomeCinema" style="@style/Text" />
 
                         <Space style="@style/VerticalSpace.16" />
 
                         <!-- Data Sessão -->
                         <TextView style="@style/Label" android:text="@string/label_data" />
-                        <TextView
-                            android:id="@+id/tvDataSessao"
-                            style="@style/Text" />
+                        <TextView android:id="@+id/tvDataSessao" style="@style/Text" />
 
                     </LinearLayout>
 
@@ -69,17 +64,17 @@
 
                         <!-- Sala -->
                         <TextView style="@style/Label" android:text="@string/label_sala" />
-                        <TextView
-                            android:id="@+id/tvNomeSala"
-                            style="@style/Text" />
+                        <TextView android:id="@+id/tvNomeSala" style="@style/Text" />
 
                         <Space style="@style/VerticalSpace.16" />
 
                         <!-- Horário Sessão -->
                         <TextView style="@style/Label" android:text="@string/label_horario" />
-                        <TextView
-                            android:id="@+id/tvHorario"
-                            style="@style/Text" />
+                        <LinearLayout style="@style/HorizontalLayout">
+                            <TextView android:id="@+id/tvHoraInicio" style="@style/Text" />
+                            <TextView android:text=" - " style="@style/Text" />
+                            <TextView android:id="@+id/tvHoraFim" style="@style/Text" />
+                        </LinearLayout>
 
                     </LinearLayout>
 
@@ -99,7 +94,6 @@
                         style="@style/BadgeContainer">
                         <TextView android:text="@string/badge_disponivel" style="@style/BadgeText"
                             android:textColor="?attr/colorOnSecondaryContainer" />
-
                     </LinearLayout>
 
                     <Space style="@style/HorizontalSpace.6" />
@@ -108,7 +102,6 @@
                     <LinearLayout android:backgroundTint="?attr/colorPrimary"
                         style="@style/BadgeContainer">
                         <TextView android:text="@string/badge_selecionado" style="@style/BadgeText"/>
-
                     </LinearLayout>
 
                     <Space style="@style/HorizontalSpace.6" />
@@ -117,7 +110,6 @@
                     <LinearLayout android:backgroundTint="?attr/colorOutline"
                         style="@style/BadgeContainer">
                         <TextView android:text="@string/badge_ocupado" style="@style/BadgeText" />
-
                     </LinearLayout>
 
                 </LinearLayout>
@@ -125,13 +117,11 @@
                 <Space style="@style/VerticalSpace.20" />
 
                 <!-- Ecrã -->
-                <TextView
+                <TextView android:text="@string/label_ecra"
                     style="@style/Label"
                     android:textAlignment="center"
-                    android:layout_marginBottom="8dp"
-                    android:text="@string/label_ecra" />
-                <View
-                    android:layout_width="match_parent"
+                    android:layout_marginBottom="8dp" />
+                <View android:layout_width="match_parent"
                     android:layout_height="3dp"
                     android:background="?attr/colorOnSurface"/>
 
@@ -152,8 +142,7 @@
                 <Space style="@style/VerticalSpace.24" />
 
                 <LinearLayout style="@style/VerticalLayout"
-                    android:padding="16dp"
-                    android:background="@drawable/container_shape_light">
+                    android:padding="16dp" android:background="@drawable/container_shape_light">
 
                     <LinearLayout style="@style/HorizontalLayout.Full">
 
@@ -178,8 +167,7 @@
                     <Space style="@style/VerticalSpace.8" />
 
                     <!-- Botão Pagar -->
-                    <Button
-                        android:id="@+id/btnPagar"
+                    <Button android:id="@+id/btnPagar"
                         style="@style/Button.Primary"
                         android:layout_width="match_parent"
                         android:text="@string/btn_selecione_lugares"/>

@@ -17,8 +17,7 @@
         <LinearLayout style="@style/HorizontalLayout.Full">
 
             <!-- Poster -->
-            <ImageView
-                android:id="@+id/ivPoster"
+            <ImageView android:id="@+id/ivPoster"
                 style="@style/MoviePoster"
                 android:layout_width="56dp"
                 android:layout_height="wrap_content" />
@@ -27,29 +26,26 @@
 
             <LinearLayout style="@style/VerticalLayout">
 
-                <LinearLayout
-                    style="@style/HorizontalLayout.Full"
+                <LinearLayout style="@style/HorizontalLayout.Full"
                     android:gravity="center_vertical">
 
                     <!-- Título -->
-                    <TextView
-                        android:id="@+id/tvTitulo"
+                    <TextView android:id="@+id/tvTitulo"
                         style="@style/Title.Bold" />
 
                     <Space style="@style/HorizontalSpace.8" />
 
                     <!-- Rating -->
                     <LinearLayout style="@style/BadgeContainer">
-                        <TextView
-                            android:id="@+id/tvRating"
-                            style="@style/BadgeText" />
+                        <TextView android:id="@+id/tvRating"
+                            style="@style/BadgeText"
+                            android:textSize="18sp" />
                     </LinearLayout>
 
                 </LinearLayout>
 
                 <!-- Géneros -->
-                <TextView
-                    android:id="@+id/tvGeneros"
+                <TextView android:id="@+id/tvGeneros"
                     style="@style/Text.Small" />
 
             </LinearLayout>

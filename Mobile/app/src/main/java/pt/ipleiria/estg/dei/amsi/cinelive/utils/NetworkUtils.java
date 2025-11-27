@@ -12,5 +12,4 @@ public class NetworkUtils {
 
         return netInfo != null && netInfo.isConnected();
     }
-
 }

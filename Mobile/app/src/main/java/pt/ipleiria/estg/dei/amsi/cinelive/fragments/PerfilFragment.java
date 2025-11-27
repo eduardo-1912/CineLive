@@ -21,6 +21,7 @@ import pt.ipleiria.estg.dei.amsi.cinelive.activities.ConfiguracoesActivity;
 import pt.ipleiria.estg.dei.amsi.cinelive.activities.EditarPerfilActivity;
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.FragmentPerfilBinding;
+import pt.ipleiria.estg.dei.amsi.cinelive.managers.AuthManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.NetworkUtils;
 
 /**
@@ -36,15 +37,6 @@ public class PerfilFragment extends Fragment {
         binding = FragmentPerfilBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
-
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        if (!AuthManager.isLoggedIn(getContext())) {
-//            startActivity(new Intent(getActivity(), LoginActivity.class));
-//            requireActivity().finish();
-//        }
-//    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -87,20 +79,23 @@ public class PerfilFragment extends Fragment {
         binding.etTelemovel.setText("912345678");
 
         binding.btnEditarPerfil.setOnClickListener(v -> {
-            startActivity(new Intent(getActivity(), EditarPerfilActivity.class));
+            Intent intent = new Intent(getActivity(), EditarPerfilActivity.class);
+
+            intent.putExtra("username", String.valueOf(binding.etUsername.getText()));
+            intent.putExtra("nome", String.valueOf(binding.etNome.getText()));
+            intent.putExtra("email", String.valueOf(binding.etEmail.getText()));
+            intent.putExtra("telemovel", String.valueOf(binding.etTelemovel.getText()));
+
+            startActivity(intent);
         });
 
         binding.btnEliminarConta.setOnClickListener(v -> {
             new com.google.android.material.dialog.MaterialAlertDialogBuilder(v.getContext())
-                    .setTitle(R.string.btn_eliminar_conta)
-                    .setMessage(R.string.message_eliminar_conta)
-                    .setPositiveButton(R.string.btn_eliminar_conta, (dialog, which) -> {
-
-                        // TODO: chamar API para apagar conta
-
-                    })
-                    .setNegativeButton(R.string.btn_cancelar, null)
-                    .show();
+                .setTitle(R.string.btn_eliminar_conta)
+                .setMessage(R.string.message_eliminar_conta)
+                .setPositiveButton(R.string.btn_eliminar_conta, (dialog, which) -> {
+                    AuthManager.deleteAccount();
+                }).setNegativeButton(R.string.btn_cancelar, null).show();
         });
 
     }

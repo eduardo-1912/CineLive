@@ -3,6 +3,7 @@ package pt.ipleiria.estg.dei.amsi.cinelive.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,6 +18,7 @@ import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivitySelecionarCinemaBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.managers.PreferencesManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Cinema;
+import pt.ipleiria.estg.dei.amsi.cinelive.utils.NetworkUtils;
 
 public class SelecionarCinemaActivity extends AppCompatActivity {
 
@@ -31,7 +33,13 @@ public class SelecionarCinemaActivity extends AppCompatActivity {
         // Aceder às preferences
         preferences = new PreferencesManager(this);
 
-        // Lista de cinemas
+        if (preferences.getApiUrl() == null) {
+            preferences.resetApiUrl();
+        }
+
+        // TODO: IR PARA CONFIGURACOES ACTIVITY SE API NAO ESTIVER A FUNCIONAR
+
+        // TODO: REPLACE THIS
         List<Cinema> cinemas = Arrays.asList(
                 new Cinema(1, "Cinema Leiria"),
                 new Cinema(2, "Cinema Coimbra"),
@@ -75,5 +83,14 @@ public class SelecionarCinemaActivity extends AppCompatActivity {
             startActivity(new Intent(this, MainActivity.class));
             finish();
         });
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        if (!NetworkUtils.hasInternet(this)) {
+            Toast.makeText(this, R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
+        }
     }
 }

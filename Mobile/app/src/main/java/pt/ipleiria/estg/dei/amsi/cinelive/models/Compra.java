@@ -2,7 +2,7 @@ package pt.ipleiria.estg.dei.amsi.cinelive.models;
 
 public class Compra {
     public int id;
-    private final String tituloFilme, dataCompra, nomeCinema, nomeSala, estado, total, dataSessao, horaInicioSessao, horaFimSessao, lugares;
+    private String tituloFilme, dataCompra, nomeCinema, nomeSala, estado, total, dataSessao, horaInicioSessao, horaFimSessao, lugares;
 
     public Compra(int id, String tituloFilme, String dataCompra, String nomeCinema, String nomeSala, String estado, String total, String dataSessao, String horaInicioSessao, String horaFimSessao, String lugares) {
         this.id = id;

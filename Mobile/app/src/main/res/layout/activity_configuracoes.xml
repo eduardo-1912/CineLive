@@ -26,13 +26,25 @@
             android:text="@string/configuracoes_subtitulo"
             style="@style/Subtitle" />
 
-        <!-- URL da API -->
+        <!-- Host da API -->
         <com.google.android.material.textfield.TextInputLayout
             style="@style/TextInputLayout"
-            android:hint="@string/configuracoes_hint_url_api">
+            android:hint="@string/configuracoes_hint_api_host">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etUrlApi"
+                android:id="@+id/etApiHost"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textUri" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Caminho da API -->
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/TextInputLayout"
+            android:hint="@string/configuracoes_hint_api_path">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etApiPath"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textUri" />

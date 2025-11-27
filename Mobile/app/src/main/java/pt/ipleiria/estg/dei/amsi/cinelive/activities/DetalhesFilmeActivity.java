@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,6 +26,7 @@ import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityDetalhesFilmeBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Filme;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Sessao;
+import pt.ipleiria.estg.dei.amsi.cinelive.utils.NetworkUtils;
 
 public class DetalhesFilmeActivity extends AppCompatActivity {
 
@@ -81,13 +83,13 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
 
         // TODO: REPLACE MOCK DATA
         sessoesPorData.put("28/11/2025", Arrays.asList(
-                new Sessao(7, "28/11/2025", "16:00", "19:46"),
-                new Sessao(8, "28/11/2025", "21:30", "21:16")
+                new Sessao(7, "28/11/2025", "16:00"),
+                new Sessao(8, "28/11/2025", "21:30")
         ));
         sessoesPorData.put("29/11/2025", Arrays.asList(
-                new Sessao(9, "29/11/2025", "14:00", "15:46"),
-                new Sessao(10, "29/11/2025", "18:00", "19:46"),
-                new Sessao(11, "29/11/2025", "22:00", "23:46")
+                new Sessao(9, "29/11/2025", "14:00"),
+                new Sessao(10, "29/11/2025", "18:00"),
+                new Sessao(11, "29/11/2025", "22:00")
         ));
 
         // Array de datas
@@ -128,6 +130,15 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
         });
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        if (!NetworkUtils.hasInternet(this)) {
+            Toast.makeText(this, R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

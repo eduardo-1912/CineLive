@@ -2,6 +2,7 @@ package pt.ipleiria.estg.dei.amsi.cinelive.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,6 +19,7 @@ import pt.ipleiria.estg.dei.amsi.cinelive.adapters.BilhetesAdapter;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityDetalhesCompraBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Bilhete;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Compra;
+import pt.ipleiria.estg.dei.amsi.cinelive.utils.NetworkUtils;
 
 public class DetalhesCompraActivity extends AppCompatActivity {
 

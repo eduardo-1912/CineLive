@@ -33,9 +33,9 @@ class AuthController extends Controller
             $user->save(false);
         }
 
-        // Devolve access-token e objeto user
+        // Devolve access-token e user
         return [
-            'token' => $user->auth_key,
+            'access-token' => $user->auth_key,
             'user' => [
                 'id' => $user->id,
                 'username' => $user->username,
@@ -60,63 +60,53 @@ class AuthController extends Controller
             throw new BadRequestHttpException('Faltam campos obrigatórios.');
         }
 
-        $transaction = Yii::$app->db->beginTransaction();
+        // 1. Criar User
+        $user = new User();
+        $user->username = $body['username'];
+        $user->email = $body['email'];
+        $user->password = $body['password'];
+        $user->status = User::STATUS_ACTIVE;
 
-        try {
-
-            // 1. Criar User
-            $user = new User();
-            $user->username = $body['username'];
-            $user->email = $body['email'];
-            $user->setPassword($body['password']);
-            $user->generateAuthKey();
-            $user->status = User::STATUS_ACTIVE;
-
-            if (!$user->save()) {
-                $transaction->rollBack();
-                return [
-                    'status' => 'error',
-                    'errors' => $user->errors
-                ];
-            }
-
-            // 2. Criar Profile
-            $profile = new UserProfile();
-            $profile->user_id = $user->id;
-            $profile->nome = $body['nome'];
-            $profile->telemovel = $body['telemovel'] ?? null;
-
-            if (!$profile->save()) {
-                $transaction->rollBack();
-                return [
-                    'status' => 'error',
-                    'errors' => $profile->errors
-                ];
-            }
-
-            // 3. Atribuir Role de Cliente
-            $auth = Yii::$app->authManager;
-            $roleCliente = $auth->getRole('cliente');
-
-            if (!$roleCliente) {
-                $transaction->rollBack();
-                throw new Exception("Role 'cliente' não existe no RBAC.");
-            }
-
-            $auth->assign($roleCliente, $user->id);
-
-            // Commit se estiver tudo ok
-            $transaction->commit();
-
+        if (!$user->save()) {
             return [
-                'status' => 'success',
-                'user_id' => $user->id,
+                'status' => 'error',
+                'errors' => $user->errors
             ];
         }
-        catch (Exception $e) {
-            $transaction->rollBack();
-            throw $e;
+
+        // 2. Criar Profile
+        $profile = new UserProfile();
+        $profile->user_id = $user->id;
+        $profile->nome = $body['nome'];
+        $profile->telemovel = $body['telemovel'] ?? null;
+
+        if (!$profile->save()) {
+            return [
+                'status' => 'error',
+                'errors' => $profile->errors
+            ];
         }
 
+        // 3. Atribuir Role de Cliente
+        $auth = Yii::$app->authManager;
+        $roleCliente = $auth->getRole('cliente');
+
+        if (!$roleCliente) {
+            throw new Exception("Role 'cliente' não existe no RBAC.");
+        }
+
+        $auth->assign($roleCliente, $user->id);
+
+        return [
+            'status' => 'success',
+            'access-token' => $user->auth_key,
+            'user' => [
+                'id' => $user->id,
+                'username' => $user->username,
+                'nome' => $user->profile->nome ?? null,
+                'email' => $user->email,
+                'telemovel' => $user->profile->telemovel ?? null,
+            ]
+        ];
     }
 }

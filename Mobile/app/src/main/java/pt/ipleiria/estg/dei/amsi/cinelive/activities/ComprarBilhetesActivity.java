@@ -3,12 +3,15 @@ package pt.ipleiria.estg.dei.amsi.cinelive.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TableRow;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,6 +20,8 @@ import java.util.List;
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityComprarBilhetesBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ItemLugarBinding;
+import pt.ipleiria.estg.dei.amsi.cinelive.models.Sessao;
+import pt.ipleiria.estg.dei.amsi.cinelive.utils.NetworkUtils;
 
 public class ComprarBilhetesActivity extends AppCompatActivity {
 
@@ -42,35 +47,48 @@ public class ComprarBilhetesActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(R.string.comprar_bilhetes);
 
-        // Obter dados da sessão/filme
+        // Obter ID da sessão
         Intent intent = getIntent();
         int idSessao = intent.getIntExtra("sessao_id", -1);
 
-        // Preencher dados da sessão
+        // Preencher dados do filme
         binding.tvTitulo.setText(intent.getStringExtra("titulo"));
         binding.tvRating.setText(intent.getStringExtra("rating"));
         binding.tvDuracao.setText(intent.getStringExtra("duracao"));
 
-        // TODO: REPLACE MOCK DATA
-        binding.tvNomeCinema.setText("CineLive Leiria");
-        binding.tvNomeSala.setText("Sala 3");
-        binding.tvDataSessao.setText("29/11/2025");
-        binding.tvHorario.setText("10:00 - 12:32");
 
         // TODO: REPLACE MOCK DATA
-        precoBilhete = 8;
-        int numFilas = 10;
-        int numColunas = 12;
-        List<String> ocupados = Arrays.asList("A5", "A6", "A7", "C3", "E4");
+        List<String> lugaresOcupados = Arrays.asList("A5", "A6", "A7", "C3", "E4");
+
+        Sessao sessao = new Sessao(idSessao, "CineLive Leiria", "Sala 3", "29/11/2025", "10:00", "12:32", 8.00, 10, 12, lugaresOcupados);
+
+        binding.tvNomeCinema.setText(sessao.nomeCinema);
+        binding.tvNomeSala.setText(sessao.nomeSala);
+        binding.tvDataSessao.setText(sessao.data);
+        binding.tvHoraInicio.setText(sessao.horaInicio);
+        binding.tvHoraFim.setText(sessao.horaFim);
+        precoBilhete = sessao.precoBilhete;
 
         // Mapa de lugares
-        gerarMapaLugares(numFilas, numColunas, ocupados);
+        gerarMapaLugares(sessao.numFilas, sessao.numColunas, sessao.lugaresOcupados);
         atualizarResumo();
 
         // Botão Pagar
         binding.btnPagar.setOnClickListener(v -> {
-            // TODO: DO SOMETHING
+            String[] opcoesPagamento = {"Cartão", "MB Way", "PayPal"};
+
+            new MaterialAlertDialogBuilder(this)
+                .setTitle("Escolha o método de pagamento")
+                .setItems(opcoesPagamento, (dialog, which) -> {
+                    String metodoSelecionado = opcoesPagamento[which];
+
+                    // TODO: criar compra e bilhetes para api
+
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
         });
+
     }
 
     private void gerarMapaLugares(int numFilas, int numColunas, List<String> ocupados) {
@@ -131,6 +149,15 @@ public class ComprarBilhetesActivity extends AppCompatActivity {
         // Botão Pagar
         binding.btnPagar.setEnabled(hasLugares);
         binding.btnPagar.setText(hasLugares ? R.string.btn_pagar : R.string.btn_selecione_lugares);
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        if (!NetworkUtils.hasInternet(this)) {
+            Toast.makeText(this, R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

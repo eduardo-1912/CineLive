@@ -13,7 +13,27 @@ class CinemaController extends Controller
 {
     public function actionIndex()
     {
-        return Cinema::find()->where(['estado' => Cinema::ESTADO_ATIVO])->all();
+        $cinemas = Cinema::find()->where(['estado' => Cinema::ESTADO_ATIVO])->all();
+
+        return array_map(fn($cinema) => [
+            'id' => $cinema->id,
+            'nome' => $cinema->nome,
+            'morada' => $cinema->morada,
+            'telefone' => "{$cinema->telefone}",
+            'email' => $cinema->email,
+            'horario' => $cinema->horario,
+            'capacidade' => "{$cinema->totalSalas} Salas • {$cinema->numeroLugares} Lugares",
+        ], $cinemas);
+    }
+
+    public function actionSimple()
+    {
+        $cinemas = Cinema::find()->where(['estado' => Cinema::ESTADO_ATIVO])->all();
+
+        return array_map(fn($cinema) => [
+            'id' => $cinema->id,
+            'nome' => $cinema->nome,
+        ], $cinemas);
     }
 
     public function actionView($id)
@@ -57,7 +77,7 @@ class CinemaController extends Controller
         return array_map(fn($filme) => [
             'id'     => $filme->id,
             'titulo' => $filme->titulo,
-            'poster' => $filme->getPosterUrl(),
+            'poster_url' => $filme->posterUrl,
         ], $filmes);
     }
 }

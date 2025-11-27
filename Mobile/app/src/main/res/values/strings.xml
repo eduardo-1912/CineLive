@@ -104,7 +104,8 @@
     <!-- activity_configuracoes -->
     <string name="configuracoes_titulo">Configurações da API</string>
     <string name="configuracoes_subtitulo">Defina o URL da API utilizada pela aplicação.</string>
-    <string name="configuracoes_hint_url_api">URL da API</string>
+    <string name="configuracoes_hint_api_host">Host da API</string>
+    <string name="configuracoes_hint_api_path">Caminho da API</string>
 
     <!-- layout_erro_internet -->
     <string name="erro_internet_titulo">Sem ligação à Internet</string>

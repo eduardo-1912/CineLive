@@ -50,7 +50,6 @@ public class FilmesFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setHasOptionsMenu(true);
     }
 
@@ -74,7 +73,6 @@ public class FilmesFragment extends Fragment {
                     adapter.filtrar(query);
                     return true;
                 }
-
                 @Override
                 public boolean onQueryTextChange(String query) {
                     adapter.filtrar(query);

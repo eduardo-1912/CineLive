@@ -165,7 +165,7 @@ class Cinema extends \yii\db\ActiveRecord
     }
 
     // OBTER MORADA COMPLETA
-    public function getMoradaCompleta(): string
+    public function getMorada(): string
     {
         return $this->rua . ', ' . $this->codigo_postal . ' ' . $this->cidade;
     }
