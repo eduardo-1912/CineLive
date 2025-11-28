@@ -1,8 +1,8 @@
 package pt.ipleiria.estg.dei.amsi.cinelive.models;
 
 public class Filme {
-    public int id;
-    public String titulo, rating, generos, sinopse, duracao, estreia, idioma, realizacao, trailerUrl, posterUrl, estado;
+    private int id;
+    private String titulo, rating, generos, sinopse, duracao, estreia, idioma, realizacao, trailerUrl, posterUrl, estado;
 
     public Filme(int id, String titulo, String posterUrl) {
         this.id = id;

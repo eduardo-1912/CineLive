@@ -1,8 +1,8 @@
 package pt.ipleiria.estg.dei.amsi.cinelive.models;
 
 public class Bilhete {
-    public int id;
-    public String codigo, lugar, preco, estado;
+    private int id;
+    private String codigo, lugar, preco, estado;
 
     public Bilhete(int id, String codigo, String lugar, String preco, String estado) {
         this.id = id;

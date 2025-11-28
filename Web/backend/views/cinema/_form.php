@@ -26,7 +26,7 @@ use yii\bootstrap4\ActiveForm;
 
     <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'telefone')->textInput() ?>
+    <?= $form->field($model, 'telefone')->Input('number', ['maxlength' => true]) ?>
 
     <?= $form->field($model, 'horario_abertura')->input('time') ?>
 

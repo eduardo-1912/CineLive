@@ -1,8 +1,8 @@
 package pt.ipleiria.estg.dei.amsi.cinelive.models;
 
 public class Cinema {
-    public int id;
-    public String nome, morada, telefone, email, horario, capacidade;
+    private int id;
+    private String nome, morada, telefone, email, horario, capacidade;
 
     public Cinema(int id, String nome) {
         this.id = id;

@@ -59,6 +59,7 @@ class Cinema extends \yii\db\ActiveRecord
             [['nome'], 'string', 'max' => 80],
             [['rua'], 'string', 'max' => 100],
             [['codigo_postal'], 'string', 'max' => 8],
+            [['telefone'], 'number', 'max' => 9],
             [['cidade'], 'string', 'max' => 50],
             [['email'], 'string', 'max' => 255],
             ['estado', 'in', 'range' => array_keys(self::optsEstado())],

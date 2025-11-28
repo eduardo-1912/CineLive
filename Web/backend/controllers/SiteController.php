@@ -168,7 +168,8 @@ class SiteController extends Controller
             // SE USER ATUAL É CLIENTE --> SEM ACESSO
             if (Yii::$app->user->can('cliente')) {
                 Yii::$app->user->logout();
-                return Yii::$app->response->redirect('../../../frontend/web');
+                Yii::$app->session->setFlash('error', 'Não pode aceder à página de administração.');
+                return $this->redirect(['login']);
             }
 
             // SE USER NÃO É ADMIN --> OBTER CINEMA DELE

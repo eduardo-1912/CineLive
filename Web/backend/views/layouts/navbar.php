@@ -7,6 +7,7 @@ use yii\bootstrap4\ActiveForm;
 ?>
 <!-- Navbar -->
 <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+
     <!-- Left navbar links -->
     <ul class="navbar-nav">
         <li class="nav-item">
@@ -25,16 +26,14 @@ use yii\bootstrap4\ActiveForm;
                 </div>
             </form>
         </li>
-        <?php if (Yii::$app->user->can('validarBilhetes')): ?>
+        <?php if (Yii::$app->user->can('confirmarBilhetes')): ?>
         <li class="nav-item">
-            <a href="" class="nav-link" data-toggle="modal" data-target="#modal-validar-bilhete">
-                <span>Validar Bilhete</span>
+            <a href="" class="nav-link" data-toggle="modal" data-target="#modal-confirmar-bilhetes">
+                <span>Confirmar Bilhetes</span>
             </a>
         </li>
         <?php endif; ?>
     </ul>
-
-
 
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">

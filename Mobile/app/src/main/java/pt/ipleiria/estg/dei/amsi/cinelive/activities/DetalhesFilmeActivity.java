@@ -24,6 +24,7 @@ import java.util.Map;
 
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityDetalhesFilmeBinding;
+import pt.ipleiria.estg.dei.amsi.cinelive.managers.PreferencesManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Filme;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Sessao;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.NetworkUtils;
@@ -31,6 +32,7 @@ import pt.ipleiria.estg.dei.amsi.cinelive.utils.NetworkUtils;
 public class DetalhesFilmeActivity extends AppCompatActivity {
 
     ActivityDetalhesFilmeBinding binding;
+    PreferencesManager preferences;
     Sessao sessaoSelecionada;
 
     @Override
@@ -59,11 +61,14 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
         // TODO: REPLACE MOCK-DATA
         Filme filme = new Filme(1, "Carros 2", "M3", "Ação, Aventura",
                 "Um grande campeão das pistas é lançado numa corrida internacional enquanto o seu amigo Mate é apanhado num enredo de espionagem que põe à prova a amizade de ambos e mostra que coragem pode surgir dos lugares mais improváveis.",
-                "2h 32min", "25/11/2025", "Português", "John Lasseter", "http://10.0.2.2/CineLive/Web/frontend/web/uploads/posters/poster_6910b6ad1f9ea.jpg", "Em exibição");
+                "2h 32min", "25/11/2025", "Português", "John Lasseter", "/CineLive/Web/frontend/web/uploads/posters/poster_6910b6ad1f9ea.jpg", "Em exibição");
+
+        // Aceder às preferences
+        preferences = new PreferencesManager(this);
 
         // Carregar Poster
         Glide.with(this)
-                .load(filme.posterUrl)
+                .load(preferences.getApiHost() + filme.getPosterUrl())
                 .placeholder(R.drawable.poster_placeholder)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(binding.ivPoster);

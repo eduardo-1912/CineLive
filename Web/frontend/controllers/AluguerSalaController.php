@@ -41,9 +41,7 @@ class AluguerSalaController extends Controller
 
     public function actionIndex()
     {
-        // OBTER USER ATUAL
         $currentUser = Yii::$app->user->identity;
-
         $alugueres = $currentUser->getAlugueres()->orderBy(['id' => SORT_DESC])->all();
 
         return $this->render('index', [

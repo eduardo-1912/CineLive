@@ -33,13 +33,12 @@ import pt.ipleiria.estg.dei.amsi.cinelive.utils.NetworkUtils;
  */
 public class FilmesFragment extends Fragment {
     private FragmentFilmesBinding binding;
-
-    private List<Filme> listaEmExibicao;
-    private List<Filme> listaKids;
-    private List<Filme> listaBrevemente;
-
     private FilmesAdapter adapter;
     private SearchView searchView;
+
+    private List<Filme> filmesEmExibicao;
+    private List<Filme> filmesKids;
+    private List<Filme> filmesBrevemente;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -60,7 +59,11 @@ public class FilmesFragment extends Fragment {
         if (NetworkUtils.hasInternet(requireContext())) {
             inflater.inflate(R.menu.menu_pesquisa, menu);
 
-            // Obter item
+            try {
+                // Obter item
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
             MenuItem itemPesquisa = menu.findItem(R.id.itemPesquisa);
 
             // Obter SearchView
@@ -92,27 +95,27 @@ public class FilmesFragment extends Fragment {
 
         binding.viewFlipper.setDisplayedChild(0);
 
-        listaEmExibicao = Arrays.asList(
-            new Filme(1, "The Truman Show", "http://10.0.2.2/CineLive/Web/frontend/web/uploads/posters/poster_68fa080f7e03f.jpg"),
-            new Filme(2, "The Social Network", "http://10.0.2.2/CineLive/Web/frontend/web/uploads/posters/poster_69032dee2ed44.jpg"),
-            new Filme(3, "Carros 2", "http://10.0.2.2/CineLive/Web/frontend/web/uploads/posters/poster_6910b6ad1f9ea.jpg"),
-            new Filme(4, "Inside Out 2", "http://10.0.2.2/CineLive/Web/frontend/web/uploads/posters/poster_6918b4c3cf56d.jpg")
+        filmesEmExibicao = Arrays.asList(
+            new Filme(1, "The Truman Show", "/CineLive/Web/frontend/web/uploads/posters/poster_68fa080f7e03f.jpg"),
+            new Filme(2, "The Social Network", "/CineLive/Web/frontend/web/uploads/posters/poster_69032dee2ed44.jpg"),
+            new Filme(3, "Carros 2", "/CineLive/Web/frontend/web/uploads/posters/poster_6910b6ad1f9ea.jpg"),
+            new Filme(4, "Inside Out 2", "/CineLive/Web/frontend/web/uploads/posters/poster_6918b4c3cf56d.jpg")
         );
 
-        listaKids = Arrays.asList(
-            new Filme(3, "Carros 2", "http://10.0.2.2/CineLive/Web/frontend/web/uploads/posters/poster_6910b6ad1f9ea.jpg"),
-            new Filme(4, "Inside Out 2", "http://10.0.2.2/CineLive/Web/frontend/web/uploads/posters/poster_6918b4c3cf56d.jpg")
+        filmesKids = Arrays.asList(
+            new Filme(3, "Carros 2", "/CineLive/Web/frontend/web/uploads/posters/poster_6910b6ad1f9ea.jpg"),
+            new Filme(4, "Inside Out 2", "/CineLive/Web/frontend/web/uploads/posters/poster_6918b4c3cf56d.jpg")
         );
 
-        listaBrevemente = Arrays.asList(
-            new Filme(5, "Interstellar", "http://10.0.2.2/CineLive/Web/frontend/web/uploads/posters/poster_68fa01aecd6d2.jpg"),
-            new Filme(6, "The Prestige", "http://10.0.2.2/CineLive/Web/frontend/web/uploads/posters/poster_6918b2d190384.jpg")
+        filmesBrevemente = Arrays.asList(
+            new Filme(5, "Interstellar", "/CineLive/Web/frontend/web/uploads/posters/poster_68fa01aecd6d2.jpg"),
+            new Filme(6, "The Prestige", "/CineLive/Web/frontend/web/uploads/posters/poster_6918b2d190384.jpg")
         );
 
         binding.rvFilmes.setLayoutManager(new GridLayoutManager(getContext(), 3));
 
         binding.btnEmExibicao.setChecked(true);
-        atualizarLista(listaEmExibicao);
+        atualizarLista(filmesEmExibicao);
 
         View.OnClickListener filterClickListener = v -> {
             binding.btnEmExibicao.setChecked(v.getId() == R.id.btnEmExibicao);
@@ -120,13 +123,13 @@ public class FilmesFragment extends Fragment {
             binding.btnBrevemente.setChecked(v.getId() == R.id.btnBrevemente);
 
             if (v.getId() == R.id.btnEmExibicao) {
-                atualizarLista(listaEmExibicao);
+                atualizarLista(filmesEmExibicao);
             }
             else if (v.getId() == R.id.btnKids) {
-                atualizarLista(listaKids);
+                atualizarLista(filmesKids);
             }
             else if (v.getId() == R.id.btnBrevemente) {
-                atualizarLista(listaBrevemente);
+                atualizarLista(filmesBrevemente);
             }
         };
 
@@ -138,7 +141,7 @@ public class FilmesFragment extends Fragment {
     private void atualizarLista(List<Filme> lista) {
         adapter = new FilmesAdapter(lista, filme -> {
             Intent intent = new Intent(getActivity(), DetalhesFilmeActivity.class);
-            intent.putExtra("filme_id", filme.id);
+            intent.putExtra("filme_id", filme.getId());
             startActivity(intent);
         });
 

@@ -6,6 +6,7 @@
 use backend\assets\AppAsset;
 use common\components\ToastWidget;
 use yii\helpers\Html;
+use yii\helpers\Url;
 
 \hail812\adminlte3\assets\AdminLteAsset::register($this);
 $this->registerCssFile('https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700');
@@ -26,19 +27,24 @@ AppAsset::register($this);
     <?php $this->registerCsrfMetaTags() ?>
     <?php $this->head() ?>
 </head>
-<body class="hold-transition login-page">
+<body class="hold-transition login-page bg-white">
 
 <?php  $this->beginBody() ?>
 <div class="login-box">
     <div class="login-logo">
         <span class="d-flex flex-column justify-content-center align-items-center">
-            <img src="<?= Yii::getAlias('@web/favicon-light.svg') ?>" alt="CineLive" style="width: 5rem;">
+            <img src="<?= Yii::getAlias('@web/favicon-light.svg') ?>" alt="CineLive" style="width: 4rem;">
             <span class="fw-bold">CineLive</span>
         </span>
     </div>
     <!-- /.login-logo -->
 
     <?= $content ?>
+
+    <div class="text-center mt-4">
+        <a href="<?= Url::to(['../../frontend/web']) ?>">Área Pública</a>
+    </div>
+
 </div>
 <!-- /.login-box -->
 

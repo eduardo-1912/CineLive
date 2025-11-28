@@ -9,9 +9,6 @@ use yii\helpers\Url;
 
 $this->title = 'Comprar Bilhetes';
 
-$sala = $sessao->sala;
-$lugaresOcupados = $sessao->lugaresOcupados ?? [];
-
 ?>
 
 <div class="container">
@@ -35,37 +32,35 @@ $lugaresOcupados = $sessao->lugaresOcupados ?? [];
                     ]) ?>
                 </div>
 
-                <!-- DETALHES DO FILME E SESSÃO -->
+                <!-- Dados do filme e sessão -->
                 <div class="w-100 h-100 d-flex flex-column justify-content-between">
                     <div class="w-100 mb-2">
 
-                        <!-- TÍTULO/RATING E DURAÇÃO -->
+                        <!-- Título, rating e duração -->
                         <div class="mb-4">
                             <h2 class="fw-bold mb-0"><?= $sessao->filme->titulo ?></h2>
                             <span class="text-muted small">
-                                <?= $sessao->filme->rating ?>
-                                •
-                                <?= $sessao->filme->duracaoEmHoras ?>
+                                <?= "{$sessao->filme->rating} • {$sessao->filme->duracaoEmHoras}" ?>
                             </span>
                         </div>
 
                         <!-- DETALHES DA SESSÃO -->
                         <div class="row row-cols-2 row-cols-md-4 row-cols-lg-2 w-100 gy-3 mb-3">
-                            <div class="d-flex flex-column text-start">
+                            <div class="d-flex flex-column">
                                 <span class="fw-semibold fs-14">Cinema</span>
                                 <span class="text-muted"><?= $sessao->cinema->nome ?></span>
                             </div>
-                            <div class="d-flex flex-column text-start">
+                            <div class="d-flex flex-column">
+                                <span class="fw-semibold fs-14">Sala</span>
+                                <span class="text-muted"><?= $sessao->sala->nome ?></span>
+                            </div>
+                            <div class="d-flex flex-column">
                                 <span class="fw-semibold fs-14">Data</span>
                                 <span class="text-muted"><?= $sessao->dataFormatada ?></span>
                             </div>
-                            <div class="d-flex flex-column text-start">
-                                <span class="fw-semibold fs-14">Hora Início</span>
-                                <span class="text-muted"><?= $sessao->horaInicioFormatada ?></span>
-                            </div>
-                            <div class="d-flex flex-column text-start">
-                                <span class="fw-semibold fs-14">Hora Fim</span>
-                                <span class="text-muted"><?= $sessao->horaFimFormatada ?></span>
+                            <div class="d-flex flex-column">
+                                <span class="fw-semibold fs-14">Horário</span>
+                                <span class="text-muted"><?= $sessao->horario ?></span>
                             </div>
                         </div>
 
@@ -101,7 +96,7 @@ $lugaresOcupados = $sessao->lugaresOcupados ?? [];
                 <!-- LUGARES -->
                 <div class="d-inline-block" style="display: block; overflow-x: auto; white-space: nowrap; max-width: 100%;">
                     <div class="d-inline-block text-center">
-                        <?php for ($fila = 1; $fila <= $sala->num_filas; $fila++): ?>
+                        <?php for ($fila = 1; $fila <= $sessao->sala->num_filas; $fila++): ?>
                             <div class="d-flex justify-content-center align-items-center mb-2 flex-nowrap">
 
                                 <div class="fw-bold me-2" style="min-width: 20px;">
@@ -147,7 +142,7 @@ $lugaresOcupados = $sessao->lugaresOcupados ?? [];
                         <span class="fw-medium fs-14">Lugares</span>
                         <span class="text-muted fw-medium"><?= $lugaresImploded ?></span>
                     </div>
-                    <div class="d-flex flex-column text-start">
+                    <div class="d-flex flex-column text-end text-sm-start">
                         <span class="fw-medium fs-14">Total</span>
                         <span class="text-muted fw-medium"><?= $total ?></span>
                     </div>

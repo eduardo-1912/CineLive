@@ -54,7 +54,6 @@ public class PerfilFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         if (item.getItemId() == R.id.itemConfiguracoes) {
             startActivity(new Intent(getActivity(), ConfiguracoesActivity.class));
             return true;
@@ -62,7 +61,6 @@ public class PerfilFragment extends Fragment {
 
         return super.onOptionsItemSelected(item);
     }
-
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {

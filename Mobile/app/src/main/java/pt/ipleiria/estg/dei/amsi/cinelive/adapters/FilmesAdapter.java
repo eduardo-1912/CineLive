@@ -14,6 +14,7 @@ import java.util.List;
 
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ItemFilmeBinding;
+import pt.ipleiria.estg.dei.amsi.cinelive.managers.PreferencesManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Filme;
 
 public class FilmesAdapter extends RecyclerView.Adapter<FilmesAdapter.ViewHolder> {
@@ -21,6 +22,7 @@ public class FilmesAdapter extends RecyclerView.Adapter<FilmesAdapter.ViewHolder
     private final List<Filme> filmesOriginais;
     private List<Filme> filmesVisiveis;
     private final OnFilmeClickListener listener;
+    PreferencesManager preferences;
 
     // Notifica o fragment quando um filme é escolhido
     public interface OnFilmeClickListener {
@@ -38,7 +40,7 @@ public class FilmesAdapter extends RecyclerView.Adapter<FilmesAdapter.ViewHolder
 
         filmesVisiveis = new ArrayList<>();
         for (Filme filme : filmesOriginais) {
-            if (filme.titulo.toLowerCase().contains(query)) {
+            if (filme.getTitulo().toLowerCase().contains(query)) {
                 filmesVisiveis.add(filme);
             }
         }
@@ -60,11 +62,14 @@ public class FilmesAdapter extends RecyclerView.Adapter<FilmesAdapter.ViewHolder
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Filme filme = filmesVisiveis.get(position);
 
-        holder.binding.tvTitulo.setText(filme.titulo);
+        holder.binding.tvTitulo.setText(filme.getTitulo());
+
+        // Aceder às preferences
+        preferences = new PreferencesManager(holder.itemView.getContext());
 
         // Carregar Poster
         Glide.with(holder.itemView.getContext())
-                .load(filme.posterUrl)
+                .load(preferences.getApiHost() + filme.getPosterUrl())
                 .placeholder(R.drawable.poster_placeholder)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(holder.binding.ivPoster);

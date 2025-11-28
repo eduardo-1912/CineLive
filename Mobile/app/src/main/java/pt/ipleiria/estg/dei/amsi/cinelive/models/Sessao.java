@@ -3,10 +3,10 @@ package pt.ipleiria.estg.dei.amsi.cinelive.models;
 import java.util.List;
 
 public class Sessao {
-    public int id, numFilas, numColunas;
-    public String nomeCinema, nomeSala, data, horaInicio, horaFim;
-    public double precoBilhete;
-    public List<String> lugaresOcupados;
+    private int id, numFilas, numColunas;
+    private String nomeCinema, nomeSala, data, horaInicio, horaFim;
+    private double precoBilhete;
+    private List<String> lugaresOcupados;
 
     public Sessao(int id, String data, String horaInicio) {
         this.id = id;

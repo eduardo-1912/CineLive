@@ -25,7 +25,6 @@ use yii\web\IdentityInterface;
  */
 class User extends ActiveRecord implements IdentityInterface
 {
-    // CAMPOS TEMPORÁRIOS
     public $password;
     public $role;
     public $cinema_id;

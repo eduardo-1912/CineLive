@@ -62,15 +62,15 @@ public class ComprarBilhetesActivity extends AppCompatActivity {
 
         Sessao sessao = new Sessao(idSessao, "CineLive Leiria", "Sala 3", "29/11/2025", "10:00", "12:32", 8.00, 10, 12, lugaresOcupados);
 
-        binding.tvNomeCinema.setText(sessao.nomeCinema);
-        binding.tvNomeSala.setText(sessao.nomeSala);
-        binding.tvDataSessao.setText(sessao.data);
-        binding.tvHoraInicio.setText(sessao.horaInicio);
-        binding.tvHoraFim.setText(sessao.horaFim);
-        precoBilhete = sessao.precoBilhete;
+        binding.tvNomeCinema.setText(sessao.getNomeCinema());
+        binding.tvNomeSala.setText(sessao.getNomeSala());
+        binding.tvDataSessao.setText(sessao.getData());
+        binding.tvHoraInicio.setText(sessao.getHoraInicio());
+        binding.tvHoraFim.setText(sessao.getHoraFim());
+        precoBilhete = sessao.getPrecoBilhete();
 
         // Mapa de lugares
-        gerarMapaLugares(sessao.numFilas, sessao.numColunas, sessao.lugaresOcupados);
+        gerarMapaLugares(sessao.getNumFilas(), sessao.getNumColunas(), sessao.getLugaresOcupados());
         atualizarResumo();
 
         // Botão Pagar
@@ -91,7 +91,7 @@ public class ComprarBilhetesActivity extends AppCompatActivity {
 
     }
 
-    private void gerarMapaLugares(int numFilas, int numColunas, List<String> ocupados) {
+    private void gerarMapaLugares(int numFilas, int numColunas, List<String> lugaresOcupados) {
 
         // Criar fila
         for (int i = 0; i < numFilas; i++) {
@@ -109,7 +109,7 @@ public class ComprarBilhetesActivity extends AppCompatActivity {
                 lugarBinding.btnLugar.setText(lugar);
 
                 // Bloquear lugares ocupados
-                if (ocupados.contains(lugar)) {
+                if (lugaresOcupados.contains(lugar)) {
                     lugarBinding.btnLugar.setEnabled(false);
                     lugarBinding.btnLugar.setChecked(false);
                 }

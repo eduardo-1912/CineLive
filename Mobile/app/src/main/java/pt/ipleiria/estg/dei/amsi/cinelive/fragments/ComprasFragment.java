@@ -52,7 +52,7 @@ public class ComprasFragment extends Fragment {
         adapter = new ComprasAdapter(
             compras, compra -> {
                 Intent intent = new Intent(getActivity(), DetalhesCompraActivity.class);
-                intent.putExtra("compra_id", compra.id);
+                intent.putExtra("compra_id", compra.getId());
                 startActivity(intent);
             }
         );

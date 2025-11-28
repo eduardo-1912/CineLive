@@ -2,14 +2,10 @@
 
 namespace frontend\controllers;
 
-use common\models\AluguerSala;
-use common\models\Compra;
 use common\models\User;
-use Exception;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
-use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 
 class PerfilController extends Controller
@@ -38,25 +34,16 @@ class PerfilController extends Controller
         ];
     }
 
-    // DADOS DO PERFIL, COMPRAS E ALUGUERES MAIS RECENTES
     public function actionIndex()
     {
-        $currentUser = Yii::$app->user;
+        $model = Yii::$app->user->identity;
 
-        $model = $this->findModel($currentUser->id);
         $edit = Yii::$app->request->get('edit') == 1;
 
-        $compras = Compra::find()->where(['cliente_id' => $currentUser->id])
-            ->orderBy(['id' => SORT_DESC])->limit(3)->all();
+        $compras = $model->getCompras()->orderBy(['id' => SORT_DESC])->limit(3)->all();
+        $alugueres = $model->getAlugueres()->orderBy(['id' => SORT_DESC])->limit(2)->all();
 
-        $alugueres = AluguerSala::find()->where(['cliente_id' => $currentUser->id])
-            ->orderBy(['id' => SORT_DESC])->limit(2)->all();
-
-
-        // SE ESTÁ A EDITAR O PERFIL
         if ($model->load(Yii::$app->request->post()) && $model->profile->load(Yii::$app->request->post())) {
-
-            // GUARDAR
             if ($model->save(false) && $model->profile->save()) {
                 Yii::$app->session->setFlash('success', 'Dados atualizados com sucesso.');
                 return $this->redirect(['index']);
@@ -74,46 +61,24 @@ class PerfilController extends Controller
     }
 
 
-    // ELIMINAR A SUA CONTA
     public function actionDeleteAccount()
     {
         $currentUser = Yii::$app->user;
 
         $model = $this->findModel($currentUser->id);
 
-        $transaction = Yii::$app->db->beginTransaction();
+        Yii::$app->authManager->revokeAll($model->id);
 
-        try {
-            // REMOVER TODAS AS ROLES/PERMISSÕES DO USER
-            Yii::$app->authManager->revokeAll($model->id);
-
-            // APAGAR PERFIL
-            if ($model->profile) {
-                if (!$model->profile->delete()) {
-                    throw new \Exception("Erro ao eliminar o perfil.");
-                }
+        if ($model->profile && $model->profile->delete()) {
+            if ($model->delete()) {
+                Yii::$app->user->logout();
+                Yii::$app->session->setFlash('success', 'A sua conta foi eliminada com sucesso.');
+                return $this->goHome();
             }
-
-            // APAGAR UTILIZADOR
-            if (!$model->delete()) {
-                throw new \Exception("Erro ao eliminar o utilizador.");
-            }
-
-            // DAR COMMIT NA TRANSAÇÃO
-            $transaction->commit();
-
-            // TERMINAR SESSÃO
-            Yii::$app->user->logout();
-            Yii::$app->session->setFlash('success', 'A sua conta foi eliminada com sucesso.');
-            return $this->goHome();
-
         }
-        catch (Exception $e) {
-            $transaction->rollBack();
-            Yii::error("Erro ao eliminar conta: " . $e->getMessage());
-            Yii::$app->session->setFlash('error', 'Ocorreu um erro ao eliminar a sua conta. Tente novamente mais tarde.');
-            return $this->redirect(['index']);
-        }
+
+        Yii::$app->session->setFlash('error', 'Erro ao eliminar a sua conta.');
+        return $this->redirect(['index']);
     }
 
 
