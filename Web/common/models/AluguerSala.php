@@ -5,6 +5,7 @@ namespace common\models;
 use common\components\EmailHelper;
 use DateTime;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "aluguer_sala".
@@ -14,9 +15,14 @@ use Yii;
  * @property int $cinema_id
  * @property int $sala_id
  * @property string $data
+ * @property string $dataFormatada
  * @property string $hora_inicio
+ * @property string $horaInicioFormatada
  * @property string $hora_fim
+ * @property string $horaFimFormatada
+ * @property string $horario
  * @property string $estado
+ * @property string $estadoFormatado
  * @property string $tipo_evento
  * @property string $observacoes
  *
@@ -75,6 +81,7 @@ class AluguerSala extends \yii\db\ActiveRecord
             'data', 'dataFormatada' => 'Data',
             'hora_inicio', 'horaInicioFormatada' => 'Hora Início',
             'hora_fim', 'horaFimFormatada' => 'Hora Fim',
+            'horario' => 'Horario',
             'estado' => 'Estado',
             'tipo_evento' => 'Tipo de Evento',
             'observacoes' => 'Observações',
@@ -129,19 +136,32 @@ class AluguerSala extends \yii\db\ActiveRecord
         return $estados;
     }
 
-    public function getDataFormatada()
+    public function getDataFormatada(): string
     {
-        return Yii::$app->formatter->asDate($this->data, 'php:d/m/Y');
+        $format = Yii::$app->params['dateFormat'];
+        return Yii::$app->formatter->asDate($this->data, $format);
     }
 
-    public function getHoraInicioFormatada()
+    public function getHoraInicioFormatada(): string
     {
-        return Yii::$app->formatter->asTime($this->hora_inicio, 'php:H:i');
+        $format = Yii::$app->params['timeFormat'];
+        return Yii::$app->formatter->asTime($this->hora_inicio, $format);
     }
 
-    public function getHoraFimFormatada()
+    public function getHoraFimFormatada(): string
     {
-        return Yii::$app->formatter->asTime($this->hora_fim, 'php:H:i');
+        $format = Yii::$app->params['timeFormat'];
+        return Yii::$app->formatter->asTime($this->hora_fim, $format);
+    }
+
+    public function getHorario(): string
+    {
+        $format = Yii::$app->params['timeFormat'];
+
+        $inicio = Yii::$app->formatter->asTime($this->hora_inicio, $format);
+        $fim = Yii::$app->formatter->asTime($this->hora_fim, $format);
+
+        return "{$inicio} - {$fim}";
     }
 
     public function getEstadoFormatado()
@@ -158,74 +178,31 @@ class AluguerSala extends \yii\db\ActiveRecord
         return "<span class='{$class}'>{$label}</span>";
     }
 
-    // VALIDAR O HORÁRIO DO ALUGUER
     public function validateHorario(): bool
     {
-        // OBTER DATAS DE HOJE E INÍCIO E FIM DO ALUGUER
         $now = new DateTime();
-        $dataHoraInicio = new DateTime("{$this->data} {$this->hora_inicio}");
-        $dataHoraFim = new DateTime("{$this->data} {$this->hora_fim}");
+        $inicio = new DateTime("{$this->data} {$this->hora_inicio}");
+        $fim = new DateTime("{$this->data} {$this->hora_fim}");
 
-        // VERIFICAÇÕES BÁSICAS
-        if ($dataHoraFim <= $dataHoraInicio) {
-            Yii::$app->session->setFlash('error', 'A hora de fim deve ser posterior à hora de início.');
+        if ($inicio >= $fim || $now >= $inicio) {
+            Yii::$app->session->setFlash('error', 'O horário escolhido não é válido.');
             return false;
         }
 
-        if ($dataHoraInicio < $now) {
-            Yii::$app->session->setFlash('error', 'A hora de início não pode ser anterior à hora atual.');
-            return false;
-        }
+        if ($this->cinema) {
+            $abertura = new DateTime("{$this->data} {$this->cinema->horario_abertura}");
+            $fecho = new DateTime("{$this->data} {$this->cinema->horario_fecho}");
 
-        // OBTER CINEMA RELACIONADO
-        $cinema = $this->cinema ?? null;
-        if ($cinema) {
-            $abertura = new DateTime("{$this->data} {$cinema->horario_abertura}");
-            $fecho = new DateTime("{$this->data} {$cinema->horario_fecho}");
-
-            if ($dataHoraInicio < $abertura) {
-                Yii::$app->session->setFlash('error', "O cinema ainda não está aberto às {$cinema->horarioAberturaFormatado}.");
-                return false;
-            }
-
-            if ($dataHoraFim > $fecho) {
-                Yii::$app->session->setFlash('error', "O cinema encerra às {$cinema->horarioFechoFormatado}. O aluguer não pode ultrapassar esse horário.");
+            if ($abertura > $inicio || $fim > $fecho) {
+                Yii::$app->session->setFlash('error', "O horário de funcionamento do cinema é {$this->cinema->horario}.");
                 return false;
             }
         }
 
-        // VERIFICAR CONFLITOS COM SESSÕES
-        $sessaoExiste = Sessao::find()
-            ->where(['sala_id' => $this->sala_id])
-            ->andWhere(['data' => $this->data])
-            ->andWhere(['and',
-                ['<', 'hora_inicio', $this->hora_fim],
-                ['>', 'hora_fim', $this->hora_inicio]
-            ])
-            ->exists();
+        $salasDisponiveis = Sala::findDisponiveis($this->cinema_id, $this->data, $this->hora_inicio, $this->hora_fim);
 
-        if ($sessaoExiste) {
-            Yii::$app->session->setFlash('error', 'Já existe uma sessão agendada nesta sala que se sobrepõe ao horário pretendido.');
-            return false;
-        }
-
-        // VERIFICAR CONFLITOS COM OUTROS ALUGUERES
-        $aluguerExiste = self::find()
-            ->where(['sala_id' => $this->sala_id])
-            ->andWhere(['data' => $this->data])
-            ->andWhere(['estado' => [
-                self::ESTADO_CONFIRMADO,
-                self::ESTADO_A_DECORRER,
-            ]])
-            ->andWhere(['and',
-                ['<', 'hora_inicio', $this->hora_fim],
-                ['>', 'hora_fim', $this->hora_inicio]
-            ])
-            ->andWhere(['!=', 'id', $this->id ?? 0])
-            ->exists();
-
-        if ($aluguerExiste) {
-            Yii::$app->session->setFlash('error', 'Já existe um aluguer ativo nesta sala que se sobrepõe ao horário pretendido.');
+        if (!in_array($this->sala, $salasDisponiveis)) {
+            Yii::$app->session->setFlash('error', 'A sala escolhida não esta disponível neste horário.');
             return false;
         }
 

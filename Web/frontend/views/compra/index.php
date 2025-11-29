@@ -2,7 +2,7 @@
 
 use yii\bootstrap4\Breadcrumbs;
 
-/** @var common\models\Compra $compras */
+/** @var common\models\Compra[] $compras */
 /** @var yii\web\View $this */
 
 $this->title = 'Compras';

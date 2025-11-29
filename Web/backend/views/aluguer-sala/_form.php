@@ -8,9 +8,9 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\bootstrap4\ActiveForm;
 
-/* @var $this yii\web\View */
-/* @var $model common\models\AluguerSala */
-/* @var $form yii\bootstrap4\ActiveForm */
+/* @var yii\web\View $this */
+/* @var common\models\AluguerSala $model */
+/* @var yii\bootstrap4\ActiveForm $form */
 
 ?>
 

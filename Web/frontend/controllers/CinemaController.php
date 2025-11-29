@@ -2,24 +2,20 @@
 
 namespace frontend\controllers;
 
-use Yii;
 use common\models\Cinema;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
 class CinemaController extends Controller
 {
-    public function actionIndex(){
-
-        $cinemas = Cinema::find()->where(['estado' => Cinema::ESTADO_ATIVO])->all();
-
+    public function actionIndex()
+    {
+        $cinemas = Cinema::findAtivos();
 
         return $this->render('index', [
             'cinemas' => $cinemas,
-
         ]);
     }
-
 
     protected function findModel($id)
     {

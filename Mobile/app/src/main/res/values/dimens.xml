@@ -7,6 +7,8 @@
     <dimen name="badge_padding_vertical">4dp</dimen>
     <dimen name="badge_padding_horizontal">14dp</dimen>
 
+    <dimen name="text_size_regular">16sp</dimen>
+    <dimen name="text_size_large">18sp</dimen>
     <dimen name="button_full_padding">16dp</dimen>
 
     <dimen name="lugar_margin">4dp</dimen>

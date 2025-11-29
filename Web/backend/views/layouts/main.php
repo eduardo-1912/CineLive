@@ -67,7 +67,7 @@ $this->registerJsFile($publishedRes[1].'/control_sidebar.js', ['depends' => '\ha
 
 <?= ToastWidget::widget() ?>
 
-<?= $this->render('_modal-confirmar-bilhetes') ?>
+<?= $this->render('_modalConfirmarBilhetes') ?>
 
 <?php $this->endBody() ?>
 </body>

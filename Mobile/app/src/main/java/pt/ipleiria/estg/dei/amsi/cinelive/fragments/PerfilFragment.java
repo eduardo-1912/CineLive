@@ -65,24 +65,27 @@ public class PerfilFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
+        // Esconder campo password
+        binding.form.tilPassword.setVisibility(GONE);
+
         if (!NetworkUtils.hasInternet(requireContext())) {
             binding.btnEditarPerfil.setVisibility(GONE);
             binding.btnEliminarConta.setVisibility(GONE);
         }
 
         // TODO: CHANGE THIS
-        binding.etUsername.setText("john.smith");
-        binding.etNome.setText("John Smith");
-        binding.etEmail.setText("john.smith@email.com");
-        binding.etTelemovel.setText("912345678");
+        binding.form.etUsername.setText("john.smith");
+        binding.form.etEmail.setText("john.smith@email.com");
+        binding.form.etNome.setText("John Smith");
+        binding.form.etTelemovel.setText("912345678");
 
         binding.btnEditarPerfil.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), EditarPerfilActivity.class);
 
-            intent.putExtra("username", String.valueOf(binding.etUsername.getText()));
-            intent.putExtra("nome", String.valueOf(binding.etNome.getText()));
-            intent.putExtra("email", String.valueOf(binding.etEmail.getText()));
-            intent.putExtra("telemovel", String.valueOf(binding.etTelemovel.getText()));
+            intent.putExtra("username", String.valueOf(binding.form.etUsername.getText()));
+            intent.putExtra("email", String.valueOf(binding.form.etEmail.getText()));
+            intent.putExtra("nome", String.valueOf(binding.form.etNome.getText()));
+            intent.putExtra("telemovel", String.valueOf(binding.form.etTelemovel.getText()));
 
             startActivity(intent);
         });

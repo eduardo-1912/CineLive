@@ -13,7 +13,7 @@ class ToastWidget extends Widget
         $flashes = $session->getAllFlashes();
 
         if (empty($flashes)) {
-            return ''; // NÃO MOSTRAR NADA SE NÃO HOUVER MENSAGENS
+            return '';
         }
 
         $output = '<div class="toast-container position-fixed bottom-0 end-0 p-4" style="z-index: 2000;">';

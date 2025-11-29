@@ -15,7 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="site-signup container">
 
     <div class="d-flex justify-content-center align-items-center" style="min-height: 65vh;">
-        <div class="w-100" style="max-width: 420px;">
+        <div class="w-100" style="max-width: 28rem;">
 
             <div class="mb-4">
                 <h5 class="fw-semibold mb-0">Crie um conta</h5>
@@ -24,17 +24,17 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <?php $form = ActiveForm::begin(['id' => 'form-signup']); ?>
 
-            <?= $form->field($model, 'username')->textInput(['autofocus' => true]) ?>
+            <?= $form->field($model, 'username')->textInput() ?>
             <?= $form->field($model, 'password')->passwordInput() ?>
-            <?= $form->field($model, 'nome') ?>
-            <?= $form->field($model, 'telemovel') ?>
             <?= $form->field($model, 'email') ?>
+            <?= $form->field($model, 'nome') ?>
+            <?= $form->field($model, 'telemovel')->Input('number', ['maxlength' => true]) ?>
 
             <div class="form-group mt-3">
                 <?= Html::submitButton('Criar Conta', ['class' => 'btn btn-dark w-100', 'name' => 'signup-button']) ?>
             </div>
 
-            <div class="mt-3 text-center fs-15" style="color:#999;">
+            <div class="mt-3 text-center fs-15 text-muted">
                 Já tem uma conta? <a href="<?= Url::to(['site/login']) ?>" class="fs-15">Iniciar Sessão</a>
             </div>
 

@@ -14,62 +14,8 @@
 
         <Space style="@style/VerticalSpace.32" />
 
-        <!-- Username -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:enabled="false"
-            style="@style/TextInputLayoutDisabled"
-            android:hint="@string/form_hint_username">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etUsername"
-                android:textColor="?attr/colorOnBackground"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Nome -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:enabled="false"
-            style="@style/TextInputLayoutDisabled"
-            android:hint="@string/form_hint_nome">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etNome"
-                android:textColor="?attr/colorOnBackground"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPersonName" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Email -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:enabled="false"
-            style="@style/TextInputLayoutDisabled"
-            android:hint="@string/form_hint_email">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etEmail"
-                android:textColor="?attr/colorOnBackground"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textEmailAddress" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Telemóvel -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:enabled="false"
-            style="@style/TextInputLayoutDisabled"
-            android:hint="@string/form_hint_telemovel">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etTelemovel"
-                android:textColor="?attr/colorOnBackground"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="phone"
-                android:maxLength="9" />
-        </com.google.android.material.textfield.TextInputLayout>
+        <!-- Form Utilizador -->
+        <include android:id="@+id/form" layout="@layout/layout_form_utilizador" />
 
         <LinearLayout style="@style/HorizontalLayout.Full" >
 

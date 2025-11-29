@@ -11,6 +11,7 @@ use yii\db\Expression;
  * @property int $id
  * @property int $cinema_id
  * @property int $numero
+ * @property string $nome
  * @property int $num_filas
  * @property int $num_colunas
  * @property float $preco_bilhete
@@ -49,7 +50,7 @@ class Sala extends \yii\db\ActiveRecord
             [['estado'], 'string'],
             ['estado', 'in', 'range' => array_keys(self::optsEstado())],
             [['cinema_id'], 'exist', 'skipOnError' => true, 'targetClass' => Cinema::class, 'targetAttribute' => ['cinema_id' => 'id']],
-            ['num_filas', 'compare', 'compareValue' => 26, 'operator' => '<=', 'type' => 'number', 'message' => 'O número máximo de filas permitido é 26.'],
+            ['num_filas', 'max' => 26],
         ];
     }
 
@@ -66,29 +67,58 @@ class Sala extends \yii\db\ActiveRecord
             'num_filas' => 'Número Filas',
             'num_colunas' => 'Número Colunas',
             'preco_bilhete' => 'Preço Bilhete',
-            'precoEmEuros' => 'Preço Bilhete',
+            'precoBilheteEuros' => 'Preço Bilhete',
             'estado' => 'Estado',
             'estadoFormatado' => 'Estado',
         ];
     }
 
-    // NOME DA SALA
-    public function getNome()
+    public function getNome(): string
     {
-        return 'Sala ' . $this->numero;
+        return "Sala {$this->numero}";
     }
 
-    // NÚMERO DE LUGARES
-    public function getLugares()
+    public function getLugares(): int
     {
         return $this->num_filas * $this->num_colunas;
     }
 
-    // PREÇO DO BILHETE EM EUROS
-    public function getPrecoEmEuros()
+    public function getPrecoBilheteEuros(): string
     {
-        return $this->preco_bilhete . '€';
+        return number_format($this->preco_bilhete, 2) . '€';
     }
+
+    public static function findDisponiveis($cinemaId, $data, $horaInicio, $horaFim, $salaAtualId = null): array
+    {
+        $salasOcupadas = Sessao::find()
+            ->select('id')
+            ->where(['data' => $data])
+            ->andWhere(['and', ['<', 'hora_inicio', $horaFim], ['>', 'hora_fim', $horaInicio]])
+            ->column();
+
+        $salasAlugadas = AluguerSala::find()
+            ->select('id')
+            ->where(['data' => $data])
+            ->andWhere(['estado' => [
+                AluguerSala::ESTADO_PENDENTE,
+                AluguerSala::ESTADO_CONFIRMADO,
+                AluguerSala::ESTADO_A_DECORRER]])
+            ->andWhere(['and', ['<', 'hora_inicio', $horaFim], ['>', 'hora_fim', $horaInicio]])
+            ->column();
+
+        $salasIndisponiveis = array_unique(array_merge($salasOcupadas, $salasAlugadas));
+
+        if ($salaAtualId) {
+            $salasIndisponiveis = array_diff($salasIndisponiveis, [$salaAtualId]);
+        }
+
+        return self::find()
+            ->where(['cinema_id' => $cinemaId, 'estado' => self::ESTADO_ATIVA])
+            ->andFilterWhere(['not in', 'id', $salasIndisponiveis])
+            ->orderBy(['numero' => SORT_ASC])
+            ->all();
+    }
+
 
     // OBTER ESTADO FORMATADO
     public function getEstadoFormatado(): string
@@ -149,48 +179,6 @@ class Sala extends \yii\db\ActiveRecord
         }
 
         return $lugares;
-    }
-
-    // OBTER SALAS DISPONÍVEIS
-    public static function getSalasDisponiveis($cinemaId, $data, $horaInicio, $horaFim, $salaAtualId = null)
-    {
-        // SALAS COM SESSÕES SOBREPOSTAS NESSE HORÁRIO
-        $salasOcupadas = Sessao::find()
-            ->select('sala_id')
-            ->where(['data' => $data])
-            ->andWhere(['and',
-                ['<', 'hora_inicio', $horaFim],
-                ['>', 'hora_fim', $horaInicio],
-            ])->column();
-
-        // SALAS COM ALUGUERES CONFIRMADOS NESSE HORÁRIO
-        $salasAlugadas = AluguerSala::find()
-            ->select('sala_id')
-            ->where(['data' => $data])
-            ->andWhere(['estado' => [
-                AluguerSala::ESTADO_PENDENTE,
-                AluguerSala::ESTADO_CONFIRMADO,
-                AluguerSala::ESTADO_A_DECORRER
-            ]])
-            ->andWhere(['and',
-                ['<', 'hora_inicio', $horaFim],
-                ['>', 'hora_fim', $horaInicio],
-            ])->column();
-
-        // IDS DAS SALAS INDISPONÍVEIS
-        $salasIndisponiveis = array_unique(array_merge($salasOcupadas, $salasAlugadas));
-
-        // SE FOR PASSADA UMA SALA ESPECÍFICA --> TIRAR DAS INDISPONÍVEIS
-        if ($salaAtualId !== null) {
-            $salasIndisponiveis = array_diff($salasIndisponiveis, [$salaAtualId]);
-        }
-
-        // DEVOLVER APENAS AS SALAS ATIVAS E DISPONÍVEIS, ORDENADAS
-        return self::find()
-            ->where(['cinema_id' => $cinemaId, 'estado' => self::ESTADO_ATIVA])
-            ->andFilterWhere(['not in', 'id', $salasIndisponiveis])
-            ->orderBy(['numero' => SORT_ASC])
-            ->all();
     }
 
 

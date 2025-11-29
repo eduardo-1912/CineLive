@@ -4,12 +4,14 @@ namespace common\models;
 
 use DateTime;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "cinema".
  *
  * @property int $id
  * @property string $nome
+ * @property string morada
  * @property string $rua
  * @property string $codigo_postal
  * @property string $cidade
@@ -17,6 +19,7 @@ use Yii;
  * @property float|null $longitude
  * @property string $email
  * @property int $telefone
+ * @property string $horario
  * @property string $horario_abertura
  * @property string $horario_fecho
  * @property string $estado
@@ -76,6 +79,7 @@ class Cinema extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'nome' => 'Nome',
+            'morada' => 'Morada',
             'rua' => 'Rua',
             'codigo_postal' => 'Código Postal',
             'cidade' => 'Cidade',
@@ -87,8 +91,44 @@ class Cinema extends \yii\db\ActiveRecord
             'horario_fecho' => 'Hórario de Fecho',
             'horario' => 'Horário',
             'estado' => 'Estado',
+            'capacidade' => 'Capacidade',
             'gerente_id' => 'Gerente',
         ];
+    }
+
+    public static function findAtivos(): array
+    {
+        return self::find()->where(['estado' => Cinema::ESTADO_ATIVO])->all();
+    }
+
+    public static function findAtivosList(): array
+    {
+        return ArrayHelper::map(self::findAtivos(), 'id', 'nome');
+    }
+
+    public function getMorada(): string
+    {
+        return "{$this->rua}, {$this->codigo_postal} {$this->cidade}";
+    }
+
+    public function getHorario(): string
+    {
+        $format = Yii::$app->params['timeFormat'];
+
+        $abertura = Yii::$app->formatter->asTime($this->horario_abertura, $format);
+        $fecho = Yii::$app->formatter->asTime($this->horario_fecho, $format);
+
+        return "{$abertura} - {$fecho}";
+    }
+
+    public function getNumeroSalas(): int
+    {
+        return count($this->salas);
+    }
+
+    public function getNumeroLugares(): int
+    {
+        return $this->getSalas()->sum('num_colunas * num_filas');
     }
 
     // OBTER ESTADO FORMATADO
@@ -165,55 +205,6 @@ class Cinema extends \yii\db\ActiveRecord
         return $sessoes || $alugueres;
     }
 
-    // OBTER MORADA COMPLETA
-    public function getMorada(): string
-    {
-        return $this->rua . ', ' . $this->codigo_postal . ' ' . $this->cidade;
-    }
-
-    // OBTER NÚMERO DE LUGARES
-    public function getNumeroLugares(): int
-    {
-        $lugares = 0;
-        foreach ($this->salas as $sala) {
-            $lugares += ($sala->num_colunas * $sala->num_filas);
-        }
-
-        return $lugares;
-    }
-
-    // TOTAL DE SALAS
-    public function getTotalSalas()
-    {
-        return count($this->salas);
-    }
-
-    // OBTER O NOME DO GERENTE
-    public function getNomeGerente()
-    {
-        return $this->gerente->profile->nome ?? null;
-    }
-
-
-    // HORA INÍCIO FORMATADA (HH:mm)
-    public function getHoraInicioFormatada()
-    {
-        return Yii::$app->formatter->asTime($this->hora_inicio, 'php:H:i');
-    }
-
-    // HORA FIM FORMATADA (HH:mm)
-    public function getHoraFimFormatada()
-    {
-        return Yii::$app->formatter->asTime($this->hora_fim, 'php:H:i');
-    }
-
-    // OBTER HORA JUNTA
-    public function getHorario()
-    {
-        return Yii::$app->formatter->asTime($this->horario_abertura, 'php:H:i')
-            . ' - ' .
-            Yii::$app->formatter->asTime($this->horario_fecho, 'php:H:i');
-    }
 
     // OBTER SESSÕES FUTURAS DESTE CINEMA (FILME OPCIONAL)
     public function getSessoesFuturas($filmeId = null)

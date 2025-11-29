@@ -22,6 +22,11 @@ use yii\web\IdentityInterface;
  * @property integer $created_at
  * @property integer $updated_at
  * @property string $password write-only password
+ *
+ * @property UserProfile $profile
+ * @property Cinema|null $cinema
+ * @property Compra[] $compras
+ * @property AluguerSala[] $aluguerSalas
  */
 class User extends ActiveRecord implements IdentityInterface
 {
@@ -67,7 +72,7 @@ class User extends ActiveRecord implements IdentityInterface
             ['email', 'email'],
             [['username', 'email'], 'unique'],
             ['role', 'safe'],
-            ['password', 'string', 'min' => 8],
+            ['password', 'string', 'min' => Yii::$app->params['user.passwordMinLength']],
             [
                 'password',
                 'required',
@@ -178,7 +183,7 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     // OBTER ALUGUERES DO USER
-    public function getAlugueres()
+    public function getAluguerSalas()
     {
         return $this->hasMany(AluguerSala::class, ['cliente_id' => 'id']);
     }

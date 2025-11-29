@@ -8,6 +8,7 @@ use common\models\Sessao;
 use DateTime;
 use Exception;
 use Yii;
+use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\Url;
 use yii\web\Controller;
@@ -23,7 +24,7 @@ class CompraController extends Controller
     {
         return [
             'access' => [
-                'class' => \yii\filters\AccessControl::class,
+                'class' => AccessControl::class,
                 'rules' => [
                     [
                         'allow' => true,
@@ -32,7 +33,7 @@ class CompraController extends Controller
                 ],
             ],
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class' => VerbFilter::class,
                 'actions' => [
                     'delete' => ['POST'],
                 ],
@@ -40,11 +41,9 @@ class CompraController extends Controller
         ];
     }
 
-    // VER TODAS AS SUAS COMPRAS
     public function actionIndex()
     {
-        $currentUser = Yii::$app->user->identity;
-        $compras = $currentUser->getCompras()->orderBy(['id' => SORT_DESC])->all();
+        $compras = Yii::$app->user->identity->getCompras()->orderBy(['id' => SORT_DESC])->all();
 
         return $this->render('index', [
             'compras' => $compras,
@@ -53,11 +52,11 @@ class CompraController extends Controller
 
     public function actionView($id)
     {
-        $currentUser = Yii::$app->user;
         $model = $this->findModel($id);
 
-        if ($currentUser->id != $model->cliente_id) {
-            return $this->redirect(Yii::$app->request->referrer ?: ['compra/index']);
+        if (!Yii::$app->user->can('verCompras', ['model' => $model])) {
+            Yii::$app->session->setFlash('error', 'Não tem permissão para ver esta compra.');
+            return $this->redirect(['compra/index']);
         }
 
         return $this->render('view', [
@@ -65,7 +64,6 @@ class CompraController extends Controller
         ]);
     }
 
-    // ESCOLHER LUGARES E PAGAMENTO
     public function actionCreate($sessao_id)
     {
         // OBTER A SESSÃO
@@ -180,7 +178,6 @@ class CompraController extends Controller
         ]);
     }
 
-    // CRIAR COMPRA E BILHETES
     public function actionPay()
     {
         $request = Yii::$app->request;

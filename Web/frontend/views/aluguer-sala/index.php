@@ -2,8 +2,8 @@
 
 use yii\bootstrap4\Breadcrumbs;
 
-/** @var common\models\AluguerSala $alugueres */
 /** @var yii\web\View $this */
+/** @var common\models\AluguerSala[] $alugueres */
 
 $this->title = 'Alugueres';
 

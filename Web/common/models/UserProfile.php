@@ -29,9 +29,9 @@ class UserProfile extends \yii\db\ActiveRecord
             [['user_id', 'nome', 'telemovel'], 'required'],
             [['user_id', 'cinema_id'], 'integer'],
             [['nome'], 'string', 'max' => 100],
-            ['telemovel', 'match', 'pattern' => '/^[0-9]{9}$/', 'message' => 'O telemóvel deve conter exatamente 9 dígitos.'],
             [['user_id'], 'unique'],
             [['cinema_id'], 'default', 'value' => null],
+            [['telemovel'], 'string', 'min' => 9, 'max' => 9],
 
             // VERIFICAR QUE O ID DO CINEMA É VÁLIDO
             [

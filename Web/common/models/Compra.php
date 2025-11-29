@@ -13,10 +13,16 @@ use Yii;
  * @property int $cliente_id
  * @property int $sessao_id
  * @property string $data
+ * @property string $dataFormatada
  * @property string $pagamento
+ * @property float $total
+ * @property string $totalEuros
+ * @property string $lugares
  * @property string $estado
+ * @property string $estadoFormatado
  *
  * @property Bilhete[] $bilhetes
+ * @property Sessao $sessao
  * @property User $cliente
  */
 class Compra extends \yii\db\ActiveRecord
@@ -71,22 +77,16 @@ class Compra extends \yii\db\ActiveRecord
             'dataFormatada' => 'Data de Compra',
             'nomeCinema' => 'Cinema',
             'numeroBilhetes' => 'Bilhetes',
-            'totalEmEuros' => 'Total',
+            'sessao' => 'Sessão',
+            'lugares' => 'Lugares',
+            'total', 'totalEuros' => 'Total',
         ];
     }
 
     public function getDataFormatada(): string
     {
-        if (empty($this->data)) {
-            return '-';
-        }
-
-        try {
-            return Yii::$app->formatter->asDate($this->data, 'php:d/m/Y');
-        }
-        catch (Exception $e) {
-            return $this->data;
-        }
+        $format = Yii::$app->params['dateFormat'];
+        return Yii::$app->formatter->asDate($this->data, $format);
     }
 
     // VERIFICAR SE TODOS OS BILHETES ESTÃO CONFIRMADOS
@@ -97,23 +97,27 @@ class Compra extends \yii\db\ActiveRecord
             ->exists();
     }
 
-    // OBTER TOTAL DA COMPRA
+    public function getNumeroBilhetes(): int
+    {
+        return count($this->bilhetes);
+    }
+
+    public function getLugares(): string
+    {
+        return implode(', ', array_column($this->bilhetes, 'lugar'));
+    }
+
     public function getTotal(): float
     {
         $total = $this->getBilhetes()->sum('preco') ?? 0;
         return round((float) $total, 2);
     }
 
-    public function getTotalEmEuros(): string
+    public function getTotalEuros(): string
     {
-        return number_format($this->total, 2, '.', '') . '€';
+        return number_format($this->total, 2) . '€';
     }
 
-    // OBTER O NÚMERO DE BILHETES
-    public function getNumeroBilhetes(): int
-    {
-        return count($this->bilhetes);
-    }
 
     // OBTER ESTADO FORMATADO
     public function getEstadoFormatado(): string
@@ -135,11 +139,6 @@ class Compra extends \yii\db\ActiveRecord
         return self::optsPagamento()[$this->pagamento] ?? ucfirst($this->pagamento);
     }
 
-    // OBTER LUGARES (EX.: A1, A2, A3)
-    public function getListaLugares()
-    {
-        return implode(', ', array_column($this->bilhetes, 'lugar'));
-    }
 
     // OBTER BILHETES
     public function getBilhetes()

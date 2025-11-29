@@ -61,13 +61,13 @@ class Bilhete extends \yii\db\ActiveRecord
             'id' => 'ID',
             'compra_id' => 'Compra',
             'lugar' => 'Lugar',
-            'preco', 'precoEmEuros' => 'Preço',
+            'preco', 'precoEuros' => 'Preço',
             'codigo' => 'Código',
             'estado' => 'Estado',
         ];
     }
 
-    public function getPrecoEmEuros(): string
+    public function getPrecoEuros(): string
     {
         return number_format($this->preco, 2) . '€';
     }

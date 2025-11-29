@@ -4,6 +4,7 @@ namespace frontend\controllers;
 
 use common\models\User;
 use Yii;
+use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -17,7 +18,7 @@ class PerfilController extends Controller
     {
         return [
             'access' => [
-                'class' => \yii\filters\AccessControl::class,
+                'class' => AccessControl::class,
                 'rules' => [
                     [
                         'allow' => true,
@@ -26,7 +27,7 @@ class PerfilController extends Controller
                 ],
             ],
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class' => VerbFilter::class,
                 'actions' => [
                     'delete' => ['POST'],
                 ],
@@ -36,20 +37,34 @@ class PerfilController extends Controller
 
     public function actionIndex()
     {
-        $model = Yii::$app->user->identity;
+        $currentUser = Yii::$app->user;
+        $model = $currentUser->identity;
 
+        // Modo editar
         $edit = Yii::$app->request->get('edit') == 1;
 
-        $compras = $model->getCompras()->orderBy(['id' => SORT_DESC])->limit(3)->all();
-        $alugueres = $model->getAlugueres()->orderBy(['id' => SORT_DESC])->limit(2)->all();
+        if (!$currentUser->can('verPerfil', ['model' => $model])) {
+            Yii::$app->session->setFlash('error', 'Não tem permissão para ver este perfil.');
+            return $this->goHome();
+        }
 
+        // Obter compras e alugueres mais recentes
+        $compras = $model->getCompras()->orderBy(['id' => SORT_DESC])->limit(3)->all();
+        $alugueres = $model->getAluguerSalas()->orderBy(['id' => SORT_DESC])->limit(2)->all();
+
+        // Editar perfil
         if ($model->load(Yii::$app->request->post()) && $model->profile->load(Yii::$app->request->post())) {
+
+            if (!Yii::$app->user->can('editarPerfil', ['model' => $model])) {
+                Yii::$app->session->setFlash('error', 'Não tem permissão para editar este perfil.');
+            }
+
             if ($model->save(false) && $model->profile->save()) {
                 Yii::$app->session->setFlash('success', 'Dados atualizados com sucesso.');
                 return $this->redirect(['index']);
             }
 
-            Yii::$app->session->setFlash('error', 'Ocorreu um erro ao atualizar os dados.');
+            Yii::$app->session->setFlash('error', 'Erro ao atualizar os dados.');
         }
 
         return $this->render('index', [
@@ -60,18 +75,22 @@ class PerfilController extends Controller
         ]);
     }
 
-
-    public function actionDeleteAccount()
+    public function actionDelete()
     {
         $currentUser = Yii::$app->user;
-
         $model = $this->findModel($currentUser->id);
 
-        Yii::$app->authManager->revokeAll($model->id);
+        if (!$currentUser->can('eliminarPerfil', ['model' => $model])) {
+            Yii::$app->session->setFlash('error', 'Não tem permissão para eliminar esta conta.');
+            return $this->goHome();
+        }
 
         if ($model->profile && $model->profile->delete()) {
+            Yii::$app->authManager->revokeAll($model->id);
+
             if ($model->delete()) {
                 Yii::$app->user->logout();
+
                 Yii::$app->session->setFlash('success', 'A sua conta foi eliminada com sucesso.');
                 return $this->goHome();
             }
@@ -80,7 +99,6 @@ class PerfilController extends Controller
         Yii::$app->session->setFlash('error', 'Erro ao eliminar a sua conta.');
         return $this->redirect(['index']);
     }
-
 
     protected function findModel($id)
     {

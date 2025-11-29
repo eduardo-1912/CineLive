@@ -15,12 +15,11 @@ $this->title = 'Cinemas';
         <h4 class="page-title m-0">Os nossos cinemas</h4>
     </div>
 
-    <!-- CINEMAS -->
     <?php foreach ($cinemas as $cinema): ?>
         <div class="box-gray p-0 overflow-hidden mb-4 shadow-sm border">
             <div class="row row-cols-1 row-cols-lg-2">
 
-                <!-- MAPA -->
+                <!-- Mapa -->
                 <div>
                     <iframe
                         width="100%" height="100%" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"
@@ -28,35 +27,35 @@ $this->title = 'Cinemas';
                     </iframe>
                 </div>
 
-                <!-- DADOS DO CINEMA -->
+                <!-- Dados do cinema -->
                 <div class="px-4 px-lg-2 py-4 d-flex flex-column justify-content-center">
-                    <a href="<?= Url::to(['filme/index', 'cinema_id' => $cinema->id]) ?>" class="fw-bold fs-4 link-dark text-decoration-none mb-1"><?= $cinema->nome ?></a>
+                    <a href="<?= Url::to(['filme/index', 'cinema_id' => $cinema->id]) ?>" class="fw-bold fs-4 link-dark text-decoration-none"><?= $cinema->nome ?></a>
 
-                    <?php if ($cinema->nomeGerente): ?>
-                        <p class="text-muted mb-4">Gerido por <span class="fw-medium"><?= $cinema->nomeGerente ?></span></p>
+                    <?php if ($cinema->gerente->profile->nome): ?>
+                        <p class="text-muted mb-4">Gerido por <span class="fw-medium"><?= $cinema->gerente->profile->nome ?></span></p>
                     <?php endif; ?>
 
                     <div class="row row-cols-2 w-100 gy-3 mb-0 mb-lg-4">
 
-                        <div class="col-12 d-flex flex-column text-start">
-                            <span class="fw-medium fs-14 fw-semibold">Morada</span>
+                        <div class="col-12">
+                            <span class="label"><?= $cinema->getAttributeLabel('morada') ?></span>
                             <span class="text-muted"><?= $cinema->morada ?></span>
                         </div>
-                        <div class="d-flex flex-column text-start">
-                            <span class="fw-medium fs-14 fw-semibold">Telefone</span>
+                        <div>
+                            <span class="label"><?= $cinema->getAttributeLabel('telefone') ?></span>
                             <span class="text-muted"><?= $cinema->telefone ?></span>
                         </div>
-                        <div class="d-flex flex-column text-start">
-                            <span class="fw-medium fs-14 fw-semibold">Horário</span>
-                            <span class="text-muted"><?= $cinema->horario ?></span>
-                        </div>
-                        <div class="d-flex flex-column text-start">
-                            <span class="fw-medium fs-14 fw-semibold">Email</span>
+                        <div>
+                            <span class="label"><?= $cinema->getAttributeLabel('email') ?></span>
                             <a href="mailto:<?= $cinema->email ?>" target="_blank" class="text-decoration-none"><?= $cinema->email ?></a>
                         </div>
-                        <div class="d-flex flex-column text-start">
-                            <span class="fw-medium fs-14 fw-semibold">Capacidade</span>
-                            <span class="text-muted"><?= $cinema->totalSalas ?> Salas<span class="d-none d-sm-inline"> • <?= $cinema->numeroLugares ?> Lugares</span></span>
+                        <div>
+                            <span class="label"><?= $cinema->getAttributeLabel('horario') ?></span>
+                            <span class="text-muted"><?= $cinema->horario ?></span>
+                        </div>
+                        <div>
+                            <span class="label"><?= $cinema->getAttributeLabel('capacidade') ?></span>
+                            <span class="text-muted"><?= "{$cinema->numeroSalas} Salas • {$cinema->numeroLugares} Lugares" ?></span>
                         </div>
 
                     </div>

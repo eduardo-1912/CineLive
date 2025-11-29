@@ -30,12 +30,12 @@ class SignupForm extends Model
             [['username', 'email', 'password', 'telemovel', 'nome'], 'required'],
             [['username', 'email'], 'trim'],
             ['username', 'string', 'min' => 2, 'max' => 255],
-            ['username', 'unique', 'targetClass' => \common\models\User::class],
+            ['username', 'unique', 'targetClass' => User::class],
             ['email', 'email'],
             ['email', 'string', 'max' => 255],
-            ['email', 'unique', 'targetClass' => \common\models\User::class],
+            ['email', 'unique', 'targetClass' => User::class],
             ['password', 'string', 'min' => Yii::$app->params['user.passwordMinLength']],
-            ['telemovel', 'match', 'pattern' => '/^[0-9]{9}$/', 'message' => 'O telemóvel deve conter exatamente 9 dígitos.'],
+            [['telemovel'], 'string', 'min' => 9, 'max' => 9],
         ];
     }
 
@@ -56,49 +56,31 @@ class SignupForm extends Model
             return null;
         }
 
-        // INICIAR TRANSACTION (TER A CERTEZA QUE NENHUM USER É CRIADO SEM USER_PROFILE)
-        $transaction = Yii::$app->db->beginTransaction();
+        $user = new User();
+        $user->username = $this->username;
+        $user->email = $this->email;
+        $user->setPassword($this->password);
+        $user->generateAuthKey();
+        $user->status = User::STATUS_ACTIVE;
 
-        try {
-            // CRIAR UTILIZADOR
-            $user = new User();
-            $user->username = $this->username;
-            $user->email = $this->email;
-            $user->setPassword($this->password);
-            $user->generateAuthKey();
-            $user->status = User::STATUS_ACTIVE;
-
-            if (!$user->save()) {
-                throw new \Exception('Ocorreu um erro ao criar o utilizador: ' . json_encode($user->getErrors()));
-            }
-
-            // ROLE CLIENTE
-            $auth = Yii::$app->authManager;
-            $role = $auth->getRole('cliente');
-            if ($role) {
-                $auth->assign($role, $user->id);
-            }
-
-            // CRIAR USER_PROFILE
-            $profile = new UserProfile();
-            $profile->user_id = $user->id;
-            $profile->nome = $this->nome;
-            $profile->telemovel = $this->telemovel;
-
-            if (!$profile->save()) {
-                throw new \Exception('Ocorreu um erro ao criar o perfil: ' . json_encode($profile->getErrors()));
-            }
-
-            // DAR COMMIT NA TRANSACTION
-            $transaction->commit();
-
-            return $user;
+        if (!$user->save()) {
+            throw new Exception('Ocorreu um erro ao criar o utilizador');
         }
-        catch (\Exception $e) {
-            $transaction->rollBack();
-            Yii::error($e->getMessage());
-            return null;
+
+        $auth = Yii::$app->authManager;
+        $role = $auth->getRole('cliente');
+        if ($role) {$auth->assign($role, $user->id);}
+
+        $profile = new UserProfile();
+        $profile->user_id = $user->id;
+        $profile->nome = $this->nome;
+        $profile->telemovel = $this->telemovel;
+
+        if (!$profile->save()) {
+            throw new Exception('Ocorreu um erro ao criar o perfil');
         }
+
+        return $user;
     }
 
     /**

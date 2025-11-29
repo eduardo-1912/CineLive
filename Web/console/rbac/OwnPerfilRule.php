@@ -16,6 +16,6 @@ class OwnPerfilRule extends Rule
 
         $model = $params['model'];
 
-        return $model->user_id == $user;
+        return $model->id == $user;
     }
 }
