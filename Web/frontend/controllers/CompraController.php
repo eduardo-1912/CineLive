@@ -2,17 +2,16 @@
 
 namespace frontend\controllers;
 
+use common\components\Formatter;
 use common\models\Bilhete;
 use common\models\Compra;
 use common\models\Sessao;
-use DateTime;
-use Exception;
+use frontend\helpers\CookieHelper;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\Url;
 use yii\web\Controller;
-use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 
 class CompraController extends Controller
@@ -66,54 +65,33 @@ class CompraController extends Controller
 
     public function actionCreate($sessao_id)
     {
-        // OBTER A SESSÃO
+        if (!Yii::$app->user->can('criarCompra')) {
+            Yii::$app->session->setFlash('error', 'Não tem permissão para criar compras.');
+            return $this->redirect(['filme/index']);
+        }
+
         $sessao = Sessao::findOne($sessao_id);
 
-        if (!$sessao) {
+        if (!$sessao || !$sessao->isEstadoAtiva()) {
+            Yii::$app->session->setFlash('error', "Não é possível comprar bilhetes para esta sessão.");
             return $this->redirect(Yii::$app->request->referrer ?: ['filme/index']);
         }
 
-        // SE A SESSÃO ESTÁ ESGOTADA, TERMINADA OU A DECORRER --> SEM ACESSO
-        if ($sessao->isEstadoEsgotada() || $sessao->isEstadoTerminada() || $sessao->isEstadoADecorrer()) {
-            Yii::$app->session->setFlash('error', "Já não é possível comprar bilhetes para esta sessão.");
-            return $this->redirect(Yii::$app->request->referrer ?: ['filme/index']);
-        }
+        // Obter lugares possíveis e ocupados
+        $lugaresPossiveis = $sessao->sala->lugares;
+        $lugaresOcupados = $sessao->lugaresOcupados;
 
-        // CALCULAR SE A SESSÃO ESTÁ PERTO DE COMEÇAR
-        $now = new DateTime();
-        $inicioSessao = new DateTime($sessao->data . ' ' . $sessao->hora_inicio);
+        // Ler lugares do URL
+        $lugaresSelecionados = array_filter(explode(',', Yii::$app->request->get('lugares', '')));
 
-        $segundosRestantes = $inicioSessao->getTimestamp() - $now->getTimestamp();
-        $minutosRestantes = floor($segundosRestantes / 60);
-
-        // AVISO SE COMEÇA DENTRO DE 60 MINUTOS, MAS AINDA NÃO COMEÇOU
-        if ($segundosRestantes > 0 && $minutosRestantes <= 60) {
-            Yii::$app->session->setFlash('warning', "A sessão começa dentro de {$minutosRestantes} minutos!");
-        }
-
-        // OBTER SALA DA SESSÃO
-        $sala = $sessao->sala;
-
-        // OBTER ARRAY COM TODOS OS LUGARES POSSÍVEIS DA SALA
-        $lugaresSala = $sala->getArrayLugares();
-
-        // OBTER OS LUGARES QUE JÁ FORAM OCUPADOS DA SESSÃO
-        $lugaresOcupados = $sessao->lugaresOcupados ?? [];
-
-        // LER LUGARES DO URL
-        $lugaresSelecionados = Yii::$app->request->get('lugares', '');
-        $lugaresSelecionados = array_filter(explode(',', $lugaresSelecionados));
-
-        // VALIDAR LUGARES
+        // Validar lugares
         $lugaresValidos = [];
         foreach ($lugaresSelecionados as $lugar) {
-            // SE LUGAR EXISTE NA SALA E NÃO ESTÁ OCUPADO --> É VÁLIDO
-            if (in_array($lugar, $lugaresSala) && !in_array($lugar, $lugaresOcupados)) {
+            if (in_array($lugar, $lugaresPossiveis) && !in_array($lugar, $lugaresOcupados)) {
                 $lugaresValidos[] = $lugar;
             }
         }
 
-        // SE OS LUGARES FOREM DIFERENTES --> REDIRECIONAR COM LUGARES VÁLIDOS
         if ($lugaresSelecionados !== $lugaresValidos) {
             return $this->redirect([
                 'compra/create',
@@ -122,43 +100,36 @@ class CompraController extends Controller
             ]);
         }
 
+        // Atualizar resumo
+        $total = $lugaresSelecionados ? Formatter::preco(count($lugaresSelecionados) * $sessao->sala->preco_bilhete) : '-';
+        $lugares = $lugaresSelecionados ? implode(', ', $lugaresSelecionados) : '-';
 
-        // CALCULAR TOTAL DA COMPRA
-        $total = '-';
-        $lugaresImploded = '-';
-        if (!empty($lugaresSelecionados)) {
-            $total =  number_format(count($lugaresSelecionados) * (float)$sessao->sala->preco_bilhete, 2) . '€';
-            $lugaresImploded = implode(', ', $lugaresSelecionados);
-        }
+        // Criar mapa de lugares
+        $mapaLugares = [];
+        for ($fila = 1; $fila <= $sessao->sala->num_filas; $fila++) {
+            for ($coluna = 1; $coluna <= $sessao->sala->num_colunas; $coluna++) {
 
-        // GERAR MAPA DA SALA
-        $mapa = [];
-        for ($fila = 1; $fila <= $sala->num_filas; $fila++) {
-            for ($coluna = 1; $coluna <= $sala->num_colunas; $coluna++) {
-
-                // FAZER LUGAR (EX.: A1)
+                // Criar lugar
                 $lugar = chr(64 + $fila) . $coluna;
 
-                // SE LUGAR ESTÁ OCUPADO
+                // Verificar se está ocupado ou selecionado
                 $ocupado = in_array($lugar, $lugaresOcupados);
-
-                // SE LUGAR ESTÁ SELECIONADO
                 $selecionado = in_array($lugar, $lugaresSelecionados);
 
-                // FAZER CÓPIA DA SELEÇÃO ATUAL
+                // Nova seleção de lugares
                 $novaSelecao = $lugaresSelecionados;
 
-                // CASO O UTILIZADOR CLIQUE NUM LUGAR QUE JÁ TINHA SELECIONADO --> TIRAR DA SELEÇÃO
+                // Remover lugar
                 if ($selecionado) {
                     $novaSelecao = array_diff($novaSelecao, [$lugar]);
                 }
-                // CASO CONTRÁRIO --> ADICIONAR LUGAR À NOVA SELEÇÃO DE LUGARES
+                // Adicionar lugar
                 else {
                     $novaSelecao[] = $lugar;
                 }
 
-                // CRIAR URL DO BOTÃO DE LUGAR
-                $mapa[$fila][$coluna] = [
+                // URL do lugar
+                $mapaLugares[$fila][$coluna] = [
                     'label' => $coluna,
                     'url' => Url::to([
                         'compra/create', 'sessao_id' => $sessao->id, 'lugares' => implode(',', $novaSelecao)
@@ -172,88 +143,77 @@ class CompraController extends Controller
         return $this->render('create', [
             'sessao' => $sessao,
             'lugaresSelecionados' => $lugaresSelecionados,
-            'lugaresImploded' => $lugaresImploded,
+            'mapaLugares' => $mapaLugares,
+            'lugares' => $lugares,
             'total' => $total,
-            'mapa' => $mapa,
         ]);
     }
 
     public function actionPay()
     {
-        $request = Yii::$app->request;
+        if (!Yii::$app->user->can('criarCompra')) {
+            Yii::$app->session->setFlash('error', 'Não tem permissão para criar compras.');
+            return $this->redirect(['filme/index']);
+        }
 
-        // OBTER DADOS
-        $sessaoId = $request->post('sessao_id');
-        $lugares = array_filter(explode(',', (string)$request->post('lugares')));
-        $metodo = $request->post('metodo');
+        // Obter dados
+        $sessaoId = Yii::$app->request->post('sessao_id');
+        $lugares = explode(',', Yii::$app->request->post('lugares'));
+        $metodo = Yii::$app->request->post('metodo');
 
-        // OBTER A SESSÃO
+        // Obter a sessão
         $sessao = Sessao::findOne($sessaoId);
 
-        // SE A SESSÃO NÃO EXISTE --> VOLTAR
-        if (!$sessao) {
+        if (!$sessao || !$sessao->isEstadoAtiva()) {
+            Yii::$app->session->setFlash('error', "Não é possível comprar bilhetes para esta sessão.");
             return $this->redirect(Yii::$app->request->referrer ?: ['filme/index']);
         }
 
-        // SE A SESSÃO ESTÁ ESGOTADA, TERMINADA OU A DECORRER --> SEM ACESSO
-        if ($sessao->isEstadoEsgotada() || $sessao->isEstadoTerminada() || $sessao->isEstadoADecorrer()) {
-            Yii::$app->session->setFlash('error', "Já não é possível comprar bilhetes para esta sessão.");
-            return $this->redirect(Yii::$app->request->referrer ?: ['filme/index']);
-        }
-
-        // SE ALGUM DOS DADOS NÃO FOI PASSADO --> VOLTAR
         if (empty($lugares) || !$metodo) {
-            Yii::$app->session->setFlash('error', 'Ocorreu um erro ao criar a compra.');
-            return $this->redirect(Yii::$app->request->referrer ?: ['compra/create', 'sessao_id' => $sessaoId]);
-
+            Yii::$app->session->setFlash('error', 'Faltam dados obrigatórios.');
+            return $this->redirect('compra/create', ['sessao_id' => $sessaoId]);
         }
 
-        // INICIAR TRANSACTION (TER A CERTEZA QUE NENHUMA COMPRA É CRIADA SEM BILHETES)
-        $transaction = Yii::$app->db->beginTransaction();
+        // Criar a compra
+        $compra = new Compra();
+        $compra->cliente_id = Yii::$app->user->id;
+        $compra->sessao_id = $sessao->id;
+        $compra->data = date('Y-m-d H:i:s');
+        $compra->pagamento = $metodo;
+        $compra->estado = Compra::ESTADO_CONFIRMADA;
 
-        try {
-            // CRIAR A COMPRA
-            $compra = new Compra();
-            $compra->cliente_id = Yii::$app->user->id;
-            $compra->sessao_id = $sessao->id;
-            $compra->data = date('Y-m-d H:i:s');
-            $compra->pagamento = $metodo;
-            $compra->estado = 'confirmada';
+        if (!$compra->save()) {
+            Yii::$app->session->setFlash('error', 'Erro ao criar a compra.');
+            return $this->redirect(['compra/create', 'sessao_id' => $sessaoId]);
+        }
 
-            // GUARDAR
-            if (!$compra->save()) {
-                throw new Exception('Ocorreu um erro ao guardar a compra: ' . json_encode($compra->getErrors()));
+        // Criar bilhetes
+        foreach ($lugares as $lugar) {
+
+            $bilhete = new Bilhete();
+            $bilhete->compra_id = $compra->id;
+            $bilhete->lugar = $lugar;
+            $bilhete->preco = $sessao->sala->preco_bilhete;
+            $bilhete->codigo = Bilhete::gerarCodigo();
+            $bilhete->estado = Bilhete::ESTADO_PENDENTE;
+
+            if (!$bilhete->save()) {
+                // Eliminar bilhetes anteriores
+                Bilhete::deleteAll(['compra_id' => $compra->id]);
+
+                // Eliminar a compra
+                $compra->delete();
+
+                Yii::$app->session->setFlash('error', 'Erro ao criar os bilhetes.');
+                return $this->redirect(['compra/create', 'sessao_id' => $sessaoId]);
             }
-
-            // CRIAR BILHETES
-            foreach ($lugares as $lugar) {
-
-                // CRIAR BILHETE
-                $bilhete = new Bilhete();
-                $bilhete->compra_id = $compra->id;
-                $bilhete->lugar = $lugar;
-                $bilhete->preco = $sessao->sala->preco_bilhete;
-                $bilhete->codigo = Bilhete::gerarCodigo();
-                $bilhete->estado = 'pendente';
-
-                // GUARDAR
-                if (!$bilhete->save()) {
-                    throw new Exception('Ocorreu um erro ao guardar o bilhete: ' . json_encode($bilhete->getErrors()));
-                }
-            }
-
-            // DAR COMMIT NA TRANSACTION
-            $transaction->commit();
-
-            Yii::$app->session->setFlash('success', 'Compra realizada com sucesso.');
-            return $this->redirect(['compra/view', 'id' => $compra->id]);
         }
-        catch (Exception $e) {
-            $transaction->rollBack();
-            Yii::error($e->getMessage());
-            Yii::$app->session->setFlash('error', 'Ocorreu um erro ao criar a compra.');
-            return $this->redirect(Yii::$app->request->referrer ?: ['compra/create', 'sessao_id' => $sessaoId]);
-        }
+
+        // Atualizar o cookie de cinema
+        CookieHelper::set('cinema_id', $sessao->cinema->id, 365);
+
+        Yii::$app->session->setFlash('success', 'Compra realizada com sucesso.');
+        return $this->redirect(['compra/view', 'id' => $compra->id]);
     }
 
     protected function findModel($id)

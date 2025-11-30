@@ -2,10 +2,9 @@
 
 namespace common\models;
 
-use Exception;
+use common\components\Formatter;
 use Yii;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
 use yii\web\UploadedFile;
 
 /**
@@ -23,8 +22,11 @@ use yii\web\UploadedFile;
  * @property string $poster_path
  * @property string $estado
  *
+ * @property-read $generos
+ * @property-read $posterUrl
+ *
  * @property FilmeGenero[] $filmeGeneros
- * @property Sessao[] $sessaos
+ * @property Sessao[] $sessoes
  */
 class Filme extends \yii\db\ActiveRecord
 {
@@ -79,36 +81,6 @@ class Filme extends \yii\db\ActiveRecord
         ];
     }
 
-    public function getPosterUrl(): string
-    {
-        // CAMINHOS DEFINIDOS EM common/config/params.php
-        $posterDir = Yii::getAlias(Yii::$app->params['posterPath']); // CAMINHO FÍSICO ABSOLUTO
-        $posterUrlBase = Yii::$app->params['posterUrl']; // URL PÚBLICO ACESSÍVEL VIA BROWSER
-
-        // CAMINHO ABSOLUTO COMPLETO
-        $posterFile = rtrim($posterDir, '/') . '/' . ltrim($this->poster_path, '/');
-
-        // CAMINHO PÚBLICO (para o <img src="...">)
-        $posterUrl = rtrim($posterUrlBase, '/') . '/' . ltrim($this->poster_path, '/');
-
-        // PLACEHOLDER PÚBLICO
-        $placeholderUrl = rtrim($posterUrlBase, '/') . '/../placeholders/poster-placeholder.jpg';
-
-        // SE NÃO TIVER POSTER_PATH --> DEVOLVE PLACEHOLDER
-        if (empty($this->poster_path)) {
-            return $placeholderUrl;
-        }
-
-        // SE O FICHEIRO NÃO EXISTER --> DEVOLVE PLACEHOLDER
-        if (!file_exists($posterFile)) {
-            return $placeholderUrl;
-        }
-
-        // CASO CONTRÁRIO --> DEVOLVE URL DO POSTER
-        return $posterUrl;
-    }
-
-
     /**
      * {@inheritdoc}
      */
@@ -119,41 +91,99 @@ class Filme extends \yii\db\ActiveRecord
             'titulo' => 'Título',
             'sinopse' => 'Sinopse',
             'duracao' => 'Duração',
-            'duracaoEmMinutos' => 'Duração',
+            'duracaoHoras' => 'Duração',
             'rating' => 'Rating',
             'estreia' => 'Estreia',
-            'estreiaFormatada' => 'Estreia',
             'idioma' => 'Idioma',
             'realizacao' => 'Realização',
             'trailer_url' => 'Trailer',
-            'poster_path' => 'Poster',
+            'poster_path', 'posterFile', 'posterUrl' => 'Poster',
             'estado' => 'Estado',
-            'posterFile' => 'Poster',
-            'generosSelecionados' => 'Géneros',
         ];
     }
 
-    /**
-     * Gets query for [[FilmeGeneros]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-
-    // VERIFICAR SE PODE SER EDITADO
-    public function isEditable(): bool { return true; }
-
-    // VERIFICAR SE PODE SER ELIMINADO
-    public function isDeletable(): bool { return !$this->getSessaos()->exists(); }
-
-    public function getFilmeGeneros()
+    public static function findComSessoesAtivas($limit = null)
     {
-        return $this->hasMany(FilmeGenero::class, ['filme_id' => 'id']);
+        $filmes = array_filter(
+            self::find()->orderBy(['id' => SORT_DESC])->all(),
+            fn($filme) => !empty($filme->getSessoesAtivas())
+        );
+
+        if ($limit) {
+            $filmes = array_slice($filmes, 0, $limit);
+        }
+
+        return $filmes;
+    }
+
+    public function getSessoesAtivas($cinemaId = null): array
+    {
+        $sessoes = array_filter($this->sessoes, fn($sessao) => $sessao->isEstadoAtiva());
+
+        if ($cinemaId) {
+            return array_filter($sessoes, fn($sessao) => $sessao->cinema_id == $cinemaId);
+        }
+
+        return $sessoes;
+    }
+
+    public function getSessoesAtivasPorData($cinemaId = null): array
+    {
+        $sessoes = $this->getSessoesAtivas($cinemaId);
+        usort($sessoes, fn($a, $b) => strcmp($a->hora_inicio, $b->hora_inicio));
+
+        $sessoesPorData = [];
+        foreach ($sessoes as $sessao) {
+            $sessoesPorData[Formatter::data($sessao->data)][] = $sessao;
+        }
+
+        ksort($sessoesPorData);
+        return $sessoesPorData;
+    }
+
+    public function getCinemasComSessoesAtivas(): array
+    {
+        $cinemas = [];
+        foreach ($this->getSessoesAtivas() as $sessao) {
+            $cinema = $sessao->cinema;
+            if ($cinema->isEstadoAtivo()) {
+                $cinemas[$cinema->id] = $cinema;
+            }
+        }
+
+        return $cinemas;
     }
 
     public function getGeneros()
     {
         return $this->hasMany(Genero::class, ['id' => 'genero_id'])->via('filmeGeneros');
     }
+
+    public function getPosterUrl(): string
+    {
+        $local = Yii::getAlias(Yii::$app->params['posterPath']);
+        $url = Yii::$app->params['posterUrl'];
+
+        $file = "{$local}/{$this->poster_path}";
+
+        if (!$this->poster_path || !file_exists($file)) {
+            return "{$url}/../placeholders/poster-placeholder.jpg";
+        }
+
+        return "{$url}/{$this->poster_path}";
+    }
+
+
+    // VERIFICAR SE PODE SER EDITADO
+    public function isEditable() {
+        return true;
+    }
+
+    // VERIFICAR SE PODE SER ELIMINADO
+    public function isDeletable(): bool {
+        return !$this->getSessoes()->exists();
+    }
+
 
     // OBTER GÉNEROS DO FILME
     public function afterFind()
@@ -181,106 +211,36 @@ class Filme extends \yii\db\ActiveRecord
         }
     }
 
-    // VERIFICAR SE TEM SESSÕES ATIVAS
-    public function hasSessoesAtivas(): bool
-    {
-        foreach ($this->sessaos as $sessao) {
-            $estado = $sessao->getEstado();
 
-            if ($estado === Sessao::ESTADO_ATIVA) {
-                return true;
-            }
-        }
 
-        return false;
-    }
-
-    // OBTER FILMES COM SESSÕES FUTURAS DE UM CINEMA
-    public static function findComSessoesFuturas($cinemaId)
-    {
-        return self::find()
-            ->joinWith(['sessaos s'])
-            ->where(['s.cinema_id' => $cinemaId])
-            ->andWhere(['>=', 's.data', date('Y-m-d')])
-            ->distinct();
-    }
-
-    // OBTER ESTREIA FORMATADA (DD/MM/AAAA)
-    public function getEstreiaFormatada(): string
-    {
-        return Yii::$app->formatter->asDate($this->estreia, 'php:d/m/Y');
-    }
-
-    public function getDuracaoEmMinutos()
-    {
-        return $this->duracao . ' minutos';
-    }
-
-    // OBTER DURAÇÃO EM HORAS
-    public function getDuracaoEmHoras()
-    {
-        if (!$this->duracao || $this->duracao <= 0) {
-            return '-';
-        }
-
-        $horas = floor($this->duracao / 60);
-        $minutos = $this->duracao % 60;
-
-        if ($horas > 0) {
-            return sprintf('%dh %02dmin', $horas, $minutos);
-        }
-        return sprintf('%dmin', $minutos);
-    }
-
-    // OBTER FILMES EM EXIBIÇÃO POR CINEMA
-    public static function getFilmesEmExibicaoPorCinema($cinemaId)
-    {
-        $now = date('Y-m-d');
-
-        return self::find()
-            ->alias('f')
-            ->joinWith('sessaos s')
-            ->where([
-                's.cinema_id' => $cinemaId,
-            ])
-            ->andWhere(['>=', 's.data', $now])
-            ->distinct()
-            ->orderBy(['f.titulo' => SORT_ASC])
-            ->all();
-    }
-
-    // OBTER CINEMAS COM SESSÕES FUTURAS PARA O DETERMINADO FILME
-    public function getCinemasComSessoesFuturas()
-    {
-        return Cinema::find()
-            ->alias('c')
-            ->joinWith('sessaos s')
-            ->where(['s.filme_id' => $this->id, 'c.estado' => Cinema::ESTADO_ATIVO])
-            ->andWhere(['>=', 's.data', date('Y-m-d')])
-            ->distinct()
-            ->orderBy(['c.nome' => SORT_ASC])
-            ->all();
-    }
-
-    // VERIFICAR SE O RATING É PARA CRIANÇAS
-    public static function ratingsKids()
-    {
-        return [self::RATING_TODOS, self::RATING_M3, self::RATING_M6];
-    }
-
-    public function isRatingKids()
-    {
-        return ($this->isRatingTodos() || $this->isRatingM3() || $this->isRatingM6());
-    }
 
     /**
-     * Gets query for [[Sessaos]].
+     * Gets query for [[FilmeGeneros]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getSessaos()
+    public function getFilmeGeneros()
+    {
+        return $this->hasMany(FilmeGenero::class, ['filme_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[Sessões]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSessoes()
     {
         return $this->hasMany(Sessao::class, ['filme_id' => 'id']);
+    }
+
+    public static function OptsRatingKids()
+    {
+        return [
+            self::RATING_TODOS,
+            self::RATING_M3,
+            self::RATING_M6
+        ];
     }
 
     /**

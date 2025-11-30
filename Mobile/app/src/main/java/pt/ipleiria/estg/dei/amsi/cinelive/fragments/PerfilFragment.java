@@ -65,7 +65,6 @@ public class PerfilFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
-        // Esconder campo password
         binding.form.tilPassword.setVisibility(GONE);
 
         if (!NetworkUtils.hasInternet(requireContext())) {

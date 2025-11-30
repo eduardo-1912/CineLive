@@ -1,13 +1,13 @@
 <?php
 
+use common\components\Formatter;
 use yii\bootstrap4\Breadcrumbs;
 use yii\helpers\Html;
-use yii\helpers\Url;
 
 /** @var yii\web\View $this */
 /** @var common\models\Compra $model */
 
-$this->title = 'Compra #' . $model->id;
+$this->title = $model->nome;
 
 ?>
 
@@ -41,6 +41,10 @@ $this->title = 'Compra #' . $model->id;
 
                 <div class="row row-cols-2 row-cols-md-3 w-100 gy-3">
                     <div class="d-flex flex-column text-start">
+                        <span class="fw-medium fs-14 fw-semibold"><?= $model->getAttributeLabel('data') ?></span>
+                        <span class="text-muted"><?= Formatter::data($model->data) ?></span>
+                    </div>
+                    <div class="d-flex flex-column text-start">
                         <span class="fw-medium fs-14 fw-semibold"><?= $model->getAttributeLabel('cinema') ?></span>
                         <span class="text-muted"><?= $model->sessao->cinema->nome ?></span>
                     </div>
@@ -49,12 +53,8 @@ $this->title = 'Compra #' . $model->id;
                         <span class="text-muted"><?= $model->sessao->sala->nome ?></span>
                     </div>
                     <div class="d-flex flex-column text-start">
-                        <span class="fw-medium fs-14 fw-semibold"><?= $model->getAttributeLabel('estado') ?></span>
-                        <span class="text-muted"><?= $model->estadoFormatado ?></span>
-                    </div>
-                    <div class="d-flex flex-column text-start">
                         <span class="fw-medium fs-14 fw-semibold"><?= $model->getAttributeLabel('sessao') ?></span>
-                        <span class="text-muted"><?= $model->sessao->dataFormatada ?></span>
+                        <span class="text-muted"><?= Formatter::data($model->sessao->data) ?></span>
                     </div>
                     <div class="d-flex flex-column text-start">
                         <span class="fw-medium fs-14 fw-semibold"><?= $model->getAttributeLabel('horario') ?></span>
@@ -62,7 +62,7 @@ $this->title = 'Compra #' . $model->id;
                     </div>
                     <div class="d-flex flex-column text-start">
                         <span class="fw-medium fs-14 fw-semibold"><?= $model->getAttributeLabel('total') ?></span>
-                        <span class="text-muted"><?= $model->totalEuros ?></span>
+                        <span class="text-muted"><?= Formatter::preco($model->total) ?></span>
                     </div>
                 </div>
 
@@ -71,7 +71,7 @@ $this->title = 'Compra #' . $model->id;
         </div>
 
         <div class="box-white rounded-4 shadow-sm p-4">
-            <h5 class="page-title mb-3">Bilhetes</h5>
+            <h5 class="page-title mb-3"><?= $model->getAttributeLabel('bilhetes') ?></h5>
 
             <div class="table-responsive">
                 <table class="table bg-white table-striped align-middle">
@@ -79,7 +79,7 @@ $this->title = 'Compra #' . $model->id;
                     <tr>
                         <th class="text-start"><?= $model->getAttributeLabel('bilhetes.codigo') ?></th>
                         <th class="text-start"><?= $model->getAttributeLabel('bilhetes.lugar') ?></th>
-                        <th class="text-start"><?= $model->getAttributeLabel('bilhetes.precoEuros') ?></th>
+                        <th class="text-start"><?= $model->getAttributeLabel('bilhetes.preco') ?></th>
                         <th class="text-start"><?= $model->getAttributeLabel('bilhetes.estado') ?></th>
                     </tr>
                     </thead>
@@ -88,7 +88,7 @@ $this->title = 'Compra #' . $model->id;
                         <tr>
                             <td><?= $bilhete->codigo ?></td>
                             <td><?= $bilhete->lugar ?></td>
-                            <td><?= $bilhete->precoEuros ?></td>
+                            <td><?= Formatter::preco($bilhete->preco) ?></td>
                             <td><?= $bilhete->estadoFormatado ?></td>
                         </tr>
                     <?php endforeach; ?>

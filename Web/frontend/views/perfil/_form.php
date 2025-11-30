@@ -4,9 +4,9 @@ use yii\bootstrap5\ActiveForm;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
+/** @var yii\web\View $this */
 /** @var common\models\User $model */
 /** @var bool $edit */
-/** @var yii\web\View $this */
 
 ?>
 
@@ -22,7 +22,9 @@ use yii\helpers\Url;
         <?= $form->field($model, 'username')->textInput(['disabled' => !$edit]) ?>
         <?= $form->field($model, 'email')->textInput(['disabled' => !$edit]) ?>
         <?= $form->field($model->profile, 'nome')->textInput(['disabled' => !$edit]) ?>
-        <?= $form->field($model->profile, 'telemovel')->Input('number', ['maxlength' => true, 'disabled' => !$edit]) ?>
+        <?= $form->field($model->profile, 'telemovel')
+            ->textInput(['type' => 'tel', 'maxlength' => 9, 'pattern' => '[0-9]{9}', 'disabled' => !$edit
+        ]) ?>
         <?= $edit ? $form->field($model, 'password')->passwordInput(['placeholder' => '(opcional)']) : '' ?>
     </div>
 

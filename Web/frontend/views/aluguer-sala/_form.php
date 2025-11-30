@@ -50,7 +50,9 @@ use yii\bootstrap5\ActiveForm;
     <?= $formPost->field($model, 'observacoes')->textarea(['rows' => 6]) ?>
 
     <div class="form-group">
-        <?= Html::submitButton('Enviar Pedido', ['class' => 'btn btn-dark fw-medium rounded-3 py-2 w-100']) ?>
+        <?= Html::submitButton('Enviar Pedido',
+            ['class' => 'btn btn-dark fw-medium rounded-3 py-2 w-100']
+        ) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

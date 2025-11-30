@@ -25,8 +25,10 @@ use yii\bootstrap4\ActiveForm;
     <?= $form->field($model, 'longitude')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'telefone')->Input('number', ['maxlength' => true]) ?>
+    
+    <?= $form->field($model, 'telefone')
+        ->textInput(['type' => 'tel', 'maxlength' => 9, 'pattern' => '[0-9]{9}'
+        ]) ?>
 
     <?= $form->field($model, 'horario_abertura')->input('time') ?>
 

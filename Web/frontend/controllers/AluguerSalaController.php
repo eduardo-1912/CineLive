@@ -4,7 +4,6 @@ namespace frontend\controllers;
 
 use common\models\Cinema;
 use common\models\Sala;
-use frontend\models\ContactForm;
 use Yii;
 use common\models\AluguerSala;
 use yii\filters\AccessControl;
@@ -83,7 +82,7 @@ class AluguerSalaController extends Controller
         $salaOptions = [];
         if ($cinema_id && $data && $hora_inicio && $hora_fim) {
             $salas = Sala::findDisponiveis($cinema_id, $data, $hora_inicio, $hora_fim);
-            $salaOptions = ArrayHelper::map($salas, 'id', fn($sala) => "{$sala->nome} • {$sala->lugares} Lugares");
+            $salaOptions = ArrayHelper::map($salas, 'id', 'nome');
         }
 
         if ($model->load(Yii::$app->request->post())) {

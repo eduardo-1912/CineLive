@@ -35,13 +35,10 @@ class PerfilController extends Controller
         ];
     }
 
-    public function actionIndex()
+    public function actionIndex($edit = false)
     {
         $currentUser = Yii::$app->user;
         $model = $currentUser->identity;
-
-        // Modo editar
-        $edit = Yii::$app->request->get('edit') == 1;
 
         if (!$currentUser->can('verPerfil', ['model' => $model])) {
             Yii::$app->session->setFlash('error', 'Não tem permissão para ver este perfil.');

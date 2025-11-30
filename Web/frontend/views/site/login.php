@@ -1,16 +1,18 @@
 <?php
 
-/** @var yii\web\View $this */
-/** @var yii\bootstrap5\ActiveForm $form */
-/** @var \common\models\LoginForm $model */
-
 use yii\bootstrap5\Html;
 use yii\bootstrap5\ActiveForm;
 use yii\helpers\Url;
 
+/** @var yii\web\View $this */
+/** @var yii\bootstrap5\ActiveForm $form */
+/** @var \common\models\LoginForm $model */
+
 $this->title = 'Login';
 $this->params['breadcrumbs'][] = $this->title;
+
 ?>
+
 <div class="site-login container">
 
     <div class="d-flex justify-content-center align-items-center" style="min-height: 65vh;">
@@ -37,7 +39,9 @@ $this->params['breadcrumbs'][] = $this->title;
             <?= $form->field($model, 'rememberMe')->label('Lembrar-me')->checkbox() ?>
 
             <div class="form-group mt-3">
-                <?= Html::submitButton('Iniciar Sessão', ['class' => 'btn btn-dark w-100', 'name' => 'login-button']) ?>
+                <?= Html::submitButton('Iniciar Sessão',
+                    ['class' => 'btn btn-dark w-100', 'name' => 'login-button']
+                ) ?>
             </div>
 
             <div class="mt-3 text-center fs-15 text-muted">

@@ -1,16 +1,17 @@
 <?php
 
-/** @var yii\web\View $this */
-/** @var common\models\Filme $carouselFilmes */
-
+use common\components\Formatter;
 use yii\helpers\Url;
+
+/** @var yii\web\View $this */
+/** @var common\models\Filme $filmes */
 
 ?>
 
 <section id="filmeCarousel" class="carousel slide bg-black" data-bs-ride="carousel">
 
     <div class="carousel-indicators">
-        <?php foreach ($carouselFilmes as $i => $filme): ?>
+        <?php foreach ($filmes as $i => $filme): ?>
             <button type="button" data-bs-target="#filmeCarousel"
                     data-bs-slide-to="<?= $i ?>" class="<?= $i === 0 ? 'active' : '' ?>">
             </button>
@@ -18,7 +19,7 @@ use yii\helpers\Url;
     </div>
 
     <div class="carousel-inner">
-        <?php foreach ($carouselFilmes as $i => $filme): ?>
+        <?php foreach ($filmes as $i => $filme): ?>
             <div class="carousel-item <?= $i === 0 ? 'active' : '' ?>">
                 <div class="container py-5">
                     <div class="d-flex flex-column flex-lg-row text-start align-items-center" style="gap: 5rem;">
@@ -26,7 +27,7 @@ use yii\helpers\Url;
                         <!-- Poster -->
                         <div class="col-lg-4 p-0">
                             <img class="img-fluid rounded-4 shadow-lg" style="aspect-ratio: 2/3"
-                                 src="<?= $filme->getPosterUrl() ?>"
+                                 src="<?= $filme->posterUrl ?>"
                                  alt="<?= $filme->titulo ?>">
                         </div>
 
@@ -34,12 +35,12 @@ use yii\helpers\Url;
                         <div class="col-lg p-0">
 
                             <p class="text-50 fs-14 mb-1 fw-medium">
-                                <?= "{$filme->rating} • {$filme->idioma} • {$filme->duracaoEmHoras}" ?>
+                                <?= "{$filme->rating} • {$filme->idioma} • " . Formatter::horas($filme->duracao) ?>
                             </p>
 
                             <h1 class="text-white fw-bold display-5 mb-3"><?= $filme->titulo ?></h1>
 
-                            <p class="text-50 mb-4" style="height: 3lh; overflow: hidden"><?= $filme->sinopse ?></p>
+                            <p class="text-50 mb-3" style="height: 3lh; overflow: hidden"><?= $filme->sinopse ?></p>
 
                             <a href="<?= Url::to(['filme/view', 'id' => $filme->id]) ?>"
                                class="btn btn-light fs-15 rounded-3 fw-medium">

@@ -2,11 +2,11 @@
 
 use yii\helpers\Url;
 
+/** @var yii\web\View $this */
 /** @var common\models\User $model */
 /** @var bool $edit */
 /** @var common\models\Compra $compras */
 /** @var common\models\AluguerSala $alugueres */
-/** @var yii\web\View $this */
 
 $this->title = 'Perfil';
 ?>
@@ -36,7 +36,7 @@ $this->title = 'Perfil';
                     <?php foreach ($compras as $compra): ?>
                         <?= $this->render('@frontend/views/compra/_card', ['compra' => $compra]) ?>
                     <?php endforeach; ?>
-                    <a href="<?= Url::to(['compra/index']) ?>" class="btn btn-dark rounded-3 mt-1 w-100">Ver todas</a>
+                    <a href="<?= Url::to(['compra/index']) ?>" class="btn btn-dark rounded-3 mt-1 w-100">Ver Todas</a>
                 <?php else: ?>
                     <div class="box-white rounded-4">
                         <div class="d-flex justify-content-center align-items-center w-100" style="height: 6.15rem;">
@@ -56,7 +56,7 @@ $this->title = 'Perfil';
                         <?php foreach($alugueres as $aluguer): ?>
                             <?= $this->render('@frontend/views/aluguer-sala/_card', ['aluguer' => $aluguer]) ?>
                         <?php endforeach; ?>
-                        <a href="<?= Url::to(['aluguer-sala/index']) ?>" class="btn btn-dark rounded-3 px-3 mt-1 w-100">Ver todos</a>
+                        <a href="<?= Url::to(['aluguer-sala/index']) ?>" class="btn btn-dark rounded-3 px-3 mt-1 w-100">Ver Todos</a>
 
                     <?php else: ?>
 
@@ -69,10 +69,6 @@ $this->title = 'Perfil';
                     <?php endif; ?>
                 </div>
             </div>
-        </div>
-    </div>
-
-
-
 </div>
+
 

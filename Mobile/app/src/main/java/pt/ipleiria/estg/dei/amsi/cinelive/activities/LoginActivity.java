@@ -1,5 +1,7 @@
 package pt.ipleiria.estg.dei.amsi.cinelive.activities;
 
+import static android.view.View.GONE;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
@@ -34,6 +36,10 @@ public class LoginActivity extends AppCompatActivity {
 
         setSupportActionBar(binding.toolbar.topAppBar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        binding.form.tilEmail.setVisibility(GONE);
+        binding.form.tilNome.setVisibility(GONE);
+        binding.form.tilTelemovel.setVisibility(GONE);
 
         binding.btnLogin.setOnClickListener(v -> {
             // TODO: DO LOGIN

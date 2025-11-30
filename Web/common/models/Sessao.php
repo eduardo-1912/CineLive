@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\components\Formatter;
 use DateTime;
 use Yii;
 
@@ -15,6 +16,11 @@ use Yii;
  * @property int $filme_id
  * @property int $sala_id
  * @property int $cinema_id
+ *
+ * @property-read $nome
+ * @property-read $horario
+ * @property-read array $lugaresOcupados
+ * @property-read array $lugaresConfirmados
  *
  * @property Bilhete[] $bilhetes
  * @property Cinema $cinema
@@ -68,12 +74,32 @@ class Sessao extends \yii\db\ActiveRecord
         ];
     }
 
-    // OBTER O NOME
-    public function getNome()
+    public function getNome(): string
     {
-        return 'Sessão #' . $this->id;
+        return "Sessão #{$this->id}";
     }
-    
+
+    public function getHorario()
+    {
+        return Formatter::horario($this->hora_inicio, $this->hora_fim);
+    }
+
+    public function getLugaresOcupados(): array
+    {
+        return $this->getBilhetes()
+            ->select('lugar')
+            ->andWhere(['<>', 'estado', Bilhete::ESTADO_CANCELADO])
+            ->column();
+    }
+
+    public function getLugaresConfirmados()
+    {
+        return $this->getBilhetes()
+            ->select('lugar')
+            ->andWhere(['estado' => Bilhete::ESTADO_CONFIRMADO])
+            ->column();
+    }
+
     // OBTER O ESTADO DA SESSÃO
     public function getEstado()
     {
@@ -104,6 +130,7 @@ class Sessao extends \yii\db\ActiveRecord
         return self::ESTADO_ATIVA;
     }
 
+
     // OBTER ESTADO FORMATADO (PARA /INDEX E /VIEW)
     public function getEstadoFormatado(): string
     {
@@ -121,22 +148,6 @@ class Sessao extends \yii\db\ActiveRecord
         return "<span class='{$class}'>{$label}</span>";
     }
 
-    // OBTER ARRAY DE LUGARES OCUPADOS
-    public function getLugaresOcupados()
-    {
-        return $this->getBilhetes()
-            ->select('lugar')
-            ->andWhere(['<>', 'estado', Bilhete::ESTADO_CANCELADO])
-            ->column();
-    }
-
-    // OBTER ARRAY DE LUGARES CONFIRMADOS
-    public function getLugaresConfirmados()
-    {
-        return $this->getBilhetes()->select('lugar')
-            ->andWhere(['estado' => Bilhete::ESTADO_CONFIRMADO])->column();
-    }
-
     // OBTER COMPRA_ID PARA CADA LUGAR DA SESSÃO
     public function getMapaLugaresCompra()
     {
@@ -145,34 +156,11 @@ class Sessao extends \yii\db\ActiveRecord
 
     public function getNumeroLugaresDisponiveis()
     {
-        return $this->sala->lugares - count($this->lugaresOcupados);
+        return ''; //$this->sala->lugares - count($this->lugaresOcupados)
     }
 
-    // OBTER DATA FORMATADA (DD/MM/AAAA)
-    public function getDataFormatada()
-    {
-        return Yii::$app->formatter->asDate($this->data, 'php:d/m/Y');
-    }
 
-    // HORA INÍCIO FORMATADA (HH:mm)
-    public function getHoraInicioFormatada()
-    {
-        return Yii::$app->formatter->asTime($this->hora_inicio, 'php:H:i');
-    }
 
-    // HORA FIM FORMATADA (HH:mm)
-    public function getHoraFimFormatada()
-    {
-        return Yii::$app->formatter->asTime($this->hora_fim, 'php:H:i');
-    }
-
-    // OBTER HORA JUNTA
-    public function getHorario()
-    {
-        return Yii::$app->formatter->asTime($this->hora_inicio, 'php:H:i')
-        . ' - ' .
-        Yii::$app->formatter->asTime($this->hora_fim, 'php:H:i');
-    }
 
     // CALCULAR A HORA FIM CONSOANTE FILME SELECIONADO E HORA INÍCIO
     public function getHoraFimCalculada($duracaoMinutos)

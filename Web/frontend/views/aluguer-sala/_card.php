@@ -1,5 +1,6 @@
 <?php
 
+use common\components\Formatter;
 use yii\helpers\Url;
 
 /** @var common\models\AluguerSala $aluguer */
@@ -14,7 +15,7 @@ use yii\helpers\Url;
             <span class="fs-14 text-muted"><?= $aluguer->tipo_evento ?></span>
         </div>
         <div class="text-end">
-            <p class="mb-0 fw-semibold"><?= $aluguer->estadoFormatado ?></p>
+            <p class="mb-0 fw-semibold"><?= $aluguer->displayEstado() ?></p>
             <span class="fs-14 text-muted">Pedido #<?= $aluguer->id ?></span>
         </div>
     </div>
@@ -23,7 +24,7 @@ use yii\helpers\Url;
         <div class="w-100 d-flex gap-2 gap-sm-5">
             <div>
                 <p class="mb-0 fs-14 fw-semibold"><?= $aluguer->getAttributeLabel('data') ?></p>
-                <span class="text-muted"><?= $aluguer->dataFormatada ?></span>
+                <span class="text-muted"><?= Formatter::data($aluguer->data) ?></span>
             </div>
             <div>
                 <p class="mb-0 fs-14 fw-semibold"><?= $aluguer->getAttributeLabel('horario') ?></p>

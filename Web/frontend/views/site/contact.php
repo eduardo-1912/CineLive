@@ -1,13 +1,13 @@
 <?php
 
-/** @var yii\web\View $this */
-/** @var yii\bootstrap5\ActiveForm $form */
-/** @var \frontend\models\ContactForm $model */
-
 use yii\bootstrap5\Html;
 use yii\bootstrap5\ActiveForm;
-use yii\captcha\Captcha;
 use yii\helpers\Url;
+
+/** @var yii\web\View $this */
+/** @var yii\bootstrap5\ActiveForm $form */
+/** @var frontend\models\ContactForm $model */
+/** @var common\models\User $currentUser */
 
 $iconsPath = '@webroot/icons/';
 $btnClasses = 'btn btn-dark fw-medium rounded-3 w-100 fs-15 py-2';
@@ -32,11 +32,11 @@ $this->title = 'Serviços';
             ]); ?>
 
             <div class="row row-cols-md-2">
-                <?= $form->field($model, 'name')->textInput(['placeholder' => 'John Smith',]) ?>
-                <?= $form->field($model, 'email')->textInput(['placeholder' => 'john.smith@email.com',]) ?>
+                <?= $form->field($model, 'name')->textInput(['placeholder' => 'John Smith']) ?>
+                <?= $form->field($model, 'email')->textInput(['placeholder' => 'john.smith@email.com']) ?>
             </div>
 
-            <?= $form->field($model, 'subject') ?>
+            <?= $form->field($model, 'subject')->textInput(['placeholder' => 'Festa de aniversário']) ?>
             <?= $form->field($model, 'body', ['options' => ['class' => 'mb-3']])->textarea(['rows' => 6]) ?>
 
             <div class="form-group">

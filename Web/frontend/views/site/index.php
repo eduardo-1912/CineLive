@@ -1,142 +1,106 @@
 <?php
 
-/** @var yii\web\View $this */
-/** @var common\models\Filme $carouselFilmes */
-
-
 use yii\helpers\Html;
 use yii\helpers\Url;
 
-$iconsPath = '@webroot/icons/';
+/** @var yii\web\View $this */
+/** @var common\models\Filme[] $filmesCarousel */
+/** @var int $cinema_id */
+/** @var array $cinemaOptions */
+/** @var int $filme_id */
+/** @var array $filmeOptions */
+/** @var string $data */
+/** @var array $dataOptions */
+/** @var int $sessao_id */
+/** @var array $horaOptions */
+/** @var common\models\Filme[] $filmesMaisVistos */
+/** @var common\models\Filme $brevemente */
 
 $this->title = 'Home';
+
 ?>
 <div class="site-index">
 
-    <?= $this->render('_carousel', ['carouselFilmes' => $carouselFilmes]) ?>
+    <?= $this->render('_carousel', ['filmes' => $filmesCarousel]) ?>
 
     <div class="container py-0">
+
         <section class="my-2 py-5">
             <div class="mb-4">
                 <h4 class="page-title m-0">Comprar Bilhetes</h4>
             </div>
 
-            <!-- FORM PARA ESCOLHER A SESSÃO -->
+            <!-- Form para escolher a sessão -->
             <form method="get" action="<?= Url::to(['index']) ?>" class="d-flex flex-column flex-lg-row gap-2">
 
-                <!-- CINEMA -->
-                <?= Html::dropDownList('cinema_id', $cinema_id, $listaCinemas, [
+                <!-- Cinema -->
+                <?= Html::dropDownList('cinema_id', $cinema_id, $cinemaOptions, [
                     'class' => 'form-select',
                     'prompt' => 'Cinema',
                     'onchange' => 'this.form.submit()',
                 ]) ?>
 
-                <!-- FIME -->
-                <?= Html::dropDownList('filme_id', $filme_id, $listaFilmes, [
+                <!-- Filme -->
+                <?= Html::dropDownList('filme_id', $filme_id, $filmeOptions, [
                     'class' => 'form-select',
                     'prompt' => 'Filme',
                     'onchange' => 'this.form.submit()',
                 ]) ?>
 
 
-                <!-- DATA -->
-                <?= Html::dropDownList('data', $dataSelecionada, $listaDatas, [
+                <!-- Data -->
+                <?= Html::dropDownList('data', $data, $dataOptions, [
                     'class' => 'form-select',
                     'prompt' => 'Data',
                     'onchange' => 'this.form.submit()',
                 ]) ?>
 
-                <!-- HORA -->
-                <?= Html::dropDownList('hora', $horaSelecionada, $listaHoras, [
+                <!-- Hora -->
+                <?= Html::dropDownList('sessao_id', $sessao_id, $horaOptions, [
                     'class' => 'form-select',
                     'prompt' => 'Hora',
                     'onchange' => 'this.form.submit()',
                 ]) ?>
 
-                <a href="<?= Url::to(['compra/create', 'sessao_id' => $sessaoSelecionada->id ?? null]) ?>"
-                   class="btn btn-dark py-2 rounded-3 fs-14 w-100 <?= !$sessaoSelecionada ? 'disabled' : '' ?>">
+                <a href="<?= Url::to(['compra/create', 'sessao_id' => $sessao_id ?? null]) ?>"
+                   class="btn btn-dark py-2 rounded-3 fs-14 w-100 <?= !$sessao_id ? 'disabled' : '' ?>">
                     Comprar Bilhetes
                 </a>
 
             </form>
 
         </section>
-        <section class="my-2 py-5">
+
+        <section class="my-2 py-4">
             <div class="mb-4">
                 <h4 class="page-title m-0">Filmes Mais Vistos</h4>
             </div>
-
             <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
-                <?php foreach ($filmesMaisVistos as $filme): ?>
-                    <a href="<?= Url::to(['filme/view', 'id' => $filme->id]) ?>"
-                       class="card-filme text-center text-decoration-none text-black d-flex flex-column gap-1">
-                        <?= Html::img($filme->getPosterUrl(), [
-                            'class' => 'card-img-top shadow-sm rounded-4',
-                            'alt' => $filme->titulo,
-                            'style' => 'object-fit: cover; aspect-ratio: 2/3;'
-                        ]) ?>
-                        <h5 class="fw-semibold fs-6"><?= $filme->titulo ?></h5>
-                    </a>
-                <?php endforeach; ?>
-            </div>
-
-        </section>
-        <section class="d-none d-md-block my-2 py-5">
-            <div class="d-flex justify-content-between align-items-center mb-4" style="min-height: 35px;">
-                <h4 class="page-title m-0">Novas Estreias</h4>
-                <div class="d-flex gap-1 align-items-center">
-                    <!-- DROPDOWN DE CINEMAS -->
-                    <div class="dropdown-center">
-                        <button class="btn btn-sm dropdown-toggle fw-medium" type="button" id="dropdownCinema" data-bs-toggle="dropdown" aria-expanded="false">
-                            <?= $currentCinema ?? 'Nenhum cinema disponível' ?>
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="dropdownCinema">
-                            <?php foreach ($cinemas as $cinema): ?>
-                                <li>
-                                    <a class="dropdown-item <?= $cinema_id == $cinema->id ? 'active' : '' ?>"
-                                       href="<?= Url::to(['index', 'cinema_id' => $cinema->id]) ?>">
-                                        <?= $cinema->nome ?>
-                                    </a>
-                                </li>
-                            <?php endforeach; ?>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- CARD DE FILMES -->
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
-                <?php if ($novasEstreias): ?>
-                    <?php foreach ($novasEstreias as $filme): ?>
-                        <div class="col">
-                            <div class="h-100 border-0">
-                                <a href="<?= Url::to(['filme/view', 'id' => $filme->id, 'cinema_id' => $cinema_id]) ?>"
-                                   class="card-filme text-center text-decoration-none text-black d-flex flex-column gap-1">
-                                    <?= Html::img($filme->getPosterUrl(), [
-                                        'class' => 'card-img-top shadow-sm rounded-4',
-                                        'alt' => $filme->titulo,
-                                        'style' => 'object-fit: cover; aspect-ratio: 2/3;'
-                                    ]) ?>
-                                    <h5 class="fw-semibold fs-6"><?= $filme->titulo ?></h5>
-                                </a>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <div class="d-flex justify-content-center align-items-center w-100" style="height: 50vh;">
-                        <h4 class="text-muted text-center fw-semibold m-0">Nenhum filme encontrado!</h4>
-                    </div>
+                <?php if ($filmesMaisVistos): ?>
+                    <?php foreach ($filmesMaisVistos as $filme): ?>
+                        <?= $this->render('@frontend/views/filme/_card', ['filme' => $filme]) ?>
+                    <?php endforeach ?>
                 <?php endif; ?>
             </div>
-
             <div class="d-flex justify-content-center">
-                <a href="<?= Url::to(['filme/index', 'cinema_id' => $cinema_id]) ?>"
+                <a href="<?= Url::to(['filme/index']) ?>"
                    class="btn btn-dark rounded-3 mt-4">
-                    Ver Todos os Filmes
+                    Ver Todos
                 </a>
             </div>
+        </section>
 
-
+        <section class="d-none d-md-block my-2 py-4">
+            <div class="mb-4">
+                <h4 class="page-title m-0">Brevemente</h4>
+            </div>
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
+                <?php if ($brevemente): ?>
+                    <?php foreach ($brevemente as $filme): ?>
+                        <?= $this->render('@frontend/views/filme/_card', ['filme' => $filme]) ?>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
         </section>
 
     </div>

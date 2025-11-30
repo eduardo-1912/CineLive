@@ -28,7 +28,9 @@ $this->params['breadcrumbs'][] = $this->title;
             <?= $form->field($model, 'password')->passwordInput() ?>
             <?= $form->field($model, 'email') ?>
             <?= $form->field($model, 'nome') ?>
-            <?= $form->field($model, 'telemovel')->Input('number', ['maxlength' => true]) ?>
+            <?= $form->field($model, 'telemovel')
+                ->textInput(['type' => 'tel', 'maxlength' => 9, 'pattern' => '[0-9]{9}'
+            ]) ?>
 
             <div class="form-group mt-3">
                 <?= Html::submitButton('Criar Conta', ['class' => 'btn btn-dark w-100', 'name' => 'signup-button']) ?>

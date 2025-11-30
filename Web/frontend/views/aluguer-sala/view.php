@@ -1,12 +1,13 @@
 <?php
 
+use common\components\Formatter;
 use yii\bootstrap4\Breadcrumbs;
 use yii\helpers\Html;
 
 /** @var yii\web\View $this */
 /** @var common\models\AluguerSala $model */
 
-$this->title = 'Aluguer #' . $model->id;
+$this->title = $model->nome;
 
 ?>
 
@@ -46,7 +47,7 @@ $this->title = 'Aluguer #' . $model->id;
                     </div>
                     <div class="d-flex flex-column text-start">
                         <span class="fw-semibold fs-14"><?= $model->getAttributeLabel('data') ?></span>
-                        <span class="text-muted"><?= $model->dataFormatada ?></span>
+                        <span class="text-muted"><?= Formatter::data($model->data) ?></span>
                     </div>
                     <div class="d-flex flex-column text-start">
                         <span class="fw-semibold fs-14"><?= $model->getAttributeLabel('horario') ?></span>
@@ -54,7 +55,7 @@ $this->title = 'Aluguer #' . $model->id;
                     </div>
                     <div class="d-flex flex-column text-start">
                         <span class="fw-semibold fs-14"><?= $model->getAttributeLabel('estado') ?></span>
-                        <span class="text-muted"><?= $model->estadoFormatado ?></span>
+                        <span class="text-muted"><?= $model->displayEstado() ?></span>
                     </div>
                 </div>
             </div>

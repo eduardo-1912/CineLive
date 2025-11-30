@@ -1,11 +1,17 @@
 <?php
 
-use common\models\Filme;
+use common\components\Formatter;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
 /** @var yii\web\View $this */
 /** @var common\models\Filme $model */
+/** @var int $cinema_id */
+/** @var array $cinemaOptions */
+/** @var string $data */
+/** @var array $dataOptions */
+/** @var int $sessao_id */
+/** @var array $horaOptions */
 
 $this->title = $model->titulo;
 ?>
@@ -13,25 +19,24 @@ $this->title = $model->titulo;
 <div class="container">
     <div class="row flex-column-reverse flex-md-row">
 
-        <!-- LEFT - POSTER E SESSÕES -->
         <div class="col-md-4">
 
-            <!-- POSTER -->
+            <!-- Poster -->
             <?= Html::img($model->getPosterUrl(), [
                 'class' => 'img-fluid d-none d-md-block rounded-4 shadow-sm',
                 'style' => 'aspect-ratio: 2/3;',
                 'alt' => $model->titulo,
             ]) ?>
 
-            <!-- SESSÕES -->
-            <div class="mt-3">
+            <!-- Sessões -->
+            <div class="mt-4 mt-md-3">
 
-                <!-- FORM PARA ESCOLHER A SESSÃO -->
+                <!-- Form para escolher a sessão -->
                 <form method="get" action="<?= Url::to(['filme/view']) ?>" class="d-flex flex-column gap-2">
                     <?= Html::hiddenInput('id', $model->id) ?>
 
-                    <!-- CINEMA -->
-                    <?= Html::dropDownList('cinema_id', $cinema_id, $listaCinemas, [
+                    <!-- Cinema -->
+                    <?= Html::dropDownList('cinema_id', $cinema_id, $cinemaOptions, [
                         'class' => 'form-select',
                         'prompt' => 'Cinema',
                         'onchange' => 'this.form.submit()',
@@ -39,16 +44,16 @@ $this->title = $model->titulo;
                     ]) ?>
 
                     <div class="d-flex w-100 gap-2">
-                        <!-- DATA -->
-                        <?= Html::dropDownList('data', $dataSelecionada, $listaDatas, [
+                        <!-- Data -->
+                        <?= Html::dropDownList('data', $data, $dataOptions, [
                             'class' => 'form-select',
                             'prompt' => 'Data',
                             'onchange' => 'this.form.submit()',
                             'disabled' => $model->isEstadoBrevemente(),
                         ]) ?>
 
-                        <!-- HORA -->
-                        <?= Html::dropDownList('hora', $horaSelecionada, $listaHoras, [
+                        <!-- Hora -->
+                        <?= Html::dropDownList('sessao_id', $sessao_id, $horaOptions, [
                             'class' => 'form-select',
                             'prompt' => 'Hora',
                             'onchange' => 'this.form.submit()',
@@ -56,8 +61,8 @@ $this->title = $model->titulo;
                         ]) ?>
                     </div>
 
-                    <a href="<?= Url::to(['compra/create', 'sessao_id' => $sessaoSelecionada->id ?? null]) ?>"
-                       class="btn btn-dark py-2 rounded-3 fs-14 w-100 <?= !$sessaoSelecionada ? 'disabled' : '' ?>">
+                    <a href="<?= Url::to(['compra/create', 'sessao_id' => $sessao_id ?? null]) ?>"
+                       class="btn btn-dark py-2 rounded-3 fs-14 w-100 <?= !$sessao_id ? 'disabled' : '' ?>">
                         <?= !$model->isEstadoBrevemente() ? 'Comprar Bilhetes' : 'Brevemente' ?>
                     </a>
                 </form>
@@ -66,26 +71,28 @@ $this->title = $model->titulo;
 
         </div>
 
-        <!-- RIGHT - DADOS DO FILME -->
+        <!-- Dados do filme -->
         <div class="col-md-8 mt-0">
 
             <div class="d-flex w-100 gap-2">
-            <?= Html::img($model->getPosterUrl(), [
+            <?= Html::img($model->posterUrl, [
                 'class' => 'img-fluid d-block d-md-none rounded-3 shadow-sm',
                 'style' => 'aspect-ratio: 2/3; max-height: 66px;',
                 'alt' => $model->titulo,
             ]) ?>
 
-            <!-- TÍTULO/RATING E GÉNEROS-->
+            <!-- Título, rating e géneros -->
             <div class="d-flex flex-column gap-2 mb-3 w-100">
 
                 <div class="d-flex justify-content-between align-items-center">
                     <h2 class="fw-bold m-0"><?= $model->titulo ?></h2>
                     <h5 class="m-0 py-1 px-3 rounded-pill fw-semibold text-white
-                        <?= $model->isRatingKids() ? 'bg-success' : 'bg-danger' ?>">
+                        <?= in_array($model->rating, $model::optsRatingKids()) ? 'bg-success' : 'bg-danger' ?>">
                         <?= $model->rating ?>
                     </h5>
                 </div>
+
+                <!-- Géneros -->
                 <div class="d-flex mb-1 gap-1">
                     <?php if ($model->generos): ?>
                         <?php foreach ($model->generos as $genero): ?>
@@ -93,39 +100,40 @@ $this->title = $model->titulo;
                         <?php endforeach; ?>
                     <?php endif; ?>
                 </div>
-            </div>
-            </div>
 
-            <!-- OUTROS DADOS -->
+            </div>
+        </div>
+
+            <!-- Dados -->
             <div class="row row-cols-2 row-cols-sm-4">
                 <div>
-                    <span class="fw-semibold fs-14">Estreia</span>
-                    <p class="text-muted"><?= $model->estreiaFormatada ?></p>
+                    <span class="fw-semibold fs-14"><?= $model->getAttributeLabel('estreia') ?></span>
+                    <p class="text-muted"><?= Formatter::data($model->estreia) ?></p>
                 </div>
                 <div>
-                    <span class="fw-semibold fs-14">Duração</span>
-                    <p class="text-muted"><?= $model->duracaoEmHoras ?></p>
+                    <span class="fw-semibold fs-14"><?= $model->getAttributeLabel('duracao') ?></span>
+                    <p class="text-muted"><?= Formatter::horas($model->duracao) ?></p>
                 </div>
                 <div>
-                    <span class="fw-semibold fs-14">Idioma</span>
+                    <span class="fw-semibold fs-14"><?= $model->getAttributeLabel('idioma') ?></span>
                     <p class="text-muted"><?= $model->idioma ?></p>
                 </div>
                 <div>
-                    <span class="fw-semibold fs-14">Realização</span>
+                    <span class="fw-semibold fs-14"><?= $model->getAttributeLabel('realizacao') ?></span>
                     <p class="text-muted"><?= $model->realizacao ?></p>
                 </div>
             </div>
 
-            <!-- SINOPSE -->
+            <!-- Sinopse -->
             <div class="mt-3">
-                <h5>Sinopse</h5>
+                <h5><?= $model->getAttributeLabel('sinopse') ?></h5>
                 <p class="text-muted" style="min-height: 3lh"><?= nl2br($model->sinopse) ?></p>
             </div>
 
-            <!-- TRAILER -->
+            <!-- Trailer -->
             <?php if ($model->trailer_url): ?>
                 <div class="mt-4">
-                    <h5>Trailer</h5>
+                    <h5><?= $model->getAttributeLabel('trailer') ?></h5>
                     <div class="rounded-3 trailer-box overflow-hidden shadow-sm">
                         <iframe width="100%" class="trailer-box" allowfullscreen
                                 src="<?= str_replace('watch?v=', 'embed/', $model->trailer_url) ?>">

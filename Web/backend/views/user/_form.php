@@ -25,7 +25,9 @@ use common\models\Cinema;
             : '(opcional)',
     ]) ?>
     <?= $form->field($profile, 'nome')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($profile, 'telemovel')->Input('number', ['maxlength' => true]) ?>
+    <?= $form->field($profile, 'telemovel')
+        ->textInput(['type' => 'tel', 'maxlength' => 9, 'pattern' => '[0-9]{9}'
+    ]) ?>
     <?= $form->field($model, 'email')->input('email') ?>
 
     <!-- SE FOR ADMIN -> PODE SELECIONAR CINEMA/ROLE -->

@@ -11,11 +11,14 @@ use yii\db\Expression;
  * @property int $id
  * @property int $cinema_id
  * @property int $numero
- * @property string $nome
  * @property int $num_filas
  * @property int $num_colunas
  * @property float $preco_bilhete
  * @property string $estado
+ *
+ * @property-read string $nome
+ * @property-read int $numeroLugares
+ * @property-read array $lugares
  *
  * @property AluguerSala[] $aluguerSalas
  * @property Cinema $cinema
@@ -67,7 +70,6 @@ class Sala extends \yii\db\ActiveRecord
             'num_filas' => 'Número Filas',
             'num_colunas' => 'Número Colunas',
             'preco_bilhete' => 'Preço Bilhete',
-            'precoBilheteEuros' => 'Preço Bilhete',
             'estado' => 'Estado',
             'estadoFormatado' => 'Estado',
         ];
@@ -78,14 +80,21 @@ class Sala extends \yii\db\ActiveRecord
         return "Sala {$this->numero}";
     }
 
-    public function getLugares(): int
+    public function getNumeroLugares(): int
     {
         return $this->num_filas * $this->num_colunas;
     }
 
-    public function getPrecoBilheteEuros(): string
+    public function getLugares(): array
     {
-        return number_format($this->preco_bilhete, 2) . '€';
+        $lugares = [];
+        for ($fila = 1; $fila <= $this->num_filas; $fila++) {
+            for ($coluna = 1; $coluna <= $this->num_colunas; $coluna++) {
+                $lugares[] = chr(64 + $fila) . $coluna;
+            }
+        }
+
+        return $lugares;
     }
 
     public static function findDisponiveis($cinemaId, $data, $horaInicio, $horaFim, $salaAtualId = null): array
@@ -167,19 +176,7 @@ class Sala extends \yii\db\ActiveRecord
             ->exists();
     }
 
-    // OBTER ARRAY COM TODOS OS LUGARES DA SALA
-    public function getArrayLugares(): array
-    {
-        $lugares = [];
 
-        for ($fila = 1; $fila <= $this->num_filas; $fila++) {
-            for ($coluna = 1; $coluna <= $this->num_colunas; $coluna++) {
-                $lugares[] = chr(64 + $fila) . $coluna;
-            }
-        }
-
-        return $lugares;
-    }
 
 
     // OBTER O PRÓXIMO NÚMERO INDICATIVO AO CRIAR UMA SALA NOVA

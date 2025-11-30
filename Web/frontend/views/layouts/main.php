@@ -4,12 +4,10 @@
 /** @var string $content */
 
 use common\components\ToastWidget;
-use common\widgets\Alert;
 use frontend\assets\AppAsset;
-use yii\bootstrap5\Breadcrumbs;
+use frontend\helpers\CookieHelper;
 use yii\bootstrap5\Html;
 use yii\bootstrap5\Nav;
-use yii\bootstrap5\NavBar;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 
@@ -40,22 +38,22 @@ $perfilPath = '/perfil/index';
 <body class="d-flex flex-column h-100">
 <?php $this->beginBody() ?>
 
-<!-- NAVBAR -->
+<!-- Navbar -->
 <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container justify-content-between">
 
-        <!-- LOGO -->
+        <!-- Logo -->
         <a class="d-flex align-items-center gap-1 text-black text-decoration-none" href="<?= Yii::$app->homeUrl ?>">
             <?= file_get_contents(Yii::getAlias($iconsPath . 'logo.svg')) ?>
             <span class="navbar-brand fw-bold me-0 fs-6 p-0">CineLive</span>
         </a>
 
-        <!-- NAV-TOGGLER (MOBILE) -->
+        <!-- Nav-toggler -->
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <!-- NAV-ITEMS -->
+        <!-- Nav-items -->
         <div class="collapse navbar-collapse justify-content-end pt-2 pt-lg-0" id="navbarNav">
             <?php
                 $menuItems = [
@@ -69,9 +67,9 @@ $perfilPath = '/perfil/index';
                 ]);
             ?>
 
-            <!-- BARRA DE PESQUISA -->
+            <!-- Pesquisa de filmes -->
             <?php $form = ActiveForm::begin([
-                'action' => Url::to(['/filme/index']),
+                'action' => Url::to(['/filme/index', 'cinema_id' => CookieHelper::get('cinema_id')]),
                 'method' => 'get',
                 'options' => [
                     'class' => 'search-form d-none d-lg-flex align-items-center ms-4 me-3',
@@ -80,7 +78,6 @@ $perfilPath = '/perfil/index';
                 ],
             ]); ?>
 
-            <!-- INPUT PESQUISA-->
             <div class="input-group nav-search overflow-hidden">
                 <?= Html::input('search', 'q', Yii::$app->request->get('q'), [
                     'class' => 'form-control border-0 bg-light shadow-none',
@@ -95,7 +92,7 @@ $perfilPath = '/perfil/index';
             </div>
             <?php ActiveForm::end(); ?>
 
-            <!-- LINK LOGIN -->
+            <!-- Link Login -->
             <?php if (Yii::$app->user->isGuest): ?>
                 <div class="d-flex align-items-center gap-3">
                     <?php echo Nav::widget([
@@ -106,7 +103,7 @@ $perfilPath = '/perfil/index';
                     ]); ?>
                 </div>
 
-            <!-- DROPDOWN ÁREA DE CLIENTE (DESKTOP) -->
+            <!-- Dropdown Área de cliente (Desktop) -->
             <?php else: ?>
                 <div class="dropdown">
                     <button class="btn d-none d-lg-inline-flex align-items-center icon-link p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -136,7 +133,7 @@ $perfilPath = '/perfil/index';
                     </ul>
                 </div>
 
-                <!-- LINK ÁREA DE CLIENTE (MOBILE) -->
+                <!-- Link Área de cliente (Mobile) -->
                 <?= Nav::widget([
                         'options' => ['class' => 'd-flex d-lg-none navbar-nav font-15 fw-medium ls-10'],
                         'items' => [
@@ -149,17 +146,16 @@ $perfilPath = '/perfil/index';
     </div>
 </nav>
 
-<!-- MAIN -->
+<!-- Main -->
 <main role="main" class="flex-shrink-0">
 
     <div>
         <?= $content ?>
-
         <?= ToastWidget::widget() ?>
     </div>
 </main>
 
-<!-- FOOTER -->
+<!-- Footer -->
 <footer class="footer mt-auto">
     <div class="container d-flex justify-content-between align-items-center">
         <div class="d-flex flex-column gap-2">
@@ -182,7 +178,7 @@ $perfilPath = '/perfil/index';
             </div>
         </div>
 
-        <!-- NAV FOOTER LINKS -->
+        <!-- Nav-links -->
         <div class="d-flex gap-5">
             <div class="d-flex flex-column align-items-end gap-1">
                 <?php

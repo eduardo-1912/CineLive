@@ -49,7 +49,6 @@ class SignupForm extends Model
         ];
     }
 
-    // CRIAR CONTA
     public function signup()
     {
         if (!$this->validate()) {
@@ -64,12 +63,9 @@ class SignupForm extends Model
         $user->status = User::STATUS_ACTIVE;
 
         if (!$user->save()) {
-            throw new Exception('Ocorreu um erro ao criar o utilizador');
+            Yii::$app->session->setFlash('error', 'Erro ao criar a conta.');
+            return null;
         }
-
-        $auth = Yii::$app->authManager;
-        $role = $auth->getRole('cliente');
-        if ($role) {$auth->assign($role, $user->id);}
 
         $profile = new UserProfile();
         $profile->user_id = $user->id;
@@ -77,7 +73,15 @@ class SignupForm extends Model
         $profile->telemovel = $this->telemovel;
 
         if (!$profile->save()) {
-            throw new Exception('Ocorreu um erro ao criar o perfil');
+            $user->delete();
+            Yii::$app->session->setFlash('error', 'Erro ao criar a conta.');
+            return null;
+        }
+
+        $auth = Yii::$app->authManager;
+        $role = $auth->getRole('cliente');
+        if ($role) {
+            $auth->assign($role, $user->id);
         }
 
         return $user;

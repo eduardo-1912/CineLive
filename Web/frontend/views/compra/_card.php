@@ -1,4 +1,6 @@
 <?php
+
+use common\components\Formatter;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
@@ -23,8 +25,8 @@ use yii\helpers\Url;
                     <span class="fs-14 text-muted"><?= $compra->sessao->cinema->nome ?></span>
                 </div>
                 <div class="text-end">
-                    <p class="mb-0 fw-semibold"><?= $compra->dataFormatada ?></p>
-                    <span class="fs-14 text-muted"><?= $compra->totalEuros ?></span>
+                    <p class="mb-0 fw-semibold"><?= Formatter::data($compra->data) ?></p>
+                    <span class="fs-14 text-muted"><?= Formatter::preco($compra->total) ?></span>
                 </div>
             </div>
 
@@ -33,7 +35,7 @@ use yii\helpers\Url;
                     <div>
                         <p class="mb-0 fs-14 fw-semibold"><?= $compra->getAttributeLabel('sessao') ?></p>
                         <span class="text-muted">
-                            <?= "{$compra->sessao->dataFormatada} - {$compra->sessao->horaInicioFormatada}" ?>
+                            <?= Formatter::data($compra->sessao->data) . ' - ' . Formatter::hora($compra->sessao->hora_inicio) ?>
                         </span>
                     </div>
                     <div class="d-none d-sm-block">

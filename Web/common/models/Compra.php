@@ -3,6 +3,7 @@
 namespace common\models;
 
 use common\components\EmailHelper;
+use common\components\Formatter;
 use Exception;
 use Yii;
 
@@ -13,13 +14,13 @@ use Yii;
  * @property int $cliente_id
  * @property int $sessao_id
  * @property string $data
- * @property string $dataFormatada
  * @property string $pagamento
- * @property float $total
- * @property string $totalEuros
  * @property string $lugares
  * @property string $estado
- * @property string $estadoFormatado
+ *
+ * @property-read $nome
+ * @property-read float $total
+ * @property-read string $estadoFormatado
  *
  * @property Bilhete[] $bilhetes
  * @property Sessao $sessao
@@ -72,29 +73,18 @@ class Compra extends \yii\db\ActiveRecord
             'sessao_id' => 'Sessão',
             'data' => 'Data de Compra',
             'pagamento' => 'Pagamento',
-            'pagamentoFormatado' => 'Pagamento',
             'estado' => 'Estado',
-            'dataFormatada' => 'Data de Compra',
             'nomeCinema' => 'Cinema',
             'numeroBilhetes' => 'Bilhetes',
             'sessao' => 'Sessão',
             'lugares' => 'Lugares',
-            'total', 'totalEuros' => 'Total',
+            'total' => 'Total',
         ];
     }
 
-    public function getDataFormatada(): string
+    public function getNome(): string
     {
-        $format = Yii::$app->params['dateFormat'];
-        return Yii::$app->formatter->asDate($this->data, $format);
-    }
-
-    // VERIFICAR SE TODOS OS BILHETES ESTÃO CONFIRMADOS
-    public function isTodosBilhetesConfirmados(): bool
-    {
-        return !$this->getBilhetes()
-            ->andWhere(['!=', 'estado', Bilhete::ESTADO_CONFIRMADO])
-            ->exists();
+        return "Compra #{$this->id}";
     }
 
     public function getNumeroBilhetes(): int
@@ -109,13 +99,15 @@ class Compra extends \yii\db\ActiveRecord
 
     public function getTotal(): float
     {
-        $total = $this->getBilhetes()->sum('preco') ?? 0;
-        return round((float) $total, 2);
+        return $this->getBilhetes()->sum('preco') ?? 0;
     }
 
-    public function getTotalEuros(): string
+    // VERIFICAR SE TODOS OS BILHETES ESTÃO CONFIRMADOS
+    public function isTodosBilhetesConfirmados(): bool
     {
-        return number_format($this->total, 2) . '€';
+        return !$this->getBilhetes()
+            ->andWhere(['!=', 'estado', Bilhete::ESTADO_CONFIRMADO])
+            ->exists();
     }
 
 
@@ -140,7 +132,7 @@ class Compra extends \yii\db\ActiveRecord
     }
 
 
-    // OBTER BILHETES
+    // TODO: COMMNETS
     public function getBilhetes()
     {
         return $this->hasMany(Bilhete::class, ['compra_id' => 'id']);

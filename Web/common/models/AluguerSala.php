@@ -3,6 +3,7 @@
 namespace common\models;
 
 use common\components\EmailHelper;
+use common\components\Formatter;
 use DateTime;
 use Yii;
 use yii\helpers\ArrayHelper;
@@ -15,16 +16,15 @@ use yii\helpers\ArrayHelper;
  * @property int $cinema_id
  * @property int $sala_id
  * @property string $data
- * @property string $dataFormatada
  * @property string $hora_inicio
- * @property string $horaInicioFormatada
  * @property string $hora_fim
- * @property string $horaFimFormatada
- * @property string $horario
  * @property string $estado
- * @property string $estadoFormatado
  * @property string $tipo_evento
  * @property string $observacoes
+ *
+ * @property-read $nome
+ * @property-read string $horario
+ * @property-read string $estadoFormatado
  *
  * @property Cinema $cinema
  * @property User $cliente
@@ -78,14 +78,24 @@ class AluguerSala extends \yii\db\ActiveRecord
             'cliente_id' => 'Cliente',
             'cinema_id' => 'Cinema',
             'sala_id' => 'Sala',
-            'data', 'dataFormatada' => 'Data',
-            'hora_inicio', 'horaInicioFormatada' => 'Hora Início',
-            'hora_fim', 'horaFimFormatada' => 'Hora Fim',
-            'horario' => 'Horario',
+            'data' => 'Data',
+            'hora_inicio' => 'Hora Início',
+            'hora_fim' => 'Hora Fim',
+            'horario' => 'Horário',
             'estado' => 'Estado',
             'tipo_evento' => 'Tipo de Evento',
             'observacoes' => 'Observações',
         ];
+    }
+
+    public function getNome(): string
+    {
+        return "Aluguer #{$this->id}";
+    }
+
+    public function getHorario(): string
+    {
+        return Formatter::horario($this->hora_inicio, $this->hora_fim);
     }
 
     // OBTER ESTADOS PERSONALIZADOS
@@ -134,34 +144,6 @@ class AluguerSala extends \yii\db\ActiveRecord
         }
 
         return $estados;
-    }
-
-    public function getDataFormatada(): string
-    {
-        $format = Yii::$app->params['dateFormat'];
-        return Yii::$app->formatter->asDate($this->data, $format);
-    }
-
-    public function getHoraInicioFormatada(): string
-    {
-        $format = Yii::$app->params['timeFormat'];
-        return Yii::$app->formatter->asTime($this->hora_inicio, $format);
-    }
-
-    public function getHoraFimFormatada(): string
-    {
-        $format = Yii::$app->params['timeFormat'];
-        return Yii::$app->formatter->asTime($this->hora_fim, $format);
-    }
-
-    public function getHorario(): string
-    {
-        $format = Yii::$app->params['timeFormat'];
-
-        $inicio = Yii::$app->formatter->asTime($this->hora_inicio, $format);
-        $fim = Yii::$app->formatter->asTime($this->hora_fim, $format);
-
-        return "{$inicio} - {$fim}";
     }
 
     public function getEstadoFormatado()

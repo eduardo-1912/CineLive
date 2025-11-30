@@ -24,30 +24,8 @@
             style="@style/Subtitle"
             android:text="@string/login_subtitulo" />
 
-        <!-- Username -->
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/TextInputLayout"
-            android:hint="@string/form_hint_username">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etUsername"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Password -->
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/TextInputLayout"
-            android:hint="@string/form_hint_password"
-            app:endIconMode="password_toggle">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etPassword"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPassword" />
-        </com.google.android.material.textfield.TextInputLayout>
+        <!-- Form Utilizador -->
+        <include android:id="@+id/form" layout="@layout/layout_form_utilizador" />
 
         <!-- Botão Login -->
         <Button

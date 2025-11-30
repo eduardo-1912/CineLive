@@ -2,8 +2,7 @@
 
 namespace common\models;
 
-use DateTime;
-use Yii;
+use common\components\Formatter;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -11,7 +10,6 @@ use yii\helpers\ArrayHelper;
  *
  * @property int $id
  * @property string $nome
- * @property string morada
  * @property string $rua
  * @property string $codigo_postal
  * @property string $cidade
@@ -19,15 +17,17 @@ use yii\helpers\ArrayHelper;
  * @property float|null $longitude
  * @property string $email
  * @property int $telefone
- * @property string $horario
  * @property string $horario_abertura
  * @property string $horario_fecho
  * @property string $estado
  * @property int|null $gerente_id
  *
+ * @property-read string morada
+ * @property-read string $horario
+ *
  * @property User $gerente
  * @property Sala[] $salas
- * @property Sessao[] $sessaos
+ * @property Sessao[] $sessoes
  * @property UserProfile[] $userProfiles
  */
 class Cinema extends \yii\db\ActiveRecord
@@ -106,6 +106,42 @@ class Cinema extends \yii\db\ActiveRecord
         return ArrayHelper::map(self::findAtivos(), 'id', 'nome');
     }
 
+    public static function findComSessoesAtivas(): array
+    {
+        return array_filter(self::findAtivos(), fn($cinema) => !empty($cinema->getSessoesAtivas()));
+    }
+
+    public function getSessoesAtivas(): array
+    {
+        return array_filter($this->sessoes, fn($sessao) => $sessao->isEstadoAtiva());
+    }
+
+    public function getFilmesComSessoesAtivas($kids = false, $q = null): array
+    {
+        $filmes = [];
+
+        // Obter filmes
+        foreach ($this->getSessoesAtivas() as $sessao)
+            $filmes[$sessao->filme->id] = $sessao->filme;
+
+        // Filtro de kids
+        if ($kids === true) {
+            $filmes = array_filter($filmes, fn($filme) => in_array($filme->rating, Filme::optsRatingKids()));
+        }
+
+        // Query
+        elseif ($q) {
+            $filmes = array_filter($filmes, fn($f) => stripos($f->titulo, $q) !== false);
+        }
+
+        // Ordernar
+        usort($filmes, function ($a, $b) {
+            return strcmp($a->titulo, $b->titulo);
+        });
+
+        return $filmes;
+    }
+
     public function getMorada(): string
     {
         return "{$this->rua}, {$this->codigo_postal} {$this->cidade}";
@@ -113,12 +149,7 @@ class Cinema extends \yii\db\ActiveRecord
 
     public function getHorario(): string
     {
-        $format = Yii::$app->params['timeFormat'];
-
-        $abertura = Yii::$app->formatter->asTime($this->horario_abertura, $format);
-        $fecho = Yii::$app->formatter->asTime($this->horario_fecho, $format);
-
-        return "{$abertura} - {$fecho}";
+        return Formatter::horario($this->horario_abertura, $this->horario_fecho);
     }
 
     public function getNumeroSalas(): int
@@ -128,7 +159,9 @@ class Cinema extends \yii\db\ActiveRecord
 
     public function getNumeroLugares(): int
     {
-        return $this->getSalas()->sum('num_colunas * num_filas');
+        $totalLugares = 0;
+        foreach ($this->salas as $sala) $totalLugares += $sala->getNumeroLugares();
+        return $totalLugares;
     }
 
     // OBTER ESTADO FORMATADO
@@ -144,25 +177,6 @@ class Cinema extends \yii\db\ActiveRecord
 
         $class = $colors[$this->estado] ?? 'text-secondary';
         return "<span class='{$class}'>{$label}</span>";
-    }
-
-    // VERIFICAR SE TEM SESSÕES ATIVAS
-    public function hasSessoesAtivas(): bool
-    {
-        foreach ($this->sessaos as $sessao) {
-            // IGNORAR SESSÕES TERMINADAS
-            if ($sessao->isEstadoTerminada()) {
-                continue;
-            }
-
-            // SE TEM SESSÕES ATIVAS --> ESTÁ ATIVA
-            if (!$sessao->isDeletable()) {
-                return true;
-            }
-        }
-
-        // NENHUMA SESSÃO ATIVA
-        return false;
     }
 
     // VERIFICAR SE TEM ALUGUERES ATIVOS
@@ -206,20 +220,6 @@ class Cinema extends \yii\db\ActiveRecord
     }
 
 
-    // OBTER SESSÕES FUTURAS DESTE CINEMA (FILME OPCIONAL)
-    public function getSessoesFuturas($filmeId = null)
-    {
-        $query = $this->getSessaos()
-            ->andWhere(['>=', 'data', date('Y-m-d')])
-            ->orderBy(['data' => SORT_ASC, 'hora_inicio' => SORT_ASC]);
-
-        if ($filmeId !== null) {
-            $query->andWhere(['filme_id' => $filmeId]);
-        }
-
-        return $query->all();
-    }
-
     // VERIFICAR SE PODE SER EDITADO
     public function isEditable(): bool { return true; }
 
@@ -256,11 +256,11 @@ class Cinema extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Sessaos]].
+     * Gets query for [[Sessões]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getSessaos()
+    public function getSessoes()
     {
         return $this->hasMany(Sessao::class, ['cinema_id' => 'id']);
     }

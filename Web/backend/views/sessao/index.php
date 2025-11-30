@@ -109,12 +109,12 @@ $this->params['breadcrumbs'][] = 'Sessões';
                                     'type' => 'time',
                                 ],
                             ],
-                            [
-                                'label' => 'Lugares Disponíveis',
-                                'attribute' => 'lugaresDisponiveis',
-                                'value' => fn($model) =>
-                                    $model->numeroLugaresDisponiveis . '/' . $model->sala->lugares,
-                            ],
+//                            [
+//                                'label' => 'Lugares Disponíveis',
+//                                'attribute' => 'lugaresDisponiveis',
+//                                'value' => fn($model) =>
+//                                    $model->numeroLugaresDisponiveis . '/' . $model->sala->lugares,
+//                            ],
                             [
                                 'attribute' => 'estado',
                                 'value' => 'estadoFormatado',
