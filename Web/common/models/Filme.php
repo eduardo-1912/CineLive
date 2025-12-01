@@ -2,7 +2,7 @@
 
 namespace common\models;
 
-use common\components\Formatter;
+use common\helpers\Formatter;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\web\UploadedFile;
@@ -22,10 +22,9 @@ use yii\web\UploadedFile;
  * @property string $poster_path
  * @property string $estado
  *
- * @property-read $generos
  * @property-read $posterUrl
  *
- * @property FilmeGenero[] $filmeGeneros
+ * @property Genero[] $generos
  * @property Sessao[] $sessoes
  */
 class Filme extends \yii\db\ActiveRecord
@@ -154,11 +153,6 @@ class Filme extends \yii\db\ActiveRecord
         return $cinemas;
     }
 
-    public function getGeneros()
-    {
-        return $this->hasMany(Genero::class, ['id' => 'genero_id'])->via('filmeGeneros');
-    }
-
     public function getPosterUrl(): string
     {
         $local = Yii::getAlias(Yii::$app->params['posterPath']);
@@ -197,31 +191,29 @@ class Filme extends \yii\db\ActiveRecord
     {
         parent::afterSave($insert, $changedAttributes);
 
-        // REMOVER GÉNEROS ANTIGOS
-        FilmeGenero::deleteAll(['filme_id' => $this->id]);
+        // remover todos os géneros anteriores
+        $this->unlinkAll('generos', true);
 
-        // ADICIONAR GÉNEROS NOVOS
+        // adicionar os novos
         if (is_array($this->generosSelecionados)) {
             foreach ($this->generosSelecionados as $generoId) {
-                $filmeGenero = new FilmeGenero();
-                $filmeGenero->filme_id = $this->id;
-                $filmeGenero->genero_id = $generoId;
-                $filmeGenero->save();
+                $genero = Genero::findOne($generoId);
+                if ($genero) {
+                    $this->link('generos', $genero);
+                }
             }
         }
     }
 
-
-
-
     /**
-     * Gets query for [[FilmeGeneros]].
+     * Gets query for [[Generos]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getFilmeGeneros()
+    public function getGeneros()
     {
-        return $this->hasMany(FilmeGenero::class, ['filme_id' => 'id']);
+        return $this->hasMany(Genero::class, ['id' => 'genero_id'])
+            ->viaTable('filme_genero', ['filme_id' => 'id']);
     }
 
     /**

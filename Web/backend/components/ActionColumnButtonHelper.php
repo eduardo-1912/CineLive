@@ -90,7 +90,7 @@ class ActionColumnButtonHelper
                     return Html::a('<i class="fas fa-toggle-on"></i>',
                         ['change-status', 'id' => $model->id, 'estado' => $model::ESTADO_ATIVO], [
                         'class' => 'btn btn-sm ' . ($model->isActivatable() ? 'btn-success' : ' btn-secondary disabled'),
-                        'title' => 'Ativar Sala',
+                        'title' => 'Ativar Cinema',
                         'data-confirm' => 'Tem a certeza que quer ativar este cinema?',
                         'data-method' => 'post',
                     ]);
@@ -102,7 +102,7 @@ class ActionColumnButtonHelper
                     return Html::a('<i class="fas fa-toggle-off"></i>',
                         ['change-status', 'id' => $model->id, 'estado' => $model::ESTADO_ENCERRADO], [
                         'class' => 'btn btn-sm ' . ($model->isClosable() ? 'btn-danger' : ' btn-secondary disabled'),
-                        'title' => 'Encerrar Sala',
+                        'title' => 'Encerrar Cinema',
                         'data-confirm' => 'Tem a certeza que quer encerrar este cinema?',
                         'data-method' => 'post',
                     ]);

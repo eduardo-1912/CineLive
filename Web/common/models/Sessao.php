@@ -2,7 +2,7 @@
 
 namespace common\models;
 
-use common\components\Formatter;
+use common\helpers\Formatter;
 use DateTime;
 use Yii;
 
@@ -17,10 +17,13 @@ use Yii;
  * @property int $sala_id
  * @property int $cinema_id
  *
+ * @property string $estado
+ *
  * @property-read $nome
  * @property-read $horario
  * @property-read array $lugaresOcupados
  * @property-read array $lugaresConfirmados
+ * @property-read string $numeroLugaresDisponiveis
  *
  * @property Bilhete[] $bilhetes
  * @property Cinema $cinema
@@ -71,6 +74,7 @@ class Sessao extends \yii\db\ActiveRecord
             'filme_id' => 'Filme',
             'sala_id' => 'Sala',
             'cinema_id' => 'Cinema',
+            'numeroLugaresDisponiveis' => 'Lugares Disponíveis',
         ];
     }
 
@@ -98,6 +102,11 @@ class Sessao extends \yii\db\ActiveRecord
             ->select('lugar')
             ->andWhere(['estado' => Bilhete::ESTADO_CONFIRMADO])
             ->column();
+    }
+
+    public function getNumeroLugaresDisponiveis()
+    {
+        return $this->sala->numeroLugares - count($this->lugaresOcupados);
     }
 
     // OBTER O ESTADO DA SESSÃO
@@ -132,10 +141,10 @@ class Sessao extends \yii\db\ActiveRecord
 
 
     // OBTER ESTADO FORMATADO (PARA /INDEX E /VIEW)
-    public function getEstadoFormatado(): string
+    public function getEstadoHtml(): string
     {
         $labels = self::optsEstado();
-        $label = $labels[$this->estado] ?? '-';
+        $label = $labels[$this->displayEstado()] ?? '-';
 
         $colors = [
             self::ESTADO_ATIVA => '',
@@ -154,13 +163,6 @@ class Sessao extends \yii\db\ActiveRecord
         return $this->getBilhetes()->select(['compra_id', 'lugar'])->indexBy('lugar')->column();
     }
 
-    public function getNumeroLugaresDisponiveis()
-    {
-        return ''; //$this->sala->lugares - count($this->lugaresOcupados)
-    }
-
-
-
 
     // CALCULAR A HORA FIM CONSOANTE FILME SELECIONADO E HORA INÍCIO
     public function getHoraFimCalculada($duracaoMinutos)
@@ -176,13 +178,11 @@ class Sessao extends \yii\db\ActiveRecord
     }
 
 
-    // VERIFICAR SE A SESSÃO PODE SER EDITADA
     public function isEditable(): bool
     {
         return $this->estado !== self::ESTADO_A_DECORRER && $this->estado !== self::ESTADO_TERMINADA;
     }
 
-    // VERIFICAR SE A SESSÃO PODE SER ELIMINADA
     public function isDeletable(): bool
     {
         return count($this->lugaresOcupados) === 0 && $this->estado !== self::ESTADO_A_DECORRER;

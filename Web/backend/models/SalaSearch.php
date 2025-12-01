@@ -14,7 +14,7 @@ use yii\helpers\ArrayHelper;
  */
 class SalaSearch extends Sala
 {
-    public $lugares;
+    public $numeroLugares;
 
     /**
      * {@inheritdoc}
@@ -22,7 +22,7 @@ class SalaSearch extends Sala
     public function rules()
     {
         return [
-            [['id', 'cinema_id', 'numero', 'num_filas', 'num_colunas', 'lugares'], 'integer'],
+            [['id', 'cinema_id', 'numero', 'num_filas', 'num_colunas', 'numeroLugares'], 'integer'],
             [['preco_bilhete'], 'number'],
             [['estado'], 'safe'],
         ];
@@ -35,11 +35,6 @@ class SalaSearch extends Sala
     {
         // bypass scenarios() implementation in the parent class
         return Model::scenarios();
-    }
-
-    public static function getCinemaFilterOptions(): array
-    {
-        return ArrayHelper::map(Cinema::find()->orderBy('nome')->asArray()->all(), 'id', 'nome');
     }
 
     /**
@@ -72,20 +67,20 @@ class SalaSearch extends Sala
 
         // grid filtering conditions
         $query->andFilterWhere([
-            'id' => $this->id,
-            'cinema_id' => $this->cinema_id,
-            'numero' => $this->numero,
-            'num_filas' => $this->num_filas,
-            'num_colunas' => $this->num_colunas,
-            'preco_bilhete' => $this->preco_bilhete,
+            'sala.id' => $this->id,
+            'sala.cinema_id' => $this->cinema_id,
+            'sala.numero' => $this->numero,
+            'sala.num_filas' => $this->num_filas,
+            'sala.num_colunas' => $this->num_colunas,
+            'sala.preco_bilhete' => $this->preco_bilhete,
         ]);
 
-        $query->andFilterWhere(['like', 'estado', $this->estado]);
+        $query->andFilterWhere(['like', 'sala.estado', $this->estado]);
 
-        // FILTRAR POR NÚMERO DE LUGARES
-        if (!empty($this->lugares)) {
-            $query->andWhere('(num_filas * num_colunas) = :lugares', [':lugares' => $this->lugares]);
+        if ($this->numeroLugares) {
+            $query->andWhere('num_filas * num_colunas = :lugares', [':lugares' => $this->numeroLugares]);
         }
+
 
         return $dataProvider;
     }

@@ -1,15 +1,11 @@
 <?php
 
-use backend\components\ActionColumnButtonHelper;
 use backend\components\AppGridView;
-use backend\components\AppActionColumn;
-use yii\bootstrap4\ActiveForm;
-use yii\helpers\Html;
-use yii\grid\GridView;
 
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\GeneroSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+/* @var $model common\models\Genero */
 
 $this->params['breadcrumbs'][] = ['label' => 'Filmes', 'url' => ['filme/index']];
 $this->title = 'Géneros';

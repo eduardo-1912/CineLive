@@ -2,8 +2,12 @@
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Sala */
+/* @var $gerirSalas bool */
+/* @var $gerirSalasCinema bool */
+/* @var $userCinema common\models\Cinema|null */
+/* @var $cinemaOptions array */
 
-$this->title = 'Editar: Sala ' . $model->numero;
+$this->title = "Editar: {$model->nome}";
 $this->params['breadcrumbs'][] = ['label' => $model->cinema->nome, 'url' => ['cinema/view?id=' . $model->cinema_id]];
 $this->params['breadcrumbs'][] = ['label' => 'Salas', 'url' => ['index', 'cinema_id' => $model->cinema_id]];
 $this->params['breadcrumbs'][] = ['label' => $model->numero, 'url' => ['view', 'id' => $model->id]];
@@ -17,11 +21,10 @@ $this->params['breadcrumbs'][] = 'Editar';
                 <div class="col-md-12">
                     <?=$this->render('_form', [
                         'model' => $model,
-                        'gerirCinemas' => $gerirCinemas,
                         'gerirSalas' => $gerirSalas,
+                        'gerirSalasCinema' => $gerirSalasCinema,
                         'userCinemaId' => $userCinema->id ?? null,
-                        'cinemasOptions' => $cinemasOptions,
-                        'proximoNumero' => $proximoNumero ?? null,
+                        'cinemaOptions' => $cinemaOptions,
                     ]) ?>
                 </div>
             </div>

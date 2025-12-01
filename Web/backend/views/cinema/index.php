@@ -2,18 +2,19 @@
 
 use backend\components\ActionColumnButtonHelper;
 use backend\components\AppGridView;
-use common\models\Cinema;
-use common\models\UserProfile;
-use yii\helpers\ArrayHelper;
+use backend\components\LinkHelper;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\CinemaSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+/* @var $estadoFilterOptions array */
 
 $this->title = 'Cinemas';
 $this->params['breadcrumbs'][] = $this->title;
+
 ?>
+
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-12">
@@ -39,19 +40,18 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                             [
                                 'attribute' => 'morada',
-                                'value' => 'morada',
                                 'headerOptions' => ['style' => 'width: 28rem;'],
                             ],
                             'email:email',
                             'telefone',
                             [
-                                'attribute' => 'gerente_id',
-                                'value' => 'gerente.profile.nome',
-                                'headerOptions' => ['style' => 'width: 12rem;'],
+                                'attribute' => 'nomeGerente',
+                                'value' => fn($model) => LinkHelper::simple($model->gerente->profile->nome, 'user/view', $model->gerente_id),
+                                'format' => 'raw',
                             ],
                             [
                                 'attribute' => 'estado',
-                                'value' => 'estadoFormatado',
+                                'value' => 'estadoHtml',
                                 'format' => 'raw',
                                 'filter' => $estadoFilterOptions,
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
@@ -67,7 +67,6 @@ $this->params['breadcrumbs'][] = $this->title;
                             'class' => 'yii\bootstrap4\LinkPager',
                         ]
                     ]); ?>
-
 
                 </div>
                 <!--.card-body-->

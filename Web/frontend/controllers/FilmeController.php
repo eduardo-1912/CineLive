@@ -2,11 +2,11 @@
 
 namespace frontend\controllers;
 
-use common\components\Formatter;
+use common\helpers\Formatter;
 use common\models\Cinema;
+use common\models\Filme;
 use frontend\helpers\CookieHelper;
 use Yii;
-use common\models\Filme;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;

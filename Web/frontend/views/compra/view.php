@@ -1,6 +1,6 @@
 <?php
 
-use common\components\Formatter;
+use common\helpers\Formatter;
 use yii\bootstrap4\Breadcrumbs;
 use yii\helpers\Html;
 

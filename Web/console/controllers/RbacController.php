@@ -32,10 +32,8 @@ class RbacController extends Controller
             'verPerfil' => 'Ver o seu perfil',
             'editarPerfil' => 'Editar o seu perfil',
             'eliminarPerfil' => 'Eliminar o seu perfil',
-
             'criarCompra' => 'Criar uma compra',
             'verCompras' => 'Ver as suas compras',
-
             'criarAluguer' => 'Criar pedido de aluguer de sala',
             'verAlugueres' => 'Ver os seus aluguers',
             'eliminarAluguer' => 'Eliminar pedido de aluguer de sala pendente',
@@ -53,7 +51,6 @@ class RbacController extends Controller
             'verFuncionariosCinema'  => 'Ver funcionários do seu cinema',
             'criarFuncionarioCinema' => 'Criar funcionário para o seu cinema',
             'alterarEstadoFuncionario' => 'Ativar/Desativar funcionários do cinema',
-
             'editarCinema' => 'Editar dados gerais do cinema',
             'gerirSalasCinema' => 'Gerir salas do cinema',
             'gerirSessoesCinema' => 'Gerir sessões do cinema',

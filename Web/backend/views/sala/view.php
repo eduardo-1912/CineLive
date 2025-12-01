@@ -1,23 +1,19 @@
 <?php
 
-use common\models\Sala;
+use common\helpers\Formatter;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Sala */
+/* @var $gerirSalas bool */
+/* @var $gerirSessoes bool */
+/** @var yii\data\ActiveDataProvider $sessoesDataProvider */
 
-$currentUser = Yii::$app->user;
-$isAdmin = $currentUser->can('admin');
-$gerirSalas = $currentUser->can('gerirSalas');
-$gerirSessoes = $currentUser->can('gerirSessoes');
-
-
-$this->title = 'Sala ' . $model->numero;
+$this->title = $model->nome;
 $this->params['breadcrumbs'][] = ['label' => $model->cinema->nome, 'url' => ['cinema/view?id=' . $model->cinema_id]];
-$this->params['breadcrumbs'][] = ['label' => 'Salas', 'url' => ['index', 'cinema_id' => $model->cinema_id]];
+$this->params['breadcrumbs'][] = ['label' => 'Salas', 'url' => 'index'];
 $this->params['breadcrumbs'][] = $model->numero;
-\yii\web\YiiAsset::register($this);
 
 ?>
 
@@ -30,7 +26,7 @@ $this->params['breadcrumbs'][] = $model->numero;
                         <?php if ($gerirSalas): ?>
                             <?= Html::a('Editar', ['update', 'id' => $model->id], ['class' => 'btn btn-warning']) ?>
 
-                            <?php if ($model->estado === $model::ESTADO_ATIVA && $model->isClosable()): ?>
+                            <?php if ($model->isClosable()): ?>
                                 <?= Html::a('Encerrar', ['change-status', 'id' => $model->id, 'estado' => $model::ESTADO_ENCERRADA], [
                                     'class' => 'btn btn-danger',
                                     'data' => [
@@ -38,7 +34,7 @@ $this->params['breadcrumbs'][] = $model->numero;
                                         'method' => 'post',
                                     ],
                                 ]) ?>
-                            <?php elseif ($model->estado === $model::ESTADO_ENCERRADA): ?>
+                            <?php elseif ($model->isActivatable()): ?>
                                 <?= Html::a('Ativar', ['change-status', 'id' => $model->id, 'estado' => $model::ESTADO_ATIVA], [
                                     'class' => 'btn btn-success',
                                     'data' => [
@@ -57,16 +53,14 @@ $this->params['breadcrumbs'][] = $model->numero;
                             'nome',
                             'num_filas',
                             'num_colunas',
-                            'lugares',
-                            'precoEmEuros',
+                            'numeroLugares',
                             [
-                                'attribute' => 'cinema.nome',
-                                'visible' => $isAdmin,
+                                'attribute' => 'preco_bilhete',
+                                'value' => fn($model) => Formatter::preco($model->preco_bilhete)
                             ],
                             [
-                                'attribute' => 'estadoFormatado',
+                                'attribute' => 'estadoHtml',
                                 'format' => 'raw',
-                                'visible' => $gerirSalas,
                             ],
                         ],
                     ]) ?>
@@ -80,7 +74,7 @@ $this->params['breadcrumbs'][] = $model->numero;
     </div>
     <!--.card-->
 
-    <?php if ($model->sessaos): ?>
+    <?php if ($model->sessoes): ?>
         <h3 class="mt-4 mb-3">Sessões</h3>
 
         <div class="card">
@@ -94,6 +88,7 @@ $this->params['breadcrumbs'][] = $model->numero;
                         </p>
                         <?= $this->render('_sessoes', [
                             'dataProvider' => $sessoesDataProvider,
+                            'gerirSessoes' => $gerirSessoes,
                         ]) ?>
                     </div>
                 </div>

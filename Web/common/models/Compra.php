@@ -3,9 +3,6 @@
 namespace common\models;
 
 use common\components\EmailHelper;
-use common\components\Formatter;
-use Exception;
-use Yii;
 
 /**
  * This is the model class for table "compra".

@@ -2,7 +2,7 @@
 
 namespace common\models;
 
-use common\components\Formatter;
+use common\helpers\Formatter;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -24,7 +24,9 @@ use yii\helpers\ArrayHelper;
  *
  * @property-read string morada
  * @property-read string $horario
+ * @property-read string $estadoHtml
  *
+ * @property AluguerSala[] $aluguerSalas
  * @property User $gerente
  * @property Sala[] $salas
  * @property Sessao[] $sessoes
@@ -62,7 +64,6 @@ class Cinema extends \yii\db\ActiveRecord
             [['nome'], 'string', 'max' => 80],
             [['rua'], 'string', 'max' => 100],
             [['codigo_postal'], 'string', 'max' => 8],
-            [['telefone'], 'number', 'max' => 9],
             [['cidade'], 'string', 'max' => 50],
             [['email'], 'string', 'max' => 255],
             ['estado', 'in', 'range' => array_keys(self::optsEstado())],
@@ -92,8 +93,51 @@ class Cinema extends \yii\db\ActiveRecord
             'horario' => 'Horário',
             'estado' => 'Estado',
             'capacidade' => 'Capacidade',
-            'gerente_id' => 'Gerente',
+            'gerente_id', 'nomeGerente' => 'Gerente',
         ];
+    }
+
+    public function getMorada(): string
+    {
+        return "{$this->rua}, {$this->codigo_postal} {$this->cidade}";
+    }
+
+    public function getHorario(): string
+    {
+        return Formatter::horario($this->horario_abertura, $this->horario_fecho);
+    }
+
+    public function getNumeroSalas(): int
+    {
+        return count($this->salas);
+    }
+
+    public function getNumeroLugares(): int
+    {
+        $totalLugares = 0;
+        foreach ($this->salas as $sala) {
+            $totalLugares += $sala->getNumeroLugares();
+        }
+
+        return $totalLugares;
+    }
+
+    public function getEstadoHtml(): string
+    {
+        $label = $this->displayEstado() ?? '-';
+
+        $colors = [
+            self::ESTADO_ATIVO => '',
+            self::ESTADO_ENCERRADO => 'text-danger',
+        ];
+
+        $class = $colors[$this->estado] ?? 'text-secondary';
+        return "<span class='{$class}'>{$label}</span>";
+    }
+
+    public static function findAllList(): array
+    {
+        return ArrayHelper::map(self::find()->all(), 'id', 'nome');
     }
 
     public static function findAtivos(): array
@@ -114,6 +158,48 @@ class Cinema extends \yii\db\ActiveRecord
     public function getSessoesAtivas(): array
     {
         return array_filter($this->sessoes, fn($sessao) => $sessao->isEstadoAtiva());
+    }
+
+    public function getProximoNumeroSala(): int
+    {
+        return ($this->getSalas()->max('numero') ?? 0) + 1;
+    }
+
+    public function getSalasDisponiveis($data, $horaInicio, $horaFim, $salaAtualId = null)
+    {
+        $salasOcupadas = $this->getSessoes()
+            ->select('sala_id')
+            ->andWhere(['data' => $data])
+            ->andWhere(['<', 'hora_inicio', $horaFim])
+            ->andWhere(['>', 'hora_fim', $horaInicio])
+            ->column();
+
+        $salasAlugadas = $this->getAluguerSalas()
+            ->select('sala_id')
+            ->where([
+                'cinema_id' => $this->id,
+                'data' => $data,
+            ])
+            ->andWhere(['estado' => [
+                AluguerSala::ESTADO_PENDENTE,
+                AluguerSala::ESTADO_CONFIRMADO,
+                AluguerSala::ESTADO_A_DECORRER,
+            ]])
+            ->andWhere(['<', 'hora_inicio', $horaFim])
+            ->andWhere(['>', 'hora_fim', $horaInicio])
+            ->column();
+
+        $salasIndisponiveis = array_unique(array_merge($salasOcupadas, $salasAlugadas));
+
+        if ($salaAtualId) {
+            $salasIndisponiveis = array_diff($salasIndisponiveis, [$salaAtualId]);
+        }
+
+        return $this->getSalas()
+            ->where(['estado' => Sala::ESTADO_ATIVA])
+            ->andFilterWhere(['not in', 'id', $salasIndisponiveis])
+            ->orderBy(['numero' => SORT_ASC])
+            ->all();
     }
 
     public function getFilmesComSessoesAtivas($kids = false, $q = null): array
@@ -142,97 +228,55 @@ class Cinema extends \yii\db\ActiveRecord
         return $filmes;
     }
 
-    public function getMorada(): string
+    public function getSessoesValidas(): array
     {
-        return "{$this->rua}, {$this->codigo_postal} {$this->cidade}";
+        return array_filter($this->sessoes, fn($sessao)
+        => $sessao->isEstadoAtiva()
+        || $sessao->isEstadoADecorrer()
+        || $sessao->isEstadoEsgotada());
     }
 
-    public function getHorario(): string
+    public function getAlugueresValidos(): array
     {
-        return Formatter::horario($this->horario_abertura, $this->horario_fecho);
+        return array_filter($this->aluguerSalas, fn($aluguer)
+            => $aluguer->isEstadoPendente()
+            || $aluguer->isEstadoConfirmado()
+            || $aluguer->isEstadoADecorrer());
     }
 
-    public function getNumeroSalas(): int
+    public function validateHorario(): bool
     {
-        return count($this->salas);
+        foreach ($this->getSessoesValidas() as $sessao) {
+            if ($sessao->hora_inicio < $this->horario_abertura ||
+                $sessao->hora_fim > $this->horario_fecho) {
+                return false;
+            }
+        }
+
+        foreach ($this->getAlugueresValidos() as $aluguer) {
+            if ($aluguer->hora_inicio < $this->horario_abertura ||
+                $aluguer->hora_fim > $this->horario_fecho) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
-    public function getNumeroLugares(): int
-    {
-        $totalLugares = 0;
-        foreach ($this->salas as $sala) $totalLugares += $sala->getNumeroLugares();
-        return $totalLugares;
+    public function isEditable(): bool {
+        return true;
     }
 
-    // OBTER ESTADO FORMATADO
-    public function getEstadoFormatado(): string
-    {
-        $labels = self::optsEstado();
-        $label = $labels[$this->estado] ?? '-';
-
-        $colors = [
-            self::ESTADO_ATIVO => '',
-            self::ESTADO_ENCERRADO => 'text-danger',
-        ];
-
-        $class = $colors[$this->estado] ?? 'text-secondary';
-        return "<span class='{$class}'>{$label}</span>";
-    }
-
-    // VERIFICAR SE TEM ALUGUERES ATIVOS
-    public function hasAlugueresAtivos(): bool
-    {
-        return $this->getAluguerSalas()
-            ->where(['estado' => [
-                AluguerSala::ESTADO_A_DECORRER,
-                AluguerSala::ESTADO_CONFIRMADO,
-                AluguerSala::ESTADO_PENDENTE]])
-            ->exists();
-    }
-
-    // VERIFICAR SE NOVO HORÁRIO TEM CONFLITOS
-    public function hasConflitosHorario(): bool
-    {
-        $agora = date('Y-m-d H:i:s');
-
-        $sessoes = Sessao::find()
-            ->where(['cinema_id' => $this->id])
-            ->andWhere(['>', 'data_hora_fim', $agora])
-            ->andWhere([
-                'or',
-                ['<', 'hora_inicio', $this->hora_abertura],
-                ['>', 'hora_fim', $this->hora_fecho],
-            ])
-            ->exists();
-
-        $alugueres = AluguerSala::find()
-            ->where(['cinema_id' => $this->id])
-            ->andWhere(['estado' => AluguerSala::ESTADO_CONFIRMADO])
-            ->andWhere(['>', 'data_fim', $agora]) // futuros
-            ->andWhere([
-                'or',
-                ['<', 'hora_inicio', $this->hora_abertura],
-                ['>', 'hora_fim', $this->hora_fecho],
-            ])
-            ->exists();
-
-        return $sessoes || $alugueres;
-    }
-
-
-    // VERIFICAR SE PODE SER EDITADO
-    public function isEditable(): bool { return true; }
-
-    // VERIFICAR SE PODE SER ATIVADO
     public function isActivatable(): bool
     {
         return $this->estado === self::ESTADO_ENCERRADO;
     }
 
-    // VERIFICAR SE PODE SER ENCERRADO
     public function isClosable(): bool
     {
-        return $this->estado === self::ESTADO_ATIVO && !$this->hasSessoesAtivas() && !$this->hasAlugueresAtivos();
+        return $this->estado === self::ESTADO_ATIVO
+            && empty($this->getSessoesValidas())
+            && empty($this->getAlugueresValidos());
     }
 
     /**

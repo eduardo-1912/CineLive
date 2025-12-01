@@ -36,7 +36,7 @@ $this->title = 'Serviços';
                 <?= $form->field($model, 'email')->textInput(['placeholder' => 'john.smith@email.com']) ?>
             </div>
 
-            <?= $form->field($model, 'subject')->textInput(['placeholder' => 'Festa de aniversário']) ?>
+            <?= $form->field($model, 'subject') ?>
             <?= $form->field($model, 'body', ['options' => ['class' => 'mb-3']])->textarea(['rows' => 6]) ?>
 
             <div class="form-group">

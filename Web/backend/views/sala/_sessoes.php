@@ -1,16 +1,11 @@
 <?php
 
-use backend\components\ActionColumnButtonHelper;
-use common\models\Cinema;
-use common\models\Sala;
-use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
+use backend\components\LinkHelper;
+use common\helpers\Formatter;
 use backend\components\AppGridView;
 
-/** @var yii\data\ActiveDataProvider $dataProvider */
-/** @var common\models\Sala $sala */
-
-$actionColumnButtons = Yii::$app->user->can('gerirSessoes') ? '{view} {update} {delete}' : '{view}';
+/* @var yii\data\ActiveDataProvider $dataProvider */
+/* @var $gerirSessoes bool */
 
 ?>
 
@@ -25,42 +20,37 @@ $actionColumnButtons = Yii::$app->user->can('gerirSessoes') ? '{view} {update} {
             'headerOptions' => ['style' => 'width: 3rem;'],
         ],
         [
-            'attribute' => 'tituloFilme',
+            'attribute' => 'filme.titulo',
             'label' => 'Filme',
             'format' => 'raw',
-            'value' => fn($model) =>
-            Html::a($model->filme->titulo,
-                ['filme/view', 'id' => $model->filme_id],
-                ['class' => 'text-decoration-none text-primary']),
+            'value' => fn($model) => LinkHelper::simple($model->filme->titulo, 'filme/view', $model->filme->id),
             'headerOptions' => ['style' => 'width: 18rem;'],
         ],
         [
             'attribute' => 'data',
-            'value' => 'dataFormatada',
+            'value' => fn($model) => Formatter::data($model->data),
         ],
         [
             'attribute' => 'hora_inicio',
-            'value' => 'horaInicioFormatada',
+            'value' => fn($model) => Formatter::hora($model->hora_inicio),
         ],
         [
             'attribute' => 'hora_fim',
-            'value' => 'horaFimFormatada',
+            'value' => fn($model) => Formatter::hora($model->hora_fim),
         ],
         [
-            'label' => 'Lugares Disponíveis',
-            'attribute' => 'lugaresDisponiveis',
-            'value' => fn($model) =>
-                $model->numeroLugaresDisponiveis . '/' . $model->sala->lugares,
+            'attribute' => 'numeroLugaresDisponiveis',
+            'value' => fn($model) => $model->numeroLugaresDisponiveis . '/' . $model->sala->numeroLugares,
         ],
         [
             'attribute' => 'estado',
-            'value' => 'estadoFormatado',
+            'value' => 'estadoHtml',
             'format' => 'raw',
             'headerOptions' => ['style' => 'width: 14rem;'],
         ],
         [
             'class' => 'backend\components\AppActionColumn',
-            'template' => $actionColumnButtons,
+            'template' => $gerirSessoes ? '{view} {update} {delete}' : '{view}',
             'controller' => 'sessao',
             'headerOptions' => ['style' => 'width: 1rem;'],
         ],

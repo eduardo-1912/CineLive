@@ -13,6 +13,7 @@ use common\models\Cinema;
 class CinemaSearch extends Cinema
 {
     public $morada;
+    public $nomeGerente;
 
     /**
      * {@inheritdoc}
@@ -23,7 +24,7 @@ class CinemaSearch extends Cinema
             [['id', 'telefone', 'gerente_id'], 'integer'],
             [['nome', 'rua', 'codigo_postal', 'cidade', 'email', 'horario_abertura', 'horario_fecho', 'estado'], 'safe'],
             [['latitude', 'longitude'], 'number'],
-            [['morada'], 'safe'],
+            [['morada', 'nomeGerente'], 'safe'],
         ];
     }
 
@@ -45,10 +46,9 @@ class CinemaSearch extends Cinema
      */
     public function search($params)
     {
-        $query = Cinema::find();
+        $query = Cinema::find()->joinWith('gerente.profile');
 
         // add conditions that should always apply here
-
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
@@ -66,23 +66,24 @@ class CinemaSearch extends Cinema
 
         // grid filtering conditions
         $query->andFilterWhere([
-            'id' => $this->id,
-            'latitude' => $this->latitude,
-            'longitude' => $this->longitude,
-            'telefone' => $this->telefone,
-            'horario_abertura' => $this->horario_abertura,
-            'horario_fecho' => $this->horario_fecho,
-            'estado' => $this->estado,
-            'gerente_id' => $this->gerente_id,
+            'cinema.id' => $this->id,
+            'cinema.latitude' => $this->latitude,
+            'cinema.longitude' => $this->longitude,
+            'cinema.telefone' => $this->telefone,
+            'cinema.horario_abertura' => $this->horario_abertura,
+            'cinema.horario_fecho' => $this->horario_fecho,
+            'cinema.estado' => $this->estado,
+            'cinema.gerente_id' => $this->gerente_id,
         ]);
 
-        $query->andFilterWhere(['like', 'nome', $this->nome])
-            ->andFilterWhere(['like', 'email', $this->email])
+        $query->andFilterWhere(['like', 'cinema.nome', $this->nome])
+            ->andFilterWhere(['like', 'cinema.email', $this->email])
             ->andFilterWhere(['or',
-                ['like', 'rua', $this->morada],
-                ['like', 'codigo_postal', $this->morada],
-                ['like', 'cidade', $this->morada],
-            ]);
+                ['like', 'cinema.rua', $this->morada],
+                ['like', 'cinema.codigo_postal', $this->morada],
+                ['like', 'cinema.cidade', $this->morada],
+            ])
+            ->andFilterWhere(['like', 'user_profile.nome', $this->nomeGerente]);
 
         return $dataProvider;
     }

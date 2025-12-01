@@ -10,7 +10,7 @@ use Yii;
  * @property int $id
  * @property string $nome
  *
- * @property FilmeGenero[] $filmeGeneros
+ * @property Filme[] $filmes
  */
 class Genero extends \yii\db\ActiveRecord
 {
@@ -53,13 +53,13 @@ class Genero extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[FilmeGeneros]].
+     * Gets query for [[Filmes]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getFilmeGeneros()
+    public function getFilmes()
     {
-        return $this->hasMany(FilmeGenero::class, ['genero_id' => 'id']);
+        return $this->hasMany(Filme::class, ['id' => 'filme_id'])
+            ->viaTable('filme_genero', ['genero_id' => 'id']);
     }
-
 }

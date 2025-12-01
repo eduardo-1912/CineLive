@@ -81,7 +81,8 @@ class AluguerSalaController extends Controller
 
         $salaOptions = [];
         if ($cinema_id && $data && $hora_inicio && $hora_fim) {
-            $salas = Sala::findDisponiveis($cinema_id, $data, $hora_inicio, $hora_fim);
+            $cinema = Cinema::findOne($cinema_id);
+            $salas = $cinema->getSalasDisponiveis($data, $hora_inicio, $hora_fim);
             $salaOptions = ArrayHelper::map($salas, 'id', 'nome');
         }
 

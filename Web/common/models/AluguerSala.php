@@ -3,10 +3,9 @@
 namespace common\models;
 
 use common\components\EmailHelper;
-use common\components\Formatter;
+use common\helpers\Formatter;
 use DateTime;
 use Yii;
-use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "aluguer_sala".

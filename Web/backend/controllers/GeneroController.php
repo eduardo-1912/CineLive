@@ -5,13 +5,11 @@ namespace backend\controllers;
 use Yii;
 use common\models\Genero;
 use backend\models\GeneroSearch;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
-/**
- * GeneroController implements the CRUD actions for Genero model.
- */
 class GeneroController extends Controller
 {
     /**
@@ -21,7 +19,7 @@ class GeneroController extends Controller
     {
         return [
             'access' => [
-                'class' => \yii\filters\AccessControl::class,
+                'class' => AccessControl::class,
                 'rules' => [
                     [
                         'allow' => true,
@@ -30,7 +28,7 @@ class GeneroController extends Controller
                 ],
             ],
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class' => VerbFilter::class,
                 'actions' => [
                     'delete' => ['POST'],
                 ],
@@ -38,22 +36,18 @@ class GeneroController extends Controller
         ];
     }
 
-    // ADMIN --> VÊ E CRIA GÉNEROS
     public function actionIndex()
     {
         $searchModel = new GeneroSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        // CRIAR NOVO GÉNERO
         $model = new Genero();
 
-        // GUARDAR NOVO GÉNERO
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             Yii::$app->session->setFlash('success', 'Género criado com sucesso.');
             return $this->redirect(['index']);
         }
 
-        // PASSAR O MODELO PARA O FORM
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -61,7 +55,6 @@ class GeneroController extends Controller
         ]);
     }
 
-    // ADMIN --> EDITA UM GÉNERO
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
@@ -75,7 +68,6 @@ class GeneroController extends Controller
         ]);
     }
 
-    // ADMIN --> ELIMINA GÉNERO
     public function actionDelete($id)
     {
         $this->findModel($id)->delete();

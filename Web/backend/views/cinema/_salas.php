@@ -1,16 +1,12 @@
 <?php
 
 use backend\components\ActionColumnButtonHelper;
-use common\models\Cinema;
-use common\models\Sala;
-use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
 use backend\components\AppGridView;
+use common\helpers\Formatter;
 
+/** @var bool $gerirSalas */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 /** @var common\models\Sala $sala */
-
-$actionColumnButtons = $gerirSalas ? '{view} {update} {activate} {close}' : '{view}';
 
 ?>
 
@@ -27,17 +23,20 @@ $actionColumnButtons = $gerirSalas ? '{view} {update} {activate} {close}' : '{vi
         'nome',
         'num_filas',
         'num_colunas',
-        'lugares',
-        'precoEmEuros',
+        'numeroLugares',
         [
-            'attribute' => 'estadoFormatado',
+            'attribute' => 'preco_bilhete',
+            'value' => fn($model) => Formatter::preco($model->preco_bilhete)
+        ],
+        [
+            'attribute' => 'estadoHtml',
             'format' => 'raw',
             'headerOptions' => ['style' => 'width: 9rem;'],
         ],
         [
             'class' => 'backend\components\AppActionColumn',
             'controller' => 'sala',
-            'template' => $actionColumnButtons,
+            'template' => $gerirSalas ? '{view} {update} {activate} {close}' : '{view}',
             'buttons' => ActionColumnButtonHelper::salaButtons(),
             'headerOptions' => ['style' => 'width: 3rem;'],
         ],

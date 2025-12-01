@@ -19,10 +19,11 @@ use yii\db\Expression;
  * @property-read string $nome
  * @property-read int $numeroLugares
  * @property-read array $lugares
+ * @property-read string $estadoHtml
  *
  * @property AluguerSala[] $aluguerSalas
  * @property Cinema $cinema
- * @property Sessao[] $sessaos
+ * @property Sessao[] $sessoes
  */
 class Sala extends \yii\db\ActiveRecord
 {
@@ -53,7 +54,7 @@ class Sala extends \yii\db\ActiveRecord
             [['estado'], 'string'],
             ['estado', 'in', 'range' => array_keys(self::optsEstado())],
             [['cinema_id'], 'exist', 'skipOnError' => true, 'targetClass' => Cinema::class, 'targetAttribute' => ['cinema_id' => 'id']],
-            ['num_filas', 'max' => 26],
+            ['num_filas', 'integer', 'max' => 26],
         ];
     }
 
@@ -69,9 +70,9 @@ class Sala extends \yii\db\ActiveRecord
             'numero' => 'Número',
             'num_filas' => 'Número Filas',
             'num_colunas' => 'Número Colunas',
+            'numeroLugares' => 'Lugares',
             'preco_bilhete' => 'Preço Bilhete',
-            'estado' => 'Estado',
-            'estadoFormatado' => 'Estado',
+            'estado', 'estadoHtml' => 'Estado',
         ];
     }
 
@@ -97,43 +98,9 @@ class Sala extends \yii\db\ActiveRecord
         return $lugares;
     }
 
-    public static function findDisponiveis($cinemaId, $data, $horaInicio, $horaFim, $salaAtualId = null): array
+    public function getEstadoHtml(): string
     {
-        $salasOcupadas = Sessao::find()
-            ->select('id')
-            ->where(['data' => $data])
-            ->andWhere(['and', ['<', 'hora_inicio', $horaFim], ['>', 'hora_fim', $horaInicio]])
-            ->column();
-
-        $salasAlugadas = AluguerSala::find()
-            ->select('id')
-            ->where(['data' => $data])
-            ->andWhere(['estado' => [
-                AluguerSala::ESTADO_PENDENTE,
-                AluguerSala::ESTADO_CONFIRMADO,
-                AluguerSala::ESTADO_A_DECORRER]])
-            ->andWhere(['and', ['<', 'hora_inicio', $horaFim], ['>', 'hora_fim', $horaInicio]])
-            ->column();
-
-        $salasIndisponiveis = array_unique(array_merge($salasOcupadas, $salasAlugadas));
-
-        if ($salaAtualId) {
-            $salasIndisponiveis = array_diff($salasIndisponiveis, [$salaAtualId]);
-        }
-
-        return self::find()
-            ->where(['cinema_id' => $cinemaId, 'estado' => self::ESTADO_ATIVA])
-            ->andFilterWhere(['not in', 'id', $salasIndisponiveis])
-            ->orderBy(['numero' => SORT_ASC])
-            ->all();
-    }
-
-
-    // OBTER ESTADO FORMATADO
-    public function getEstadoFormatado(): string
-    {
-        $labels = self::optsEstado();
-        $label = $labels[$this->estado] ?? '-';
+        $label = $this->displayEstado() ?? '-';
 
         $colors = [
             self::ESTADO_ATIVA => '',
@@ -144,68 +111,37 @@ class Sala extends \yii\db\ActiveRecord
         return "<span class='{$class}'>{$label}</span>";
     }
 
-    // VERIFICAR SE TEM SESSÕES ATIVAS
-    public function hasSessoesAtivas(): bool
+    public function getSessoesValidas(): array
     {
-        foreach ($this->sessaos as $sessao)
-        {
-            // IGNORAR SESSÕES TERMINADAS
-            if ($sessao->isEstadoTerminada()) {
-                continue;
-            }
-
-            // SE TEM SESSÕES ATIVAS
-            if (!$sessao->isDeletable())
-            {
-                return true;
-            }
-        }
-
-        // SE NENHUMA SESSÃO IMPEDE O ENCERRAMENTO DA SALA
-        return false;
+        return array_filter($this->sessoes, fn($sessao)
+            => $sessao->isEstadoAtiva()
+            || $sessao->isEstadoADecorrer()
+            || $sessao->isEstadoEsgotada());
     }
 
-    // VERIFICAR SE TEM ALUGUERES ATIVOS
-    public function hasAlugueresAtivos(): bool
+    public function getAlugueresValidos(): array
     {
-        return $this->getAluguerSalas()
-            ->where(['estado' => [
-                AluguerSala::ESTADO_A_DECORRER,
-                AluguerSala::ESTADO_CONFIRMADO,
-            ]])
-            ->exists();
+        return array_filter($this->aluguerSalas, fn($aluguer)
+        => $aluguer->isEstadoPendente()
+            || $aluguer->isEstadoConfirmado()
+            || $aluguer->isEstadoADecorrer());
     }
 
-
-
-
-    // OBTER O PRÓXIMO NÚMERO INDICATIVO AO CRIAR UMA SALA NOVA
-    public static function getProximoNumeroPorCinema($cinemaId): int
-    {
-        if (!$cinemaId) {
-            return 1;
-        }
-
-        $ultimoNumero = self::find()
-            ->where(['cinema_id' => $cinemaId])
-            ->max('numero');
-
-        return ($ultimoNumero ?? 0) + 1;
+    public function isEditable(): bool {
+        return $this->cinema->isEstadoAtivo();
     }
 
-    // VERIFICAR SE PODE SER EDITADA
-    public function isEditable(): bool { return true; }
-
-    // VERIFICAR SE PODE SER ATIVADA
     public function isActivatable(): bool
     {
-        return $this->estado === self::ESTADO_ENCERRADA && $this->cinema->isEstadoAtivo();
+        return $this->estado === self::ESTADO_ENCERRADA
+            && $this->cinema->isEstadoAtivo();
     }
 
-    // VERIFICAR SE PODE SER ENCERRADA
     public function isClosable(): bool
     {
-        return !$this->hasSessoesAtivas() && !$this->hasAlugueresAtivos();
+        return $this->estado === self::ESTADO_ATIVA
+            && empty($this->getSessoesValidas())
+            && empty($this->getAlugueresValidos());
     }
 
     /**
@@ -229,11 +165,11 @@ class Sala extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Sessaos]].
+     * Gets query for [[Sessões]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getSessaos()
+    public function getSessoes()
     {
         return $this->hasMany(Sessao::class, ['sala_id' => 'id']);
     }

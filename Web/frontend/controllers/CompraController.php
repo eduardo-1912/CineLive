@@ -2,7 +2,7 @@
 
 namespace frontend\controllers;
 
-use common\components\Formatter;
+use common\helpers\Formatter;
 use common\models\Bilhete;
 use common\models\Compra;
 use common\models\Sessao;

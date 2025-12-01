@@ -1,8 +1,9 @@
 <?php
 
-namespace common\components;
+namespace common\helpers;
 
 use Yii;
+use yii\helpers\Html;
 
 class Formatter
 {
@@ -45,5 +46,4 @@ class Formatter
         $restoMinutos = $minutos % 60;
         return "{$horas}h {$restoMinutos}min";
     }
-
 }

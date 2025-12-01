@@ -1,43 +1,24 @@
 <?php
 
-use backend\components\LinkHelper;
-use common\models\Cinema;
-use common\models\Sala;
-use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
-use backend\components\AppGridView;
-use backend\components\AppActionColumn;
 use backend\components\ActionColumnButtonHelper;
+use backend\components\AppGridView;
+use backend\components\LinkHelper;
+use common\helpers\Formatter;
+use yii\helpers\Html;
 
 /* @var $this yii\web\View */
+/* @var $cinema common\models\Cinema|null */
+/* @var $gerirSalas bool */
 /* @var $searchModel backend\models\SalaSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+/* @var $cinemaOptions array */
+/* @var $estadoOptions array */
 
-$currentUser = Yii::$app->user;
-$userCinema = $currentUser->identity->profile->cinema;
-$isAdmin = $currentUser->can('admin');
-$gerirSalas = $currentUser->can('gerirSalas');
-$actionColumnButtons = $gerirSalas ? '{view} {update} {activate} {close}' : '{view}';
-
-// ALGUM CINEMA FOI PASSADO POR PARÂMETRO
-if (!empty($cinemaId) && $cinemaSelecionado)
-{
-    $this->title = 'Salas de ' . $cinemaSelecionado->nome;
-    $this->params['breadcrumbs'][] = [
-        'label' => $cinemaSelecionado->nome,
-        'url' => ['cinema/view', 'id' => $cinemaSelecionado->id]
-    ];
-}
-else
-{
-    $this->title = 'Salas';
-    $this->params['breadcrumbs'][] = [
-        'label' => $isAdmin ? 'Cinemas' : $userCinema->nome,
-        'url' => [$isAdmin ? 'cinema/index' : ('cinema/view?id=' . $userCinema->id)]
-    ];
-}
-
+$this->title = $cinema ? "Salas de {$cinema->nome}" : 'Salas';
+$this->params['breadcrumbs'][] = ['label' => $cinema ? $cinema->nome : 'Cinemas',
+    'url' => $cinema ? ['cinema/view', 'id' => $cinema->id] : ['index']];
 $this->params['breadcrumbs'][] = 'Salas';
+
 ?>
 
 <div class="container-fluid">
@@ -71,31 +52,31 @@ $this->params['breadcrumbs'][] = 'Salas';
                             ],
                             'num_filas',
                             'num_colunas',
-                            'lugares',
+                            'numeroLugares',
                             [
                                 'attribute' => 'preco_bilhete',
-                                'value' => 'precoEmEuros'
+                                'value' => fn($model) => Formatter::preco($model->preco_bilhete)
                             ],
                             [
                                 'attribute' => 'cinema_id',
                                 'format' => 'raw',
-                                'value' => fn($model) => LinkHelper::cinema($model),
-                                'filter' => $cinemaFilterOptions,
+                                'value' => fn($model) => LinkHelper::simple($model->cinema->nome, 'cinema/view', $model->cinema_id),
+                                'filter' => $cinemaOptions,
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
                                 'headerOptions' => ['style' => 'width: 12rem;'],
-                                'visible' => $isAdmin && empty($cinemaId),
+                                'visible' => !$cinema,
                             ],
                             [
                                 'attribute' => 'estado',
-                                'value' => 'estadoFormatado',
+                                'value' => 'estadoHtml',
                                 'format' => 'raw',
-                                'filter' => $estadoFilterOptions,
+                                'filter' => $estadoOptions,
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
                                 'headerOptions' => ['style' => 'width: 9rem;'],
                             ],
                             [
                                 'class' => 'backend\components\AppActionColumn',
-                                'template' => $actionColumnButtons,
+                                'template' => $gerirSalas ? '{view} {update} {activate} {close}' : '{view}',
                                 'buttons' => ActionColumnButtonHelper::salaButtons(),
                                 'headerOptions' => ['style' => 'width: 3rem;'],
                             ],

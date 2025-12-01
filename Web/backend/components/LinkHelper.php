@@ -6,49 +6,16 @@ use yii\helpers\Html;
 
 class LinkHelper
 {
-    public static function filme($model)
+    public static function simple($valor, $path, $id)
     {
-        return Html::a(
-            $model->filme->titulo,
-            ['filme/view', 'id' => $model->filme_id],
-            ['class' => 'text-decoration-none text-primary']
-        );
+        return Html::a($valor, [$path, 'id' => $id],
+            ['class' => 'text-decoration-none text-primary']);
     }
 
-    public static function cinema($model)
+    public static function condition($valor, $path, $id, $else)
     {
-        return Html::a(
-            $model->cinema->nome,
-            ['cinema/view', 'id' => $model->cinema_id],
-            ['class' => 'text-decoration-none text-primary']
-        );
-    }
-
-    public static function sala($model)
-    {
-        return Html::a(
-            $model->sala->nome,
-            ['sala/view', 'id' => $model->sala_id],
-            ['class' => 'text-decoration-none text-primary']
-        );
-    }
-
-    public static function sessao($model)
-    {
-        return Html::a(
-            $model->sessao->nome,
-            ['sessao/view', 'id' => $model->sessao_id],
-            ['class' => 'text-decoration-none text-primary']
-        );
-    }
-
-
-    public static function cliente($model)
-    {
-        return $model->cliente && $model->cliente->profile
-            ? Html::a($model->cliente->profile->nome,
-                ['user/view', 'id' => $model->cliente->id],
-                ['class' => 'text-decoration-none text-primary'])
-            : '<span class="text-muted">Conta eliminada</span>';
+        return $valor ? Html::a($valor, [$path, 'id' => $id],
+            ['class' => 'text-decoration-none text-primary'])
+            : '<span class="text-muted">' . $else . '</span>';
     }
 }

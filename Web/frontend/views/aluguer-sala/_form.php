@@ -42,11 +42,9 @@ use yii\bootstrap5\ActiveForm;
     <?= $formPost->field($model, 'hora_fim')->hiddenInput()->label(false) ?>
     <?= $formPost->field($model, 'cinema_id')->hiddenInput()->label(false) ?>
 
-    <?= $formGet->field($model, 'sala_id')->dropDownList(
-            $salaOptions, ['prompt' => 'Selecione a sala']
-    ) ?>
+    <?= $formGet->field($model, 'sala_id')->dropDownList($salaOptions, ['prompt' => 'Selecione a sala']) ?>
 
-    <?= $formPost->field($model, 'tipo_evento') ?>
+    <?= $formPost->field($model, 'tipo_evento')->textInput(['placeholder' => 'Festa de aniversário']) ?>
     <?= $formPost->field($model, 'observacoes')->textarea(['rows' => 6]) ?>
 
     <div class="form-group">

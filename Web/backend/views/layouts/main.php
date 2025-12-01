@@ -3,7 +3,6 @@
 /* @var $this \yii\web\View */
 /* @var $content string */
 
-use backend\components\SidebarHelper;
 use common\components\ToastWidget;
 use yii\bootstrap4\ActiveForm;
 use yii\helpers\Html;
@@ -51,7 +50,7 @@ $this->registerJsFile($publishedRes[1].'/control_sidebar.js', ['depends' => '\ha
     <!-- /.navbar -->
 
     <!-- Main Sidebar Container -->
-    <?= $this->render('sidebar', ['assetDir' => $assetDir, 'data' => SidebarHelper::getSidebarData(),]) ?>
+    <?= $this->render('sidebar', ['assetDir' => $assetDir]) ?>
 
     <!-- Content Wrapper. Contains page content -->
     <?= $this->render('content', ['content' => $content, 'assetDir' => $assetDir]) ?>

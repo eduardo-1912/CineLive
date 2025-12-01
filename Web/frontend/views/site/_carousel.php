@@ -1,6 +1,6 @@
 <?php
 
-use common\components\Formatter;
+use common\helpers\Formatter;
 use yii\helpers\Url;
 
 /** @var yii\web\View $this */
