@@ -71,7 +71,7 @@ class Sessao extends \yii\db\ActiveRecord
             'hora_inicio' => 'Hora Início',
             'hora_fim' => 'Hora Fim',
             'horario' => 'Horário',
-            'filme_id' => 'Filme',
+            'filme_id', 'tituloFilme' => 'Filme',
             'sala_id' => 'Sala',
             'cinema_id' => 'Cinema',
             'numeroLugaresDisponiveis' => 'Lugares Disponíveis',

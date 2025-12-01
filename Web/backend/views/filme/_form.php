@@ -1,15 +1,14 @@
 <?php
 
 use common\models\Filme;
-use common\models\Genero;
 use yii\helpers\Html;
 use yii\bootstrap5\ActiveForm;
-use yii\helpers\ArrayHelper;
 use yii\web\JqueryAsset;
 
 /** @var yii\web\View $this */
 /** @var common\models\Filme $model */
 /** @var yii\widgets\ActiveForm $form */
+/** @var array $generoOptions */
 
 ?>
 
@@ -20,32 +19,22 @@ use yii\web\JqueryAsset;
     ]); ?>
 
     <?= $form->field($model, 'titulo')->textInput(['maxlength' => true]) ?>
-
     <?= $form->field($model, 'sinopse')->textarea(['rows' => 3]) ?>
-
     <?= $form->field($model, 'duracao')->textInput()->label('Duração (em minutos)') ?>
-
     <?= $form->field($model, 'generosSelecionados')->dropDownList(
-        $generosOptions, ['multiple' => true, 'id' => 'generos-select',]
+        $generoOptions, ['multiple' => true, 'id' => 'generos-select',]
     ) ?>
-
     <?= $form->field($model, 'rating')->dropDownList(Filme::optsRating()) ?>
-
     <?= $form->field($model, 'estreia')->input('date') ?>
-
     <?= $form->field($model, 'idioma')->textInput(['maxlength' => true]) ?>
-
     <?= $form->field($model, 'realizacao')->textInput(['maxlength' => true]) ?>
-
     <?= $form->field($model, 'trailer_url')->textInput(['maxlength' => true]) ?>
-
     <?= $form->field($model, 'estado')->dropDownList($model::optsEstado()) ?>
-
     <?= $form->field($model, 'posterFile')->fileInput() ?>
 
     <?php if ($model->poster_path): ?>
         <div class="mb-2">
-            <?= Html::img($model->getPosterUrl(), [
+            <?= Html::img($model->posterUrl, [
                 'style' => 'max-width:200px; border-radius:8px'
             ]) ?>
         </div>

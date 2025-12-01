@@ -1,39 +1,21 @@
 <?php
 
-use backend\components\ActionColumnButtonHelper;
 use backend\components\AppGridView;
 use backend\components\LinkHelper;
-use common\models\Cinema;
-use common\models\Filme;
-use common\models\Sala;
-use common\models\Sessao;
-use yii\helpers\ArrayHelper;
+use common\helpers\Formatter;
 use yii\helpers\Html;
-use yii\grid\GridView;
 
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\SessaoSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+/* @var $cinema common\models\Cinema */
+/* @var $gerirSessoes bool */
+/* @var $cinemaOptions array */
+/* @var $estadoOptions array */
 
-// ALGUM CINEMA FOI PASSADO POR PARÂMETRO
-if (!empty($cinemaId) && $cinemaSelecionado)
-{
-    $this->title = 'Sessões de ' . $cinemaSelecionado->nome;
-    $this->params['breadcrumbs'][] = [
-        'label' => $cinemaSelecionado->nome,
-        'url' => ['cinema/view', 'id' => $cinemaSelecionado->id]
-    ];
-}
+$this->title = $cinema ? "Sessões de {$cinema->nome}" : 'Sessões';
+if ($cinema) $this->params['breadcrumbs'][] = ['label' => $cinema->nome, 'url' => ['cinema/view', 'id' => $cinema->id]];
 
-// VISTA DE ADMIN/GERENTE
-else
-{
-    $this->title = 'Sessões';
-    $this->params['breadcrumbs'][] = [
-        'label' => $gerirCinemas ? 'Cinemas' : $userCinema->nome,
-        'url' => [$gerirCinemas ? 'cinema/index' : ('cinema/view?id=' . $userCinema->id)]
-    ];
-}
 $this->params['breadcrumbs'][] = 'Sessões';
 
 ?>
@@ -64,30 +46,29 @@ $this->params['breadcrumbs'][] = 'Sessões';
                             ],
                             [
                                 'attribute' => 'tituloFilme',
-                                'label' => 'Filme',
                                 'format' => 'raw',
-                                'value' => fn($model) => LinkHelper::filme($model),
+                                'value' => fn($model) => LinkHelper::simple($model->filme->titulo, 'filme/view', $model->filme_id),
                                 'headerOptions' => ['style' => 'width: 18rem;'],
                             ],
                             [
                                 'attribute' => 'cinema_id',
                                 'format' => 'raw',
-                                'value' => fn($model) => LinkHelper::cinema($model),
-                                'filter' => $cinemaFilterOptions,
+                                'value' => fn($model) => LinkHelper::simple($model->cinema->nome, 'cinema/view', $model->cinema_id),
+                                'filter' => $cinemaOptions,
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
                                 'headerOptions' => ['style' => 'width: 28rem;'],
-                                'visible' => $gerirCinemas && empty($cinemaId),
+                                'visible' => !$cinema && $gerirSessoes,
                             ],
                             [
                                 'attribute' => 'numeroSala',
                                 'label' => 'Sala',
                                 'format' => 'raw',
-                                'value' => fn($model) => LinkHelper::sala($model),
+                                'value' => fn($model) => LinkHelper::simple($model->sala->nome, 'sala/view', $model->sala_id),
                                 'headerOptions' => ['style' => 'width: 8rem;'],
                             ],
                             [
                                 'attribute' => 'data',
-                                'value' => 'dataFormatada',
+                                'value' => fn($model) => Formatter::data($model->data),
                                 'filterInputOptions' => [
                                     'class' => 'form-control',
                                     'type' => 'date',
@@ -95,7 +76,7 @@ $this->params['breadcrumbs'][] = 'Sessões';
                             ],
                             [
                                 'attribute' => 'hora_inicio',
-                                'value' => 'horaInicioFormatada',
+                                'value' => fn($model) => Formatter::hora($model->hora_inicio),
                                 'filterInputOptions' => [
                                     'class' => 'form-control',
                                     'type' => 'time',
@@ -103,29 +84,29 @@ $this->params['breadcrumbs'][] = 'Sessões';
                             ],
                             [
                                 'attribute' => 'hora_fim',
-                                'value' => 'horaFimFormatada',
+                                'value' => fn($model) => Formatter::hora($model->hora_fim),
                                 'filterInputOptions' => [
                                     'class' => 'form-control',
                                     'type' => 'time',
                                 ],
                             ],
-//                            [
-//                                'label' => 'Lugares Disponíveis',
-//                                'attribute' => 'lugaresDisponiveis',
-//                                'value' => fn($model) =>
-//                                    $model->numeroLugaresDisponiveis . '/' . $model->sala->lugares,
-//                            ],
+                            [
+                                'label' => 'Lugares Disponíveis',
+                                'attribute' => 'lugaresDisponiveis',
+                                'value' => fn($model) =>
+                                    $model->numeroLugaresDisponiveis . '/' . $model->sala->numeroLugares,
+                            ],
                             [
                                 'attribute' => 'estado',
-                                'value' => 'estadoFormatado',
+                                'value' => 'estadoHtml',
                                 'format' => 'raw',
-                                'filter' => $estadoFilterOptions,
+                                'filter' => $estadoOptions,
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
                                 'headerOptions' => ['style' => 'width: 14rem;'],
                             ],
                             [
                                 'class' => 'backend\components\AppActionColumn',
-                                'template' => $actionColumnButtons,
+                                'template' => $gerirSessoes ? '{view} {update} {delete}' : '{view}',
                                 'headerOptions' => ['style' => 'width: 1rem;'],
                             ],
                         ],

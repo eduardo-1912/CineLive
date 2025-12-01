@@ -10,6 +10,7 @@ use Yii;
 use common\models\Sessao;
 use backend\models\SessaoSearch;
 use yii\data\ActiveDataProvider;
+use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
@@ -28,7 +29,7 @@ class SessaoController extends Controller
     {
         return [
             'access' => [
-                'class' => \yii\filters\AccessControl::class,
+                'class' => AccessControl::class,
                 'rules' => [
                     [
                         'allow' => true,
@@ -47,7 +48,7 @@ class SessaoController extends Controller
                 ],
             ],
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class' => VerbFilter::class,
                 'actions' => [
                     'delete' => ['POST'],
                 ],
@@ -55,91 +56,57 @@ class SessaoController extends Controller
         ];
     }
 
-    // ADMIN -> VÊ AS SESSÕES DE TODOS OS CINEMAS
-    // GERENTE/FUNCIONÁRIO --> APENAS VÊ AS SESSÕES DO SEU CINEMA
     public function actionIndex($cinema_id = null)
     {
-        // OBTER O USER ATUAL
         $currentUser = Yii::$app->user;
+        $userCinemaId = $currentUser->identity->profile->cinema_id ?? null;
+        $cinema = Cinema::findOne($userCinemaId ?? $cinema_id);
 
-        $userCinema = $currentUser->identity->profile->cinema;
-        $gerirCinemas = $currentUser->can('gerirCinemas');
         $gerirSessoes = $currentUser->can('gerirSessoes');
+        $gerirSessoesCinema = $currentUser->can('gerirSessoesCinema', ['model' => $cinema]);
+        $verSessoesCinema = $currentUser->can('verSessoesCinema', ['model' => $cinema]);
 
-        // CRIAR SEARCH MODEL E QUERY NA DB
         $searchModel = new SessaoSearch();
         $params = Yii::$app->request->queryParams;
 
-        // FILTRO POR CINEMA
-        $cinemaFilterOptions = ArrayHelper::map(Cinema::find()->asArray()->all(), 'id', 'nome');
-
-        $actionColumnButtons = $gerirSessoes ? '{view} {update} {delete}' : '{view}';
-
-        // SE FOR ADMIN --> VÊ TODOS OS UTILIZADORES
-        if ($currentUser->can('admin')) {
-            if ($cinema_id !== null) {
+        if ($gerirSessoes) {
+            if ($cinema_id) {
                 $params['SessaoSearch']['cinema_id'] = $cinema_id;
             }
-            $dataProvider = $searchModel->search($params);
         }
-
-        // SE FOR GERENTE/FUNCIONÁRIO --> APENAS VÊ OS FUNCIONÁRIOS DO SEU CINEMA
+        elseif (($gerirSessoesCinema || $verSessoesCinema) && $userCinemaId) {
+            $params['SessaoSearch']['cinema_id'] = $userCinemaId;
+        }
         else {
-            // OBTER PERFIL DO USER ATUAL
-            $userProfile = $currentUser->identity->profile;
-
-            // VERIFICAR SE TEM CINEMA ASSOCIADO
-            if (!$userProfile || !$userProfile->cinema_id) {
-                throw new ForbiddenHttpException('Não está associado a nenhum cinema.');
-            }
-
-            if ($cinema_id !== null) {
-                $this->redirect(['index']);
-            }
-
-            // APLICAR FILTRO DE CINEMA
-            $params['SessaoSearch']['cinema_id'] = $userProfile->cinema_id;
-            $dataProvider = $searchModel->search($params);
+            Yii::$app->session->setFlash('error', 'Não tem permissão para ver sessões.');
+            return $this->goHome();
         }
 
-        $cinemaSelecionado = !empty($cinema_id) ? Cinema::findOne($cinema_id) : null;
+        $dataProvider = $searchModel->search($params);
 
         return $this->render('index', [
+            'cinema' => $cinema,
+            'gerirSessoes' => $gerirSessoes || $gerirSessoesCinema,
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-            'cinemaId' => $cinema_id,
-            'cinemaSelecionado' => $cinemaSelecionado,
-            'estadoFilterOptions' => Sessao::optsEstado(),
-            'cinemaFilterOptions' => $cinemaFilterOptions,
-            'userCinema' => $userCinema,
-            'gerirCinemas' => $gerirCinemas,
-            'gerirSessoes' => $gerirSessoes,
-            'actionColumnButtons' => $actionColumnButtons,
+            'cinemaOptions' => Cinema::findAllList(),
+            'estadoOptions' => Sessao::optsEstado(),
         ]);
     }
 
-
-    // ADMIN -> VÊ OS DETALHES DAS SESSÕES DE TODOS OS CINEMAS
-    // GERENTE/FUNCIONÁRIO --> APENAS VÊ OS DETALHES DAS SESSÕES DO SEU CINEMA
     public function actionView($id)
     {
-        // OBTER O USER ATUAL
         $currentUser = Yii::$app->user;
-
-        // OBTER SESSÃO
+        $userCinemaId = $currentUser->identity->profile->cinema_id ?? null;
         $model = $this->findModel($id);
 
-        // SE FOR GERENTE/FUNCIONÁRIO --> OBTER O SEU CINEMA
-        if (!$currentUser->can('admin')) {
+        $gerirSessoes = $currentUser->can('gerirSessoes');
+        $gerirSessoesCinema = $currentUser->can('gerirSessoesCinema', ['model' => $model->cinema]);
+        $verSessoesCinema = $currentUser->can('verSessoesCinema', ['model' => $model->cinema]);
 
-            // OBTER ID DO CINEMA DO USER ATUAL
-            $cinemaId = $currentUser->identity->profile->cinema_id;
-
-            // SE CINEMA DO USER E CINEMA DA SESSÃO FOREM DIFERENTES --> SEM ACESSO
-            if ($cinemaId != $model->cinema_id) {
-                Yii::$app->session->setFlash('error', 'Não tem permissão para ver esta sessão.');
-                return $this->redirect('index');
-            }
+        if (!$gerirSessoes && !$gerirSessoesCinema && !$verSessoesCinema) {
+            Yii::$app->session->setFlash('error', 'Não tem permissão para ver esta sessão.');
+            return $this->redirect('index');
         }
 
         $comprasDataProvider = new ActiveDataProvider([
@@ -171,7 +138,6 @@ class SessaoController extends Controller
             }
         }
 
-        // SE É ADMIN OU UTILIZADOR É DO MESMO CINEMA DA SESSÃO --> TEM ACESSO
         return $this->render('view', [
             'model' => $model,
             'comprasDataProvider' => $comprasDataProvider,

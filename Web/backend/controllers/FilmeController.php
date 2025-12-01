@@ -4,7 +4,10 @@ namespace backend\controllers;
 
 use common\models\Filme;
 use backend\models\FilmeSearch;
+use common\models\Genero;
 use Yii;
+use yii\filters\AccessControl;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
@@ -25,7 +28,7 @@ class FilmeController extends Controller
     {
         return [
             'access' => [
-                'class' => \yii\filters\AccessControl::class,
+                'class' => AccessControl::class,
                 'rules' => [
                     [
                         'allow' => true,
@@ -39,7 +42,7 @@ class FilmeController extends Controller
                 ],
             ],
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class' => VerbFilter::class,
                 'actions' => [
                     'delete' => ['POST'],
                 ],
@@ -47,189 +50,159 @@ class FilmeController extends Controller
         ];
     }
 
-    // VER FILMES
     public function actionIndex()
     {
-        $searchModel = new FilmeSearch();
-        $dataProvider = $searchModel->search($this->request->queryParams);
-
         $currentUser = Yii::$app->user;
         $gerirFilmes = $currentUser->can('gerirFilmes');
 
-        $actionColumnButtons = $gerirFilmes ? '{view} {update} {delete}' : '{view}';
+        $searchModel = new FilmeSearch();
+        $dataProvider = $searchModel->search($this->request->queryParams);
+
+        $ratingOptions = array_diff_key(Filme::optsRating(), [Filme::RATING_TODOS => null]);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-            'ratingFilterOptions' => FilmeSearch::getRatingFilterOptions(),
-            'estadoFilterOptions' => Filme::optsEstado(),
             'gerirFilmes' => $gerirFilmes,
-            'actionColumnButtons' => $actionColumnButtons,
+            'ratingOptions' => $ratingOptions,
+            'estadoOptions' => Filme::optsEstado(),
         ]);
     }
 
-
-    // VER DETALHES DE UM FILME
     public function actionView($id)
     {
+        $currentUser = Yii::$app->user;
+        $userCinema = $currentUser->identity->profile->cinema;
         $model = $this->findModel($id);
 
-        $currentUser = Yii::$app->user;
+        $gerirSessoes = $currentUser->can('gerirSessoes');
+        $gerirSessoesCinema = $currentUser->can('gerirSessoesCinema', ['model' => $userCinema]);
         $gerirFilmes = $currentUser->can('gerirFilmes');
-
-        $generos = array_map(fn($g) => Html::encode($g->nome), $model->generos);
-        $generos = !empty($generos) ? implode(', ', $generos) : '-';
 
         return $this->render('view', [
             'model' => $model,
-            'generos' => $generos,
+            'gerirSessoes' => $gerirSessoes || $gerirSessoesCinema,
             'gerirFilmes' => $gerirFilmes,
         ]);
     }
 
-
-    // ADMIN --> CRIA FILME
     public function actionCreate()
     {
-        // CRIAR NOVO FILME
-        $model = new Filme();
-
-        // METER A DATA DE HOJE POR DEFAULT
-        if ($model->isNewRecord) {
-            $model->estreia = date('Y-m-d');
+        if (!Yii::$app->user->can('gerirFilmes')) {
+            Yii::$app->session->setFlash('error', 'Não tem permissão para criar filmes.');
+            return $this->redirect(['index']);
         }
 
-        if ($model->load(Yii::$app->request->post())) {
+        $model = new Filme();
+        $model->estreia = date('Y-m-d');
+        $generoOptions = ArrayHelper::map(Genero::find()->orderBy('nome')->all(), 'id', 'nome');
 
-            // OBTER FICHEIRO DO POSTER
+        if ($model->load(Yii::$app->request->post())) {
             $model->posterFile = UploadedFile::getInstance($model, 'posterFile');
 
-            // VALIDAR DADOS
-            if ($model->validate()) {
-
-                // GUARDAR POSTER (SE EXISTIR)
+            if ($model->validate() && $model->save(false)) {
                 $this->guardarPoster($model);
 
-                // ASSOCIAR GÉNEROS SELECIONADOS
-                $model->generosSelecionados = Yii::$app->request->post('Filme')['generosSelecionados'] ?? [];
+                $generos = Yii::$app->request->post('Filme')['generosSelecionados'] ?? [];
+                $model->guardarGeneros($generos);
 
-                // GUARDAR FILME
-                if ($model->save(false)) {
-                    Yii::$app->session->setFlash('success', 'Filme criado com sucesso!');
-                    return $this->redirect(['view', 'id' => $model->id]);
-                }
+                Yii::$app->session->setFlash('success', 'Filme criado com sucesso.');
+                return $this->redirect(['view', 'id' => $model->id]);
             }
+
+            Yii::$app->session->setFlash('error', 'Erro ao criar o filme.');
         }
 
         return $this->render('create', [
             'model' => $model,
-            'generosOptions' => FilmeSearch::getGenerosOptions(),
+            'generoOptions' => $generoOptions,
         ]);
     }
 
-
-    // ADMIN --> EDITA FILME
     public function actionUpdate($id)
     {
-        // OBTER FILME
-        $model = $this->findModel($id);
+        if (!Yii::$app->user->can('gerirFilmes')) {
+            Yii::$app->session->setFlash('error', 'Não tem permissão para editar filmes.');
+            return $this->redirect(['index']);
+        }
 
-        // GUARDAR POSTER ANTIGO (CASO SEJA ALTERADO)
+        $model = $this->findModel($id);
         $oldPoster = $model->poster_path;
+        $generoOptions = ArrayHelper::map(Genero::find()->orderBy('nome')->all(), 'id', 'nome');
 
         if ($model->load(Yii::$app->request->post())) {
-
-            // OBTER POSTER NOVO (CASO TENHA SIDO ENVIADO)
             $model->posterFile = UploadedFile::getInstance($model, 'posterFile');
 
-            // VALIDAR DADOS
-            if ($model->validate()) {
-
-                // GUARDAR POSTER (SUBSTITUI SE NOVO FOI ENVIADO)
+            if ($model->validate() && $model->save(false)) {
                 $this->guardarPoster($model, $oldPoster);
 
-                // ASSOCIAR GÉNEROS SELECIONADOS
-                $model->generosSelecionados = Yii::$app->request->post('Filme')['generosSelecionados'] ?? [];
+                $generos = Yii::$app->request->post('Filme')['generosSelecionados'] ?? [];
+                $model->guardarGeneros($generos);
 
-                // GUARDAR ALTERAÇÕES
-                if ($model->save(false)) {
-                    Yii::$app->session->setFlash('success', 'Filme atualizado com successo.');
-                    return $this->redirect(['view', 'id' => $model->id]);
-                }
+
+                Yii::$app->session->setFlash('success', 'Filme atualizado com successo.');
+                return $this->redirect(['view', 'id' => $model->id]);
             }
+
+            Yii::$app->session->setFlash('error', 'Erro ao atualizar o filme.');
+
         }
 
         return $this->render('update', [
             'model' => $model,
-            'generosOptions' => FilmeSearch::getGenerosOptions(),
+            'generoOptions' => $generoOptions,
         ]);
     }
 
-
-    // ADMIN --> ELIMINA FILME
     public function actionDelete($id)
     {
-        // OBTER FILME
-        $model = $this->findModel($id);
-
-        // OBTER POSTER
-        $basePath = Yii::getAlias(Yii::$app->params['posterPath']);
-
-        // ELIMINAR POSTER
-        if ($model->poster_path && is_file($basePath . DIRECTORY_SEPARATOR . $model->poster_path)) {
-            @unlink($basePath . DIRECTORY_SEPARATOR . $model->poster_path);
+        if (!Yii::$app->user->can('gerirFilmes')) {
+            Yii::$app->session->setFlash('error', 'Não tem permissão para eliminar filmes.');
+            return $this->redirect(['index']);
         }
 
-        // ELIMINAR FILME
+        $model = $this->findModel($id);
+
+        if ($model->sessoes) {
+            Yii::$app->session->setFlash('error', 'Não pode eliminar filmes com sessões associadas.');
+            return $this->redirect(['index']);
+        }
+
+        $basePath = Yii::getAlias(Yii::$app->params['posterPath']);
+        if ($model->poster_path && is_file($basePath . '/' . $model->poster_path)) {
+            @unlink($basePath . '/' . $model->poster_path);
+        }
+
         $model->delete();
 
         return $this->redirect(['index']);
     }
 
-    // ADMIN --> MUDA O ESTADO DO FILME
     public function actionChangeStatus($id, $estado)
     {
-        // VERIFICAR PERMISSÕES
         if (!Yii::$app->user->can('gerirFilmes')) {
-            throw new ForbiddenHttpException('Não tem permissão para alterar o estado dos filmes.');
+            Yii::$app->session->setFlash('error','Não tem permissão para alterar o estado dos filmes.');
+            return $this->redirect(['index']);
         }
 
         $model = $this->findModel($id);
 
-        // VERIFICAR SE O ESTADO É VÁLIDO
-        if (!array_key_exists($estado, Filme::optsEstado())) {
-            throw new BadRequestHttpException('Estado inválido.');
-        }
-
-        // VERIFICAR SE TEM SESSÕES FUTURAS
-        $temSessoesFuturas = $model->getSessaos()->where(['>', 'data', date('Y-m-d H:i:s')])->exists();
-
-        // ATUALIZAR ESTADO
+        $estadoAntigo = $model->estado;
         $model->estado = $estado;
         $model->save(false);
 
-        // OBTER ESTADO NOVO
-        $label = ucfirst(Filme::optsEstado()[$estado]);
-
-        if ($estado === Filme::ESTADO_TERMINADO && $temSessoesFuturas) {
-            Yii::$app->session->setFlash('warning',
-                "O filme foi marcado como {$label}, mas ainda tem sessões agendadas. As sessões continuarão visíveis até ocorrerem."
-            );
+        if ($estadoAntigo === $model::ESTADO_EM_EXIBICAO && $estadoAntigo !== $model->estado && $model->getSessoesAtivas()->exists()) {
+            Yii::$app->session->setFlash('warning', "O estado foi alterado, as sessões agendadas continuarão visíveis.");
         }
         else {
-            Yii::$app->session->setFlash('success',
-                "O filme foi alterado para o estado {$label}."
-            );
+            Yii::$app->session->setFlash('success', "Estado do filme alterado com sucesso");
         }
 
         return $this->redirect(['index']);
     }
 
-
-    // GUARDAR POSTER DE UM FILME
     private function guardarPoster(Filme $model, ?string $oldPoster = null): void
     {
-        // SE NÃO FOI ENVIADO NENHUM POSTER --> MANTER ANTIGO
         if (!$model->posterFile) {
             if ($oldPoster) {
                 $model->poster_path = $oldPoster;
@@ -237,31 +210,26 @@ class FilmeController extends Controller
             return;
         }
 
-        // DEFINIR DIRETÓRIO BASE (PARAMS.PHP)
         $basePath = Yii::getAlias(Yii::$app->params['posterPath']);
-
-        // CRIAR DIRETÓRIO SE NÃO EXISTE
         if (!is_dir($basePath)) {
             mkdir($basePath, 0775, true);
         }
 
-        // GERAR NOME ÚNICO PARA O NOVO POSTER
+        // Gerar ID único para o ficheiro do poster
         $filename = uniqid('poster_') . '.' . $model->posterFile->extension;
 
-        // CAMINHO COMPLETO PARA GUARDAR
-        $savePath = $basePath . DIRECTORY_SEPARATOR . $filename;
+        $savePath = $basePath . '/' . $filename;
 
-        // GUARDAR FICHEIRO NO SERVIDOR
+        // Guardar ficheiro
         if ($model->posterFile->saveAs($savePath)) {
             $model->poster_path = $filename;
 
-            // APAGAR POSTER ANTIGO (SE EXISTIR)
-            if ($oldPoster && is_file($basePath . DIRECTORY_SEPARATOR . $oldPoster)) {
-                @unlink($basePath . DIRECTORY_SEPARATOR . $oldPoster);
+            // Apagar poster antigo se existir
+            if ($oldPoster && is_file($basePath . '/' . $oldPoster)) {
+                @unlink($basePath . '/' . $oldPoster);
             }
         }
     }
-
 
     protected function findModel($id)
     {

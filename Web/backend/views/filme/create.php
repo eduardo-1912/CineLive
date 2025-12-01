@@ -1,9 +1,8 @@
 <?php
 
-use yii\helpers\Html;
-
 /** @var yii\web\View $this */
 /** @var common\models\Filme $model */
+/** @var array $generoOptions */
 
 $this->title = 'Criar Filme';
 $this->params['breadcrumbs'][] = ['label' => 'Filmes', 'url' => ['index']];
@@ -17,7 +16,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     <div class="col-md-12">
                         <?= $this->render('_form', [
                             'model' => $model,
-                            'generosOptions' => $generosOptions,
+                            'generoOptions' => $generoOptions,
                         ]) ?>
                     </div>
                 </div>

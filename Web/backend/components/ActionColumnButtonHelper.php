@@ -46,10 +46,8 @@ class ActionColumnButtonHelper
         $items = '';
         foreach (User::optsStatus() as $estado => $label) {
 
-            // IGNORAR O ESTADO ATUAL
             if ($estado === $model->status) continue;
 
-            // SE USER ATUAL FOR GERENTE, NÃO MOSTRAR 'ELIMINADO'
             if (!Yii::$app->user->can('gerirUtilizadores')) {
                 if ($estado === User::STATUS_DELETED) continue;
             }
@@ -142,15 +140,13 @@ class ActionColumnButtonHelper
 
     public static function filmeEstadoDropdown(Filme $model): string
     {
-        $currentUser = Yii::$app->user;
-
         $btnClass = match ($model->estado) {
-            Filme::ESTADO_BREVEMENTE => 'text-secondary',
-            Filme::ESTADO_TERMINADO => 'text-secondary font-italic',
+            $model::ESTADO_BREVEMENTE => 'text-secondary',
+            $model::ESTADO_TERMINADO => 'text-secondary font-italic',
             default => '',
         };
 
-        if (!$currentUser->can('gerirFilmes')) {
+        if (!Yii::$app->user->can('gerirFilmes')) {
             return Html::tag('span', Html::encode($model->displayEstado()), ['class' => "fs-6 $btnClass"]);
         }
 
@@ -197,14 +193,12 @@ class ActionColumnButtonHelper
 
     public static function compraEstadoDropdown(Compra $model): string
     {
-        $currentUser = Yii::$app->user;
-
         $btnClass = match ($model->estado) {
             Compra::ESTADO_CANCELADA => 'text-danger',
             default => '',
         };
 
-        if (!$currentUser->can('gerirCompras') || $model->sessao->isEstadoTerminada() || $model->isEstadoCancelada()) {
+        if (!Yii::$app->user->can('gerirCompras') || $model->sessao->isEstadoTerminada() || $model->isEstadoCancelada()) {
             return Html::tag('span', Html::encode($model->displayEstado()), ['class' => "fs-6 $btnClass"]);
         }
 

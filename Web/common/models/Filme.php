@@ -22,6 +22,8 @@ use yii\web\UploadedFile;
  * @property string $poster_path
  * @property string $estado
  *
+ * @property-read $nomesGeneros
+ * @property-read $generosSelecionados
  * @property-read $posterUrl
  *
  * @property Genero[] $generos
@@ -32,7 +34,7 @@ class Filme extends \yii\db\ActiveRecord
     /** @var UploadedFile|null */
     public $posterFile;
 
-    /** @var array|null IDs dos géneros selecionados (campo virtual) */
+    /** @var array|null */
     public $generosSelecionados;
 
     /**
@@ -90,15 +92,55 @@ class Filme extends \yii\db\ActiveRecord
             'titulo' => 'Título',
             'sinopse' => 'Sinopse',
             'duracao' => 'Duração',
-            'duracaoHoras' => 'Duração',
             'rating' => 'Rating',
+            'generosSelecionados', 'nomesGeneros' => 'Géneros',
             'estreia' => 'Estreia',
             'idioma' => 'Idioma',
             'realizacao' => 'Realização',
             'trailer_url' => 'Trailer',
-            'poster_path', 'posterFile', 'posterUrl' => 'Poster',
+            'poster_path' => 'Poster',
             'estado' => 'Estado',
         ];
+    }
+
+    public function afterFind()
+    {
+        parent::afterFind();
+        $this->generosSelecionados = ArrayHelper::getColumn($this->generos, 'id');
+    }
+
+    public function getNomesGeneros(): string
+    {
+        if (empty($this->generos)) {
+            return '-';
+        }
+
+        return implode(', ', ArrayHelper::getColumn($this->generos, 'nome'));
+    }
+
+    public function guardarGeneros(array $ids)
+    {
+        $this->unlinkAll('generos', true);
+
+        foreach ($ids as $id) {
+            if ($genero = Genero::findOne($id)) {
+                $this->link('generos', $genero);
+            }
+        }
+    }
+
+    public function getPosterUrl(): string
+    {
+        $local = Yii::getAlias(Yii::$app->params['posterPath']);
+        $url = Yii::$app->params['posterUrl'];
+
+        $file = "{$local}/{$this->poster_path}";
+
+        if (!$this->poster_path || !file_exists($file)) {
+            return "{$url}/../placeholders/poster-placeholder.jpg";
+        }
+
+        return "{$url}/{$this->poster_path}";
     }
 
     public static function findComSessoesAtivas($limit = null)
@@ -153,56 +195,12 @@ class Filme extends \yii\db\ActiveRecord
         return $cinemas;
     }
 
-    public function getPosterUrl(): string
-    {
-        $local = Yii::getAlias(Yii::$app->params['posterPath']);
-        $url = Yii::$app->params['posterUrl'];
-
-        $file = "{$local}/{$this->poster_path}";
-
-        if (!$this->poster_path || !file_exists($file)) {
-            return "{$url}/../placeholders/poster-placeholder.jpg";
-        }
-
-        return "{$url}/{$this->poster_path}";
-    }
-
-
-    // VERIFICAR SE PODE SER EDITADO
     public function isEditable() {
         return true;
     }
 
-    // VERIFICAR SE PODE SER ELIMINADO
     public function isDeletable(): bool {
         return !$this->getSessoes()->exists();
-    }
-
-
-    // OBTER GÉNEROS DO FILME
-    public function afterFind()
-    {
-        parent::afterFind();
-        $this->generosSelecionados = ArrayHelper::getColumn($this->generos, 'id');
-    }
-
-    // GUARDAR GÉNEROS NA TABLE FILME_GÉNERO
-    public function afterSave($insert, $changedAttributes)
-    {
-        parent::afterSave($insert, $changedAttributes);
-
-        // remover todos os géneros anteriores
-        $this->unlinkAll('generos', true);
-
-        // adicionar os novos
-        if (is_array($this->generosSelecionados)) {
-            foreach ($this->generosSelecionados as $generoId) {
-                $genero = Genero::findOne($generoId);
-                if ($genero) {
-                    $this->link('generos', $genero);
-                }
-            }
-        }
     }
 
     /**
@@ -213,7 +211,8 @@ class Filme extends \yii\db\ActiveRecord
     public function getGeneros()
     {
         return $this->hasMany(Genero::class, ['id' => 'genero_id'])
-            ->viaTable('filme_genero', ['filme_id' => 'id']);
+            ->viaTable('filme_genero', ['filme_id' => 'id'])
+            ->orderBy(['nome' => SORT_ASC]);
     }
 
     /**

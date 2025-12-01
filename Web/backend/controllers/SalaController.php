@@ -96,11 +96,6 @@ class SalaController extends Controller
             return $this->redirect('index');
         }
 
-        if ($model->cinema_id !== $userCinemaId && ($gerirSalasCinema || $verSalasCinema)) {
-            Yii::$app->session->setFlash('error', 'Não tem permissão para ver esta sala.');
-            return $this->redirect('index');
-        }
-
         $gerirSessoes = $currentUser->can('gerirSessoes');
         $gerirSessoesCinema = $currentUser->can('gerirSessoesCinema', ['model' => $model->cinema]);
 

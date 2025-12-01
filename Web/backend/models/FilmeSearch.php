@@ -25,16 +25,6 @@ class FilmeSearch extends Filme
         ];
     }
 
-    public static function getGenerosOptions(): array
-    {
-        return ArrayHelper::map(Genero::find()->orderBy('nome')->all(), 'id', 'nome');
-    }
-
-    public static function getRatingFilterOptions(): array
-    {
-        return array_diff_key(Filme::optsRating(), [Filme::RATING_TODOS => null]);
-    }
-
     /**
      * {@inheritdoc}
      */

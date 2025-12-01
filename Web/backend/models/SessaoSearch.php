@@ -64,7 +64,6 @@ class SessaoSearch extends Sessao
 
         $this->load($params);
 
-        // PERMITIR ORDENAR POR NOME DO CLIENTE
         $dataProvider->sort->attributes['estado'] = [
             'asc' => ['estado' => SORT_ASC],
             'desc' => ['estado' => SORT_DESC],
@@ -90,24 +89,20 @@ class SessaoSearch extends Sessao
         $query->andFilterWhere(['like', 'filme.titulo', $this->tituloFilme]);
         $query->andFilterWhere(['like', 'sala.numero', $this->numeroSala]);
 
-        // OBTER TODAS AS SESSÕES
         $sessoes = $query->all();
 
-        // FILTRO POR ESTADO
         if (!empty($this->estado)) {
             $sessoes = array_filter($sessoes, function ($sessao) {
                 return $sessao->estado === $this->estado;
             });
         }
 
-        // FILTRO POR LUGARES DISPONÍVEIS
         if (!empty($this->lugaresDisponiveis)) {
             $sessoes = array_filter($sessoes, function ($sessao) {
                 return $sessao->numeroLugaresDisponiveis == $this->lugaresDisponiveis;
             });
         }
 
-        // ORDENAR POR ESTADO
         $ordemEstados = [
             Sessao::ESTADO_A_DECORRER => 1,
             Sessao::ESTADO_ATIVA => 2,

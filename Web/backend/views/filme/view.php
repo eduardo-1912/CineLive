@@ -1,12 +1,14 @@
 <?php
 
 use backend\components\ActionColumnButtonHelper;
-use common\models\Filme;
+use common\helpers\Formatter;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 /** @var yii\web\View $this */
 /** @var common\models\Filme $model */
+/** @var bool $gerirSessoes */
+/** @var bool $gerirFilmes */
 
 $this->title = $model->titulo;
 $this->params['breadcrumbs'][] = ['label' => 'Filmes', 'url' => ['index']];
@@ -20,16 +22,16 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="row">
                 <div class="col-md-12">
                     <div class="d-flex mb-3 gap-1">
+
+                        <?php if ($gerirSessoes && $model->isEstadoEmExibicao()): ?>
+                            <?= Html::a('Criar Sessão', ['sessao/create', 'filme_id' => $model->id], [
+                                'class' => 'btn btn-success',
+                                'title' => 'Criar Sessão',
+                                'data-method' => 'post',
+                            ]); ?>
+                        <?php endif; ?>
+
                         <?php if ($gerirFilmes): ?>
-
-                            <?php if ($model->isEstadoEmExibicao()): ?>
-                                <?= Html::a('Criar Sessão', ['sessao/create', 'filme_id' => $model->id], [
-                                    'class' => 'btn btn-success',
-                                    'title' => 'Criar Sessão',
-                                    'data-method' => 'post',
-                                ]); ?>
-                            <?php endif; ?>
-
                             <?= Html::a('Editar', ['update', 'id' => $model->id], ['class' => 'btn btn-warning']) ?>
 
                             <?php if ($model->isDeletable()): ?>
@@ -52,14 +54,16 @@ $this->params['breadcrumbs'][] = $this->title;
                             'id',
                             'titulo',
                             'sinopse:ntext',
-                            'duracaoEmMinutos',
                             [
-                                'label' => 'Géneros',
-                                'format' => 'raw',
-                                'value' => $generos,
+                                'attribute' => 'duracao',
+                                'value' => Formatter::minutos($model->duracao),
                             ],
+                            'nomesGeneros',
                             'rating',
-                            'estreiaFormatada',
+                            [
+                                'attribute' => 'estreia',
+                                'value' => Formatter::data($model->estreia),
+                            ],
                             'idioma',
                             'realizacao',
                             'trailer_url:url',
@@ -71,11 +75,8 @@ $this->params['breadcrumbs'][] = $this->title;
                             [
                                 'attribute' => 'poster_path',
                                 'format' => 'raw',
-                                'value' => fn($model) =>
-                                    Html::img($model->getPosterUrl(), [
-                                        'alt' => $model->titulo,
-                                        'style' => 'max-width:400px;',
-                                        'class' => 'rounded-3 shadow-sm',]),
+                                'value' => fn($model) => Html::img($model->posterUrl, ['alt' => $model->titulo,
+                                    'style' => 'max-width:400px;', 'class' => 'rounded-3 shadow-sm']),
                             ],
                         ],
                     ]) ?>

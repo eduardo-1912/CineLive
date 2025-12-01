@@ -1,18 +1,16 @@
 <?php
 
-use backend\assets\AppAsset;
 use backend\components\ActionColumnButtonHelper;
-use common\models\Cinema;
-use common\models\Filme;
-use yii\helpers\ArrayHelper;
+use common\helpers\Formatter;
 use yii\helpers\Html;
-use yii\grid\GridView;
 use backend\components\AppGridView;
-use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\UserSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+/* @var $gerirFilmes bool */
+/* @var $ratingOptions array */
+/* @var $estadoOptions array */
 
 $this->title = 'Filmes';
 $this->params['breadcrumbs'][] = $this->title;
@@ -42,7 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             [
                                 'attribute' => 'poster_path',
                                 'format' => 'raw',
-                                'value' => fn($model) => Html::img($model->getPosterUrl(), [
+                                'value' => fn($model) => Html::img($model->posterUrl, [
                                     'style' => 'width: 4rem; height: 31px; object-fit: cover;',
                                     'class' => 'rounded-1',
                                 ]),
@@ -55,29 +53,29 @@ $this->params['breadcrumbs'][] = $this->title;
                             'titulo',
                             [
                                 'attribute' => 'duracao',
-                                'value' => 'duracaoEmMinutos'
+                                'value' => fn($model) => Formatter::minutos($model->duracao),
                             ],
                             [
                                 'attribute' => 'estreia',
-                                'value' => 'estreiaFormatada',
+                                'value' => fn($model) => Formatter::data($model->estreia),
                                 'filterInputOptions' => ['type' => 'date', 'class' => 'form-control',],
                             ],
                             [
                                 'attribute' => 'rating',
-                                'filter' => $ratingFilterOptions,
+                                'filter' => $ratingOptions,
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
                             ],
                             [
                                 'attribute' => 'estado',
                                 'value' => fn($model) => ActionColumnButtonHelper::filmeEstadoDropdown($model),
                                 'format' => 'raw',
-                                'filter' => $estadoFilterOptions,
+                                'filter' => $estadoOptions,
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos',],
                                 'headerOptions' => ['style' => 'width: 9rem;'],
                             ],
                             [
                                 'class' => 'backend\components\AppActionColumn',
-                                'template' => $actionColumnButtons,
+                                'template' => $gerirFilmes ? '{view} {update} {delete}' : '{view}',
                                 'headerOptions' => ['style' => 'width: 1rem;'],
                             ],
                         ]
