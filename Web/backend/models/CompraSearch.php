@@ -14,7 +14,6 @@ class CompraSearch extends Compra
 {
     public $nomeCliente;
     public $cinema_id;
-    public $nomeCinema;
     public $total;
     public $numeroBilhetes;
 
@@ -26,7 +25,7 @@ class CompraSearch extends Compra
         return [
             [['id', 'cliente_id', 'sessao_id', 'cinema_id', 'numeroBilhetes'], 'integer'],
             [['total'], 'number'],
-            [['data', 'pagamento', 'estado', 'nomeCliente', 'nomeCinema'], 'safe'],
+            [['data', 'pagamento', 'estado', 'nomeCliente'], 'safe'],
         ];
     }
 

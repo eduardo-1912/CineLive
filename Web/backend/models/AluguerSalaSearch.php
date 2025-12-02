@@ -2,12 +2,10 @@
 
 namespace backend\models;
 
-use common\models\Cinema;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\models\AluguerSala;
-use yii\helpers\ArrayHelper;
 
 /**
  * AluguerSalaSearch represents the model behind the search form of `common\models\AluguerSala`.
@@ -15,7 +13,6 @@ use yii\helpers\ArrayHelper;
 class AluguerSalaSearch extends AluguerSala
 {
     public $nomeCliente;
-    public $nomeCinema;
     public $numeroSala;
 
     /**
@@ -25,13 +22,8 @@ class AluguerSalaSearch extends AluguerSala
     {
         return [
             [['id', 'cliente_id', 'cinema_id', 'sala_id', 'numeroSala'], 'integer'],
-            [['data', 'hora_inicio', 'hora_fim', 'estado', 'tipo_evento', 'observacoes', 'nomeCliente', 'nomeCinema'], 'safe'],
+            [['data', 'hora_inicio', 'hora_fim', 'estado', 'tipo_evento', 'observacoes', 'nomeCliente'], 'safe'],
         ];
-    }
-
-    public static function getCinemaFilterOptions(): array
-    {
-        return ArrayHelper::map(Cinema::find()->select(['id', 'nome'])->orderBy('nome')->all(), 'id', 'nome');
     }
 
     /**

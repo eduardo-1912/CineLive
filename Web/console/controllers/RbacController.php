@@ -146,7 +146,7 @@ class RbacController extends Controller
         $auth->add($gerente);
         $auth->addChild($gerente, $funcionario);
         $auth->addChild($gerente, $verFuncionariosCinema);
-        $auth->addChild($gerente, $criarFuncionarioCinema);
+        $auth->addChild($gerente, $criarFuncionariosCinema);
         $auth->addChild($gerente, $alterarEstadoFuncionario);
         $auth->addChild($gerente, $gerirSalasCinema);
         $auth->addChild($gerente, $gerirSessoesCinema);
@@ -163,7 +163,7 @@ class RbacController extends Controller
         $auth->addChild($admin, $gerirGeneros);
         $auth->addChild($admin, $gerirSessoes);
         $auth->addChild($admin, $verTodasCompras);
-        $auth->addChild($funcionario, $confirmarBilhetes);
+        $auth->addChild($admin, $confirmarBilhetes);
         $auth->addChild($admin, $gerirAlugueres);
         $auth->addChild($admin, $verEstatisticas);
 

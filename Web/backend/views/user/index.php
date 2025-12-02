@@ -1,17 +1,18 @@
 <?php
 
-use backend\assets\AppAsset;
-use backend\components\ActionColumnButtonHelper;
-use common\models\Cinema;
-use common\models\User;
-use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
-use yii\grid\GridView;
 use backend\components\AppGridView;
+use backend\helpers\ActionColumnButtonHelper;
+use backend\helpers\LinkHelper;
+use yii\helpers\Html;
 
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\UserSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+/* @var $gerirUtilizadores bool */
+/* @var $verFuncionariosCinema bool */
+/* @var $roleOptions array */
+/* @var $cinemaOptions array */
+/* @var $statusOptions array */
 
 $title = $gerirUtilizadores ? 'Utilizadores' : 'Funcionários';
 
@@ -26,7 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="card-body">
                     <div class="row mb-2">
                         <div class="col-md-12">
-                            <?php if($gerirUtilizadores || $gerirFuncionarios): ?>
+                            <?php if($gerirUtilizadores || $verFuncionariosCinema): ?>
                                 <?= Html::a('Criar ' . ($gerirUtilizadores ? 'Utilizador' : 'Funcionário'), ['create'], ['class' => 'btn btn-success']) ?>
                             <?php endif; ?>
                         </div>
@@ -52,19 +53,20 @@ $this->params['breadcrumbs'][] = $this->title;
                             [
                                 'attribute' => 'telemovel',
                                 'value' => 'profile.telemovel',
-                                'visible' => $gerirFuncionarios,
+                                'visible' => $verFuncionariosCinema,
                             ],
                             [
                                 'attribute' => 'role',
-                                'value' => 'roleFormatted',
-                                'filter' => $roleFilterOptions,
+                                'value' => 'roleName',
+                                'filter' => $roleOptions,
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
                                 'visible' => $gerirUtilizadores,
                             ],
                             [
                                 'attribute' => 'cinema_id',
-                                'value' => 'cinema.nome',
-                                'filter' => $cinemaFilterOptions,
+                                'value' => fn($model) => LinkHelper::nullSafe($model->profile->cinema->nome ?? null, 'cinema/view', $model->profile->cinema_id, '-'),
+                                'format' => 'raw',
+                                'filter' => $cinemaOptions,
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
                                 'visible' => $gerirUtilizadores,
                             ],
@@ -72,14 +74,13 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'attribute' => 'status',
                                 'value' => fn($model) => ActionColumnButtonHelper::userEstadoDropdown($model),
                                 'format' => 'raw',
-                                'filter' => $statusFilterOptions,
+                                'filter' => $statusOptions,
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos',],
                                 'headerOptions' => ['style' => 'width: 8rem'],
                             ],
                             [
                                 'class' => 'backend\components\AppActionColumn',
-                                'template' => $actionColumnButtons,
-                                'buttons' => ActionColumnButtonHelper::userButtons(),
+                                'template' => $gerirUtilizadores ? '{view} {update}' : '{view}',
                                 'headerOptions' => ['style' => 'width: 2rem;'],
                             ],
                         ],

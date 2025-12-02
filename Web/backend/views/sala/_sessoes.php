@@ -1,8 +1,8 @@
 <?php
 
-use backend\components\LinkHelper;
-use common\helpers\Formatter;
 use backend\components\AppGridView;
+use backend\helpers\LinkHelper;
+use common\helpers\Formatter;
 
 /* @var yii\data\ActiveDataProvider $dataProvider */
 /* @var $gerirSessoes bool */

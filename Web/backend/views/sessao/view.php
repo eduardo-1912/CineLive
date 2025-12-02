@@ -1,6 +1,6 @@
 <?php
 
-use backend\components\LinkHelper;
+use backend\helpers\LinkHelper;
 use common\helpers\Formatter;
 use yii\helpers\Html;
 use yii\widgets\DetailView;

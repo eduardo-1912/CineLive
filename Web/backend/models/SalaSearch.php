@@ -2,12 +2,10 @@
 
 namespace backend\models;
 
-use common\models\Cinema;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\models\Sala;
-use yii\helpers\ArrayHelper;
 
 /**
  * SalaSearch represents the model behind the search form of `common\models\Sala`.
@@ -80,7 +78,6 @@ class SalaSearch extends Sala
         if ($this->numeroLugares) {
             $query->andWhere('num_filas * num_colunas = :lugares', [':lugares' => $this->numeroLugares]);
         }
-
 
         return $dataProvider;
     }

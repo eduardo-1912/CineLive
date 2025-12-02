@@ -2,18 +2,13 @@
 
 namespace backend\controllers;
 
-use common\models\Compra;
 use Yii;
 use common\models\Bilhete;
-use backend\models\BilheteSearch;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use yii\web\Response;
 
-/**
- * BilheteController implements the CRUD actions for Bilhete model.
- */
 class BilheteController extends Controller
 {
     /**
@@ -23,7 +18,7 @@ class BilheteController extends Controller
     {
         return [
             'access' => [
-                'class' => \yii\filters\AccessControl::class,
+                'class' => AccessControl::class,
                 'rules' => [
                     [
                         'allow' => true,
@@ -32,7 +27,7 @@ class BilheteController extends Controller
                 ],
             ],
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class' => VerbFilter::class,
                 'actions' => [
                     'delete' => ['POST'],
                 ],
@@ -40,66 +35,47 @@ class BilheteController extends Controller
         ];
     }
 
-    // ADMIN --> ATUALIZA O LUGAR DE BILHETES DE QUALQUER COMPRA
-    // GERENTE/FUNCIONÁRIO --> ATUALIZA O LUGAR DE BILHETES DO SEU CINEMA
     public function actionUpdateLugar($id)
     {
-        // OBTER USER ATUAL
         $currentUser = Yii::$app->user;
-
-        // OBTER BILHETE
         $model = $this->findModel($id);
 
-        // VERIFICAR PERMISSÃO
-        if (!Yii::$app->user->can('validarBilhetes')) {
-            Yii::$app->session->setFlash('error', 'Não tem permissão para editar bilhetes.');
-            return $this->redirect(['compra/index']);
+        $confirmarBilhetes = $currentUser->can('confirmarBilhetes');
+        $confirmarBilhetesCinema = $currentUser->can('confirmarBilhetesCinema', ['model' => $model->compra->sessao->cinema]);
+
+        if (!$confirmarBilhetes && !$confirmarBilhetesCinema) {
+            Yii::$app->session->setFlash('error', 'Não tem permissão para editar este bilhete.');
+            return $this->redirect(['compra/view', 'id' => $model->compra_id]);
         }
 
-        // OBTER SESSÃO DA COMRA
-        $sessao = $model->compra->sessao;
-
-        // OBTER CINEMA DA COMPRA
-        $cinemaId = $sessao->cinema_id ?? null;
-
-        // GERENTE/FUNCIONÁRIO --> SÓ PODEM EDITAR BILHETES DO SEU CINEMA
-        if (!$currentUser->can('admin')) {
-
-            // OBTER CINEMA DO USER ATUAL
-            $userCinemaId = $currentUser->identity->profile->cinema_id ?? null;
-
-            if ($userCinemaId === null || $userCinemaId != $cinemaId) {
-                Yii::$app->session->setFlash('error', 'Não tem permissão para editar bilhetes de outro cinema.');
-                return $this->redirect(['index']);
-            }
+        if ($model->compra->isEstadoCancelada()) {
+            Yii::$app->session->setFlash('error', 'Não é possível alterar bilhetes de uma compra cancelada.');
+            return $this->redirect(['compra/view', 'id' => $model->compra_id]);
         }
 
-        // SÓ PODE EDITAR BILHETES PENDENTES
-        if ($model->estado !== Bilhete::ESTADO_PENDENTE) {
+        if (!$model->isEstadoPendente()) {
             Yii::$app->session->setFlash('warning', 'Apenas bilhetes pendentes podem ser editados.');
             return $this->redirect(['compra/view', 'id' => $model->compra_id]);
         }
 
-        // SE A SESSÃO JÁ TERMINOU --> NÃO DEIXAR ALTERAR O LUGAR
-        if ($sessao->isEstadoTerminada()) {
+        if ($model->compra->sessao->isEstadoTerminada()) {
             Yii::$app->session->setFlash('error', 'Não pode editar bilhetes cuja sessão já terminou.');
             return $this->redirect(['compra/view', 'id' => $model->compra_id]);
         }
 
-        if ($model->load(Yii::$app->request->post())) {
+        if ($model->compra->isEstadoCancelada()) {
+            Yii::$app->session->setFlash('error', 'Não é possível alterar bilhetes de uma compra cancelada.');
+            return $this->redirect(['compra/view', 'id' => $model->compra_id]);
+        }
 
-            // NORMALIZAR NOVO LUGAR
+        if ($model->load(Yii::$app->request->post())) {
+            // Normalizar
             $novoLugar = strtoupper(trim($model->lugar));
 
-            // OBTER DADOS DA SESSÃO E SALA
-            $sessao = $model->compra->sessao;
-            $sala = $sessao->sala;
-
-            // OBTER TODOS OS LUGARES DA SALA E OS OCUPADOS
-            $lugaresSala = $sala->getArrayLugares();
+            $lugaresSala = $model->compra->sessao->sala->getLugares();
             $lugaresOcupados = $sessao->lugaresOcupados ?? [];
 
-            // FILTRAR LUGAR VÁLIDO E DISPONÍVEL
+            // Verificar se novo lugar é válido
             $lugarValido = in_array($novoLugar, $lugaresSala) && !in_array($novoLugar, $lugaresOcupados);
 
             if (!$lugarValido) {
@@ -107,109 +83,77 @@ class BilheteController extends Controller
                 return $this->redirect(['compra/view', 'id' => $model->compra_id]);
             }
 
-            // ATUALIZAR E GUARDAR
             $model->lugar = $novoLugar;
 
-            // GUARDAR
             if ($model->save(false)) {
                 Yii::$app->session->setFlash('success', 'Lugar atualizado com sucesso.');
             }
             else {
-                Yii::$app->session->setFlash('error', 'Ocorreu um erro ao atualizar o lugar.');
+                Yii::$app->session->setFlash('error', 'Erro ao atualizar o lugar.');
             }
         }
 
         return $this->redirect(['compra/view', 'id' => $model->compra_id]);
     }
 
-
-    // ADMIN/GERENTE/FUNCIONÁRIO --> MUDA O ESTADO DOS BILHETES
-    // GERENTE/FUNCIONÁRIO --> MUDA O ESTADO DOS BILHETES DO SEU CINEMA
     public function actionChangeStatus($id, $estado)
     {
-        // OBTER USER ATUAL
         $currentUser = Yii::$app->user;
-
-        // OBTER BILHETE
         $model = $this->findModel($id);
 
-        // VERIFICAR PERMISSÃO
-        if (!Yii::$app->user->can('validarBilhetes')) {
-            Yii::$app->session->setFlash('error', 'Não tem permissão para alterar o estado de bilhetes.');
+        $confirmarBilhetes = $currentUser->can('confirmarBilhetes');
+        $confirmarBilhetesCinema = $currentUser->can('confirmarBilhetesCinema', ['model' => $model->compra->sessao->cinema]);
+
+        if (!$confirmarBilhetes && !$confirmarBilhetesCinema) {
+            Yii::$app->session->setFlash('error', 'Não tem permissão para editar este bilhete.');
             return $this->redirect(['compra/view', 'id' => $model->compra_id]);
         }
 
-        // VERIFICAR CINEMA (GERENTE/FUNCIONÁRIO --> SÓ O SEU CINEMA)
-        if (!$currentUser->can('admin')) {
-
-            $userCinemaId = $currentUser->identity->profile->cinema_id ?? null;
-
-            if ($userCinemaId === null || $userCinemaId != $model->compra->sessao->cinema_id) {
-                Yii::$app->session->setFlash('error', 'Não tem permissão para alterar bilhetes de outro cinema.');
-                return $this->redirect(['compra/view', 'id' => $model->compra_id]);
-            }
-        }
-
-        // VERIFICAR QUE O ESTADO É VÁLIDO
-        $estadosValidos = array_keys(Bilhete::optsEstado());
-        if (!in_array($estado, $estadosValidos)) {
-            Yii::$app->session->setFlash('error', 'Estado inválido.');
-            return $this->redirect(['compra/view', 'id' => $model->compra_id]);
-        }
-
-        // SE JÁ ESTIVER NO ESTADO PRETENDIDO --> VOLTAR
         if ($model->estado === $estado) {
-            Yii::$app->session->setFlash('info', 'O bilhete já se encontra neste estado.');
             return $this->redirect(['compra/view', 'id' => $model->compra_id]);
         }
 
-        // OBTER A SESSÃO
-        $sessao = $model->compra->sessao;
 
-        // IMPEDIR ATIVAÇÃO SE A COMPRA ESTIVER CANCELADA
-        if (($estado === Bilhete::ESTADO_PENDENTE || $estado === Bilhete::ESTADO_CONFIRMADO) && $model->compra->estado === Compra::ESTADO_CANCELADA) {
-            Yii::$app->session->setFlash('error', 'Não é possível reativar ou confirmar bilhetes de uma compra cancelada.');
+        if ($model->compra->isEstadoCancelada()) {
+            Yii::$app->session->setFlash('error', 'Não é possível alterar bilhetes de uma compra cancelada.');
             return $this->redirect(['compra/view', 'id' => $model->compra_id]);
         }
 
-        // SE A SESSÃO JÁ TERMINOU --> NÃO DEIXAR ALTERAR
-        if ($sessao->isEstadoTerminada()) {
+        if ($model->compra->sessao->isEstadoTerminada()) {
             Yii::$app->session->setFlash('error', 'Não pode alterar o estado de bilhetes cuja sessão já terminou.');
             return $this->redirect(['compra/view', 'id' => $model->compra_id]);
         }
 
         // SE FOR DESCANCELAR --> VER SE O LUGAR AINDA ESTÁ DISPONÍVEL
-        if ($model->estado === Bilhete::ESTADO_CANCELADO && $estado !== Bilhete::ESTADO_CANCELADO) {
+        if ($model->isEstadoCancelado() && $estado !== $model::ESTADO_CANCELADO) {
 
-            $lugaresDisponiveis = $sessao->getNumeroLugaresDisponiveis();
+            $lugaresDisponiveis = $model->compra->sessao->isEstadoEsgotada();
 
-            // SE NÃO EXISTIREM LUGARES DISPONÍVEIS --> NÃO DEIXAR RE-ATIVAR BILHETE
             if ($lugaresDisponiveis <= 0) {
-                Yii::$app->session->setFlash('error', 'Não é possível reativar o bilhete. Não há lugares disponíveis.');
+                Yii::$app->session->setFlash('error', 'Não é possível reativar o bilhete pois a sessão está esgotada.');
                 return $this->redirect(['compra/view', 'id' => $model->compra_id]);
             }
 
-            // VER SE O LUGAR FOI OCUPADO POR OUTRO BILHETE
-            $lugarOcupado = $sessao->getBilhetes()
+            // Ver se o lugar foi ocupado
+            $lugarOcupado = $model->compra->sessao->getBilhetes()
                 ->andWhere(['lugar' => $model->lugar])
                 ->andWhere(['<>', 'estado', Bilhete::ESTADO_CANCELADO])
                 ->andWhere(['<>', 'id', $model->id])
                 ->exists();
 
-            // SE O LUGAR ESTIVER OCUPADO --> REMOVER O LUGAR ANTIGO
+            // Se lugar estiver ocupado --> null
             if ($lugarOcupado) {
                 $model->lugar = null;
             }
 
         }
 
-        // IMPEDIR CONFIRMAR BILHETE SEM LUGAR
-        if ($estado === Bilhete::ESTADO_CONFIRMADO && empty($model->lugar)) {
+        if ($estado === $model::ESTADO_CONFIRMADO && empty($model->lugar)) {
             Yii::$app->session->setFlash('warning', 'Não é possível confirmar um bilhete sem lugar atribuído.');
             return $this->redirect(['compra/view', 'id' => $model->compra_id]);
         }
 
-        // ALTERAR O ESTADO
+        // Alterar o estado
         $model->estado = $estado;
 
         if ($model->save(false, ['estado', 'lugar'])) {
@@ -222,76 +166,55 @@ class BilheteController extends Controller
         return $this->redirect(['compra/view', 'id' => $model->compra_id]);
     }
 
-    // ADMIN --> VALIDA BILHETES DE QUALQUER CINEMA
-    // GERENTE/FUNCIONÁRIO --> VALIDA BILHETES DO SEU CINEMA
     public function actionValidate()
     {
-        // OBTER USER ATUAL
         $currentUser = Yii::$app->user;
+        $codigo = Yii::$app->request->post('codigo');
+        $bilhete = Bilhete::findOne(['codigo' => $codigo]);
 
-        // VERIFICAR PERMISSÃO
-        if (!Yii::$app->user->can('validarBilhetes')) {
-            Yii::$app->session->setFlash('error', 'Não tem permissão para validar bilhetes.');
-            return $this->redirect(Yii::$app->request->referrer ?: ['compra/index']);
+        $confirmarBilhetes = $currentUser->can('confirmarBilhetes');
+        $confirmarBilhetesCinema = $currentUser->can('confirmarBilhetesCinema', ['model' => $bilhete->compra->sessao->cinema]);
+
+        if (!$confirmarBilhetes && !$confirmarBilhetesCinema) {
+            Yii::$app->session->setFlash('error', 'Não tem permissão para confirmar este bilhete.');
+            return $this->goHome();
         }
 
-        // OBTER CÓDIGO
-        $codigo = Yii::$app->request->post('codigo');
-
-        // SE USAR MARCOU CHECKBOX DE CONFIRMAR TODOS OS BILHETES DA MESMA COMPRA
-        $confirmarTodos = Yii::$app->request->post('confirmar_todos');
-
-        // SE NENHUM CÓDIGO FOI PASSADO --> MENSAGEM DE ERRO
         if (empty($codigo)) {
             Yii::$app->session->setFlash('error', 'Por favor, insira um código de bilhete.');
             return $this->redirect(Yii::$app->request->referrer ?: ['compra/index']);
         }
 
-        // OBTER BILHETE
-        $bilhete = Bilhete::findOne(['codigo' => $codigo]);
+        // Ver se é para confirmar todos os bilhetes da compra
+        $confirmarTodos = Yii::$app->request->post('confirmar_todos');
 
-        // SE BILHETE NÃO EXISTIR --> MENSAGEM DE ERRO
+        // Ver se o bilhete existe
         if (!$bilhete) {
             Yii::$app->session->setFlash('error', 'Código de bilhete inválido.');
             return $this->redirect(Yii::$app->request->referrer ?: ['compra/index']);
         }
 
-        // VERIFICAR CINEMA (GERENTE/FUNCIONÁRIO --> SÓ O SEU CINEMA)
-        if (!$currentUser->can('admin')) {
-
-            // OBTER CINEMA DO USER ATUAL
-            $userCinemaId = $currentUser->identity->profile->cinema_id ?? null;
-
-            if ($userCinemaId === null || $userCinemaId != $bilhete->compra->sessao->cinema_id) {
-                Yii::$app->session->setFlash('error', 'Não tem permissão para validar bilhetes de outro cinema.');
-                return $this->redirect(Yii::$app->request->referrer ?: ['compra/index']);
-            }
-        }
-
-        // SE O BILHETE JÁ ESTIVER CONFIRMADO --> VOLTAR
-        if ($bilhete->estado === $bilhete::ESTADO_CONFIRMADO) {
+        // Se o bilhete já está confirmado --> voltar
+        if ($bilhete->isEstadoConfirmado()) {
             Yii::$app->session->setFlash('info', 'Este bilhete já foi confirmado.');
             return $this->redirect(Yii::$app->request->referrer ?: ['compra/index']);
         }
 
-        // CONFIRMAR BILHETE INDIVIDUAL
+        // Confirmar todos os bilhetes
+        if ($confirmarTodos && $bilhete->compra_id) {
+            foreach ($bilhete->compra->bilhetes as $bilhete) {
+                $bilhete->estado = $bilhete::ESTADO_CONFIRMADO;
+                $bilhete->save(false, ['estado']);
+            }
+        }
+
+        // Apenas confirmar o bilhete inserido
         $bilhete->estado = $bilhete::ESTADO_CONFIRMADO;
         $bilhete->save(false, ['estado']);
-
-        $confirmados = 1;
-
-        // SE CHECKBOX CONFIRMAR TODOS MARCADA --> CONFIRMAR OS OUTROS BILHETES
-        if ($confirmarTodos && $bilhete->compra_id) {
-            $confirmados = Bilhete::updateAll(
-                ['estado' => $bilhete::ESTADO_CONFIRMADO],
-                ['compra_id' => $bilhete->compra_id, 'estado' => $bilhete::ESTADO_PENDENTE]
-            );
-        }
 
         Yii::$app->session->setFlash('success', "Bilhete(s) confirmado(s) com sucesso!");
         return $this->redirect(Yii::$app->request->referrer ?: ['compra/index']);
     }
-
 
     protected function findModel($id)
     {

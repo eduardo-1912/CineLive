@@ -3,13 +3,15 @@
 use common\models\User;
 use yii\helpers\Html;
 use yii\bootstrap4\ActiveForm;
-use yii\helpers\ArrayHelper;
-use common\models\Cinema;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\User */
 /* @var $profile common\models\UserProfile */
 /* @var $form yii\bootstrap4\ActiveForm */
+/* @var $gerirUtilizadores bool */
+/* @var $criarFuncionariosCinema bool */
+/* @var $cinemaOptions array */
+/* @var $userCinemaId int|null */
 
 ?>
 
@@ -18,39 +20,24 @@ use common\models\Cinema;
 
     <?= $form->field($model, 'id')->hiddenInput()->label(false) ?>
     <?= $form->field($model, 'username')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'password')->passwordInput([
-        'maxlength' => true,
-        'placeholder' => $model->isNewRecord
-            ? ''
-            : '(opcional)',
-    ]) ?>
+    <?= $form->field($model, 'password')->passwordInput(['maxlength' => true, 'placeholder' => $model->isNewRecord ? '' : '(opcional)',]) ?>
     <?= $form->field($profile, 'nome')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($profile, 'telemovel')
-        ->textInput(['type' => 'tel', 'maxlength' => 9, 'pattern' => '[0-9]{9}'
-    ]) ?>
+    <?= $form->field($profile, 'telemovel')->textInput(['type' => 'tel', 'maxlength' => 9, 'pattern' => '[0-9]{9}']) ?>
     <?= $form->field($model, 'email')->input('email') ?>
 
-    <!-- SE FOR ADMIN -> PODE SELECIONAR CINEMA/ROLE -->
     <?php if ($gerirUtilizadores): ?>
 
-        <!-- DROPDOWN DOS ROLES-->
         <?= $form->field($model, 'role')->dropDownList(User::optsRoles()) ?>
-
-        <!-- DROPDOWN DOS CINEMAS (VÍSIVEL SE ROLE SELECIONADO == FUNCIONÁRIO/GERENTE) -->
         <div id="formFieldCinema" style="display:none;">
-            <?= $form->field($profile, 'cinema_id')->dropDownList($cinemasOptions, ['prompt' => 'Selecione o cinema']) ?>
+            <?= $form->field($profile, 'cinema_id')->dropDownList($cinemaOptions, ['prompt' => 'Selecione o cinema']) ?>
         </div>
-
-        <!-- DROPDOWN DE ESTADO -->
         <?= $form->field($model, 'status')->dropDownList(User::optsStatus()) ?>
 
-    <!-- SE FOR GERENTE SÓ PODE CRIAR FUNCIONÁRIOS PARA O SEU CINEMA -->
-    <?php elseif ($gerirFuncionarios): ?>
+    <?php elseif ($userCinemaId): ?>
 
-        <!-- ROLE 'FUNCIONÁRIO', CINEMA DO GERENTE E ESTADO 'ATIVO' -->
         <?= Html::activeHiddenInput($model, 'role', ['value' => 'funcionario']) ?>
-        <?= Html::activeHiddenInput($profile, 'cinema_id', ['value' => Yii::$app->user->identity->profile->cinema_id]) ?>
-        <?= Html::activeHiddenInput($model, 'status', ['value' => User::STATUS_ACTIVE]) ?>
+        <?= Html::activeHiddenInput($profile, 'cinema_id', ['value' => $userCinemaId]) ?>
+        <?= Html::activeHiddenInput($model, 'status', ['value' => $model::STATUS_ACTIVE]) ?>
 
     <?php endif; ?>
 
@@ -64,27 +51,21 @@ use common\models\Cinema;
 <?php
 $script = <<<JS
 
-    // MOSTRAR/ESCONDER CAMPO DE CINEMA CONSOANTE O ROLE SELECIONADO
-    function toggleCinemaField()
-    {
-        // OBTER VALOR DO CAMPO ROLE
+    // Mostrar/esconder o campo de cinema se o role for gerente ou funcionário
+    function toggleCinemaField() {
         var role = $('#user-role').val();
         
-        // SE O ROLE SELECIONADO FOR GERENTE/FUNCIONÁRIO --> MOSTRAR CAMPO CINEMA
         if (role === 'gerente' || role === 'funcionario') {
             $('#formFieldCinema').show();
             $('#formFieldCinema select').prop('disabled', false);
         }
-        
-        // CASO CONTRÁRIO --> ESCONDER CAMPO CINEMA
         else {
             $('#formFieldCinema').hide();
             $('#formFieldCinema select').prop('disabled', true);
         }
     }
     
-    $(document).ready(function()
-    {
+    $(document).ready(function() {
         toggleCinemaField();
         $('#user-role').on('change', toggleCinemaField);
     });

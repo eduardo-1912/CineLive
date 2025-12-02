@@ -2,8 +2,6 @@
 
 namespace common\models;
 
-use Yii;
-
 /**
  * This is the model class for table "user_profile".
  *
@@ -32,24 +30,8 @@ class UserProfile extends \yii\db\ActiveRecord
             [['user_id'], 'unique'],
             [['cinema_id'], 'default', 'value' => null],
             [['telemovel'], 'string', 'min' => 9, 'max' => 9],
-
-            // VERIFICAR QUE O ID DO CINEMA É VÁLIDO
-            [
-                ['cinema_id'],
-                'exist',
-                'skipOnError' => true,
-                'targetClass' => Cinema::class,
-                'targetAttribute' => ['cinema_id' => 'id']
-            ],
-
-            // VERIFICAR QUE O ID DO USER É VÁLIDO
-            [
-                ['user_id'],
-                'exist',
-                'skipOnError' => true,
-                'targetClass' => User::class,
-                'targetAttribute' => ['user_id' => 'id']
-            ],
+            [['cinema_id'], 'exist', 'skipOnError' => true, 'targetClass' => Cinema::class, 'targetAttribute' => ['cinema_id' => 'id']],
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
 
@@ -64,13 +46,21 @@ class UserProfile extends \yii\db\ActiveRecord
         ];
     }
 
-    // OBTER O UTILIZADOR
+    /**
+     * Gets query for [[User]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
     public function getUser()
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
 
-    // OBTER O CINEMA DO UTILIZADOR
+    /**
+     * Gets query for [[Cinema]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
     public function getCinema()
     {
         return $this->hasOne(Cinema::class, ['id' => 'cinema_id']);

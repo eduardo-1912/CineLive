@@ -1,17 +1,18 @@
 <?php
 
-use backend\components\ActionColumnButtonHelper;
 use backend\components\AppGridView;
-use backend\components\LinkHelper;
-use common\models\AluguerSala;
-use common\models\Cinema;
-use yii\helpers\ArrayHelper;
+use backend\helpers\ActionColumnButtonHelper;
+use backend\helpers\LinkHelper;
+use common\helpers\Formatter;
 use yii\helpers\Html;
-use yii\grid\GridView;
 
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\AluguerSalaSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+/* @var $gerirCinemas bool */
+/* @var $gerirAlugueres bool */
+/* @var $cinemaOptions array */
+/* @var $estadoOptions array */
 
 $this->title = 'Alugueres';
 $this->params['breadcrumbs'][] = $this->title;
@@ -36,8 +37,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                             [
                                 'attribute' => 'cliente',
-                                'value' => fn($model) => LinkHelper::cliente($model),
-
+                                'value' => fn($model) => LinkHelper::nullSafe($model->cliente->profile->nome ?? null, 'user/view', $model->cliente_id, 'Conta eliminada'),
                                 'format' => 'raw',
                                 'filter' => Html::activeTextInput($searchModel, 'nomeCliente', ['class' => 'form-control',]),
                             ],
@@ -45,8 +45,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'attribute' => 'cinema_id',
                                 'label' => 'Cinema',
                                 'format' => 'raw',
-                                'value' => fn($model) => LinkHelper::cinema($model),
-                                'filter' => $cinemaFilterOptions,
+                                'value' => fn($model) => LinkHelper::simple($model->cinema->nome, 'cinema/view', $model->cinema_id),
+                                'filter' => $cinemaOptions,
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
                                 'visible' => $gerirCinemas,
                             ],
@@ -54,17 +54,17 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'attribute' => 'numeroSala',
                                 'label' => 'Sala',
                                 'format' => 'raw',
-                                'value' => fn($model) => LinkHelper::sala($model),
+                                'value' => fn($model) => LinkHelper::simple($model->sala->nome, 'sala/view', $model->sala_id),
                                 'headerOptions' => ['style' => 'width: 8rem;'],
                             ],
                             [
                                 'attribute' => 'data',
-                                'value' => 'dataFormatada',
+                                'value' => fn($model) => Formatter::data($model->data),
                                 'filterInputOptions' => ['class' => 'form-control', 'type' => 'date',],
                             ],
                             [
                                 'attribute' => 'hora_inicio',
-                                'value' => 'horaInicioFormatada',
+                                'value' => fn($model) => Formatter::hora($model->hora_inicio),
                                 'filterInputOptions' => [
                                     'class' => 'form-control',
                                     'type' => 'time',
@@ -72,7 +72,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                             [
                                 'attribute' => 'hora_fim',
-                                'value' => 'horaFimFormatada',
+                                'value' => fn($model) => Formatter::hora($model->hora_fim),
                                 'filterInputOptions' => [
                                     'class' => 'form-control',
                                     'type' => 'time',
@@ -83,19 +83,17 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'label' => 'Estado',
                                 'value' => fn($model) => ActionColumnButtonHelper::aluguerEstadoDropdown($model),
                                 'format' => 'raw',
-                                'filter' => $estadoFilterOptions,
+                                'filter' => $estadoOptions,
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
                                 'headerOptions' => ['style' => 'width: 100px;'],
                             ],
-
                             [
                                 'class' => 'backend\components\AppActionColumn',
-                                'template' => $actionColumnButtons,
+                                'template' => $gerirAlugueres ? '{view} {delete}' : '{view}',
                                 'headerOptions' => ['style' => 'width: 1rem;'],
                             ],
                         ],
                     ]); ?>
-
 
                 </div>
                 <!--.card-body-->

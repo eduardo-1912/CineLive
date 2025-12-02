@@ -3,24 +3,18 @@
 namespace backend\controllers;
 
 use common\models\AluguerSala;
-use common\models\Bilhete;
 use common\models\Cinema;
 use common\models\Compra;
 use common\models\Filme;
 use common\models\LoginForm;
 use common\models\Sessao;
 use common\models\User;
-use common\models\UserProfile;
 use Yii;
-use yii\db\Expression;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\Response;
 
-/**
- * Site controller
- */
 class SiteController extends Controller
 {
     /**
@@ -71,70 +65,54 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        $user = Yii::$app->user;
-        $isAdmin = $user->can('admin');
-        $isGerente = $user->can('gerente');
-        $isFuncionario = $user->can('funcionario');
-        $userCinemaId = $user->identity->profile->cinema_id ?? null;
+        $currentUser = Yii::$app->user;
+        $cinema = $currentUser->identity->profile->cinema ?? null;
+
+        $verEstatisticas = $currentUser->can('verEstatisticas');
+        $verEstatisticasCinema = $currentUser->can('verEstatisticasCinema', ['model' => $cinema]);
 
         $now = date('Y-m-d');
+        $year = date('Y');
 
-        // SE É ADMIN
-        if ($isAdmin) {
-            $totalFilmesEmExibicao = Filme::find()->where(['estado' => Filme::ESTADO_EM_EXIBICAO])->count();
+        $labelsCinemas = [];
+        $valoresVendas = [];
+
+        if ($verEstatisticas) {
+            $filmesEmExibicao = Filme::findComSessoesAtivas();
+            $totalFilmes = count($filmesEmExibicao);
+            $totalSessoes = Sessao::find()->where(['data' => $now])->count();
             $totalAlugueres = AluguerSala::find()->where(['estado' => AluguerSala::ESTADO_PENDENTE])->count();
-            $ultimasCompras = Compra::find()->with(['sessao.filme', 'sessao.cinema'])->orderBy(['id' => SORT_DESC])->limit(10)->all();
-            $filmesEmExibicao = Filme::find()->where(['estado' => Filme::ESTADO_EM_EXIBICAO])->all();
+            $ultimasCompras = Compra::find()->orderBy(['id' => SORT_DESC])->limit(10)->all();
 
-            $anoAtual = date('Y');
+            foreach (Cinema::findAtivos() as $cinema) {
+                $total = 0;
+                foreach ($cinema->sessoes as $sessao) {
+                    foreach ($sessao->compras as $compra) {
+                        if (date('Y', strtotime($compra->data)) != $year) continue;
+                        foreach ($compra->bilhetes as $bilhete) {
+                            $total += $bilhete->preco;
+                        }
+                    }
+                }
 
-            $vendasPorCinema = Compra::find()
-                ->alias('c')
-                ->joinWith(['bilhetes b', 'sessao s', 'sessao.cinema ci'])
-                ->select([
-                    'ci.nome AS cinema',
-                    new Expression('SUM(b.preco) AS total')
-                ])
-                ->where(['YEAR(s.data)' => $anoAtual])
-                ->groupBy('ci.id')
-                ->orderBy(['total' => SORT_DESC])
-                ->asArray()
-                ->all();
-
-            $labelsCinemas = array_column($vendasPorCinema, 'cinema');
-            $valoresVendas = array_map('floatval', array_column($vendasPorCinema, 'total'));
+                $labelsCinemas[] = $cinema->nome;
+                $valoresVendas[] = $total;
+            }
         }
-
-        // SE É GERENTE
-        if ($isGerente && !$isAdmin) {
-            $totalAlugueres = AluguerSala::find()->where(['estado' => AluguerSala::ESTADO_PENDENTE, 'cinema_id' => $userCinemaId])->count();
-            $valoresVendas = [];
+        elseif ($verEstatisticasCinema && $cinema) {
+            $filmesEmExibicao = $cinema->getFilmesComSessoesAtivas();
+            $totalFilmes = count($filmesEmExibicao);
+            $totalAlugueres = $cinema->getAluguerSalas()->where(['estado' => AluguerSala::ESTADO_PENDENTE])->count();
+            $totalSessoes = $cinema->getSessoes()->where(['data' => $now])->count();
+            $ultimasCompras = $cinema->getCompras()->limit(10)->all();
         }
-
-        // SE TEM CINEMA
-        if ($userCinemaId !== null) {
-            $totalFilmesEmExibicao = Filme::find()->joinWith('sessaos s')->where(['>=', 's.data', $now])->andWhere(['s.cinema_id' => $userCinemaId])->distinct()->count();
-            $totalAlugueres = AluguerSala::find()->where(['data' => $now, 'cinema_id' => $userCinemaId,])->count();
-            $ultimasCompras = Compra::find()
-                ->alias('c')
-                ->joinWith(['sessao s'])
-                ->where(['s.cinema_id' => $userCinemaId])
-                ->with(['sessao.filme', 'sessao.cinema'])
-                ->orderBy(['c.id' => SORT_DESC])
-                ->limit(10)
-                ->all();
-            $filmesEmExibicao = Filme::getFilmesEmExibicaoPorCinema($userCinemaId);
-
-            $labelsCinemas = [];
-            $valoresVendas = [];
-        }
-
-        $totalSessoesHoje = Sessao::find()->where(['data' => $now])->andFilterWhere($isAdmin ? [] : ['cinema_id' => $userCinemaId])->count();
 
         return $this->render('index', [
-            'totalFilmesEmExibicao' => $totalFilmesEmExibicao,
+            'verEstatisticas' => $verEstatisticas,
+            'verEstatisticasCinema' => $verEstatisticasCinema,
+            'totalFilmes' => $totalFilmes,
             'totalAlugueres' => $totalAlugueres,
-            'totalSessoesHoje' => $totalSessoesHoje,
+            'totalSessoes' => $totalSessoes,
             'ultimasCompras' => $ultimasCompras,
             'filmesEmExibicao' => $filmesEmExibicao,
             'labelsCinemas' => $labelsCinemas,

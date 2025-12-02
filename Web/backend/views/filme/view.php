@@ -1,6 +1,6 @@
 <?php
 
-use backend\components\ActionColumnButtonHelper;
+use backend\helpers\ActionColumnButtonHelper;
 use common\helpers\Formatter;
 use yii\helpers\Html;
 use yii\widgets\DetailView;

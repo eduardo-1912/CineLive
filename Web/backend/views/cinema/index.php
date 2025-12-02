@@ -1,8 +1,8 @@
 <?php
 
-use backend\components\ActionColumnButtonHelper;
 use backend\components\AppGridView;
-use backend\components\LinkHelper;
+use backend\helpers\ActionColumnButtonHelper;
+use backend\helpers\LinkHelper;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */

@@ -1,15 +1,17 @@
 <?php
 
-use backend\components\ActionColumnButtonHelper;
-use backend\components\LinkHelper;
-use common\models\Compra;
+use backend\helpers\ActionColumnButtonHelper;
+use backend\helpers\LinkHelper;
+use common\helpers\Formatter;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Compra */
+/* @var $gerirCinemas bool */
+/** @var yii\data\ActiveDataProvider $bilhetesDataProvider */
 
-$this->title = 'Compra #' . $model->id;
+$this->title = $model->nome;
 $this->params['breadcrumbs'][] = ['label' => 'Compras', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $model->id;
 \yii\web\YiiAsset::register($this);
@@ -28,27 +30,36 @@ $this->params['breadcrumbs'][] = $model->id;
                             'id',
                             [
                                 'attribute' => 'cliente',
-                                'value' => fn($model) => LinkHelper::cliente($model),
+                                'value' => LinkHelper::nullSafe($model->cliente->profile->nome ?? null, 'user/view', $model->cliente_id, 'Conta eliminada'),
                                 'format' => 'raw',
                             ],
                             [
                                 'attribute' => 'sessao_id',
                                 'label' => 'Sessão',
                                 'format' => 'raw',
-                                'value' => fn($model) => LinkHelper::sessao($model),
+                                'value' => LinkHelper::simple($model->sessao->nome, 'sessao/view', $model->sessao_id),
                             ],
                             [
                                 'label' => 'Filme',
                                 'format' => 'raw',
-                                'value' => fn($model) => LinkHelper::filme($model->sessao),
+                                'value' => LinkHelper::simple($model->sessao->filme->titulo, 'filme/view', $model->sessao->filme_id),
                             ],
-                            'dataFormatada',
-                            'totalEmEuros',
-                            'pagamentoFormatado',
+                            [
+                                'attribute' => 'data',
+                                'value' => Formatter::data($model->data),
+                            ],
+                            [
+                                'attribute' => 'total',
+                                'value' => Formatter::preco($model->total),
+                            ],
+                            [
+                                'attribute' => 'pagamento',
+                                'value' => $model->displayPagamento()
+                            ],
                             [
                                 'attribute' => 'nomeCinema',
                                 'format' => 'raw',
-                                'value' => fn($model) => LinkHelper::cinema($model->sessao),
+                                'value' => fn($model) => LinkHelper::simple($model->sessao->cinema->nome, 'cinema/view', $model->sessao->cinema_id),
                                 'visible' => $gerirCinemas,
                             ],
                             [

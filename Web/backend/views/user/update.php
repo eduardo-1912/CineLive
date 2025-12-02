@@ -1,10 +1,14 @@
 <?php
 
 /* @var $this yii\web\View */
+/* @var $gerirUtilizadores bool */
 /* @var $model common\models\User */
+/* @var $profile common\models\UserProfile */
+/* @var $cinemaOptions array */
+/* @var $userCinemaId int|null */
 
 $this->title = 'Editar: ' . $model->profile->nome;
-$this->params['breadcrumbs'][] = ['label' => 'Utilizadores', 'url' => [$gerirUtilizadores ? 'index' : ('view?id=' . $currentUser->id)]];
+$this->params['breadcrumbs'][] = $gerirUtilizadores ? ['label' => 'Utilizadores', 'url' => ['index']] : ['label' => 'Utilizadores'];
 $this->params['breadcrumbs'][] = ['label' => $model->profile->nome, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = 'Editar';
 ?>
@@ -17,10 +21,9 @@ $this->params['breadcrumbs'][] = 'Editar';
                     <?= $this->render('_form', [
                         'model' => $model,
                         'profile' => $profile,
-                        'cinemasOptions' => $cinemasOptions,
+                        'cinemaOptions' => $cinemaOptions,
                         'userCinemaId' => $userCinemaId,
                         'gerirUtilizadores' => $gerirUtilizadores,
-                        'gerirFuncionarios' => $gerirFuncionarios,
                     ]) ?>
                 </div>
             </div>

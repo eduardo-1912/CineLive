@@ -2,8 +2,12 @@
 
 /* @var $this yii\web\View */
 /* @var $model common\models\AluguerSala */
+/* @var bool $gerirAlugueres */
+/* @var bool $gerirAlugueresCinema */
+/* @var array $salaOptions */
+/* @var array $estadoOptions */
 
-$this->title = 'Aluguer #' . $model->id;
+$this->title = $model->nome;
 $this->params['breadcrumbs'][] = ['label' => 'Alugueres', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $model->id;
 
@@ -16,14 +20,11 @@ $this->params['breadcrumbs'][] = $model->id;
                 <div class="col-md-12">
                     <?= $this->render('_form', [
                         'model' => $model,
-                        'nomeCliente' => $nomeCliente,
-                        'emailCliente' => $emailCliente,
-                        'telemovelCliente' => $telemovelCliente,
-                        'nomeCinema' => $nomeCinema,
-                        'salasDisponiveis' => $salasDisponiveis,
-                        'isAdmin' => $isAdmin,
+                        'gerirAlugueres' => $gerirAlugueres,
+                        'gerirAlugueresCinema' => $gerirAlugueresCinema,
+                        'salaOptions' => $salaOptions,
+                        'estadoOptions' => $estadoOptions,
                     ]) ?>
-
                 </div>
             </div>
         </div>

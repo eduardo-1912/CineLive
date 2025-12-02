@@ -1,7 +1,7 @@
 <?php
 
-use backend\components\ActionColumnButtonHelper;
 use backend\components\AppGridView;
+use backend\helpers\ActionColumnButtonHelper;
 use common\helpers\Formatter;
 
 /** @var bool $gerirSalas */

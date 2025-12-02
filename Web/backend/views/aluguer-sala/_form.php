@@ -1,67 +1,42 @@
 <?php
 
-use common\models\AluguerSala;
-use common\models\Cinema;
-use common\models\Sala;
-use common\models\User;
-use yii\helpers\ArrayHelper;
+use common\helpers\Formatter;
 use yii\helpers\Html;
 use yii\bootstrap4\ActiveForm;
 
 /* @var yii\web\View $this */
 /* @var common\models\AluguerSala $model */
 /* @var yii\bootstrap4\ActiveForm $form */
+/* @var bool $gerirAlugueres */
+/* @var bool $gerirAlugueresCinema */
+/* @var array $salaOptions */
+/* @var array $estadoOptions */
 
 ?>
 
 <div class="aluguer-sala-form">
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'cliente_id')->textInput(['value' => $nomeCliente, 'disabled' => true]) ?>
-    <?= $form->field($model, 'email')->textInput(['value' => $emailCliente, 'disabled' => true,])->label('Email') ?>
-    <?= $form->field($model, 'telemovel')->textInput(['value' => $telemovelCliente, 'disabled' => true,])->label('Telemóvel') ?>
+    <?= $form->field($model, 'cliente_id')->textInput(['value' => $model->cliente->profile->nome, 'disabled' => true]) ?>
+    <?= $form->field($model, 'email')->textInput(['value' => $model->cliente->email, 'disabled' => true])->label('Email') ?>
+    <?= $form->field($model, 'telemovel')->textInput(['value' => $model->cliente->profile->telemovel, 'disabled' => true])->label('Telemóvel') ?>
 
-    <!-- CAMPO CINEMA APENAS PARA ADMIN -->
-    <div class="<?= $isAdmin ? 'd-block' : 'd-none' ?> ">
-        <?= $form->field($model, 'cinema_id')->textInput(['value' => $nomeCinema, 'disabled' => true]) ?>
-    </div>
+    <?php if ($gerirAlugueres): ?>
+        <?= $form->field($model, 'cinema_id')->textInput(['value' => $model->cinema->nome, 'disabled' => true]) ?>
+    <?php endif ?>
 
-    <!-- DATA E HORAS -->
-    <?= $form->field($model, 'horario')->textInput
-    (['value' => $model->dataFormatada . ' | ' . $model->horaInicioFormatada . ' - ' . $model->horaFimFormatada, 'disabled' => true,])
-    ->label('Horário') ?>
-
+    <?= $form->field($model, 'data')->textInput(['value' => Formatter::data($model->data), 'disabled' => true]) ?>
+    <?= $form->field($model, 'horario')->textInput(['value' => $model->horario, 'disabled' => true,]) ?>
     <?= $form->field($model, 'tipo_evento')->textInput(['maxlength' => true, 'disabled' => true]) ?>
     <?= $form->field($model, 'observacoes')->textarea(['rows' => 4, 'disabled' => true]) ?>
+    <?= $form->field($model, 'sala_id')->dropDownList($salaOptions, ['prompt' => 'Selecione uma sala', 'disabled' => !$model->isEditable()]) ?>
+    <?= $form->field($model, 'estado')->dropDownList($estadoOptions, ['disabled' => !$model->isEditable()]) ?>
 
-    <!-- SALAS -->
-    <?= $form->field($model, 'sala_id')->dropDownList($salasDisponiveis,
-        [
-            'prompt' => 'Selecione uma sala',
-            'disabled' => in_array($model->estado, [
-                $model::ESTADO_A_DECORRER,
-                $model::ESTADO_TERMINADO,
-                $model::ESTADO_CANCELADO,
-            ]),
-        ]
-    ) ?>
-
-
-    <!-- ESTADO -->
-    <?= $form->field($model, 'estado')->dropDownList(
-        $model->getEstadoOptions(),
-        [
-            'disabled' => in_array($model->estado, [
-                $model::ESTADO_A_DECORRER,
-                $model::ESTADO_TERMINADO,
-                $model::ESTADO_CANCELADO,
-            ]),
-        ]
-    ) ?>
-
+    <?php if (($gerirAlugueres || $gerirAlugueresCinema) && $model->isEditable()): ?>
     <div class="form-group">
         <?= Html::submitButton('Guardar', ['class' => 'btn btn-success']) ?>
     </div>
+    <?php endif; ?>
 
     <?php ActiveForm::end(); ?>
 </div>

@@ -1,9 +1,8 @@
 <?php
 
-use backend\components\ActionColumnButtonHelper;
-use common\models\Bilhete;
-use yii\helpers\Html;
 use backend\components\AppGridView;
+use backend\helpers\ActionColumnButtonHelper;
+use common\helpers\Formatter;
 
 /** @var yii\data\ActiveDataProvider $dataProvider */
 /** @var common\models\Compra $compra */
@@ -20,8 +19,10 @@ use backend\components\AppGridView;
         [
             'attribute' => 'codigo',
         ],
-        'precoEmEuros',
         [
+            'attribute' => 'preco',
+            'value' => fn($model) => Formatter::preco($model->preco),
+        ],        [
             'attribute' => 'lugar',
             'value' => 'lugar' ?? '-',
             'format' => 'raw',
@@ -29,24 +30,8 @@ use backend\components\AppGridView;
         [
             'header' => 'Editar',
             'format' => 'raw',
-            'value' => function ($bilhete) {
-
-                $btnClass = !$bilhete->isEditable() ? 'btn-warning' : 'btn-secondary';
-
-                return Html::beginForm(['bilhete/update-lugar', 'id' => $bilhete->id], 'post', [
-                        'class' => 'd-inline-flex gap-1 align-items-center',
-                    ]) .
-                    Html::input('text', 'Bilhete[lugar]', $bilhete->lugar, [
-                        'class' => 'form-control form-control-sm', 'style' => 'width: 20rem', 'disabled' => !$bilhete->isEditable(),
-                    ]) .
-                    Html::submitButton('<i class="fas fa-edit"></i>', [
-                        'class' => "btn btn-sm {$btnClass}",
-                        'title' => 'Guardar',
-                        'disabled' => !$bilhete->isEditable(),
-                    ]) .
-                    Html::endForm();
-            },
-            'headerOptions' => ['style' => 'width: 20rem'],
+            'value' => fn($model) => $this->render('_formInlineBilhete', ['model' => $model]),
+            'headerOptions' => ['style' => 'width: 10rem'],
         ],
         [
             'header' => 'Estado',

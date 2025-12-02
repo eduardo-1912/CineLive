@@ -1,9 +1,13 @@
 <?php
 
-use yii\helpers\Html;
-
 /* @var $this yii\web\View */
+/* @var $gerirUtilizadores bool */
+/* @var $criarFuncionariosCinema bool */
 /* @var $model common\models\User */
+/* @var $profile common\models\UserProfile */
+/* @var $cinemaOptions array */
+/* @var $userCinemaId int|null */
+
 
 $this->title = 'Criar ' . ($gerirUtilizadores ? 'Utilizador' : 'Funcionário');
 $this->params['breadcrumbs'][] = ['label' => $gerirUtilizadores ? 'Utilizadores' : 'Funcionários', 'url' => ['index']];
@@ -18,12 +22,11 @@ $this->params['breadcrumbs'][] = $this->title;
                     <?= $this->render('_form', [
                         'model' => $model,
                         'profile' => $profile,
-                        'cinemasOptions' => $cinemasOptions,
+                        'cinemaOptions' => $cinemaOptions,
                         'userCinemaId' => $userCinemaId,
                         'gerirUtilizadores' => $gerirUtilizadores,
-                        'gerirFuncionarios' => $gerirFuncionarios,
+                        'criarFuncionariosCinema' => $criarFuncionariosCinema,
                     ]) ?>
-
                 </div>
             </div>
         </div>

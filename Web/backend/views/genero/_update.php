@@ -1,6 +1,6 @@
 <?php
+
 use yii\helpers\Html;
-use yii\bootstrap4\ActiveForm;
 
 /** @var $model common\models\Genero */
 ?>

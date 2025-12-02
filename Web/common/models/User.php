@@ -3,7 +3,6 @@
 namespace common\models;
 
 use Yii;
-use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
@@ -21,6 +20,7 @@ use yii\web\IdentityInterface;
  * @property integer $status
  * @property integer $created_at
  * @property integer $updated_at
+ *
  * @property string $password write-only password
  *
  * @property UserProfile $profile
@@ -32,12 +32,10 @@ class User extends ActiveRecord implements IdentityInterface
 {
     public $password;
     public $role;
-    public $cinema_id;
 
     const STATUS_DELETED = 0;
     const STATUS_INACTIVE = 9;
     const STATUS_ACTIVE = 10;
-
 
     /**
      * {@inheritdoc}
@@ -72,13 +70,8 @@ class User extends ActiveRecord implements IdentityInterface
             ['email', 'email'],
             [['username', 'email'], 'unique'],
             ['role', 'safe'],
+            ['password', 'required', 'on' => 'create', 'message' => 'Password cannot be blank.',],
             ['password', 'string', 'min' => Yii::$app->params['user.passwordMinLength']],
-            [
-                'password',
-                'required',
-                'on' => 'backendCreate',
-                'message' => 'Password cannot be blank.',
-            ],
         ];
     }
 
@@ -94,7 +87,7 @@ class User extends ActiveRecord implements IdentityInterface
             'telemovel' => 'Telemóvel',
             'password' => 'Password',
             'role' => 'Função',
-            'roleFormatted' => 'Função',
+            'roleName' => 'Função',
             'status' => 'Estado',
             'cinema_id' => 'Cinema',
         ];
@@ -108,11 +101,6 @@ class User extends ActiveRecord implements IdentityInterface
         return static::findOne(['id' => $id, 'status' => self::STATUS_ACTIVE]);
     }
 
-    public function isEditable(): bool { return true; }
-
-    public function isDeletable(): bool { return true; }
-
-    // GUARDAR A PASSWORD E AUTH_KEY/TOKEN (SE NÃO EXISTIR)
     public function beforeSave($insert)
     {
         if ($this->password) {
@@ -131,15 +119,12 @@ class User extends ActiveRecord implements IdentityInterface
         return parent::beforeSave($insert);
     }
 
-    // OBTER ROLE DO USER
-    public function getRoleName()
+    public function isEditable(): bool
     {
-        $roles = Yii::$app->authManager->getRolesByUser($this->id);
-        return empty($roles) ? null : array_key_first($roles);
+        return Yii::$app->user->can('gerirUtilizadores');
     }
 
-    // OBTER ROLE DO USER FORMATADO
-    public function getRoleFormatted()
+    public function getRoleName()
     {
         $roles = Yii::$app->authManager->getRolesByUser($this->id);
 
@@ -155,34 +140,41 @@ class User extends ActiveRecord implements IdentityInterface
         return $labels[$key] ?? ucfirst($key);
     }
 
-    // VERIFICAR SE É GERENTE OU FUNCIONÁRIO
-    public function isStaff(): bool
-    {
-        if ($this->roleName == 'gerente' || $this->roleName == 'funcionario'){
-            return true;
-        }
-        return false;
-    }
-
-    // OBTER USER_PROFILE DO USER
+    /**
+     * Gets query for [[Profile]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
     public function getProfile()
     {
         return $this->hasOne(UserProfile::class, ['user_id' => 'id']);
     }
 
-    // OBTER CINEMA DO USER
+    /**
+     * Gets query for [[Cinema]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
     public function getCinema()
     {
         return $this->hasOne(Cinema::class, ['id' => 'cinema_id'])->via('profile');
     }
 
-    // OBTER COMPRAS DO USER
+    /**
+     * Gets query for [[Compras]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
     public function getCompras()
     {
         return $this->hasMany(Compra::class, ['cliente_id' => 'id']);
     }
 
-    // OBTER ALUGUERES DO USER
+    /**
+     * Gets query for [[AluguerSalas]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
     public function getAluguerSalas()
     {
         return $this->hasMany(AluguerSala::class, ['cliente_id' => 'id']);
@@ -222,39 +214,6 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return self::optsRoles()[$this->roleName];
     }
-
-    /**
-     * @return bool
-     */
-    public function isRoleAdmin()
-    {
-        return $this->roleName === 'admin';
-    }
-
-    /**
-     * @return bool
-     */
-    public function isRoleGerente()
-    {
-        return $this->roleName === 'gerente';
-    }
-
-    /**
-     * @return bool
-     */
-    public function isRoleFuncionario()
-    {
-        return $this->roleName === 'funcionario';
-    }
-
-    /**
-     * @return bool
-     */
-    public function isRoleCliente()
-    {
-        return $this->roleName === 'cliente';
-    }
-
 
     /**
      * @return string

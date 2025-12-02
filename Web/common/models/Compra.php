@@ -2,8 +2,6 @@
 
 namespace common\models;
 
-use common\components\EmailHelper;
-
 /**
  * This is the model class for table "compra".
  *
@@ -17,7 +15,6 @@ use common\components\EmailHelper;
  *
  * @property-read $nome
  * @property-read float $total
- * @property-read string $estadoFormatado
  *
  * @property Bilhete[] $bilhetes
  * @property Sessao $sessao
@@ -99,20 +96,14 @@ class Compra extends \yii\db\ActiveRecord
         return $this->getBilhetes()->sum('preco') ?? 0;
     }
 
-    // VERIFICAR SE TODOS OS BILHETES ESTÃO CONFIRMADOS
     public function isTodosBilhetesConfirmados(): bool
     {
-        return !$this->getBilhetes()
-            ->andWhere(['!=', 'estado', Bilhete::ESTADO_CONFIRMADO])
-            ->exists();
+        return !$this->getBilhetes()->andWhere(['!=', 'estado', Bilhete::ESTADO_CONFIRMADO])->exists();
     }
 
-
-    // OBTER ESTADO FORMATADO
-    public function getEstadoFormatado(): string
+    public function getEstadoHtml(): string
     {
-        $labels = self::optsEstado();
-        $label = $labels[$this->estado] ?? 'Desconhecida';
+        $label = $this->displayEstado() ?? '-';
 
         $colors = [
             self::ESTADO_CONFIRMADA => '',
@@ -123,69 +114,26 @@ class Compra extends \yii\db\ActiveRecord
         return "<span class='{$class}'>{$label}</span>";
     }
 
-    public function getPagamentoFormatado(): string
-    {
-        return self::optsPagamento()[$this->pagamento] ?? ucfirst($this->pagamento);
-    }
-
-
-    // TODO: COMMNETS
     public function getBilhetes()
     {
         return $this->hasMany(Bilhete::class, ['compra_id' => 'id']);
     }
 
-    public function enviarEmailEstado($estadoNovo)
-    {
-        // GARANTIR QUE EXISTE CLIENTE
-        if (!$this->cliente || !$this->cliente->email) {
-            return false;
-        }
-
-        // DADOS DO CLIENTE
-        $nome = $this->cliente->profile->nome ?? $this->cliente->username;
-        $email = $this->cliente->email;
-
-        // NOME DO CINEMA
-        $cinemaNome = $this->sessao->cinema->nome ?? 'CineLive';
-
-        // TEXTO DEPENDENTE DO ESTADO
-        switch ($estadoNovo) {
-            case self::ESTADO_CONFIRMADA:
-                $titulo = 'Confirmação da sua compra - CineLive';
-                $mensagem = "
-                <p>Olá <strong>{$nome}</strong>,</p>
-                <p>A sua <b>compra #{$this->id}</b> foi <span style='color:green;'>confirmada</span> com sucesso.</p>
-                <p>Os seus bilhetes estão disponíveis na sua área de cliente.</p>
-                <p style='margin-top:0.75rem;'>Cinema: <b>{$cinemaNome}</b></p>
-                <p style='margin-top:0.75rem;'>Cumprimentos,<br><b>Equipa CineLive</b></p>";
-                break;
-
-            case self::ESTADO_CANCELADA:
-                $titulo = 'Cancelamento da sua compra - CineLive';
-                $mensagem = "
-                <p>Olá <strong>{$nome}</strong>,</p>
-                <p>Lamentamos informar que a sua <b>compra #{$this->id}</b> foi <span style='color:#c00;'>cancelada</span>.</p>
-                <p>Se acha que isto foi um erro, por favor contacte o cinema correspondente.</p>
-                <p style='margin-top:0.75rem;'>Cumprimentos,<br><b>Equipa CineLive</b></p>";
-                break;
-
-            default:
-                return false;
-        }
-
-        // ENVIAR EMAIL
-        return EmailHelper::enviarEmail($email, $titulo, $mensagem);
-    }
-
-    // OBTER SESSÕES
+    /**
+     * Gets query for [[Sessão]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
      public function getSessao()
     {
         return $this->hasOne(Sessao::class, ['id' => 'sessao_id']);
     }
 
-
-    // OBTER CINEMAS
+    /**
+     * Gets query for [[Cinema]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
     public function getCinema()
     {
         return $this->hasOne(Cinema::class, ['id' => 'cinema_id'])->via('sessao');

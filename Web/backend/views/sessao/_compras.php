@@ -1,8 +1,8 @@
 <?php
 
-use backend\components\ActionColumnButtonHelper;
 use backend\components\AppGridView;
-use backend\components\LinkHelper;
+use backend\helpers\ActionColumnButtonHelper;
+use backend\helpers\LinkHelper;
 use common\helpers\Formatter;
 
 /* @var $this yii\web\View */
@@ -23,7 +23,7 @@ use common\helpers\Formatter;
         [
             'attribute' => 'nomeCliente',
             'label' => 'Cliente',
-            'value' => fn($model) => LinkHelper::condition($model->cliente->profile->nome, 'user/view', $model->cliente_id, 'Conta eliminada'),
+            'value' => fn($model) => LinkHelper::nullSafe($model->cliente->profile->nome ?? null, 'user/view', $model->cliente_id, 'Conta eliminada'),
             'format' => 'raw',
         ],
         [

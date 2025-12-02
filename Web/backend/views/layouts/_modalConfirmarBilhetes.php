@@ -1,7 +1,9 @@
 <?php
+
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\bootstrap5\ActiveForm;
+
 ?>
 
 <div class="modal fade" id="modal-confirmar-bilhetes" tabindex="-1" role="dialog" aria-labelledby="modalConfirmarLabel" aria-hidden="true">
@@ -14,7 +16,7 @@ use yii\bootstrap5\ActiveForm;
                 </button>
             </div>
             <div class="modal-body">
-                <?php $form = ActiveForm::begin(['id' => 'form-confirmar-bilhetes', 'action' => Url::to(['/bilhetes/validate']), 'method' => 'post',]); ?>
+                <?php $form = ActiveForm::begin(['id' => 'form-confirmar-bilhetes', 'action' => Url::to(['/bilhete/validate']), 'method' => 'post',]); ?>
 
                 <div class="form-group">
                     <?= Html::label('Código do Bilhete', 'codigo-bilhetes') ?>

@@ -1,6 +1,6 @@
 <?php
 
-namespace backend\components;
+namespace backend\helpers;
 
 use yii\helpers\Html;
 
@@ -12,10 +12,10 @@ class LinkHelper
             ['class' => 'text-decoration-none text-primary']);
     }
 
-    public static function condition($valor, $path, $id, $else)
+    public static function nullSafe($valor, $path, $id, $null)
     {
         return $valor ? Html::a($valor, [$path, 'id' => $id],
             ['class' => 'text-decoration-none text-primary'])
-            : '<span class="text-muted">' . $else . '</span>';
+            : '<span class="text-muted">' . $null . '</span>';
     }
 }

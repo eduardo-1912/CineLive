@@ -17,7 +17,6 @@ class SessaoSearch extends Sessao
     public $estado;
     public $lugaresDisponiveis;
 
-
     /**
      * {@inheritdoc}
      */

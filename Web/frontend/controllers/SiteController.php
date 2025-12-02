@@ -116,7 +116,7 @@ class SiteController extends Controller
             ->limit(4)
             ->all();
 
-        $brevemente = Filme::find()->where(['estado' => Filme::ESTADO_BREVEMENTE])->all();
+        $brevemente = Filme::find()->where(['estado' => Filme::ESTADO_BREVEMENTE])->limit(8)->all();
 
         return $this->render('index', [
             'filmesCarousel' => $filmesCarousel,

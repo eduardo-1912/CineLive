@@ -1,14 +1,9 @@
 <?php
 
-use backend\components\ActionColumnButtonHelper;
 use backend\components\AppGridView;
-use backend\components\LinkHelper;
-use common\models\Cinema;
-use common\models\Compra;
-use common\models\Sessao;
-use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
-use yii\grid\GridView;
+use backend\helpers\ActionColumnButtonHelper;
+use backend\helpers\LinkHelper;
+use common\helpers\Formatter;
 
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -29,21 +24,21 @@ use yii\grid\GridView;
             'attribute' => 'cinema_id',
             'label' => 'Cinema',
             'format' => 'raw',
-            'value' => fn($model) => LinkHelper::cinema($model->sessao),
+            'value' => fn($model) => LinkHelper::simple($model->sessao->cinema->nome, 'cinema/view', $model->sessao->cinema->id),
         ],
         [
             'attribute' => 'sessao_id',
             'format' => 'raw',
-            'value' => fn($model) => LinkHelper::sessao($model),
+            'value' => fn($model) => LinkHelper::simple($model->sessao->nome, 'sessao/view', $model->sessao->id),
 
         ],
         [
             'attribute' => 'data',
-            'value' => 'dataFormatada',
+            'value' => fn($model) => Formatter::data($model->data),
         ],
         [
             'attribute' => 'total',
-            'value' => 'totalEmEuros',
+            'value' => fn($model) => Formatter::preco($model->total),
         ],
         'numeroBilhetes',
         [

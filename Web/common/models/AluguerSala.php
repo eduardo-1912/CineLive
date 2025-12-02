@@ -2,7 +2,6 @@
 
 namespace common\models;
 
-use common\components\EmailHelper;
 use common\helpers\Formatter;
 use DateTime;
 use Yii;
@@ -23,7 +22,7 @@ use Yii;
  *
  * @property-read $nome
  * @property-read string $horario
- * @property-read string $estadoFormatado
+ * @property-read string $estadoHtml
  *
  * @property Cinema $cinema
  * @property User $cliente
@@ -97,37 +96,33 @@ class AluguerSala extends \yii\db\ActiveRecord
         return Formatter::horario($this->hora_inicio, $this->hora_fim);
     }
 
-    // OBTER ESTADOS PERSONALIZADOS
-    public function atualizarEstadoAutomatico(): void
+    public function afterFind()
     {
-        // AGORA
+        parent::afterFind();
+        $this->atualizarEstado();
+    }
+
+    public function atualizarEstado(): void
+    {
         $now = new DateTime();
 
-        // DATAS DE INÍCIO E FIM
         $inicio = new DateTime("{$this->data} {$this->hora_inicio}");
         $fim = new DateTime("{$this->data} {$this->hora_fim}");
 
-        // SE ESTIVER PENDENTE E A HORA DE INÍCIO JÁ PASSOU --> CANCELAR AUTOMATICAMENTE
-        if ($this->estado === self::ESTADO_PENDENTE && $now > $inicio) {
+        // Se estava pendente e já tiver passado --> cancelar
+        if ($this->isEstadoPendente() && $now > $inicio) {
             $this->estado = self::ESTADO_CANCELADO;
             $this->save(false, ['estado']);
         }
 
-        // SÓ ATUALIZAR SE ESTADO ANTERIOR FOSSE CONFIRMADO
-        if ($this->estado === self::ESTADO_CONFIRMADO) {
+        if ($this->isEstadoConfirmado()) {
             if ($now >= $inicio && $now <= $fim) {
                 $this->estado = self::ESTADO_A_DECORRER;
-            } elseif ($now > $fim) {
+            }
+            elseif ($now > $fim) {
                 $this->estado = self::ESTADO_TERMINADO;
             }
         }
-    }
-
-    // MOSTRAR ESTADOS (A DECORRER/TERMINADO)
-    public function afterFind()
-    {
-        parent::afterFind();
-        $this->atualizarEstadoAutomatico();
     }
 
     public function getEstadoOptions(): array
@@ -145,7 +140,7 @@ class AluguerSala extends \yii\db\ActiveRecord
         return $estados;
     }
 
-    public function getEstadoFormatado()
+    public function getEstadoHtml()
     {
         $label = self::optsEstado()[$this->estado] ?? '-';
 
@@ -180,7 +175,9 @@ class AluguerSala extends \yii\db\ActiveRecord
             }
         }
 
-        $salasDisponiveis = Sala::findDisponiveis($this->cinema_id, $this->data, $this->hora_inicio, $this->hora_fim);
+        $salasDisponiveis = $this->cinema->getSalasDisponiveis(
+            $this->data, $this->hora_inicio, $this->hora_fim, $this->id ? $this->sala_id : null
+        );
 
         if (!in_array($this->sala, $salasDisponiveis)) {
             Yii::$app->session->setFlash('error', 'A sala escolhida não esta disponível neste horário.');
@@ -190,46 +187,12 @@ class AluguerSala extends \yii\db\ActiveRecord
         return true;
     }
 
-    // ENVIAR EMAIL AO CLIENTE CONFORME O NOVO ESTADO DO PEDIDO DE ALUGUER
-    public function enviarEmailEstado(?string $novoEstado = null): bool
+    /**
+     * @return bool
+     */
+    public function isEditable(): bool
     {
-        $novoEstado = $novoEstado ?? $this->estado;
-
-        // OBTER CLIENTE
-        $cliente = $this->cliente;
-        if (!$cliente) return false;
-
-        $nome = $cliente->profile->nome ?? $cliente->username;
-        $email = $cliente->email;
-
-        switch ($novoEstado) {
-            case self::ESTADO_CONFIRMADO:
-                $assunto = 'Confirmação do aluguer de sala - CineLive';
-                $mensagem = "
-                    <p>Olá <strong>{$nome}</strong>,</p>
-                    <p>O seu <b>aluguer de sala #{$this->id}</b> foi <span style='color:green;'>confirmado</span> com sucesso!</p>
-                    <p><b>Data:</b> {$this->dataFormatada}<br>
-                       <b>Hora:</b> {$this->horaInicioFormatada} - {$this->horaFimFormatada}<br>
-                       <b>Sala:</b> {$this->sala->nome}</p>
-                    <p style='margin-top:0.75rem;'>Obrigado por escolher o CineLive.<br><b>Até breve!</b></p>";
-                break;
-
-            case self::ESTADO_CANCELADO:
-                $assunto = 'Cancelamento do aluguer de sala - CineLive';
-                $mensagem = "
-                    <p>Olá <strong>{$nome}</strong>,</p>
-                    <p>O seu <b>aluguer de sala #{$this->id}</b> foi <span style='color:#c00;'>cancelado</span>.</p>
-                    <p>Se desejar reagendar, entre em contacto com o cinema.</p>
-                    <p style='margin-top:0.75rem;'>Cumprimentos,<br><b>Equipa CineLive</b></p>";
-                break;
-
-            default:
-                return false;
-        }
-
-        // ENVIAR EMAIL
-        EmailHelper::enviarEmail($email, $assunto, $mensagem);
-        return true;
+        return in_array($this->estado, [$this::ESTADO_PENDENTE, $this::ESTADO_CONFIRMADO]);
     }
 
     /**
@@ -237,7 +200,7 @@ class AluguerSala extends \yii\db\ActiveRecord
      */
     public function isDeletable(): bool
     {
-        return $this->estado === self::ESTADO_CANCELADO || $this->estado === self::ESTADO_PENDENTE;
+        return in_array($this->estado, [$this::ESTADO_CANCELADO, $this::ESTADO_PENDENTE]);
     }
 
     /**

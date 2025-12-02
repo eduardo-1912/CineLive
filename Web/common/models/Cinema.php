@@ -30,6 +30,7 @@ use yii\helpers\ArrayHelper;
  * @property User $gerente
  * @property Sala[] $salas
  * @property Sessao[] $sessoes
+ * @property Compra[] $compras
  * @property UserProfile[] $userProfiles
  */
 class Cinema extends \yii\db\ActiveRecord
@@ -307,6 +308,16 @@ class Cinema extends \yii\db\ActiveRecord
     public function getSessoes()
     {
         return $this->hasMany(Sessao::class, ['cinema_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[Compras]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCompras()
+    {
+        return $this->hasMany(Compra::class, ['sessao_id' => 'id'])->via('sessoes');
     }
 
     /**

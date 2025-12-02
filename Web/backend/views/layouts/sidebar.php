@@ -3,16 +3,16 @@
 use common\models\AluguerSala;
 
 $currentUser = Yii::$app->user;
-$userCinemaId = $currentUser->identity->profile->cinema->id ?? null;
+$userCinema = $currentUser->identity->profile->cinema ?? null;
 
-$verFuncionarios = $currentUser->can('verFuncionarios');
+$verFuncionariosCinema = $currentUser->can('verFuncionariosCinema', ['model' => $userCinema]);
 $gerirUtilizadores = $currentUser->can('gerirUtilizadores');
 $gerirCinemas = $currentUser->can('gerirCinemas');
 $gerirFilmes = $currentUser->can('gerirFilmes');
 
-$alugueresPendentes =AluguerSala::find()
-    ->where(['estado' => AluguerSala::ESTADO_PENDENTE, 'cinema_id' => $userCinemaId])
-    ->exists();
+if ($userCinema) {
+    $alugueresPendentes = AluguerSala::find()->where(['estado' => AluguerSala::ESTADO_PENDENTE, 'cinema_id' => $userCinema->id])->exists();
+}
 
 ?>
 
@@ -32,9 +32,9 @@ $alugueresPendentes =AluguerSala::find()
                 'items' => [
                     ['label' => 'Dashboard',  'icon' => 'columns', 'url' => ['/site/index']],
 
-                    ['label' => 'Gestão', 'header' => true, 'visible' => $gerirUtilizadores || $verFuncionarios],
+                    ['label' => 'Gestão', 'header' => true, 'visible' => $gerirUtilizadores || $verFuncionariosCinema],
                     ['label' => $gerirUtilizadores ? 'Utilizadores' : 'Funcionários',
-                        'icon' => 'users', 'url' => ['/user/index'], 'visible' => $gerirUtilizadores || $verFuncionarios],
+                        'icon' => 'users', 'url' => ['/user/index'], 'visible' => $gerirUtilizadores || $verFuncionariosCinema],
 
                     ['label' => 'Espaços', 'header' => true],
                     [
@@ -42,7 +42,7 @@ $alugueresPendentes =AluguerSala::find()
                         'icon'  => 'building',
                         'url'   => $gerirCinemas
                             ? ['/cinema/index']
-                            : ['/cinema/view', 'id' => $userCinemaId],
+                            : ['/cinema/view', 'id' => $userCinema->id],
                     ],
                     ['label' => 'Salas',  'icon' => 'chair', 'url' => ['/sala/index']],
 
@@ -53,7 +53,7 @@ $alugueresPendentes =AluguerSala::find()
 
                     ['label' => 'Reservas', 'header' => true],
                     ['label' => 'Compras',  'icon' => 'ticket-alt', 'url' => ['/compra/index']],
-                    ['label' => 'Alugueres' . ($alugueresPendentes ? '<i class="fas fa-exclamation text-danger ms-2"></i>' : ''),
+                    ['label' => 'Alugueres' . ($userCinema && $alugueresPendentes ? '<i class="fas fa-exclamation text-danger ms-2"></i>' : ''),
                         'icon' => 'clock', 'url' => ['/aluguer-sala/index'], 'encode' => false,
                     ],
                 ],

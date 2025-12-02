@@ -1,7 +1,7 @@
 <?php
 
 use backend\components\AppGridView;
-use backend\components\LinkHelper;
+use backend\helpers\LinkHelper;
 use common\helpers\Formatter;
 use yii\helpers\Html;
 
@@ -48,7 +48,7 @@ $this->params['breadcrumbs'][] = 'Sessões';
                                 'attribute' => 'tituloFilme',
                                 'format' => 'raw',
                                 'value' => fn($model) => LinkHelper::simple($model->filme->titulo, 'filme/view', $model->filme_id),
-                                'headerOptions' => ['style' => 'width: 18rem;'],
+                                'headerOptions' => ['style' => 'width: 24rem;'],
                             ],
                             [
                                 'attribute' => 'cinema_id',

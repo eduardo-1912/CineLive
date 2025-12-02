@@ -8,10 +8,7 @@ use common\models\Genero;
 use Yii;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
-use yii\web\BadRequestHttpException;
 use yii\web\Controller;
-use yii\web\ForbiddenHttpException;
 use yii\web\UploadedFile;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -100,14 +97,16 @@ class FilmeController extends Controller
         if ($model->load(Yii::$app->request->post())) {
             $model->posterFile = UploadedFile::getInstance($model, 'posterFile');
 
-            if ($model->validate() && $model->save(false)) {
+            if ($model->validate()) {
                 $this->guardarPoster($model);
 
-                $generos = Yii::$app->request->post('Filme')['generosSelecionados'] ?? [];
-                $model->guardarGeneros($generos);
+                if ($model->save(false)) {
+                    $generos = Yii::$app->request->post('Filme')['generosSelecionados'] ?? [];
+                    $model->guardarGeneros($generos);
 
-                Yii::$app->session->setFlash('success', 'Filme criado com sucesso.');
-                return $this->redirect(['view', 'id' => $model->id]);
+                    Yii::$app->session->setFlash('success', 'Filme criado com sucesso.');
+                    return $this->redirect(['view', 'id' => $model->id]);
+                }
             }
 
             Yii::$app->session->setFlash('error', 'Erro ao criar o filme.');
@@ -128,20 +127,23 @@ class FilmeController extends Controller
 
         $model = $this->findModel($id);
         $oldPoster = $model->poster_path;
+
         $generoOptions = ArrayHelper::map(Genero::find()->orderBy('nome')->all(), 'id', 'nome');
 
         if ($model->load(Yii::$app->request->post())) {
             $model->posterFile = UploadedFile::getInstance($model, 'posterFile');
 
-            if ($model->validate() && $model->save(false)) {
+            if ($model->validate()) {
                 $this->guardarPoster($model, $oldPoster);
 
-                $generos = Yii::$app->request->post('Filme')['generosSelecionados'] ?? [];
-                $model->guardarGeneros($generos);
+                if ($model->save(false)) {
+                    $generos = Yii::$app->request->post('Filme')['generosSelecionados'] ?? [];
+                    $model->guardarGeneros($generos);
 
 
-                Yii::$app->session->setFlash('success', 'Filme atualizado com successo.');
-                return $this->redirect(['view', 'id' => $model->id]);
+                    Yii::$app->session->setFlash('success', 'Filme atualizado com successo.');
+                    return $this->redirect(['view', 'id' => $model->id]);
+                }
             }
 
             Yii::$app->session->setFlash('error', 'Erro ao atualizar o filme.');
@@ -191,7 +193,7 @@ class FilmeController extends Controller
         $model->estado = $estado;
         $model->save(false);
 
-        if ($estadoAntigo === $model::ESTADO_EM_EXIBICAO && $estadoAntigo !== $model->estado && $model->getSessoesAtivas()->exists()) {
+        if ($estadoAntigo === $model::ESTADO_EM_EXIBICAO && $estadoAntigo !== $model->estado && count($model->getSessoesAtivas()) > 0) {
             Yii::$app->session->setFlash('warning', "O estado foi alterado, as sessões agendadas continuarão visíveis.");
         }
         else {
@@ -211,26 +213,26 @@ class FilmeController extends Controller
         }
 
         $basePath = Yii::getAlias(Yii::$app->params['posterPath']);
+
+        // Criar caminho se não existe
         if (!is_dir($basePath)) {
             mkdir($basePath, 0775, true);
         }
 
-        // Gerar ID único para o ficheiro do poster
+        // Gerar nome único
         $filename = uniqid('poster_') . '.' . $model->posterFile->extension;
 
-        $savePath = $basePath . '/' . $filename;
+        $savePath = $basePath . DIRECTORY_SEPARATOR . $filename;
 
-        // Guardar ficheiro
         if ($model->posterFile->saveAs($savePath)) {
             $model->poster_path = $filename;
 
-            // Apagar poster antigo se existir
-            if ($oldPoster && is_file($basePath . '/' . $oldPoster)) {
-                @unlink($basePath . '/' . $oldPoster);
+            // Apagar poster antigo se exister
+            if ($oldPoster && is_file($basePath . DIRECTORY_SEPARATOR . $oldPoster)) {
+                @unlink($basePath . DIRECTORY_SEPARATOR . $oldPoster);
             }
         }
     }
-
     protected function findModel($id)
     {
         if (($model = Filme::findOne(['id' => $id])) !== null) {

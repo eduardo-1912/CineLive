@@ -29,8 +29,7 @@ class UserSearch extends User
 
     public function search($params)
     {
-        $query = User::find()
-            ->joinWith(['profile', 'cinema']); // Faz join com user_profile e cinema
+        $query = User::find()->joinWith(['profile', 'cinema']);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -70,7 +69,6 @@ class UserSearch extends User
             ->andFilterWhere(['like', 'user_profile.nome', $this->nome])
             ->andFilterWhere(['like', 'user_profile.telemovel', $this->telemovel]);
 
-        // FILTRAR POR ROLE
         if ($this->role) {
             $ids = Yii::$app->authManager->getUserIdsByRole($this->role);
             $query->andWhere(['user.id' => $ids ?: 0]);

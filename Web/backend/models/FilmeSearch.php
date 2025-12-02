@@ -2,12 +2,10 @@
 
 namespace backend\models;
 
-use common\models\Genero;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\models\Filme;
-use yii\helpers\ArrayHelper;
 
 /**
  * FilmeSearch represents the model behind the search form of `common\models\Filme`.

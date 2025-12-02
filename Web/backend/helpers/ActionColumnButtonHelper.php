@@ -1,55 +1,24 @@
 <?php
 
-namespace backend\components;
+namespace backend\helpers;
 
 
-use common\models\AluguerSala;
-use common\models\Filme;
-use Yii;
-use yii\helpers\Html;
-use common\models\User;
 use common\models\Bilhete;
 use common\models\Compra;
+use common\models\Filme;
+use common\models\User;
+use Yii;
+use yii\helpers\Html;
 
 class ActionColumnButtonHelper
 {
-    public static function userButtons()
-    {
-        return [
-            'softDelete' => function ($url, $model) {
-                return Html::a('<i class="fas fa-trash"></i>', ['change-status', 'id' => $model->id, 'estado' => $model::STATUS_DELETED], [
-                    'class' => 'btn btn-sm btn-danger',
-                    'title' => 'Eliminar',
-                    'data' => [
-                        'confirm' => 'Tem a certeza que quer eliminar este utilizador?',
-                        'method' => 'post',
-                    ],
-                    'data-toggle' => 'tooltip',
-                ]);
-            },
-            'hardDelete' => function ($url, $model) {
-                return Html::a('<i class="fas fa-trash"></i>', ['delete', 'id' => $model->id], [
-                    'class' => 'btn btn-sm ' . ($model->id == Yii::$app->user->identity->id ? 'btn-secondary disabled' : 'btn-danger'),
-                    'title' => 'Eliminar',
-                    'data' => [
-                        'confirm' => 'Tem a certeza que quer eliminar este utilizador permanentemente? Esta ação não pode ser desfeita!',
-                        'method' => 'post',
-                    ],
-                    'data-toggle' => 'tooltip',
-                ]);
-            },
-        ];
-    }
-
     public static function userEstadoDropdown(User $model): string
     {
         $items = '';
         foreach (User::optsStatus() as $estado => $label) {
 
-            if ($estado === $model->status) continue;
-
-            if (!Yii::$app->user->can('gerirUtilizadores')) {
-                if ($estado === User::STATUS_DELETED) continue;
+            if ($estado === $model->status || ($estado == $model::STATUS_ACTIVE && $model->cinema->isEstadoEncerrado())) {
+                continue;
             }
 
             $items .=
@@ -64,11 +33,12 @@ class ActionColumnButtonHelper
         }
 
         $btnClass = match ($model->status) {
-            User::STATUS_ACTIVE => '',
             User::STATUS_INACTIVE => 'text-danger',
             User::STATUS_DELETED => 'text-secondary font-italic',
             default => '',
         };
+
+
 
         return '
         <div class="btn-group"> ' .
@@ -147,7 +117,7 @@ class ActionColumnButtonHelper
         };
 
         if (!Yii::$app->user->can('gerirFilmes')) {
-            return Html::tag('span', Html::encode($model->displayEstado()), ['class' => "fs-6 $btnClass"]);
+            return Html::tag('span', $model->displayEstado(), ['class' => "fs-6 $btnClass"]);
         }
 
         $items = '';
@@ -199,7 +169,7 @@ class ActionColumnButtonHelper
         };
 
         if (!Yii::$app->user->can('gerirCompras') || $model->sessao->isEstadoTerminada() || $model->isEstadoCancelada()) {
-            return Html::tag('span', Html::encode($model->displayEstado()), ['class' => "fs-6 $btnClass"]);
+            return Html::tag('span', $model->displayEstado(), ['class' => "fs-6 $btnClass"]);
         }
 
         $items = '';
@@ -292,7 +262,7 @@ class ActionColumnButtonHelper
             $model->isEstadoADecorrer() ||
             $model->isEstadoTerminado()
         ) {
-            return $model->getEstadoFormatado();
+            return $model->getEstadoHtml();
         }
 
         $items = '';

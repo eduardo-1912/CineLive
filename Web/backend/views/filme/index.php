@@ -1,9 +1,9 @@
 <?php
 
-use backend\components\ActionColumnButtonHelper;
+use backend\components\AppGridView;
+use backend\helpers\ActionColumnButtonHelper;
 use common\helpers\Formatter;
 use yii\helpers\Html;
-use backend\components\AppGridView;
 
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\UserSearch */

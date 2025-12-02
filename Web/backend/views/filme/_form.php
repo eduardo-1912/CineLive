@@ -14,9 +14,7 @@ use yii\web\JqueryAsset;
 
 <div class="filme-form">
 
-    <?php $form = ActiveForm::begin([
-        'options' => ['enctype' => 'multipart/form-data']
-    ]); ?>
+    <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
 
     <?= $form->field($model, 'titulo')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'sinopse')->textarea(['rows' => 3]) ?>
@@ -34,9 +32,7 @@ use yii\web\JqueryAsset;
 
     <?php if ($model->poster_path): ?>
         <div class="mb-2">
-            <?= Html::img($model->posterUrl, [
-                'style' => 'max-width:200px; border-radius:8px'
-            ]) ?>
+            <?= Html::img($model->getPosterUrl(), ['style' => 'max-width:200px; border-radius:8px']) ?>
         </div>
     <?php endif; ?>
 

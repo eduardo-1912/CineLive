@@ -1,21 +1,16 @@
 <?php
 
-use backend\components\ActionColumnButtonHelper;
 use backend\components\AppGridView;
-use backend\components\LinkHelper;
+use backend\helpers\ActionColumnButtonHelper;
+use backend\helpers\LinkHelper;
 use common\helpers\Formatter;
-use common\models\Cinema;
-use common\models\Compra;
-use common\models\Sessao;
-use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
-use yii\grid\GridView;
 
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\CompraSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 /* @var $cinemaOptions array */
-
+/* @var $gerirCinemas bool */
+/* @var $estadoOptions array */
 
 $this->title = 'Compras';
 $this->params['breadcrumbs'][] = $this->title;
@@ -41,7 +36,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             [
                                 'attribute' => 'nomeCliente',
                                 'label' => 'Cliente',
-                                'value' => fn($model) => LinkHelper::condition($model->cliente->profile->nome ?? null, 'user/view', $model->cliente_id, 'Conta eliminada'),
+                                'value' => fn($model) => LinkHelper::nullSafe($model->cliente->profile->nome ?? null, 'user/view', $model->cliente_id, 'Conta eliminada'),
                                 'format' => 'raw',
                             ],
                             [
@@ -66,7 +61,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                             [
                                 'attribute' => 'total',
-                                'value' => 'totalEmEuros',
+                                'value' => fn($model) => Formatter::preco($model->total),
                             ],
                             'numeroBilhetes',
                             [
