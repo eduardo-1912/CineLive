@@ -25,6 +25,7 @@ use Yii;
  * @property-read array $lugaresConfirmados
  * @property-read string $numeroLugaresDisponiveis
  *
+ * @property Compra[] $compras
  * @property Bilhete[] $bilhetes
  * @property Cinema $cinema
  * @property Filme $filme
@@ -71,7 +72,8 @@ class Sessao extends \yii\db\ActiveRecord
             'hora_inicio' => 'Hora Início',
             'hora_fim' => 'Hora Fim',
             'horario' => 'Horário',
-            'filme_id', 'tituloFilme' => 'Filme',
+            'filme_id' => 'Filme',
+            'tituloFilme' => 'Filme',
             'sala_id' => 'Sala',
             'cinema_id' => 'Cinema',
             'numeroLugaresDisponiveis' => 'Lugares Disponíveis',
@@ -88,63 +90,29 @@ class Sessao extends \yii\db\ActiveRecord
         return Formatter::horario($this->hora_inicio, $this->hora_fim);
     }
 
-    public function getLugaresOcupados(): array
-    {
-        return $this->getBilhetes()
-            ->select('lugar')
-            ->andWhere(['<>', 'estado', Bilhete::ESTADO_CANCELADO])
-            ->column();
-    }
-
-    public function getLugaresConfirmados()
-    {
-        return $this->getBilhetes()
-            ->select('lugar')
-            ->andWhere(['estado' => Bilhete::ESTADO_CONFIRMADO])
-            ->column();
-    }
-
-    public function getNumeroLugaresDisponiveis()
-    {
-        return $this->sala->numeroLugares - count($this->lugaresOcupados);
-    }
-
-    // OBTER O ESTADO DA SESSÃO
     public function getEstado()
     {
-        // OBTER DATA E HORA ATUAL
         $now = new DateTime();
 
-        // OBTER DATA E HORA INÍCIO E FIM DA SESSÃO
-        $dataHoraInicio = new DateTime("{$this->data} {$this->hora_inicio}");
-        $dataHoraFim = new DateTime("{$this->data} {$this->hora_fim}");
+        $inicio = new DateTime("{$this->data} {$this->hora_inicio}");
+        $fim = new DateTime("{$this->data} {$this->hora_fim}");
 
-        if (!$this->sala) {
-            return self::ESTADO_ATIVA;
-        }
+        if (!$this->sala) return self::ESTADO_ATIVA;
 
-        // NÚMERO DE LUGARES OCUPADOS
-        $lugaresOcupados = count($this->lugaresOcupados ?? 0);
+        $lugaresOcupados = count($this->lugaresOcupados);
 
-        // SE JÁ TERMINOU
-        if ($now > $dataHoraFim) { return self::ESTADO_TERMINADA; }
+        if ($now > $fim) return self::ESTADO_TERMINADA;
 
-        // SE ESTÁ A DECORRER
-        if ($now > $dataHoraInicio && $dataHoraFim > $now) { return self::ESTADO_A_DECORRER; }
+        if ($now > $inicio && $fim > $now) return self::ESTADO_A_DECORRER;
 
-        // SE ESTÁ ESGOTADA
-        if ($lugaresOcupados >= $this->sala->lugares) { return self::ESTADO_ESGOTADA; }
+        if ($lugaresOcupados >= $this->sala->lugares) return self::ESTADO_ESGOTADA;
 
-        // SE ESTÁ ATIVA
         return self::ESTADO_ATIVA;
     }
 
-
-    // OBTER ESTADO FORMATADO (PARA /INDEX E /VIEW)
     public function getEstadoHtml(): string
     {
-        $labels = self::optsEstado();
-        $label = $labels[$this->displayEstado()] ?? '-';
+        $label = $this->displayEstado() ?? '-';
 
         $colors = [
             self::ESTADO_ATIVA => '',
@@ -157,112 +125,102 @@ class Sessao extends \yii\db\ActiveRecord
         return "<span class='{$class}'>{$label}</span>";
     }
 
-    // OBTER COMPRA_ID PARA CADA LUGAR DA SESSÃO
-    public function getMapaLugaresCompra()
+    public function getCompraIdPorLugar(string $lugar): ?int
     {
-        return $this->getBilhetes()->select(['compra_id', 'lugar'])->indexBy('lugar')->column();
+        return $this->getBilhetes()
+            ->select('compra_id')
+            ->andWhere(['lugar' => $lugar])
+            ->andWhere(['!=', 'estado', Bilhete::ESTADO_CANCELADO])
+            ->scalar() ?: null;
+    }
+    public function getLugaresOcupados(): array
+    {
+        return $this->getBilhetes()
+            ->select('lugar')
+            ->andWhere(['estado' => Bilhete::ESTADO_PENDENTE])
+            ->column();
     }
 
-
-    // CALCULAR A HORA FIM CONSOANTE FILME SELECIONADO E HORA INÍCIO
-    public function getHoraFimCalculada($duracaoMinutos)
+    public function getLugaresConfirmados(): array
     {
-        if (!$this->hora_inicio || !$duracaoMinutos) {
+        return $this->getBilhetes()
+            ->select('lugar')
+            ->andWhere(['estado' => Bilhete::ESTADO_CONFIRMADO])
+            ->column();
+    }
+
+    public function getNumeroLugaresDisponiveis(): int
+    {
+        return $this->sala->numeroLugares - count($this->lugaresOcupados);
+    }
+
+    public function getHoraFimCalculada($duracaoFilme): ?string
+    {
+        if (!$this->hora_inicio || !$duracaoFilme) {
             return null;
         }
 
         $inicio = new DateTime($this->hora_inicio);
-        $inicio->modify("+{$duracaoMinutos} minutes");
+        $inicio->modify("+{$duracaoFilme} minutes");
 
         return $inicio->format('H:i');
     }
 
-
-    public function isEditable(): bool
-    {
-        return $this->estado !== self::ESTADO_A_DECORRER && $this->estado !== self::ESTADO_TERMINADA;
-    }
-
-    public function isDeletable(): bool
-    {
-        return count($this->lugaresOcupados) === 0 && $this->estado !== self::ESTADO_A_DECORRER;
-    }
-
-    // VALIDAR O HORÁRIO DA SESSÃO
     public function validateHorario(): bool
     {
-        // OBTER DATAS DE HOJE E INÍCIO E FIM DE SESSÃO
         $now = new DateTime();
-        $dataHoraInicio = new DateTime("{$this->data} {$this->hora_inicio}");
-        $dataHoraFim = new DateTime("{$this->data} {$this->hora_fim}");
+        $inicio = new DateTime("{$this->data} {$this->hora_inicio}");
+        $fim = new DateTime("{$this->data} {$this->hora_fim}");
 
-        // SE A HORA DE FIM FOR ANTERIOR À HORA DE INÍCIO --> MENSAGEM DE ERRO
-        if ($dataHoraFim <= $dataHoraInicio) {
+        if ($fim <= $inicio) {
             Yii::$app->session->setFlash('error', 'A hora de fim deve ser posterior à hora de início.');
             return false;
         }
 
-        // SE A SESSÃO FOR HOJE E A HORA DE INÍCIO JÁ TIVER PASSADO --> MENSAGEM DE ERRO
-        if ($dataHoraInicio < $now) {
-            Yii::$app->session->setFlash('error', 'A hora de início não pode ser anterior à hora atual.');
+        if ($inicio < $now) {
+            Yii::$app->session->setFlash('error', 'A sessão não pode começar no passado.');
             return false;
         }
 
-        // OBTER CINEMA RELACIONADO
         $cinema = $this->cinema ?? null;
 
         if ($cinema) {
-            // OBTER HORARIO ABERTURA E FECHO
             $abertura = new DateTime("{$this->data} {$cinema->horario_abertura}");
             $fecho = new DateTime("{$this->data} {$cinema->horario_fecho}");
 
-            if ($dataHoraInicio < $abertura) {
-                Yii::$app->session->setFlash('error', "O cinema ainda não está aberto às {$cinema->horarioAberturaFormatado}.");
+            if ($inicio < $abertura) {
+                Yii::$app->session->setFlash('error', "O cinema ainda não está aberto à hora selecionada.");
                 return false;
             }
 
-            if ($dataHoraFim > $fecho) {
-                Yii::$app->session->setFlash('error', "O cinema encerra às {$cinema->horarioFechoFormatado}. A sessão não pode ultrapassar esse horário.");
+            if ($fim > $fecho) {
+                Yii::$app->session->setFlash('error', "A sessão não pode ultrapassar a horário do fecho do cinema.");
                 return false;
             }
-        }
 
-        // VERIFICAR CONFLITOS COM OUTRAS SESSÕES
-        $sessoes = self::find()
-            ->where(['sala_id' => $this->sala_id])
-            ->andWhere(['data' => $this->data])
-            ->andWhere(['and',
-                ['<', 'hora_inicio', $this->hora_fim],
-                ['>', 'hora_fim', $this->hora_inicio]
-            ])
-            ->andWhere(['!=', 'id', $this->id ?? 0])
-            ->exists();
+            $salasDisponiveis = $cinema->getSalasDisponiveis(
+                $this->data, $this->hora_inicio, $this->hora_fim, $this->id ? $this->sala_id : null
+            );
 
-        if ($sessoes) {
-            Yii::$app->session->setFlash('error', 'Já existe uma sessão nesta sala que se sobrepõe a este horário.');
-            return false;
-        }
-
-        // VERIFICAR CONFLITOS COM ALUGUERES DE SALA
-        $aluguerExiste = AluguerSala::find()
-            ->where(['sala_id' => $this->sala_id])
-            ->andWhere(['data' => $this->data])
-            ->andWhere(['estado' => [
-                AluguerSala::ESTADO_CONFIRMADO,
-                AluguerSala::ESTADO_A_DECORRER,
-            ]])
-            ->andWhere(['and',
-                ['<', 'hora_inicio', $this->hora_fim],
-                ['>', 'hora_fim', $this->hora_inicio]
-            ])
-            ->exists();
-
-        if ($aluguerExiste) {
-            Yii::$app->session->setFlash('error', 'Esta sala encontra-se alugada neste horário.');
-            return false;
+            if (!in_array($this->sala, $salasDisponiveis)) {
+                Yii::$app->session->setFlash('error', "A sala selecionada não está disponível no horário selecionado.");
+                return false;
+            }
         }
 
         return true;
+    }
+
+    public function isEditable(): bool
+    {
+        return $this->estado !== self::ESTADO_A_DECORRER
+            && $this->estado !== self::ESTADO_TERMINADA;
+    }
+
+    public function isDeletable(): bool
+    {
+        return count($this->lugaresOcupados) === 0
+            && $this->estado !== self::ESTADO_A_DECORRER;
     }
 
     public static function optsEstado()

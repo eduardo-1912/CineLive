@@ -1,9 +1,11 @@
 <?php
 
-use yii\helpers\Html;
-
 /* @var $this yii\web\View */
 /* @var $model common\models\Sessao */
+/* @var $gerirSessoes bool */
+/* @var $cinemaOptions array */
+/* @var $filmeOptions array */
+/* @var $salaOptions array */
 
 $this->title = 'Criar Sessão';
 $this->params['breadcrumbs'][] = ['label' => 'Sessões', 'url' => ['index']];
@@ -17,13 +19,11 @@ $this->params['breadcrumbs'][] = $this->title;
                 <div class="col-md-12">
                     <?=$this->render('_form', [
                         'model' => $model,
-                        'cinemasAtivos' => $cinemasAtivos,
-                        'filmesEmExibicao' => $filmesEmExibicao,
-                        'salasDropdown' => $salasDropdown,
-                        'cinema_id' => $cinema_id,
-                        'gerirCinemas' => $gerirCinemas,
-                        'userCinemaId' => $userCinemaId,
-                        'temBilhetes' => $temBilhetes,
+                        'gerirSessoes' => $gerirSessoes,
+                        'cinemaOptions' => $cinemaOptions,
+                        'filmeOptions' => $filmeOptions,
+                        'salaOptions' => $salaOptions,
+                        'hasBilhetes' => false,
                     ]) ?>
                 </div>
             </div>

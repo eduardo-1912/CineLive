@@ -3,6 +3,7 @@
 use backend\components\ActionColumnButtonHelper;
 use backend\components\AppGridView;
 use backend\components\LinkHelper;
+use common\helpers\Formatter;
 use common\models\Cinema;
 use common\models\Compra;
 use common\models\Sessao;
@@ -13,6 +14,8 @@ use yii\grid\GridView;
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\CompraSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+/* @var $cinemaOptions array */
+
 
 $this->title = 'Compras';
 $this->params['breadcrumbs'][] = $this->title;
@@ -38,15 +41,15 @@ $this->params['breadcrumbs'][] = $this->title;
                             [
                                 'attribute' => 'nomeCliente',
                                 'label' => 'Cliente',
-                                'value' => fn($model) => LinkHelper::cliente($model),
+                                'value' => fn($model) => LinkHelper::condition($model->cliente->profile->nome ?? null, 'user/view', $model->cliente_id, 'Conta eliminada'),
                                 'format' => 'raw',
                             ],
                             [
                                 'attribute' => 'cinema_id',
                                 'label' => 'Cinema',
                                 'format' => 'raw',
-                                'value' => fn($model) => LinkHelper::cinema($model->sessao),
-                                'filter' => $cinemaFilterOptions,
+                                'value' => fn($model) => LinkHelper::simple($model->sessao->cinema->nome, 'cinema/view', $model->sessao->cinema_id),
+                                'filter' => $cinemaOptions,
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
                                 'headerOptions' => ['style' => 'width: 14rem;'],
                                 'visible' => $gerirCinemas,
@@ -54,11 +57,11 @@ $this->params['breadcrumbs'][] = $this->title;
                             [
                                 'attribute' => 'sessao_id',
                                 'format' => 'raw',
-                                'value' => fn($model) => LinkHelper::sessao($model),
+                                'value' => fn($model) => LinkHelper::simple($model->sessao->nome, 'sessao/view', $model->sessao_id),
                             ],
                             [
                                 'attribute' => 'data',
-                                'value' => 'dataFormatada',
+                                'value' => fn($model) => Formatter::data($model->data),
                                 'filterInputOptions' => ['class' => 'form-control', 'type' => 'date',],
                             ],
                             [
@@ -70,7 +73,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'attribute' => 'estado',
                                 'label' => 'Estado',
                                 'format' => 'raw',
-                                'filter' => $estadoFilterOptions,
+                                'filter' => $estadoOptions,
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
                                 'value' => fn($model) => ActionColumnButtonHelper::compraEstadoDropdown($model),
                                 'headerOptions' => ['style' => 'width: 9rem'],

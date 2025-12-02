@@ -163,6 +163,7 @@ class RbacController extends Controller
         $auth->addChild($admin, $gerirGeneros);
         $auth->addChild($admin, $gerirSessoes);
         $auth->addChild($admin, $verTodasCompras);
+        $auth->addChild($funcionario, $confirmarBilhetes);
         $auth->addChild($admin, $gerirAlugueres);
         $auth->addChild($admin, $verEstatisticas);
 

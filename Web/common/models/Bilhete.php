@@ -67,9 +67,9 @@ class Bilhete extends \yii\db\ActiveRecord
         ];
     }
 
-    public function getEstadoFormatado(): string
+    public function getEstadoHtml(): string
     {
-        $label = self::optsEstado()[$this->estado] ?? '-';
+        $label = $this->displayEstado() ?? '-';
 
         $colors = [
             self::ESTADO_CONFIRMADO => '',
@@ -85,7 +85,8 @@ class Bilhete extends \yii\db\ActiveRecord
     {
         do {
             $codigo = strtoupper(Yii::$app->security->generateRandomString(6));
-        } while (self::find()->where(['codigo' => $codigo])->exists());
+        }
+        while (self::find()->where(['codigo' => $codigo])->exists());
 
         return $codigo;
     }

@@ -143,6 +143,16 @@ class Filme extends \yii\db\ActiveRecord
         return "{$url}/{$this->poster_path}";
     }
 
+    public static function findPorEstado($estado): array
+    {
+        return self::find()->where(['estado' => $estado])->orderBy('titulo')->all();
+    }
+
+    public static function findPorEstadoList($estado): array
+    {
+        return ArrayHelper::map(self::findPorEstado($estado), 'id', 'titulo');
+    }
+
     public static function findComSessoesAtivas($limit = null)
     {
         $filmes = array_filter(

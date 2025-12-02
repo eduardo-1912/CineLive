@@ -2,22 +2,19 @@
 
 namespace backend\controllers;
 
-use common\components\EmailHelper;
 use common\models\Bilhete;
 use common\models\Cinema;
 use Yii;
 use common\models\Compra;
 use backend\models\CompraSearch;
 use yii\data\ActiveDataProvider;
+use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
-/**
- * CompraController implements the CRUD actions for Compra model.
- */
 class CompraController extends Controller
 {
     /**
@@ -27,7 +24,7 @@ class CompraController extends Controller
     {
         return [
             'access' => [
-                'class' => \yii\filters\AccessControl::class,
+                'class' => AccessControl::class,
                 'rules' => [
                     [
                         'allow' => true,
@@ -41,7 +38,7 @@ class CompraController extends Controller
                 ],
             ],
             'verbs' => [
-                'class' => VerbFilter::className(),
+                'class' => VerbFilter::class,
                 'actions' => [
                     'delete' => ['POST'],
                 ],
@@ -49,8 +46,6 @@ class CompraController extends Controller
         ];
     }
 
-    // ADMIN --> VÊ AS COMPRAS DE QUALQUER CINEMA
-    // GERENTE/FUNCIONÁRIO --> VÊ AS COMPRAS DO SEU CINEMA
     public function actionIndex($cinema_id = null)
     {
         // OBTER USER ATUAL

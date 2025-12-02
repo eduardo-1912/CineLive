@@ -2,6 +2,11 @@
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Sessao */
+/* @var $gerirSessoes bool */
+/* @var $cinemaOptions array */
+/* @var $filmeOptions array */
+/* @var $salaOptions array */
+/* @var $hasBilhetes bool */
 
 $this->title = 'Editar: ' . $model->nome;
 $this->params['breadcrumbs'][] = ['label' => 'Sessões', 'url' => ['index']];
@@ -16,12 +21,11 @@ $this->params['breadcrumbs'][] = 'Editar';
                 <div class="col-md-12">
                     <?=$this->render('_form', [
                         'model' => $model,
-                        'cinemasAtivos' => $cinemasAtivos,
-                        'filmesEmExibicao' => $filmesEmExibicao,
-                        'salasDropdown' => $salasDropdown,
-                        'gerirCinemas' => $gerirCinemas,
-                        'userCinemaId' => $userCinemaId,
-                        'temBilhetes' => $temBilhetes,
+                        'gerirSessoes' => $gerirSessoes,
+                        'cinemaOptions' => $cinemaOptions,
+                        'filmeOptions' => $filmeOptions,
+                        'salaOptions' => $salaOptions,
+                        'hasBilhetes' => $hasBilhetes,
                     ]) ?>
                 </div>
             </div>
