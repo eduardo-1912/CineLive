@@ -2,10 +2,10 @@
 
 namespace backend\modules\api\controllers;
 
+use common\helpers\Formatter;
 use common\models\Bilhete;
 use common\models\Compra;
 use common\models\Sessao;
-use Throwable;
 use Yii;
 use yii\filters\auth\CompositeAuth;
 use yii\filters\auth\HttpBearerAuth;
@@ -33,52 +33,42 @@ class CompraController extends Controller
 
     public function actionIndex()
     {
-        $userId = Yii::$app->user->id;
+        $user = Yii::$app->user->identity;
+        $compras = $user->getCompras()->orderBy(['id' => SORT_DESC])->all();
 
-        $compras = Compra::find()
-            ->where(['cliente_id' => $userId])
-            ->with(['bilhetes', 'sessao.filme', 'sessao.cinema']) // Eager loading (reduz queries)
-            ->orderBy(['id' => SORT_DESC])
-            ->all();
+        return array_map(fn($compra) => [
+            'id' => $compra->id,
+            'cliente_id' => $compra->cliente_id,
+            'data' => Formatter::data($compra->data),
+            'total' => Formatter::preco($compra->total),
+            'estado' => $compra->displayEstado(),
 
-        return array_map(fn($compra) =>
-             [
-                'id' => $compra->id,
-                'cliente_id' => $compra->cliente_id,
-                'data' => $compra->dataFormatada,
-                'total' => $compra->totalEmEuros,
-                'estado' => $compra->displayEstado(),
+            'filme_id' => $compra->sessao->filme_id,
+            'filme_nome' => $compra->sessao->filme->titulo,
 
-                'filme_id' => $compra->sessao->filme_id,
-                'filme_nome' => $compra->sessao->filme->titulo,
+            'cinema_id' => $compra->sessao->cinema_id,
+            'cinema_nome' => $compra->sessao->cinema->nome,
 
-                'cinema_id' => $compra->sessao->cinema_id,
-                'cinema_nome' => $compra->sessao->cinema->nome,
-
-                'sessao_id' => $compra->sessao->id,
-                'sessao_data' => $compra->sessao->dataFormatada,
-                'sessao_hora_inicio' => $compra->sessao->horaInicioFormatada,
-            ], $compras);
+            'sessao_id' => $compra->sessao->id,
+            'sessao_data' => Formatter::data($compra->sessao->data),
+            'sessao_hora_inicio' => Formatter::hora($compra->sessao->hora_inicio),
+        ], $compras);
     }
 
     public function actionView($id)
     {
         $userId = Yii::$app->user->id;
+        $compra = Compra::findOne($id);
 
-        $compra = Compra::find()
-            ->where(['id' => $id, 'cliente_id' => $userId])
-            ->with(['bilhetes', 'sessao.filme', 'sessao.cinema', 'sessao.sala']) // Eager loading (reduz queries)
-            ->one();
-
-        if (!$compra) {
+        if (!$compra || $compra->cliente_id != $userId) {
             throw new NotFoundHttpException("Compra não encontrada.");
         }
 
         return [
             'id' => $compra->id,
             'cliente_id' => $compra->cliente_id,
-            'data' => $compra->dataFormatada,
-            'total' => $compra->totalEmEuros,
+            'data' => Formatter::data($compra->data),
+            'total' => Formatter::preco($compra->total),
             'estado' => $compra->displayEstado(),
 
             'filme_id' => $compra->sessao->filme_id,
@@ -91,16 +81,15 @@ class CompraController extends Controller
             'sala_nome' => $compra->sessao->sala->nome,
 
             'sessao_id' => $compra->sessao->id,
-            'sessao_data' => $compra->sessao->dataFormatada,
+            'sessao_data' => Formatter::data($compra->sessao->data),
             'sessao_horario' => $compra->sessao->horario,
 
-            'bilhetes' => array_map(fn($bilhete) =>
-                [
-                    'id' => $bilhete->id,
-                    'lugar' => $bilhete->lugar,
-                    'preco' => $bilhete->preco,
-                    'estado' => $bilhete->displayEstado(),
-                ], $compra->bilhetes)
+            'bilhetes' => array_map(fn($bilhete) => [
+                'id' => $bilhete->id,
+                'lugar' => $bilhete->lugar,
+                'preco' => Formatter::preco($bilhete->preco),
+                'estado' => $bilhete->displayEstado(),
+            ], $compra->bilhetes)
         ];
     }
 
@@ -114,26 +103,23 @@ class CompraController extends Controller
         $lugares = $body['lugares'] ?? null;
 
         if (!$sessaoId || !$pagamento || !$lugares) {
-            throw new BadRequestHttpException("sessao_id, pagamento e lugares são obrigatórios.");
+            throw new BadRequestHttpException('Faltam campos obrigatórios.');
         }
 
         $sessao = Sessao::findOne($sessaoId);
 
-        if (!$sessao->isEstadoAtiva()) {
+        if (!$sessaoId || !$sessao->isEstadoAtiva()) {
             throw new BadRequestHttpException("Sessão inválida.");
         }
 
-        $ocupados = $sessao->getLugaresOcupados();
-        $validos = $sessao->sala->getArrayLugares();
-
         foreach ($lugares as $lugar) {
-            if (!in_array($lugar, $validos)) {
+            if (!in_array($lugar, $sessao->sala->lugares)) {
                 return [
                     'status' => 'error',
                     'message' => "O lugar $lugar não é válido."
                 ];
             }
-            if (in_array($lugar, $ocupados)) {
+            if (in_array($lugar, $sessao->lugaresOcupados)) {
                 return [
                     'status' => 'error',
                     'message' => "O lugar $lugar já está ocupado."
@@ -141,59 +127,54 @@ class CompraController extends Controller
             }
         }
 
-        $transaction = Yii::$app->db->beginTransaction();
+        // 1. Criar compra
+        $compra = new Compra();
+        $compra->cliente_id = $userId;
+        $compra->sessao_id = $sessaoId;
+        $compra->data = date('Y-m-d H:i:s');
+        $compra->pagamento = $pagamento;
+        $compra->estado = $compra::ESTADO_CONFIRMADA;
 
-        try {
-            // Criar compra
-            $compra = new Compra();
-            $compra->cliente_id = $userId;
-            $compra->sessao_id = $sessaoId;
-            $compra->data = date('Y-m-d H:i:s');
-            $compra->pagamento = $pagamento;
-            $compra->estado = Compra::ESTADO_CONFIRMADA;
+        if (!$compra->save()) {
+            return [
+                'status' => 'error',
+                'errors' => $compra->errors
+            ];
+        }
 
-            if (!$compra->save()) {
-                $transaction->rollBack();
-                return ['status' => 'error', 'errors' => $compra->errors];
-            }
+        // 2. Criar bilhetes
+        $bilhetes = [];
 
-            // Criar bilhetes
-            $bilhetesCriados = [];
+        foreach ($lugares as $lugar) {
+            $bilhete = new Bilhete();
+            $bilhete->compra_id = $compra->id;
+            $bilhete->lugar = $lugar;
+            $bilhete->preco = $sessao->sala->preco_bilhete;
+            $bilhete->codigo = $bilhete::gerarCodigo();
+            $bilhete->estado = $bilhete::ESTADO_PENDENTE;
 
-            foreach ($lugares as $lugar) {
-                $bilhete = new Bilhete();
-                $bilhete->compra_id = $compra->id;
-                $bilhete->lugar = $lugar;
-                $bilhete->preco = $sessao->sala->preco_bilhete;
-                $bilhete->codigo = Bilhete::gerarCodigo();
-                $bilhete->estado = Bilhete::ESTADO_PENDENTE;
+            if (!$bilhete->save()) {
+                $compra->delete();
 
-                if (!$bilhete->save()) {
-                    $transaction->rollBack();
-                    return ['status' => 'error', 'errors' => $bilhete->errors];
-                }
-
-                $bilhetesCriados[] = [
-                    'id' => $bilhete->id,
-                    'codigo' => $bilhete->codigo,
-                    'lugar' => $bilhete->lugar,
-                    'preco' => $bilhete->preco,
+                return [
+                    'status' => 'error',
+                    'errors' => $bilhete->errors
                 ];
             }
 
-            $transaction->commit();
-
-            return [
-                'status' => 'success',
-                'compra_id' => $compra->id,
-                'total' => $compra->total,
-                'bilhetes' => $bilhetesCriados
+            $bilhetes[] = [
+                'id' => $bilhete->id,
+                'codigo' => $bilhete->codigo,
+                'lugar' => $bilhete->lugar,
+                'preco' => $bilhete->preco,
             ];
         }
-        catch (Throwable $e) {
-            $transaction->rollBack();
-            throw $e;
-        }
-    }
 
+        return [
+            'status' => 'success',
+            'compra_id' => $compra->id,
+            'total' => $compra->total,
+            'bilhetes' => $bilhetes
+        ];
+    }
 }

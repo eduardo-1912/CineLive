@@ -46,7 +46,10 @@ public class PreferencesManager {
     }
 
     public String getApiUrl() {
-        return getApiHost() + getApiPath();
+        if (getApiHost() != null && getApiPath() != null) {
+            return getApiHost() + getApiPath();
+        }
+        return null;
     }
 
     public void setApiUrl(String apiHost, String apiPath) {

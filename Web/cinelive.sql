@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Dec 03, 2025 at 10:13 AM
+-- Generation Time: Dec 03, 2025 at 11:13 AM
 -- Server version: 9.1.0
 -- PHP Version: 8.3.14
 
@@ -329,7 +329,7 @@ CREATE TABLE IF NOT EXISTS `cinema` (
 INSERT INTO `cinema` (`id`, `nome`, `rua`, `codigo_postal`, `cidade`, `latitude`, `longitude`, `email`, `telefone`, `horario_abertura`, `horario_fecho`, `estado`, `gerente_id`) VALUES
 (1, 'CineLive Leiria', 'Rua Dr. Francisco Sá Carneiro Nº25', '2400-149', 'Leiria', 39.743620, -8.807049, 'leiria@cinelive.pt', 244123456, '10:00:00', '23:30:00', 'ativo', 2),
 (2, 'CineLive Lisboa', 'Avenida da Liberdade Nº180', '1250-146', 'Lisboa', 38.720345, -9.144021, 'lisboa@cinelive.pt', 213456789, '09:30:00', '23:30:00', 'ativo', 3),
-(3, 'CineLive Porto', 'Rua de Santa Catarina Nº428', '4000-446', 'Porto', 41.149610, -8.606277, 'porto@cinelive.pt', 222456789, '10:00:00', '23:45:00', 'ativo', 4);
+(3, 'CineLive Porto', 'Rua de Santa Catarina Nº428', '4000-446', 'Porto', 41.149610, -8.606277, 'porto@cinelive.pt', 222456789, '10:00:00', '23:45:00', 'encerrado', 4);
 
 -- --------------------------------------------------------
 
@@ -464,8 +464,6 @@ INSERT INTO `filme_genero` (`filme_id`, `genero_id`) VALUES
 (3, 9),
 (3, 1),
 (3, 10),
-(4, 1),
-(4, 3),
 (2, 2),
 (2, 1),
 (2, 3),
@@ -474,7 +472,10 @@ INSERT INTO `filme_genero` (`filme_id`, `genero_id`) VALUES
 (1, 7),
 (5, 2),
 (5, 1),
-(5, 10);
+(5, 10),
+(4, 2),
+(4, 1),
+(4, 3);
 
 -- --------------------------------------------------------
 
@@ -567,12 +568,12 @@ INSERT INTO `sala` (`id`, `cinema_id`, `numero`, `num_filas`, `num_colunas`, `pr
 (8, 2, 2, 10, 10, 8.00, 'ativa'),
 (9, 2, 3, 8, 10, 12.00, 'ativa'),
 (10, 2, 4, 10, 10, 6.00, 'ativa'),
-(11, 3, 1, 12, 14, 8.00, 'ativa'),
-(12, 3, 2, 10, 10, 10.00, 'ativa'),
-(13, 3, 3, 12, 12, 6.00, 'ativa'),
-(14, 3, 4, 10, 10, 6.00, 'ativa'),
-(15, 3, 5, 10, 12, 8.00, 'ativa'),
-(16, 3, 6, 10, 12, 12.00, 'ativa');
+(11, 3, 1, 12, 14, 8.00, 'encerrada'),
+(12, 3, 2, 10, 10, 10.00, 'encerrada'),
+(13, 3, 3, 12, 12, 6.00, 'encerrada'),
+(14, 3, 4, 10, 10, 6.00, 'encerrada'),
+(15, 3, 5, 10, 12, 8.00, 'encerrada'),
+(16, 3, 6, 10, 12, 12.00, 'encerrada');
 
 -- --------------------------------------------------------
 
@@ -642,7 +643,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `email` (`email`),
   UNIQUE KEY `password_reset_token` (`password_reset_token`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
 
 --
 -- Dumping data for table `user`
@@ -652,17 +653,17 @@ INSERT INTO `user` (`id`, `username`, `auth_key`, `password_hash`, `password_res
 (1, 'admin', 'RiJaKAf7Hp424dBk1iQOV1vVBCH9JPtg', '$2y$13$MOGtdUncKuf2Ha0vfkZLbeeclpAAZZKLvTNK8Xq3tCDw36Vy0MetO', NULL, 'admin@cinelive.pt', 10, 1761155589, 1761852169, 'y0Xwr7YzzzQDbI9pyjshvWWe8vkNsDnE_1761155589'),
 (2, 'gerente_leiria', 'U7lb3yNGR61TWnaV-JKGQEXpBbBlESaN', '$2y$13$hyMYwc1Xh8Yzgbz7bCbyXuFERsN6cov/L9YUqgkVvz08d3B89YWWS', NULL, 'joao.santos@cinelive.pt', 10, 1761566974, 1764696349, 'WX40mKBrd5X42eoDi89ebQiOWVOoEE01_1761566974'),
 (3, 'gerente_lisboa', 'D2gMIv_2TEHAR0LZvdfcoQdRW1bk2Dqo', '$2y$13$RAEqwyWe8IXsmqmKNKwX7OnaVLqSiFkIJw8lSqoovnT.y2BorI1ae', NULL, 'ana.costa@cinelive.pt', 10, 1761567081, 1762543597, 'txaOr3YHbo46trhQNh5Zbcp4XORyCuz9_1761567081'),
-(4, 'gerente_porto', 'kzSJHLcffp4AgkJ8K_EsE3owsm1I7n4V', '$2y$13$o5wT5jDBuhUEwlNU9crq5eJBJdtNKsgWbGuTS4brEY/f9DuFKaxGG', NULL, 'jose.lopes@cinelive.pt', 10, 1761567155, 1761658002, 'Y4gdxRCr8ivtj3GylOPMqhmS1bGnni0G_1761567155'),
+(4, 'gerente_porto', 'kzSJHLcffp4AgkJ8K_EsE3owsm1I7n4V', '$2y$13$o5wT5jDBuhUEwlNU9crq5eJBJdtNKsgWbGuTS4brEY/f9DuFKaxGG', NULL, 'jose.lopes@cinelive.pt', 9, 1761567155, 1761658002, 'Y4gdxRCr8ivtj3GylOPMqhmS1bGnni0G_1761567155'),
 (5, 'funcionario1_leiria', 'DKliNxbAxkV0AS1k9a6iOUhwihcX1yRI', '$2y$13$TMdaGK8E56AYDaTuwK2.subQR4YjLe8X8QykBynB2HQpaciQQDetC', NULL, 'pedro.gaspar@cinelive.pt', 10, 1761567277, 1762535118, 'mzJQdLRZ46gM83QEnGPHyf0_zSBKytD-_1761567277'),
 (6, 'funcionario2_leiria', 'bOq92Yc4xgkx8r5gZIlQZmPXcybcNPTB', '$2y$13$WXJqNUuruvEP2t4nBa8Eg.Mtyy39mxIA71TGJygIswDmanCuneLuO', NULL, 'mario.lopes@cinelive.pt', 10, 1761739108, 1762108148, 'MiBN8jQSLjsJnC-Xk6VtnHL5mMGjeG8M_1761739108'),
 (7, 'funcionario3_leiria', 'EMxEfUEPGMctUh8-s99OdgHqaXjEhOHk', '$2y$13$W/vkfQLvB2AGxTcs3d3pSuKzWrZ8WvUMJlg/jaVzKQnMwRnLvNp4e', NULL, 'joana.matos@cinelive.pt', 10, 1761843131, 1764707487, 'a90HbTqSLK7WPgpFg10jkJLYu6Ujriy6_1761843131'),
 (8, 'funcionario1_lisboa', 'z2GqE3NcqpkUTceDye_sboypxEmVTglQ', '$2y$13$AUAV5/fqdDuxHawP2snZC.RUVqdHqs27kEmXOb1Ix/xmWEm9PELBm', NULL, 'nuno.borges@cinelive.pt', 10, 1761843283, 1761858274, 'ivjsG6OhTExYJ0lgpuyR4NBnmmgL2BAS_1761843283'),
 (9, 'funcionario2_lisboa', 'sIojR6MIsPTDqlhPeEq1vh0dBLZDGa2h', '$2y$13$PMEOqBqxFkVSpiwQKA/aW.5c0eHH1cicSPbrNwU4ACy2jCHQRCu42', NULL, 'tiago.silva@cinelive.pt', 10, 1761899566, 1761899566, 'VLg3DAHhUIROGS8IWvb08kB_9oVNeTyz_1761899566'),
 (10, 'funcionario3_lisboa', '3j4zo6Ppo6QZw-Ryj6Vq-sSWQkoAztcM', '$2y$13$BmeXq.fZ6INZrjUEvQwDwOBoLYCY.pmhwo8H9wga2pWR2IKcC.Hzu', NULL, 'joao.pereira@cinelive.pt', 10, 1761899622, 1762528324, 'ZIGTe969TCk-xPbVNL2tW_woMU_Xd_ai_1761899622'),
-(11, 'funcionario1_porto', 'fWDeR3W4Oz1y_-lTFb3SQJA_mNZ2sZbC', '$2y$13$VxxddZCR/LXbcxkhLOBI2.3Q2PiARz37s/dacQZizcah60jRCpn5G', NULL, 'marta.costa@cinelive.pt', 10, 1761899669, 1761899669, 'XmigJ8rUfPT0PuJHE5YLdve1FyQwoy25_1761899669'),
-(12, 'funcionario2_porto', 'wmqDy7TILwqyTMGL8oLX4SpLs0nEVogZ', '$2y$13$tfkNqWtTTnjgqbhyyy2qmOOvIrP5ky.lzywbuzumhZ/eFw8s7taty', NULL, 'pedro.santos@cinelive.pt', 10, 1761899704, 1761899704, 'W0IOZCEoEOeTpipvqhcN-qimarrNRFXH_1761899704'),
-(13, 'funcionario3_porto', 'ltOPHO_e-vKwB_aC3NuDy9nvJRRJH23W', '$2y$13$2oYlbWTxZuKmX2OdixSh3.mYvhWng6.4QBmzKd.tYTGdhV1o9RFia', NULL, 'ana.oliveira@cinelive.pt', 10, 1761899749, 1761899749, 'cmvPY0EH0N_XgTKdIZC0JaxQt_fGvfrG_1761899749'),
-(14, 'cliente1', 'B3BmNn_leTEb-maw16V0vOqZIYABiY54', '$2y$13$7GePk56MTJ1DK3DfO0PTZuWn2yNyJRmdixpa2J2fnR0IJRkSC3KbC', NULL, 'miguel.ribeiro@email.com', 10, 1761946487, 1764442055, NULL),
+(11, 'funcionario1_porto', 'fWDeR3W4Oz1y_-lTFb3SQJA_mNZ2sZbC', '$2y$13$VxxddZCR/LXbcxkhLOBI2.3Q2PiARz37s/dacQZizcah60jRCpn5G', NULL, 'marta.costa@cinelive.pt', 9, 1761899669, 1761899669, 'XmigJ8rUfPT0PuJHE5YLdve1FyQwoy25_1761899669'),
+(12, 'funcionario2_porto', 'wmqDy7TILwqyTMGL8oLX4SpLs0nEVogZ', '$2y$13$tfkNqWtTTnjgqbhyyy2qmOOvIrP5ky.lzywbuzumhZ/eFw8s7taty', NULL, 'pedro.santos@cinelive.pt', 9, 1761899704, 1761899704, 'W0IOZCEoEOeTpipvqhcN-qimarrNRFXH_1761899704'),
+(13, 'funcionario3_porto', 'ltOPHO_e-vKwB_aC3NuDy9nvJRRJH23W', '$2y$13$2oYlbWTxZuKmX2OdixSh3.mYvhWng6.4QBmzKd.tYTGdhV1o9RFia', NULL, 'ana.oliveira@cinelive.pt', 9, 1761899749, 1761899749, 'cmvPY0EH0N_XgTKdIZC0JaxQt_fGvfrG_1761899749'),
+(14, 'cliente1', 'k62J4TvTccg2tW0zRtOWrZXHcwhBlNpZ', '$2y$13$3MNx8IRC3SE81J/Ju2Bgm.gPc4UYaIxav2Oc.bk.YFCx85kY6w1Ou', NULL, 'miguel.ribeiro@email.com', 10, 1761946487, 1764757753, NULL),
 (15, 'cliente2', 'fMlyme1W2HIpj0ifglLZmSQ7J1f4MLdI', '$2y$13$j2E.l0WhJWfNhW6W5uCSF.9dCvXARYOrZGAmC140gLqPiFkYOYXRm', NULL, 'luis.marques@email.com', 10, 1764708269, 1764708269, 'lReE4fICppu6YHBvBGo-vClLFL1sBBX6_1764708269'),
 (16, 'cliente3', 'z1kKgBz1X4ZTbiHTDV0Vq036KqgLOQhi', '$2y$13$73gH5tKRKSRD6VqWtvgg5OPvKdiHrDCYyDYxjFyYJgXrQOgMzqeGK', NULL, 'rodrigo.costa@email.com', 10, 1764708322, 1764708322, 'jzlDxup_UK664pyU_5DwEFIttWkMxwKo_1764708322');
 
@@ -682,7 +683,7 @@ CREATE TABLE IF NOT EXISTS `user_profile` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx-user_profile-user_id` (`user_id`),
   KEY `idx-user_profile-cinema_id` (`cinema_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb3;
 
 --
 -- Dumping data for table `user_profile`

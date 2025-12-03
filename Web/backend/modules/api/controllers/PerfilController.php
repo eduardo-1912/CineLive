@@ -2,7 +2,6 @@
 
 namespace backend\modules\api\controllers;
 
-use Throwable;
 use Yii;
 use yii\filters\auth\CompositeAuth;
 use yii\filters\auth\HttpBearerAuth;
@@ -59,7 +58,6 @@ class PerfilController extends Controller
             $user->email = $body['email'];
         }
 
-        // Password é opcional
         if (!empty($body['password'])) {
             $user->password = $body['password'];
         }

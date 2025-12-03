@@ -2,6 +2,7 @@
 
 /* @var $this yii\web\View */
 /* @var $gerirUtilizadores bool */
+/* @var $isOwnAccount bool */
 /* @var $model common\models\User */
 /* @var $profile common\models\UserProfile */
 /* @var $cinemaOptions array */
@@ -24,6 +25,7 @@ $this->params['breadcrumbs'][] = 'Editar';
                         'cinemaOptions' => $cinemaOptions,
                         'userCinemaId' => $userCinemaId,
                         'gerirUtilizadores' => $gerirUtilizadores,
+                        'isOwnAccount' => $isOwnAccount,
                     ]) ?>
                 </div>
             </div>

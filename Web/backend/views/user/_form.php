@@ -9,6 +9,7 @@ use yii\bootstrap4\ActiveForm;
 /* @var $profile common\models\UserProfile */
 /* @var $form yii\bootstrap4\ActiveForm */
 /* @var $gerirUtilizadores bool */
+/* @var $isOwnAccount bool */
 /* @var $criarFuncionariosCinema bool */
 /* @var $cinemaOptions array */
 /* @var $userCinemaId int|null */
@@ -27,7 +28,10 @@ use yii\bootstrap4\ActiveForm;
 
     <?php if ($gerirUtilizadores): ?>
 
-        <?= $form->field($model, 'role')->dropDownList(User::optsRoles()) ?>
+        <?= $form->field($model, 'role')->dropDownList(
+            User::optsRoles(),
+            ['disabled' => ($isOwnAccount || $model->roleName === 'Administrador')]
+        ) ?>
         <div id="formFieldCinema" style="display:none;">
             <?= $form->field($profile, 'cinema_id')->dropDownList($cinemaOptions, ['prompt' => 'Selecione o cinema']) ?>
         </div>

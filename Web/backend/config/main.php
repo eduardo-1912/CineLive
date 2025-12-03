@@ -79,22 +79,24 @@ return [
                     'controller' => ['api/cinema'],
                     'extraPatterns' => [
                         'GET {id}/filmes' => 'filmes',
-                        'GET simple' => 'simple',
+                        'GET list' => 'list',
                     ],
                 ],
                 [
                     'class' => 'yii\rest\UrlRule',
                     'controller' => ['api/filme'],
                     'extraPatterns' => [
-                        'GET {id}/sessaos' => 'sessaos',
+                        'GET {id}/sessoes' => 'sessoes',
                     ],
                 ],
                 [
                     'class' => 'yii\rest\UrlRule',
-                    'controller' => [
-                        'api/compra',
-                        'api/sessao',
-                    ],
+                    'controller' => ['api/compra'],
+                ],
+                [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => ['api/sessoes'],
+                    'pluralize' => false,
                 ],
             ],
         ],

@@ -3,6 +3,7 @@
 /* @var $this yii\web\View */
 /* @var $gerirUtilizadores bool */
 /* @var $criarFuncionariosCinema bool */
+/* @var $isOwnAccount bool */
 /* @var $model common\models\User */
 /* @var $profile common\models\UserProfile */
 /* @var $cinemaOptions array */
@@ -26,6 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'userCinemaId' => $userCinemaId,
                         'gerirUtilizadores' => $gerirUtilizadores,
                         'criarFuncionariosCinema' => $criarFuncionariosCinema,
+                        'isOwnAccount' => false,
                     ]) ?>
                 </div>
             </div>

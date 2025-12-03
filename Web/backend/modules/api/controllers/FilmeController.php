@@ -2,45 +2,44 @@
 
 namespace backend\modules\api\controllers;
 
+use common\helpers\Formatter;
+use common\models\Cinema;
 use common\models\Filme;
-use common\models\Sessao;
-use Yii;
 use yii\rest\Controller;
-use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
 
 class FilmeController extends Controller
 {
-    public $modelClass = 'common\models\Filme';
-
-    public function actionIndex()
+    public function actionIndex($cinema_id = null, $filter = null, $q = null)
     {
-        $cinemaId = Yii::$app->request->get('cinema_id');
-        $kids = Yii::$app->request->get('kids');
-        $estado = Yii::$app->request->get('estado');
-        $q = Yii::$app->request->get('q');
+        $kids = $filter === 'kids';
+        $brevemente = $filter === 'brevemente';
 
-        $query = Filme::find();
+        $cinema = Cinema::findOne($cinema_id) ?? null;
 
-        if ($cinemaId) {
-            Filme::findComSessoesFuturas($cinemaId);
+        // Se tem cinema --> obter apenas com sessões ativas desse cinema
+        if ($cinema) {
+            if (!$cinema->isEstadoAtivo()) {
+                throw new NotFoundHttpException("Cinema não encontrado.");
+            }
+
+            $filmes = $cinema->getFilmesComSessoesAtivas($kids, $q);
         }
 
-        if ($kids) {
-            $query->andWhere(['filme.rating' => Filme::ratingsKids()]);
+        // Caso contrário --> obter todos os filmes
+        else {
+            $filmes = Filme::find();
+            if ($kids) $filmes->andWhere(['rating' => Filme::optsRatingKids()]);
+            if ($brevemente) $filmes->andWhere(['estado' => Filme::ESTADO_BREVEMENTE]);
+            if ($q) $filmes->andWhere(['like', 'titulo', $q]);
+            $filmes = $filmes->orderBy(['titulo' => SORT_ASC])->all();
         }
 
-        if ($estado) {
-            $query->andWhere(['filme.estado' => $estado]);
-        }
-
-        if ($q) {
-            $query->andWhere(['like', 'filme.titulo', $q]);
-        }
-
-        $filmes = $query->orderBy(['titulo' => SORT_ASC])->all();
-
-        return $filmes;
+        return array_map(fn($filme) => [
+            'id' => $filme->id,
+            'titulo' => $filme->titulo,
+            'poster_url' => $filme->posterUrl,
+        ], $filmes);
     }
 
     public function actionView($id)
@@ -52,67 +51,32 @@ class FilmeController extends Controller
             'titulo' => $filme->titulo,
             'poster_url' => $filme->posterUrl,
             'rating' => $filme->rating,
-            'generos' => implode(', ', array_map(fn($g) => $g->nome, $filme->generos)),
+            'generos' => implode(', ', array_map(fn($genero) => $genero->nome, $filme->generos)),
             'estreia' => $filme->estreia,
-            'duracao' => $filme->duracao,
+            'duracao' => Formatter::horas($filme->duracao),
             'idioma' => $filme->idioma,
             'realizacao' => $filme->realizacao,
             'sinopse' => $filme->sinopse,
         ];
     }
 
-    public function actionSessaos($id)
+    public function actionSessoes($id, $cinema_id = null)
     {
-        $cinemaId = Yii::$app->request->get('cinema_id');
-
-        // Verificar filme
         $filme = Filme::findOne($id);
+
         if (!$filme || $filme->isEstadoBrevemente()) {
             throw new NotFoundHttpException("Filme não encontrado ou ainda não disponível.");
         }
 
-        $query = Sessao::find()
-            ->where(['filme_id' => $id])
-            ->andWhere(['>=', 'data', date('Y-m-d')])
-            ->with(['cinema', 'sala'])
-            ->orderBy(['data' => SORT_ASC, 'hora_inicio' => SORT_ASC]);
+        $sessoes = $filme->getSessoesAtivasPorData($cinema_id);
 
-        // Filtro opcional por cinema
-        if ($cinemaId) {
-            $query->andWhere(['cinema_id' => $cinemaId]);
-        }
-
-        $sessoes = $query->all();
-
-        if (!$sessoes) {
-            throw new NotFoundHttpException($cinemaId ? "Não existem sessões deste filme neste cinema." : "Não existem sessões disponíveis para este filme.");
-        }
-
-        // AGRUPAR POR DATA
-        $sessoesPorData = [];
-
-        foreach ($sessoes as $sessao) {
-
-            if (!$sessao->isEstadoAtiva()) continue;
-
-            $data = $sessao->dataFormatada;
-
-            // Base da sessão
-            $dadosSessao = [
-                'id' => $sessao->id,
-                'hora_inicio' => $sessao->horaInicioFormatada,
-                'hora_fim' => $sessao->horaFimFormatada,
-            ];
-
-            // ADICIONAR cinena APENAS SE cinema_id não veio no request
-            if (!$cinemaId) {
-                $dadosSessao['cinema_id'] = $sessao->cinema_id;
-                $dadosSessao['cinema_nome'] = $sessao->cinema->nome;
-            }
-
-            $sessoesPorData[$data][] = $dadosSessao;
-        }
-
-        return $sessoesPorData;
+        return array_map(fn($sessoesPorData) =>
+            array_map(fn($sessao) => [
+                'id'          => $sessao->id,
+                'hora_inicio' => Formatter::hora($sessao->hora_inicio),
+                'hora_fim'    => Formatter::hora($sessao->hora_fim),
+                'cinema_id'   => $sessao->cinema_id,
+            ], $sessoesPorData),
+        $sessoes);
     }
 }

@@ -47,13 +47,11 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 
-    implementation("com.google.android.material:material:1.13.0")
+    implementation(libs.material)
+    implementation(libs.navigation.fragment)
+    implementation(libs.androidx.navigation.ui)
 
-    // Navigation Component
-    implementation("androidx.navigation:navigation-fragment:2.9.5")
-    implementation("androidx.navigation:navigation-ui:2.9.5")
-
-    // Glide
-    implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation(libs.glide)
+    implementation (libs.volley)
 
 }

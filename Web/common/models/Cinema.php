@@ -16,7 +16,7 @@ use yii\helpers\ArrayHelper;
  * @property float|null $latitude
  * @property float|null $longitude
  * @property string $email
- * @property int $telefone
+ * @property string $telefone
  * @property string $horario_abertura
  * @property string $horario_fecho
  * @property string $estado
@@ -24,6 +24,8 @@ use yii\helpers\ArrayHelper;
  *
  * @property-read string morada
  * @property-read string $horario
+ * @property-read int numeroSalas
+ * @property-read int numeroLugares
  * @property-read string $estadoHtml
  *
  * @property AluguerSala[] $aluguerSalas
@@ -59,11 +61,12 @@ class Cinema extends \yii\db\ActiveRecord
             [['gerente_id'], 'default', 'value' => null],
             [['nome', 'rua', 'codigo_postal', 'cidade', 'latitude', 'longitude', 'email', 'telefone', 'horario_abertura', 'horario_fecho', 'estado'], 'required'],
             [['latitude', 'longitude'], 'number'],
-            [['telefone', 'gerente_id'], 'integer'],
+            [['gerente_id'], 'integer'],
             [['horario_abertura', 'horario_fecho'], 'safe'],
             [['estado'], 'string'],
             [['nome'], 'string', 'max' => 80],
             [['rua'], 'string', 'max' => 100],
+            [['telefone'], 'string', 'max' => 9],
             [['codigo_postal'], 'string', 'max' => 8],
             [['cidade'], 'string', 'max' => 50],
             [['email'], 'string', 'max' => 255],
@@ -207,7 +210,7 @@ class Cinema extends \yii\db\ActiveRecord
     {
         $filmes = [];
 
-        // Obter filmes
+        // Obter filmes através de sessões ativas
         foreach ($this->getSessoesAtivas() as $sessao)
             $filmes[$sessao->filme->id] = $sessao->filme;
 
@@ -217,7 +220,7 @@ class Cinema extends \yii\db\ActiveRecord
         }
 
         // Query
-        elseif ($q) {
+        if ($q) {
             $filmes = array_filter($filmes, fn($f) => stripos($f->titulo, $q) !== false);
         }
 

@@ -15,6 +15,7 @@ class AuthController extends Controller
     public function actionLogin()
     {
         $body = Yii::$app->request->bodyParams;
+
         $username = $body['username'] ?? null;
         $password = $body['password'] ?? null;
 
@@ -28,12 +29,12 @@ class AuthController extends Controller
             throw new UnauthorizedHttpException("Credenciais inválidas.");
         }
 
+        // Gerar access-token se não tiver
         if (!$user->auth_key) {
             $user->generateAuthKey();
             $user->save(false);
         }
 
-        // Devolve access-token e user
         return [
             'access-token' => $user->auth_key,
             'user' => [
@@ -62,10 +63,10 @@ class AuthController extends Controller
 
         // 1. Criar User
         $user = new User();
-        $user->username = $body['username'];
-        $user->email = $body['email'];
-        $user->password = $body['password'];
-        $user->status = User::STATUS_ACTIVE;
+        $user->username = $username;
+        $user->password = $password;
+        $user->email = $email;
+        $user->status = $user::STATUS_ACTIVE;
 
         if (!$user->save()) {
             return [
@@ -77,25 +78,27 @@ class AuthController extends Controller
         // 2. Criar Profile
         $profile = new UserProfile();
         $profile->user_id = $user->id;
-        $profile->nome = $body['nome'];
-        $profile->telemovel = $body['telemovel'] ?? null;
+        $profile->nome = $nome;
+        $profile->telemovel = $telemovel;
 
         if (!$profile->save()) {
+            $user->delete();
+
             return [
                 'status' => 'error',
                 'errors' => $profile->errors
             ];
         }
 
-        // 3. Atribuir Role de Cliente
+        // 3. Atribuir role 'cliente'
         $auth = Yii::$app->authManager;
-        $roleCliente = $auth->getRole('cliente');
+        $role = $auth->getRole('cliente');
 
-        if (!$roleCliente) {
+        if (!$role) {
             throw new Exception("Role 'cliente' não existe no RBAC.");
         }
 
-        $auth->assign($roleCliente, $user->id);
+        $auth->assign($role, $user->id);
 
         return [
             'status' => 'success',

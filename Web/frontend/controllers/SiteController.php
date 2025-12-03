@@ -147,6 +147,12 @@ class SiteController extends Controller
 
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
+            if (Yii::$app->user->identity->roleName !== 'Cliente') {
+                Yii::$app->user->logout();
+                Yii::$app->session->setFlash('error', 'A sua conta não tem acesso à área pública.');
+                return $this->redirect(['login']);
+            }
+
             return $this->goBack();
         }
 

@@ -218,6 +218,7 @@ class UserController extends Controller
             'cinemaOptions' => Cinema::findAllList(),
             'userCinemaId' => $userCinema->id ?? null,
             'gerirUtilizadores' => $gerirUtilizadores,
+            'isOwnAccount' => $isOwnAccount,
         ]);
     }
 

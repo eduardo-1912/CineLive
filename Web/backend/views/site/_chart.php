@@ -8,7 +8,7 @@ use yii\helpers\Json;
 
 ?>
 
-<div class="d-none d-lg-flex row mt-4">
+<div class="row mt-4">
     <div>
         <div class="card card-primary shadow-sm">
             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">

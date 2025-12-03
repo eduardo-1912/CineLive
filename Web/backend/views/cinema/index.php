@@ -46,7 +46,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'telefone',
                             [
                                 'attribute' => 'nomeGerente',
-                                'value' => fn($model) => LinkHelper::simple($model->gerente->profile->nome, 'user/view', $model->gerente_id),
+                                'value' => fn($model) => LinkHelper::nullSafe($model->gerente->profile->nome ?? null, 'user/view', $model->gerente_id, '-'),
                                 'format' => 'raw',
                             ],
                             [

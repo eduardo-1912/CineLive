@@ -54,8 +54,7 @@ $this->params['breadcrumbs'][] = $model->nome;
                             [
                                 'attribute' => 'nomeGerente',
                                 'format' => 'raw',
-                                'value' => $gerirCinemas ? LinkHelper::simple($model->gerente->profile->nome,
-                                    'user/view', $model->gerente_id) : $model->gerente->profile->nome,
+                                'value' => LinkHelper::nullSafe($model->gerente->profile->nome ?? null, 'user/view', $model->gerente_id, '-'),
                                 'visible' => !$editarCinema,
                             ],
                             'email:email',
