@@ -8,6 +8,7 @@ use yii\filters\auth\HttpBearerAuth;
 use yii\filters\auth\QueryParamAuth;
 use yii\rest\Controller;
 use yii\web\UnauthorizedHttpException;
+use common\models\UserProfile;
 
 class PerfilController extends Controller
 {
@@ -44,23 +45,13 @@ class PerfilController extends Controller
         $user = Yii::$app->user->identity;
 
         if (!$user) {
-            throw new UnauthorizedHttpException("Token inválido.");
+            throw new UnauthorizedHttpException("Credenciais inválidas.");
         }
 
         $body = Yii::$app->request->bodyParams;
 
-        // 1. Atualizar user
-        if (isset($body['username'])) {
-            $user->username = $body['username'];
-        }
-
-        if (isset($body['email'])) {
-            $user->email = $body['email'];
-        }
-
-        if (!empty($body['password'])) {
-            $user->password = $body['password'];
-        }
+        // Atualizar user
+        $user->load($body, '');
 
         if (!$user->save()) {
             return [
@@ -69,16 +60,11 @@ class PerfilController extends Controller
             ];
         }
 
-        // 2. Atualizar profile
-        $profile = $user->profile;
+        // Criar profile se não tiver
+        $profile = $user->profile ?? new UserProfile(['user_id' => $user->id]);
 
-        if (isset($body['nome'])) {
-            $profile->nome = $body['nome'];
-        }
-
-        if (isset($body['telemovel'])) {
-            $profile->telemovel = $body['telemovel'];
-        }
+        // Atualizar profile
+        $profile->load($body, '');
 
         if (!$profile->save()) {
             return [
@@ -93,9 +79,9 @@ class PerfilController extends Controller
             'user' => [
                 'id' => $user->id,
                 'username' => $user->username,
-                'nome' => $profile->nome,
+                'nome' => $profile->nome ?? null,
                 'email' => $user->email,
-                'telemovel' => $profile->telemovel,
+                'telemovel' => $profile->telemovel ?? null,
             ]
         ];
     }
@@ -105,13 +91,13 @@ class PerfilController extends Controller
         $user = Yii::$app->user->identity;
 
         if (!$user) {
-            throw new UnauthorizedHttpException("Token inválido.");
+            throw new UnauthorizedHttpException("Credenciais inválidas.");
         }
 
         // Remover RBAC assignments
         Yii::$app->authManager->revokeAll($user->id);
 
-        // Remover profile
+        // Eliminar profile
         if ($user->profile && !$user->profile->delete()) {
             return [
                 'status' => 'error',
@@ -119,7 +105,7 @@ class PerfilController extends Controller
             ];
         }
 
-        // Remover user
+        // Eliminar user
         if (!$user->delete()) {
             return [
                 'status' => 'error',

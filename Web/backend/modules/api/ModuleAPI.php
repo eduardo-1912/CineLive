@@ -22,11 +22,11 @@ class ModuleAPI extends \yii\base\Module
     {
         parent::init();
 
-        // Forçar resposta em JSON
-        Yii::$app->response->format = Response::FORMAT_JSON;
-
         // Desativar sessões (API deve ser stateless)
         Yii::$app->user->enableSession = false;
+
+        // Forçar resposta em JSON
+        Yii::$app->response->format = Response::FORMAT_JSON;
 
         // Não redirecionar para página de login
         Yii::$app->user->loginUrl = null;

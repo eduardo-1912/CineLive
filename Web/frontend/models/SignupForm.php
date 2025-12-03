@@ -3,11 +3,9 @@
 namespace frontend\models;
 
 use common\models\UserProfile;
-use Exception;
 use Yii;
 use yii\base\Model;
 use common\models\User;
-
 
 /**
  * Signup form
@@ -19,7 +17,6 @@ class SignupForm extends Model
     public $email;
     public $password;
     public $telemovel;
-
 
     /**
      * {@inheritdoc}
@@ -58,8 +55,7 @@ class SignupForm extends Model
         $user = new User();
         $user->username = $this->username;
         $user->email = $this->email;
-        $user->setPassword($this->password);
-        $user->generateAuthKey();
+        $user->password = $this->password;
         $user->status = User::STATUS_ACTIVE;
 
         if (!$user->save()) {

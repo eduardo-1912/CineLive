@@ -139,47 +139,27 @@ class SiteController extends Controller
 
         if ($model->load(Yii::$app->request->post()) && $model->login())
         {
-            // OBTER USER ATUAL
-            $user = Yii::$app->user->identity;
+            $currentUser = Yii::$app->user->identity;
 
-            // OBTER ROLE RBAC DO USER
-            $roles = Yii::$app->authManager->getRolesByUser($user->id);
-
-            // SE USER ATUAL É CLIENTE --> SEM ACESSO
-            if (Yii::$app->user->can('cliente')) {
+            // Se for cliente
+            if ($currentUser->isCliente()) {
                 Yii::$app->user->logout();
                 Yii::$app->session->setFlash('error', 'Não pode aceder à página de administração.');
                 return $this->redirect(['login']);
             }
 
-            // SE USER NÃO É ADMIN --> OBTER CINEMA DELE
-            if (!Yii::$app->user->can('admin')) {
+            // Se for gerente ou funcionário
+            if ($currentUser->isGerente() || $currentUser->isFuncionario()) {
+                $cinema = Cinema::findOne($currentUser->profile->cinema ?? null);
 
-                // OBTER USER ATUAL
-                $userId = Yii::$app->user->id;
-                $user = User::findOne(['id' => $userId]);
-
-                // OBTER O CINEMA DO USER ATUAL
-                $cinemaId = $user->profile->cinema_id;
-
-                // SE NÃO TIVER ASSOCIADO A NENHUM CINEMA --> SEM ACESSO
-                if ($cinemaId === null) {
+                // Se não tiver cinema
+                if (!$cinema || $cinema->isEstadoEncerrado()) {
                     Yii::$app->user->logout();
-                    Yii::$app->session->setFlash('error', 'Não está associado a nenhum cinema!');
-                    return $this->redirect(['login']);
-                }
-
-                // OBTER CINEMA DO USER
-                $cinema = Cinema::findOne($cinemaId);
-
-                if ($cinema->estado == $cinema::ESTADO_ENCERRADO) {
-                    Yii::$app->user->logout();
-                    Yii::$app->session->setFlash('error', 'O seu cinema foi encerrado!');
+                    Yii::$app->session->setFlash('error', 'O seu cinema não é válido.');
                     return $this->redirect(['login']);
                 }
             }
 
-            // SE TUDO BEM --> IR PARA SITE/INDEX
             return $this->goHome();
         }
 

@@ -87,7 +87,6 @@ class User extends ActiveRecord implements IdentityInterface
             'telemovel' => 'Telemóvel',
             'password' => 'Password',
             'role' => 'Função',
-            'roleName' => 'Função',
             'status' => 'Estado',
             'cinema_id' => 'Cinema',
         ];
@@ -107,37 +106,21 @@ class User extends ActiveRecord implements IdentityInterface
             $this->setPassword($this->password);
         }
 
-        if ($insert) {
-            if (empty($this->auth_key)) {
-                $this->generateAuthKey();
-            }
-            if (empty($this->verification_token)) {
-                $this->generateEmailVerificationToken();
-            }
+        if ($insert && empty($this->auth_key)) {
+            $this->generateAuthKey();
         }
 
         return parent::beforeSave($insert);
     }
 
+    public function getRole()
+    {
+        return array_key_first(Yii::$app->authManager->getRolesByUser($this->id));
+    }
+
     public function isEditable(): bool
     {
         return Yii::$app->user->can('gerirUtilizadores');
-    }
-
-    public function getRoleName()
-    {
-        $roles = Yii::$app->authManager->getRolesByUser($this->id);
-
-        if (empty($roles)) return '-';
-
-        $labels = [
-            'admin' => 'Administrador',
-            'gerente' => 'Gerente',
-            'funcionario' => 'Funcionário',
-            'cliente' => 'Cliente',
-        ];
-        $key = array_key_first($roles);
-        return $labels[$key] ?? ucfirst($key);
     }
 
     /**
@@ -195,6 +178,46 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
+     * @return string
+     */
+    public function displayRole()
+    {
+        return self::optsRoles()[$this->getRole()];
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAdmin()
+    {
+        return $this->getRole() === 'admin';
+    }
+
+    /**
+     * @return bool
+     */
+    public function isGerente()
+    {
+        return $this->getRole() === 'gerente';
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFuncionario()
+    {
+        return $this->getRole() === 'funcionario';
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCliente()
+    {
+        return $this->getRole() === 'cliente';
+    }
+
+    /**
      * column status ENUM value labels
      * @return string[]
      */
@@ -205,14 +228,6 @@ class User extends ActiveRecord implements IdentityInterface
             self::STATUS_INACTIVE => 'Inativo',
             self::STATUS_DELETED => 'Eliminado',
         ];
-    }
-
-    /**
-     * @return string
-     */
-        public function displayRole()
-    {
-        return self::optsRoles()[$this->roleName];
     }
 
     /**

@@ -6,12 +6,31 @@ use common\models\User;
 use common\models\UserProfile;
 use Exception;
 use Yii;
+use yii\filters\auth\CompositeAuth;
+use yii\filters\auth\HttpBearerAuth;
+use yii\filters\auth\QueryParamAuth;
 use yii\rest\Controller;
 use yii\web\BadRequestHttpException;
 use yii\web\UnauthorizedHttpException;
 
 class AuthController extends Controller
 {
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+
+        $behaviors['authenticator'] = [
+            'class' => CompositeAuth::class,
+            'authMethods' => [
+                HttpBearerAuth::class,
+                QueryParamAuth::class,
+            ],
+            'except' => ['login', 'signup'],
+        ];
+
+        return $behaviors;
+    }
+
     public function actionLogin()
     {
         $body = Yii::$app->request->bodyParams;
@@ -51,17 +70,17 @@ class AuthController extends Controller
     {
         $body = Yii::$app->request->bodyParams;
 
-        $username = $body['username'] ?? null;
-        $password = $body['password'] ?? null;
-        $email = $body['email'] ?? null;
-        $nome = $body['nome'] ?? null;
-        $telemovel = $body['telemovel'] ?? null;
+        $campos = ['username', 'password', 'email', 'nome', 'telemovel'];
+        foreach ($campos as $campo) {
+            // Criar variável com o nome do campo
+            $$campo = $body[$campo] ?? null;
 
-        if (!$username || !$password || !$email || !$nome || !$telemovel) {
-            throw new BadRequestHttpException('Faltam campos obrigatórios.');
+            if (empty($$campo)) {
+                throw new BadRequestHttpException("O campo '$campo' é obrigatório.");
+            }
         }
 
-        // 1. Criar User
+        // Criar user
         $user = new User();
         $user->username = $username;
         $user->password = $password;
@@ -75,7 +94,7 @@ class AuthController extends Controller
             ];
         }
 
-        // 2. Criar Profile
+        // Criar profile
         $profile = new UserProfile();
         $profile->user_id = $user->id;
         $profile->nome = $nome;
@@ -90,7 +109,7 @@ class AuthController extends Controller
             ];
         }
 
-        // 3. Atribuir role 'cliente'
+        // Atribuir role RBAC
         $auth = Yii::$app->authManager;
         $role = $auth->getRole('cliente');
 
@@ -110,6 +129,19 @@ class AuthController extends Controller
                 'email' => $user->email,
                 'telemovel' => $user->profile->telemovel ?? null,
             ]
+        ];
+    }
+
+    public function actionValidateToken()
+    {
+        $user = Yii::$app->user->identity;
+
+        return [
+            'id' => $user->id,
+            'username' => $user->username,
+            'email' => $user->email,
+            'nome' => $user->profile->nome ?? null,
+            'telemovel' => $user->profile->telemovel ?? null,
         ];
     }
 }

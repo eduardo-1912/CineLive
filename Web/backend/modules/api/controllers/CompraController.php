@@ -6,13 +6,16 @@ use common\helpers\Formatter;
 use common\models\Bilhete;
 use common\models\Compra;
 use common\models\Sessao;
+use Throwable;
 use Yii;
 use yii\filters\auth\CompositeAuth;
 use yii\filters\auth\HttpBearerAuth;
 use yii\filters\auth\QueryParamAuth;
 use yii\rest\Controller;
 use yii\web\BadRequestHttpException;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\ServerErrorHttpException;
 
 class CompraController extends Controller
 {
@@ -42,13 +45,10 @@ class CompraController extends Controller
             'data' => Formatter::data($compra->data),
             'total' => Formatter::preco($compra->total),
             'estado' => $compra->displayEstado(),
-
             'filme_id' => $compra->sessao->filme_id,
             'filme_nome' => $compra->sessao->filme->titulo,
-
             'cinema_id' => $compra->sessao->cinema_id,
             'cinema_nome' => $compra->sessao->cinema->nome,
-
             'sessao_id' => $compra->sessao->id,
             'sessao_data' => Formatter::data($compra->sessao->data),
             'sessao_hora_inicio' => Formatter::hora($compra->sessao->hora_inicio),
@@ -57,10 +57,9 @@ class CompraController extends Controller
 
     public function actionView($id)
     {
-        $userId = Yii::$app->user->id;
         $compra = Compra::findOne($id);
 
-        if (!$compra || $compra->cliente_id != $userId) {
+        if (!$compra || $compra->cliente_id != Yii::$app->user->id) {
             throw new NotFoundHttpException("Compra não encontrada.");
         }
 
@@ -70,20 +69,15 @@ class CompraController extends Controller
             'data' => Formatter::data($compra->data),
             'total' => Formatter::preco($compra->total),
             'estado' => $compra->displayEstado(),
-
             'filme_id' => $compra->sessao->filme_id,
             'filme_titulo' => $compra->sessao->filme->titulo,
-
             'cinema_id' => $compra->sessao->cinema_id,
             'cinema_nome' => $compra->sessao->cinema->nome,
-
             'sala_id' => $compra->sessao->sala_id,
             'sala_nome' => $compra->sessao->sala->nome,
-
             'sessao_id' => $compra->sessao->id,
             'sessao_data' => Formatter::data($compra->sessao->data),
             'sessao_horario' => $compra->sessao->horario,
-
             'bilhetes' => array_map(fn($bilhete) => [
                 'id' => $bilhete->id,
                 'lugar' => $bilhete->lugar,
@@ -98,17 +92,19 @@ class CompraController extends Controller
         $userId = Yii::$app->user->id;
         $body = Yii::$app->request->bodyParams;
 
-        $sessaoId = $body['sessao_id'] ?? null;
-        $pagamento = $body['pagamento'] ?? null;
-        $lugares = $body['lugares'] ?? null;
+        $campos = ['sessao_id', 'pagamento', 'lugares'];
+        foreach ($campos as $campo) {
+            // Criar variável com o nome do campo
+            $$campo = $body[$campo] ?? null;
 
-        if (!$sessaoId || !$pagamento || !$lugares) {
-            throw new BadRequestHttpException('Faltam campos obrigatórios.');
+            if (empty($$campo)) {
+                throw new BadRequestHttpException("O campo '$campo' é obrigatório.");
+            }
         }
 
-        $sessao = Sessao::findOne($sessaoId);
+        $sessao = Sessao::findOne($sessao_id);
 
-        if (!$sessaoId || !$sessao->isEstadoAtiva()) {
+        if (!$sessao || !$sessao->isEstadoAtiva()) {
             throw new BadRequestHttpException("Sessão inválida.");
         }
 
@@ -127,10 +123,10 @@ class CompraController extends Controller
             }
         }
 
-        // 1. Criar compra
+        // Criar compra
         $compra = new Compra();
         $compra->cliente_id = $userId;
-        $compra->sessao_id = $sessaoId;
+        $compra->sessao_id = $sessao_id;
         $compra->data = date('Y-m-d H:i:s');
         $compra->pagamento = $pagamento;
         $compra->estado = $compra::ESTADO_CONFIRMADA;
@@ -142,7 +138,7 @@ class CompraController extends Controller
             ];
         }
 
-        // 2. Criar bilhetes
+        // Criar bilhetes
         $bilhetes = [];
 
         foreach ($lugares as $lugar) {
@@ -154,6 +150,8 @@ class CompraController extends Controller
             $bilhete->estado = $bilhete::ESTADO_PENDENTE;
 
             if (!$bilhete->save()) {
+                // Eliminar compra e bilhetes anteriores
+                Bilhete::deleteAll(['compra_id' => $compra->id]);
                 $compra->delete();
 
                 return [
@@ -173,8 +171,31 @@ class CompraController extends Controller
         return [
             'status' => 'success',
             'compra_id' => $compra->id,
-            'total' => $compra->total,
-            'bilhetes' => $bilhetes
+        ];
+    }
+
+    public function actionDelete($id)
+    {
+        $compra = Compra::findOne($id);
+
+        if (!$compra) {
+            throw new NotFoundHttpException("Compra não encontrada.");
+        }
+
+        if (!$compra->isEstadoCancelada()) {
+            throw new ForbiddenHttpException("Apenas pode eliminar compras canceladas.");
+        }
+
+        if ($compra->delete()) {
+            return [
+                'status' => 'error',
+                'message' => 'Erro ao eliminar a compra.'
+            ];
+        }
+
+        return [
+            'status' => 'success',
+            'message' => 'Compra eliminada com sucesso.'
         ];
     }
 }

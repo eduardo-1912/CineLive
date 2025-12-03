@@ -137,7 +137,7 @@ class UserController extends Controller
                     $auth->assign($role, $model->id);
                 }
 
-                if ($model->role === 'gerente') {
+                if ($model->isGerente()) {
                     $this->atualizarGerenteCinema($model, $profile);
                 }
 
@@ -188,7 +188,7 @@ class UserController extends Controller
                 $profile->save(false);
 
                 // Se o role mudou
-                if ($currentUser->can('admin') && $model->role) {
+                if ($gerirUtilizadores && $model->role) {
 
                     // Retirar antigos
                     $auth = Yii::$app->authManager;
@@ -200,7 +200,7 @@ class UserController extends Controller
                     }
                 }
 
-                if ($model->role === 'gerente') {
+                if ($model->isGerente()) {
                     $this->atualizarGerenteCinema($model, $profile);
                 }
 

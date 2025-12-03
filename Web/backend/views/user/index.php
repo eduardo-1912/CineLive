@@ -57,7 +57,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                             [
                                 'attribute' => 'role',
-                                'value' => 'roleName',
+                                'value' => fn($model) => $model->displayRole(),
                                 'filter' => $roleOptions,
                                 'filterInputOptions' => ['class' => 'form-control', 'prompt' => 'Todos'],
                                 'visible' => $gerirUtilizadores,

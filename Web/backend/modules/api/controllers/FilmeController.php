@@ -17,7 +17,11 @@ class FilmeController extends Controller
 
         $cinema = Cinema::findOne($cinema_id) ?? null;
 
-        // Se tem cinema --> obter apenas com sessões ativas desse cinema
+        if ($cinema_id && !$cinema) {
+            throw new NotFoundHttpException("Cinema não encontrado.");
+        }
+
+        // Se tem cinema --> obter apenas filmes com sessões ativas desse cinema
         if ($cinema) {
             if (!$cinema->isEstadoAtivo()) {
                 throw new NotFoundHttpException("Cinema não encontrado.");

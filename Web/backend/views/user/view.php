@@ -48,11 +48,14 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'attribute' => 'profile.telemovel',
                                 'value' => $model->profile->telemovel ?? '-',
                             ],
-                           'roleName',
+                            [
+                                'attribute' => 'role',
+                                'value' => $model->displayRole(),
+                            ],
                             [
                                 'attribute' => 'cinema_id',
                                 'value' => $model->cinema->nome ?? '-',
-                                'visible' => $gerirUtilizadores,
+                                'visible' => $gerirUtilizadores && $model->profile->cinema_id,
                             ],
                             [
                                 'attribute' => 'status',

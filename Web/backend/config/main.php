@@ -61,7 +61,17 @@ return [
             'rules' => [
                 [
                     'class' => 'yii\rest\UrlRule',
+                    'controller' => ['api/default'],
+                    'pluralize' => false,
+                ],
+                [
+                    'class' => 'yii\rest\UrlRule',
                     'controller' => ['api/auth'],
+                    'pluralize' => false,
+                ],
+                [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => ['api/aluguer-sala'],
                     'pluralize' => false,
                 ],
                 [
@@ -92,6 +102,10 @@ return [
                 [
                     'class' => 'yii\rest\UrlRule',
                     'controller' => ['api/compra'],
+                ],
+                [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => ['api/genero'],
                 ],
                 [
                     'class' => 'yii\rest\UrlRule',
