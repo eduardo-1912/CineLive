@@ -25,6 +25,7 @@ $this->title = 'Home';
 
     <div class="container py-0">
 
+        <!-- Comprar bilhetes -->
         <section class="my-2 py-5">
             <div class="mb-4">
                 <h4 class="page-title m-0">Comprar Bilhetes</h4>
@@ -71,6 +72,7 @@ $this->title = 'Home';
 
         </section>
 
+        <!-- Filmes mais vistos -->
         <section class="my-2 py-4">
             <div class="mb-4">
                 <h4 class="page-title m-0">Filmes Mais Vistos</h4>
@@ -78,7 +80,10 @@ $this->title = 'Home';
             <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
                 <?php if ($filmesMaisVistos): ?>
                     <?php foreach ($filmesMaisVistos as $filme): ?>
-                        <?= $this->render('@frontend/views/filme/_card', ['filme' => $filme]) ?>
+                        <?= $this->render('@frontend/views/filme/_card', [
+                            'filme' => $filme,
+                            'cinema_id' => $cinema_id
+                        ]) ?>
                     <?php endforeach ?>
                 <?php endif; ?>
             </div>
@@ -90,6 +95,7 @@ $this->title = 'Home';
             </div>
         </section>
 
+        <!-- Brevemente -->
         <section class="d-none d-md-block my-2 py-4">
             <div class="mb-4">
                 <h4 class="page-title m-0">Brevemente</h4>
@@ -97,7 +103,7 @@ $this->title = 'Home';
             <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
                 <?php if ($brevemente): ?>
                     <?php foreach ($brevemente as $filme): ?>
-                        <?= $this->render('@frontend/views/filme/_card', ['filme' => $filme]) ?>
+                        <?= $this->render('@frontend/views/filme/_card', ['filme' => $filme,]) ?>
                     <?php endforeach; ?>
                 <?php endif; ?>
             </div>

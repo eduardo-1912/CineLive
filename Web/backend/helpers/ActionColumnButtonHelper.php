@@ -266,12 +266,13 @@ class ActionColumnButtonHelper
         }
 
         $items = '';
-        foreach ([$model::ESTADO_CONFIRMADO => 'Confirmar', $model::ESTADO_CANCELADO  => 'Cancelar',] as $estado => $label) {
+        foreach ($model::optsEstadoBD() as $key => $label) {
 
-            if ($model->estado === $estado) continue;
+            if ($key === $model::ESTADO_PENDENTE) continue;
+            if ($model->estado === $key) continue;
 
             $items .= Html::tag('li',
-                Html::a($label, ['aluguer-sala/change-status', 'id' => $model->id, 'estado' => $estado], [
+                Html::a($label, ['aluguer-sala/change-status', 'id' => $model->id, 'estado' => $label], [
                     'class' => 'dropdown-item',
                     'data' => [
                         'method' => 'post',

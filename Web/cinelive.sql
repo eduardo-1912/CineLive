@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Dec 02, 2025 at 09:39 PM
+-- Generation Time: Dec 03, 2025 at 10:13 AM
 -- Server version: 9.1.0
 -- PHP Version: 8.3.14
 
@@ -36,21 +36,24 @@ CREATE TABLE IF NOT EXISTS `aluguer_sala` (
   `data` date NOT NULL,
   `hora_inicio` time NOT NULL,
   `hora_fim` time NOT NULL,
-  `estado` enum('pendente','confirmado','cancelado') NOT NULL,
-  `tipo_evento` varchar(100) NOT NULL,
-  `observacoes` text NOT NULL,
+  `estado` enum('pendente','confirmado','cancelado') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `tipo_evento` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `observacoes` text CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
   PRIMARY KEY (`id`),
   KEY `idx-aluguer_sala-cliente_id` (`cliente_id`),
   KEY `idx-aluguer_sala-sala_id` (`sala_id`),
   KEY `cinema_id` (`cinema_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb3;
 
 --
 -- Dumping data for table `aluguer_sala`
 --
 
 INSERT INTO `aluguer_sala` (`id`, `cliente_id`, `cinema_id`, `sala_id`, `data`, `hora_inicio`, `hora_fim`, `estado`, `tipo_evento`, `observacoes`) VALUES
-(1, 14, 1, 1, '2026-01-29', '10:00:00', '12:00:00', 'pendente', 'Festa de aniversário', 'Somos um grupo de 8 pessoas e vamos celebrar um aniversário de forma simples. Vou levar alguns balões e uma pequena decoração para colocar na entrada da sala, por isso agradecia se pudesse entrar uns 15 minutos mais cedo. Também vou levar um bolo, por isso precisava de um pequeno espaço para o pousar antes de começarmos a sessão.');
+(1, 14, 1, 1, '2026-01-29', '10:00:00', '12:00:00', 'confirmado', 'Festa de aniversário', 'Somos um grupo de 8 pessoas e vamos celebrar um aniversário de forma simples. Vou levar alguns balões e uma pequena decoração para colocar na entrada da sala, por isso agradecia se pudesse entrar uns 15 minutos mais cedo. Também vou levar um bolo, por isso precisava de um pequeno espaço para o pousar antes de começarmos a sessão.'),
+(2, 14, 1, 2, '2026-02-14', '20:00:00', '23:00:00', 'pendente', 'Pedido de casamento', 'Gostaria de utilizar a sala para organizar um pedido de casamento surpresa. Pretendo que, antes da sessão, seja exibido um vídeo curto que irei fornecer, seguido do momento do pedido. Agradeço apoio na coordenação do timing, preparação da sala e qualquer sugestão adicional para tornar a experiência especial e memorável.'),
+(3, 15, 2, 7, '2026-02-01', '20:00:00', '23:00:00', 'pendente', 'Festa de anos', 'Gostaria de saber se é possível realizar o aluguer da sala para uma sessão privada em data e horário flexíveis, de preferência durante um fim-de-semana à tarde. O filme escolhido será The Batman, e gostaria de confirmar a disponibilidade de legendas em português. Além disso, peço informações sobre as condições de projeção, como a possibilidade de utilizar um sistema de som surround e a qualidade da imagem em formato digital. Seria também útil saber se há pacotes de catering disponíveis (como pipocas e bebidas) e os preços para adicionar extras como o aluguer de auriculares para uma experiência mais imersiva.'),
+(4, 16, 1, 2, '2026-01-30', '10:00:00', '14:00:00', 'pendente', 'Evento de empresa', 'Gostaria de solicitar que a sala esteja equipada com um projetor e sistema de som, pois será realizada uma apresentação durante o evento. Além disso, seria ótimo ter uma opção de coffee break para os participantes. Agradeço desde já pela disponibilidade e aguardo confirmação da reserva.');
 
 -- --------------------------------------------------------
 
@@ -238,14 +241,61 @@ DROP TABLE IF EXISTS `bilhete`;
 CREATE TABLE IF NOT EXISTS `bilhete` (
   `id` int NOT NULL AUTO_INCREMENT,
   `compra_id` int NOT NULL,
-  `lugar` varchar(3) NOT NULL,
+  `lugar` varchar(3) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
   `preco` decimal(5,2) NOT NULL,
-  `codigo` varchar(45) NOT NULL,
-  `estado` enum('pendente','confirmado','cancelado') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `codigo` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `estado` enum('pendente','confirmado','cancelado') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `codigo` (`codigo`),
   KEY `idx-bilhete-compra_id` (`compra_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8mb3;
+
+--
+-- Dumping data for table `bilhete`
+--
+
+INSERT INTO `bilhete` (`id`, `compra_id`, `lugar`, `preco`, `codigo`, `estado`) VALUES
+(1, 1, 'B4', 10.00, '57SV7K', 'pendente'),
+(2, 1, 'B5', 10.00, 'PJFZWZ', 'pendente'),
+(3, 1, 'B6', 10.00, 'YNGG_7', 'pendente'),
+(4, 1, 'B7', 10.00, 'XP7I1B', 'pendente'),
+(5, 2, 'G4', 8.00, 'QPRCLB', 'pendente'),
+(6, 2, 'G6', 8.00, '-KEXFN', 'pendente'),
+(7, 2, 'G7', 8.00, 'ZKHMU_', 'pendente'),
+(8, 2, 'G5', 8.00, 'D4SD91', 'pendente'),
+(9, 2, 'G8', 8.00, 'ZFUCOR', 'pendente'),
+(10, 2, 'G9', 8.00, 'II0OMF', 'pendente'),
+(11, 3, 'H4', 10.00, 'KMGIRD', 'pendente'),
+(12, 3, 'H5', 10.00, '4ATOLD', 'pendente'),
+(13, 3, 'H6', 10.00, 'JNL3ZX', 'pendente'),
+(14, 4, 'B4', 10.00, 'PRCP6O', 'pendente'),
+(15, 4, 'B5', 10.00, 'LF6E47', 'pendente'),
+(16, 4, 'B6', 10.00, 'IAZQNV', 'pendente'),
+(17, 4, 'B7', 10.00, 'IQTICO', 'pendente'),
+(18, 5, 'C3', 10.00, 'A5HWYN', 'pendente'),
+(19, 5, 'C5', 10.00, 'K6LTSW', 'pendente'),
+(20, 5, 'C4', 10.00, 'R4ETCE', 'pendente'),
+(21, 6, 'F5', 10.00, 'S-CAVD', 'pendente'),
+(22, 6, 'F6', 10.00, 'JODGWU', 'pendente'),
+(23, 6, 'F7', 10.00, 'JM2VI5', 'pendente'),
+(24, 6, 'F8', 10.00, 'ZOTIDD', 'pendente'),
+(25, 7, 'F3', 10.00, 'SNH94N', 'pendente'),
+(26, 7, 'F4', 10.00, 'YGT0CW', 'pendente'),
+(27, 7, 'F5', 10.00, 'K7NLBH', 'pendente'),
+(28, 7, 'F6', 10.00, 'YTPAYG', 'pendente'),
+(29, 7, 'F7', 10.00, 'TGO3MS', 'pendente'),
+(30, 7, 'F8', 10.00, '-MBGHO', 'pendente'),
+(31, 7, 'F9', 10.00, 'QNBDCD', 'pendente'),
+(32, 8, 'D3', 8.00, 'VE9BAF', 'pendente'),
+(33, 8, 'D4', 8.00, 'N5US2E', 'pendente'),
+(34, 8, 'D5', 8.00, 'CLC_OX', 'pendente'),
+(35, 8, 'D6', 8.00, 'IXVOTW', 'pendente'),
+(36, 9, 'F4', 10.00, 'LQKVMK', 'pendente'),
+(37, 9, 'F5', 10.00, 'LN_OWE', 'pendente'),
+(38, 9, 'F8', 10.00, 'FFT-22', 'pendente'),
+(39, 9, 'F7', 10.00, 'GDUISC', 'pendente'),
+(40, 9, 'F6', 10.00, 'EYEGOA', 'pendente'),
+(41, 9, 'F9', 10.00, 'PLCUPP', 'pendente');
 
 -- --------------------------------------------------------
 
@@ -256,21 +306,21 @@ CREATE TABLE IF NOT EXISTS `bilhete` (
 DROP TABLE IF EXISTS `cinema`;
 CREATE TABLE IF NOT EXISTS `cinema` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `nome` varchar(80) NOT NULL,
-  `rua` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `codigo_postal` varchar(8) NOT NULL,
-  `cidade` varchar(50) NOT NULL,
+  `nome` varchar(80) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `rua` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `codigo_postal` varchar(8) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `cidade` varchar(50) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
   `latitude` decimal(10,6) NOT NULL,
   `longitude` decimal(10,6) NOT NULL,
-  `email` varchar(255) NOT NULL,
+  `email` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
   `telefone` int NOT NULL,
   `horario_abertura` time NOT NULL,
   `horario_fecho` time NOT NULL,
-  `estado` enum('ativo','encerrado') NOT NULL,
+  `estado` enum('ativo','encerrado') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
   `gerente_id` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx-cinema-gerente_id` (`gerente_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb3;
 
 --
 -- Dumping data for table `cinema`
@@ -293,12 +343,27 @@ CREATE TABLE IF NOT EXISTS `compra` (
   `cliente_id` int DEFAULT NULL,
   `sessao_id` int NOT NULL,
   `data` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `pagamento` enum('mbway','cartao','multibanco') NOT NULL,
-  `estado` enum('confirmada','cancelada') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `pagamento` enum('mbway','cartao','multibanco') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `estado` enum('confirmada','cancelada') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
   PRIMARY KEY (`id`),
   KEY `idx-compra-cliente_id` (`cliente_id`),
   KEY `sessao_id` (`sessao_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb3;
+
+--
+-- Dumping data for table `compra`
+--
+
+INSERT INTO `compra` (`id`, `cliente_id`, `sessao_id`, `data`, `pagamento`, `estado`) VALUES
+(1, 14, 18, '2025-12-03 08:24:39', 'mbway', 'confirmada'),
+(2, 14, 14, '2025-12-03 08:25:41', 'cartao', 'confirmada'),
+(3, 14, 12, '2025-12-03 08:26:40', 'multibanco', 'confirmada'),
+(4, 14, 8, '2025-12-03 08:26:58', 'mbway', 'confirmada'),
+(5, 14, 20, '2025-12-03 08:27:34', 'mbway', 'confirmada'),
+(6, 15, 9, '2025-12-03 08:39:27', 'mbway', 'confirmada'),
+(7, 16, 18, '2025-12-03 09:59:05', 'multibanco', 'confirmada'),
+(8, 16, 14, '2025-12-03 09:59:16', 'mbway', 'confirmada'),
+(9, 16, 12, '2025-12-03 09:59:28', 'mbway', 'confirmada');
 
 -- --------------------------------------------------------
 
@@ -309,34 +374,34 @@ CREATE TABLE IF NOT EXISTS `compra` (
 DROP TABLE IF EXISTS `filme`;
 CREATE TABLE IF NOT EXISTS `filme` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `titulo` varchar(255) NOT NULL,
-  `sinopse` text NOT NULL,
+  `titulo` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `sinopse` text CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
   `duracao` int NOT NULL,
-  `rating` enum('Todos','M3','M6','M12','M14','M16','M18') NOT NULL,
+  `rating` enum('Todos','M3','M6','M12','M14','M16','M18') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
   `estreia` date NOT NULL,
-  `idioma` varchar(50) NOT NULL,
-  `realizacao` varchar(80) NOT NULL,
-  `trailer_url` varchar(255) NOT NULL,
-  `poster_path` varchar(255) NOT NULL,
-  `estado` enum('brevemente','em_exibicao','terminado') NOT NULL,
+  `idioma` varchar(50) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `realizacao` varchar(80) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `trailer_url` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `poster_path` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `estado` enum('brevemente','em_exibicao','terminado') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb3;
 
 --
 -- Dumping data for table `filme`
 --
 
 INSERT INTO `filme` (`id`, `titulo`, `sinopse`, `duracao`, `rating`, `estreia`, `idioma`, `realizacao`, `trailer_url`, `poster_path`, `estado`) VALUES
-(1, 'Interstellar', 'Um grupo de exploradores espaciais viaja através de um buraco de minhoca em busca de um novo planeta habitável, enquanto a Terra enfrenta um colapso ambiental e humano.', 169, 'M12', '2025-10-23', 'Inglês', 'Christopher Nolan', 'https://www.youtube.com/watch?v=2LqzF5WauAw', 'poster_68fa01aecd6d2.jpg', 'brevemente'),
-(2, 'The Truman Show', 'Truman Burbank vive uma vida aparentemente perfeita até começar a suspeitar que tudo à sua volta é parte de um gigantesco programa televisivo.', 103, 'M12', '2025-10-22', 'Inglês', 'Peter Weir', 'https://www.youtube.com/watch?v=dlnmQbPGuls', 'poster_68fa080f7e03f.jpg', 'em_exibicao'),
-(3, 'Shutter Island', 'Um agente federal norte-americano investiga o desaparecimento de uma paciente num hospital psiquiátrico isolado, mas à medida que aprofunda o caso começa a duvidar da sua própria sanidade.', 139, 'M16', '2010-02-19', 'Inglês', 'Martin Scorsese', 'https://www.youtube.com/watch?v=gN02XJ9pDAU', 'poster_690329f4e86ee.jpg', 'em_exibicao'),
-(4, 'The Social Network', 'Um estudante de Harvard cria uma plataforma online que rapidamente se transforma no Facebook, mas o sucesso traz consigo conflitos pessoais e batalhas legais pela sua verdadeira autoria.', 120, 'M12', '2010-10-01', 'Inglês', 'David Fincher', 'https://www.youtube.com/watch?v=lB95KLmpLR4', 'poster_69032dee2ed44.jpg', 'em_exibicao'),
-(5, 'Prisoners', 'Duas raparigas desaparecem durante um feriado em família e, enquanto a polícia investiga, o pai de uma delas decide assumir o caso sozinho, mergulhando numa espiral de desespero e vingança.', 153, 'M16', '2013-09-20', 'Inglês', 'Denis Villeneuve', 'https://www.youtube.com/watch?v=bpXfcTF6iVk', 'poster_69032e821fed0.jpg', 'brevemente'),
+(1, 'Interstellar', 'Em um futuro próximo, a Terra enfrenta um colapso ambiental que ameaça a sobrevivência da humanidade. Diante dessa crise, um ex-piloto da NASA se junta a um grupo de exploradores encarregados de realizar uma missão ousada.', 169, 'M12', '2025-10-23', 'Inglês', 'Christopher Nolan', 'https://www.youtube.com/watch?v=2LqzF5WauAw', 'poster_68fa01aecd6d2.jpg', 'brevemente'),
+(2, 'The Truman Show', 'Truman Burbank leva uma vida aparentemente tranquila e perfeita em uma cidade que parece saída de um cartão-postal. No entanto, pequenos incidentes começam a despertar nele a estranha sensação de que algo não se encaixa.', 103, 'M12', '2025-10-22', 'Inglês', 'Peter Weir', 'https://www.youtube.com/watch?v=dlnmQbPGuls', 'poster_68fa080f7e03f.jpg', 'em_exibicao'),
+(3, 'Shutter Island', 'Um agente federal norte-americano chega a uma ilha remota para investigar o súbito desaparecimento de uma paciente considerada perigosa em um hospital psiquiátrico de segurança máxima. Conforme entrevista médicos, explora as instalações e tenta decifrar pistas contraditórias.', 139, 'M16', '2010-02-19', 'Inglês', 'Martin Scorsese', 'https://www.youtube.com/watch?v=gN02XJ9pDAU', 'poster_690329f4e86ee.jpg', 'em_exibicao'),
+(4, 'The Social Network', 'Um brilhante, porém socialmente desajeitado estudante de Harvard cria uma plataforma online inicialmente pensada para conectar universitários, mas o projeto cresce com uma velocidade explosiva e rapidamente evolui para aquilo que se tornaria o Facebook.', 120, 'M12', '2010-10-01', 'Inglês', 'David Fincher', 'https://www.youtube.com/watch?v=lB95KLmpLR4', 'poster_69032dee2ed44.jpg', 'em_exibicao'),
+(5, 'Prisoners', 'Duas raparigas desaparecem durante um feriado em família, deixando todos em pânico.Enquanto a polícia segue pistas incertas, o pai de uma delas decide investigar por conta própria.Consumido pelo desespero, ele cruza limites perigosos numa busca que ameaça destruir tudo à sua volta.', 153, 'M16', '2013-09-20', 'Inglês', 'Denis Villeneuve', 'https://www.youtube.com/watch?v=bpXfcTF6iVk', 'poster_69032e821fed0.jpg', 'brevemente'),
 (6, 'Zodiac', 'Um desenhador de cartoons de São Francisco torna-se obcecado em decifrar a identidade do assassino em série apelidado de “Zodíaco”, que aterroriza a área da baía com cartas cifradas, assassinatos e o troçar da polícia.', 157, 'M16', '2007-03-02', 'Inglês', 'David Fincher', 'https://www.youtube.com/watch?v=yNncHPl1UXg', 'poster_69032f4f900e9.jpg', 'brevemente'),
 (7, 'Toy Story', 'Um brinquedo vê a sua posição ameaçada quando um novo boneco espacial chega ao quarto, desencadeando uma aventura onde ambos terão de superar rivalidades e trabalhar juntos para regressar a casa do dono.', 81, 'M6', '1996-03-29', 'Português', 'John Lasseter', 'https://www.youtube.com/watch?v=v-PjgYDrg70', 'poster_6910b61fbd2d6.jpg', 'brevemente'),
 (8, 'Carros 2', 'Um grande campeão das pistas é lançado numa corrida internacional enquanto o seu amigo Mate é apanhado num enredo de espionagem que põe à prova a amizade de ambos e mostra que coragem pode surgir dos lugares mais improváveis.', 106, 'M6', '2011-06-14', 'Português', 'John Lasseter', 'https://www.youtube.com/watch?v=oFTfAdauCOo', 'poster_6910b6ad1f9ea.jpg', 'em_exibicao'),
 (9, 'The Prestige', 'Dois mágicos rivais da era vitoriana competem obsessivamente para superar-se, à medida que o truque se torna cada vez mais perigoso, ambos descobrem que o preço da obsessão pode ser a própria identidade.', 130, 'M14', '2006-12-28', 'Inglês', 'Christopher Nolan', 'https://www.youtube.com/watch?v=RLtaA9fFNXU', 'poster_6918b2d190384.jpg', 'em_exibicao'),
-(10, 'Seven', 'Dois detetives perseguem um serial killer cujos crimes representam os sete pecados capitais numa investigação sombria que descobre o horror nas mais triviais escolhas humanas.', 127, 'M16', '1996-02-02', 'Inglês', 'David Fincher', 'https://www.youtube.com/watch?v=znmZoVkCjpI', 'poster_6918b3d09bd73.jpg', 'em_exibicao'),
+(10, 'Seven', 'Quando um serial killer começa a cometer assassinatos meticulosamente inspirados nos sete pecados capitais, cada cena do crime se transforma em um ritual macabro, carregado de simbolismos e de uma crueldade calculada.', 127, 'M16', '1996-02-02', 'Inglês', 'David Fincher', 'https://www.youtube.com/watch?v=znmZoVkCjpI', 'poster_6918b3d09bd73.jpg', 'em_exibicao'),
 (11, 'Divertida-Mente', 'Riley tem 11 anos e muda-se com a família para São Francisco. No quartel-general da sua mente vivem as emoções Alegria, Tristeza, Medo, Raiva e Repulsa, que tentam orientar-na, mas quando os sentimentos entram em conflito, Riley afronta uma nova vida, nova escola e a incerteza de crescer.', 94, 'Todos', '2015-06-18', 'Português', 'Pete Docter', 'https://www.youtube.com/watch?v=yRUAzGQ3nSY', 'poster_6918b4c3cf56d.jpg', 'brevemente'),
 (12, 'Monstros e Companhia', 'Na fábrica Monstros S.A., os monstros recolhem gritos de crianças para gerar energia, mas tudo muda quando uma menina humana entra no mundo dos monstros, obrigando Sulley e Mike a enfrentarem medos, conspirações e a descobrir que a amizade pode ser a força mais poderosa de todas.', 92, 'M3', '2002-03-14', 'Português', 'Pete Docter', 'https://www.youtube.com/watch?v=CGbgaHoapFM', 'poster_6918b5ace5025.jpg', 'brevemente'),
 (13, 'Inception', 'Dom Cobb é um especialista em invadir sonhos para roubar segredos do subconsciente. Para recuperar a sua vida e regressar aos filhos, aceita uma missão arriscada: implantar uma ideia na mente de um alvo, algo considerado quase impossível.', 148, 'M12', '2010-07-16', 'Inglês', 'Christopher Nolan', 'https://www.youtube.com/watch?v=YoHD9XEInc0', 'poster_692df41aa80ee.jpg', 'brevemente'),
@@ -356,7 +421,7 @@ CREATE TABLE IF NOT EXISTS `filme_genero` (
   `genero_id` int NOT NULL,
   KEY `idx-filme_genero-filme_id` (`filme_id`),
   KEY `idx-filme_genero-genero_id` (`genero_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 --
 -- Dumping data for table `filme_genero`
@@ -366,17 +431,6 @@ INSERT INTO `filme_genero` (`filme_id`, `genero_id`) VALUES
 (7, 8),
 (7, 9),
 (7, 4),
-(3, 9),
-(3, 1),
-(3, 10),
-(4, 1),
-(4, 3),
-(5, 2),
-(5, 1),
-(5, 10),
-(10, 2),
-(10, 10),
-(10, 3),
 (8, 8),
 (8, 9),
 (8, 1),
@@ -389,18 +443,12 @@ INSERT INTO `filme_genero` (`filme_id`, `genero_id`) VALUES
 (11, 8),
 (11, 9),
 (11, 4),
-(2, 2),
-(2, 1),
-(2, 3),
 (13, 2),
 (13, 9),
 (13, 7),
 (6, 2),
 (6, 1),
 (6, 10),
-(1, 2),
-(1, 1),
-(1, 7),
 (14, 2),
 (14, 7),
 (14, 3),
@@ -409,7 +457,24 @@ INSERT INTO `filme_genero` (`filme_id`, `genero_id`) VALUES
 (15, 3),
 (16, 8),
 (16, 9),
-(16, 4);
+(16, 4),
+(10, 2),
+(10, 10),
+(10, 3),
+(3, 9),
+(3, 1),
+(3, 10),
+(4, 1),
+(4, 3),
+(2, 2),
+(2, 1),
+(2, 3),
+(1, 2),
+(1, 1),
+(1, 7),
+(5, 2),
+(5, 1),
+(5, 10);
 
 -- --------------------------------------------------------
 
@@ -420,10 +485,10 @@ INSERT INTO `filme_genero` (`filme_id`, `genero_id`) VALUES
 DROP TABLE IF EXISTS `genero`;
 CREATE TABLE IF NOT EXISTS `genero` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `nome` varchar(80) NOT NULL,
+  `nome` varchar(80) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `nome` (`nome`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb3;
 
 --
 -- Dumping data for table `genero`
@@ -449,10 +514,10 @@ INSERT INTO `genero` (`id`, `nome`) VALUES
 
 DROP TABLE IF EXISTS `migration`;
 CREATE TABLE IF NOT EXISTS `migration` (
-  `version` varchar(180) NOT NULL,
+  `version` varchar(180) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
   `apply_time` int DEFAULT NULL,
   PRIMARY KEY (`version`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 --
 -- Dumping data for table `migration`
@@ -482,10 +547,10 @@ CREATE TABLE IF NOT EXISTS `sala` (
   `num_filas` int NOT NULL,
   `num_colunas` int NOT NULL,
   `preco_bilhete` decimal(5,2) NOT NULL,
-  `estado` enum('ativa','encerrada') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `estado` enum('ativa','encerrada') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
   PRIMARY KEY (`id`),
   KEY `idx-sala-cinema_id` (`cinema_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb3;
 
 --
 -- Dumping data for table `sala`
@@ -495,7 +560,7 @@ INSERT INTO `sala` (`id`, `cinema_id`, `numero`, `num_filas`, `num_colunas`, `pr
 (1, 1, 1, 10, 12, 8.00, 'ativa'),
 (2, 1, 2, 10, 10, 10.00, 'ativa'),
 (3, 1, 3, 10, 14, 8.00, 'ativa'),
-(4, 1, 4, 10, 10, 40.00, 'ativa'),
+(4, 1, 4, 10, 10, 8.00, 'ativa'),
 (5, 1, 5, 10, 12, 6.00, 'ativa'),
 (6, 1, 6, 10, 10, 8.00, 'ativa'),
 (7, 2, 1, 10, 14, 12.00, 'ativa'),
@@ -528,7 +593,7 @@ CREATE TABLE IF NOT EXISTS `sessao` (
   KEY `idx-sessao-filme_id` (`filme_id`),
   KEY `idx-sessao-sala_id` (`sala_id`),
   KEY `idx-sessao-cinema_id` (`cinema_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb3;
 
 --
 -- Dumping data for table `sessao`
@@ -550,7 +615,10 @@ INSERT INTO `sessao` (`id`, `data`, `hora_inicio`, `hora_fim`, `filme_id`, `sala
 (14, '2026-02-02', '19:30:00', '21:37:00', 10, 4, 1),
 (15, '2026-01-30', '21:00:00', '23:00:00', 4, 1, 1),
 (16, '2026-01-31', '17:00:00', '18:32:00', 16, 8, 2),
-(17, '2026-01-30', '20:00:00', '22:56:00', 15, 3, 1);
+(17, '2026-01-30', '20:00:00', '22:56:00', 15, 3, 1),
+(18, '2026-02-01', '17:00:00', '18:32:00', 16, 2, 1),
+(19, '2026-02-02', '20:00:00', '22:07:00', 10, 1, 1),
+(20, '2026-02-02', '20:00:00', '22:19:00', 3, 2, 1);
 
 -- --------------------------------------------------------
 
@@ -609,12 +677,12 @@ CREATE TABLE IF NOT EXISTS `user_profile` (
   `id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL,
   `cinema_id` int DEFAULT NULL,
-  `nome` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `telemovel` varchar(9) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `nome` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `telemovel` varchar(9) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx-user_profile-user_id` (`user_id`),
   KEY `idx-user_profile-cinema_id` (`cinema_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb3;
 
 --
 -- Dumping data for table `user_profile`

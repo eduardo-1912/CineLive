@@ -95,8 +95,10 @@ class SiteController extends Controller
                     }
                 }
 
-                $labelsCinemas[] = $cinema->nome;
-                $valoresVendas[] = $total;
+                if ($total > 0) {
+                    $labelsCinemas[] = $cinema->nome;
+                    $valoresVendas[] = $total;
+                }
             }
         }
         elseif ($verEstatisticasCinema && $cinema) {

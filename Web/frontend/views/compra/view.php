@@ -89,7 +89,7 @@ $this->title = $model->nome;
                             <td><?= $bilhete->codigo ?></td>
                             <td><?= $bilhete->lugar ?></td>
                             <td><?= Formatter::preco($bilhete->preco) ?></td>
-                            <td><?= $bilhete->estadoFormatado ?></td>
+                            <td><?= $bilhete->estadoHtml ?></td>
                         </tr>
                     <?php endforeach; ?>
                     </tbody>

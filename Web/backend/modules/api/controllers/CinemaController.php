@@ -6,7 +6,6 @@ use common\models\Cinema;
 use common\models\Filme;
 use Yii;
 use yii\rest\Controller;
-use yii\web\MethodNotAllowedHttpException;
 use yii\web\NotFoundHttpException;
 
 class CinemaController extends Controller

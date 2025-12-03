@@ -7,10 +7,12 @@ use yii\helpers\Url;
 
 /** @var common\models\Filme $filme */
 
+$cinema_id = $cinema_id ?? CookieHelper::get('cinema_id', array_key_first(Cinema::findAtivos()))
+
 ?>
 
 <a href="<?= Url::to(['filme/view', 'id' => $filme->id,
-    'cinema_id' => CookieHelper::get('cinema_id', array_key_first(Cinema::findAtivos()))]) ?>"
+    'cinema_id' => $cinema_id]) ?>"
    class="card-filme text-center text-decoration-none text-black d-flex flex-column gap-1">
     <?= Html::img($filme->posterUrl, [
         'class' => 'card-img-top shadow-sm rounded-4',

@@ -92,7 +92,10 @@ $this->title = 'Filmes';
             <?php foreach ($filmes as $filme): ?>
                 <div class="col">
                     <div class="h-100 border-0">
-                        <?= $this->render('_card', ['filme' => $filme]) ?>
+                        <?= $this->render('_card', [
+                            'filme' => $filme,
+                            'cinema_id' => $cinema_id
+                        ]) ?>
                     </div>
                 </div>
             <?php endforeach; ?>
