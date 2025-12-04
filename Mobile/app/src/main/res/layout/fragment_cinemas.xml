@@ -1,24 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
+    style="@style/VerticalLayout.Full"
     tools:context=".fragments.CinemasFragment">
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefresh" style="@style/VerticalLayout.Full">
 
-        <!-- Cinemas -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvCinemas"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/Container.ForList"
-            android:paddingBottom="16dp"
-            tools:listitem="@layout/item_cinema" />
+        <ViewFlipper android:id="@+id/viewFlipper" style="@style/VerticalLayout.Full">
 
-    </ScrollView>
+            <!-- Loading -->
+            <include android:id="@+id/loading" layout="@layout/layout_loading" />
+
+            <!-- Error -->
+            <include android:id="@+id/error" layout="@layout/layout_error" />
+
+            <!-- Main -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvCinemas"
+                tools:listitem="@layout/item_cinema"
+                style="@style/Container.ForList"
+                android:scrollbarStyle="outsideOverlay"
+                android:scrollbars="vertical"
+                android:clipToPadding="false" />
+
+        </ViewFlipper>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </LinearLayout>

@@ -11,18 +11,16 @@
     <!-- Toolbar -->
     <include android:id="@+id/toolbar" layout="@layout/toolbar" />
 
-    <!-- Container -->
+    <!-- Main -->
     <LinearLayout style="@style/Container.Main">
 
         <!-- Título -->
-        <TextView
-            android:id="@+id/tvTitulo"
+        <TextView android:id="@+id/tvTitulo"
             android:text="@string/configuracoes_titulo"
             style="@style/Title" />
 
         <!-- Subtítulo -->
-        <TextView
-            android:id="@+id/tvSubtitulo"
+        <TextView android:id="@+id/tvSubtitulo"
             android:text="@string/configuracoes_subtitulo"
             style="@style/Subtitle" />
 
@@ -51,34 +49,31 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Botão Guardar -->
-        <Button
-            android:id="@+id/btnGuardar"
+        <Button android:id="@+id/btnGuardar"
             style="@style/Button.Primary.Full"
             android:text="@string/btn_guardar" />
 
         <!-- Botão Restaurar -->
-        <Button
-            android:id="@+id/btnRestaurar"
+        <Button android:id="@+id/btnRestaurar"
             style="@style/Button.Text"
             android:text="@string/btn_restaurar" />
 
         <Space style="@style/VerticalSpace.24" />
 
         <!-- Progress Bar -->
-        <ProgressBar
-            android:id="@+id/progressBar"
+        <ProgressBar android:id="@+id/progressBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingTop="20dp"
             android:visibility="gone"
             android:layout_gravity="center"
             style="?android:attr/progressBarStyleLarge" />
 
         <!-- Resposta da API -->
-        <TextView
-            android:id="@+id/tvApiResponse"
+        <TextView android:id="@+id/tvApiResponse"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16dp"
+            android:padding="20dp"
             android:textColor="@color/black"
             android:textIsSelectable="true"
             android:fontFamily="monospace"

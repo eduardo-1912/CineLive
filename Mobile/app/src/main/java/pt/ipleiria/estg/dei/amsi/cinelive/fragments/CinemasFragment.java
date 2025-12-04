@@ -1,5 +1,9 @@
 package pt.ipleiria.estg.dei.amsi.cinelive.fragments;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -10,14 +14,20 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
-import java.util.Arrays;
 import java.util.List;
 
+import pt.ipleiria.estg.dei.amsi.cinelive.R;
+import pt.ipleiria.estg.dei.amsi.cinelive.activities.ConfiguracoesActivity;
+import pt.ipleiria.estg.dei.amsi.cinelive.listeners.CinemaListener;
+import pt.ipleiria.estg.dei.amsi.cinelive.managers.CinemasManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.managers.PreferencesManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.adapters.CinemasAdapter;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.FragmentCinemasBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Cinema;
+import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
+import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorPage;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -26,8 +36,16 @@ import pt.ipleiria.estg.dei.amsi.cinelive.models.Cinema;
  */
 public class CinemasFragment extends Fragment {
     private FragmentCinemasBinding binding;
-    private PreferencesManager preferences;
     private CinemasAdapter adapter;
+    private CinemasManager cinemasManager;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Obter o manager
+        cinemasManager = CinemasManager.getInstance();
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -37,28 +55,93 @@ public class CinemasFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        // Aceder às preferences
-        preferences = new PreferencesManager(requireContext());
+        // Swipe refresh
+        binding.swipeRefresh.setOnRefreshListener(() -> {
+            binding.swipeRefresh.setRefreshing(false);
 
-        // Obter cinema selecionado
-        int cinemaSelecionado = preferences.getCinemaId();
+            // Apenas limpar a cache de cinemas se tiver internet
+            if (ConnectionUtils.hasInternet(requireContext())) cinemasManager.clearCache();
 
-        List<Cinema> cinemas = Arrays.asList(
-                new Cinema(1, "Cinema Leiria", "Rua das Flores N5, Leiria", "123456789", "leiria@cinelive.pt", "10:00 - 23:00", "12 Salas • 800 Lugares"),
-                new Cinema(2, "Cinema Coimbra", "Av. Fernão Magalhães, Coimbra", "123456789", "coimbra@cinelive.pt", "10:00 - 23:00", "12 Salas • 800 Lugares"),
-                new Cinema(3, "Cinema Lisboa", "Rua Augusta 115, Lisboa", "123456789", "lisboa@cinelive.pt", "10:00 - 23:00", "12 Salas • 800 Lugares")
-        );
+            // Carregar cinemas
+            loadCinemas();
+        });
 
-        adapter = new CinemasAdapter(
-            cinemas, cinemaSelecionado,
-            cinema -> {
-                preferences.setCinemaId(cinema.getId());
-                adapter.setCinemaSelecionado(cinema.getId());
-            }
-        );
-
+        // Configurar layout da recycler-view
         binding.rvCinemas.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        // Carregar cinemas
+        loadCinemas();
+    }
+
+    private void loadCinemas() {
+        binding.viewFlipper.setDisplayedChild(0); // Loading
+
+        // Obter estado da ligação à internet
+        boolean hasInternet = ConnectionUtils.hasInternet(requireContext());
+
+        // Obter cinemas (API ou cache)
+        cinemasManager.fetchCinemas(requireContext(), new CinemaListener() {
+            @Override
+            public void onSuccess(List<Cinema> cinemas) {
+                setAdapter(cinemas);
+
+                // Tem cache mas não tem internet
+                if (!hasInternet) {
+                    Toast.makeText(requireActivity(), R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
+                }
+            }
+            @Override
+            public void onEmpty() {
+                showError(ErrorPage.Type.NENHUM_CINEMA);
+            }
+            @Override
+            public void onError() {
+                showError(hasInternet ? ErrorPage.Type.API : ErrorPage.Type.INTERNET);
+            }
+        });
+    }
+
+    private void setAdapter(List<Cinema> cinemas) {
+        // Evitar crash ao sair do fragment
+        if (binding == null || !isAdded()) return;
+        binding.viewFlipper.setDisplayedChild(2); // Main
+
+        // Aceder às preferences
+        PreferencesManager preferences = new PreferencesManager(requireContext());
+
+        // Se clicou num cinema --> selecionar e guardar nas preferences
+        adapter = new CinemasAdapter(cinemas, preferences.getCinemaId(), cinema -> {
+            preferences.setCinemaId(cinema.getId());
+            adapter.setCinemaSelecionado(cinema.getId());
+        });
+
         binding.rvCinemas.setAdapter(adapter);
+    }
+
+    private void showError(ErrorPage.Type type) {
+        // Evitar crash ao sair do fragment
+        if (binding == null || !isAdded()) return;
+
+        binding.viewFlipper.setDisplayedChild(1); // Error
+        ErrorPage.showError(binding.error, type);
+
+        // Ação do botão
+        binding.error.btnAction.setOnClickListener(v -> {
+            switch (type) {
+                case INTERNET: case NENHUM_CINEMA:
+                    loadCinemas();
+                    break;
+                case API:
+                    startActivity(new Intent(requireContext(), ConfiguracoesActivity.class));
+                    break;
+            }
+        });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadCinemas();
     }
 
     @Override

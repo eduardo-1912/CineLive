@@ -4,6 +4,8 @@
     <dimen name="container_padding_vertical">24dp</dimen>
     <dimen name="container_padding_horizontal">24dp</dimen>
 
+    <dimen name="list_padding_bottom">16dp</dimen>
+
     <dimen name="badge_padding_vertical">4dp</dimen>
     <dimen name="badge_padding_horizontal">14dp</dimen>
 

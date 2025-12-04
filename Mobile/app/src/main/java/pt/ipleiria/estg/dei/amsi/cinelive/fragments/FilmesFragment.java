@@ -15,16 +15,22 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
-import java.util.Arrays;
 import java.util.List;
 
+import pt.ipleiria.estg.dei.amsi.cinelive.activities.ConfiguracoesActivity;
 import pt.ipleiria.estg.dei.amsi.cinelive.activities.DetalhesFilmeActivity;
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
+import pt.ipleiria.estg.dei.amsi.cinelive.activities.MainActivity;
 import pt.ipleiria.estg.dei.amsi.cinelive.adapters.FilmesAdapter;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.FragmentFilmesBinding;
+import pt.ipleiria.estg.dei.amsi.cinelive.listeners.FilmeListener;
+import pt.ipleiria.estg.dei.amsi.cinelive.managers.FilmesManager;
+import pt.ipleiria.estg.dei.amsi.cinelive.managers.PreferencesManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Filme;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
+import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorPage;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -33,8 +39,11 @@ import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
  */
 public class FilmesFragment extends Fragment {
     private FragmentFilmesBinding binding;
+    private FilmesManager filmesManager;
     private FilmesAdapter adapter;
     private SearchView searchView;
+
+    private boolean isFilmesLoaded;
 
     private List<Filme> filmesEmExibicao;
     private List<Filme> filmesKids;
@@ -43,6 +52,13 @@ public class FilmesFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentFilmesBinding.inflate(inflater, container, false);
+
+        // Swipe refresh
+        binding.swipeRefresh.setOnRefreshListener(() -> {
+            binding.swipeRefresh.setRefreshing(false);
+            load();
+        });
+
         return binding.getRoot();
     }
 
@@ -56,66 +72,34 @@ public class FilmesFragment extends Fragment {
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
-        if (ConnectionUtils.hasInternet(requireContext())) {
-            inflater.inflate(R.menu.menu_pesquisa, menu);
+        inflater.inflate(R.menu.menu_pesquisa, menu);
+        MenuItem itemPesquisa = menu.findItem(R.id.itemPesquisa);
 
-            try {
-                // Obter item
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+        // Apenas mostrar item pesquisa se tiver filmes carregados
+        itemPesquisa.setVisible(isFilmesLoaded);
+
+        // Obter SearchView
+        searchView = (SearchView) itemPesquisa.getActionView();
+        searchView.setQueryHint(getString(R.string.pesquisar_filmes));
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                adapter.filtrar(query);
+                return true;
             }
-            MenuItem itemPesquisa = menu.findItem(R.id.itemPesquisa);
-
-            // Obter SearchView
-            searchView = (SearchView) itemPesquisa.getActionView();
-            searchView.setQueryHint(getString(R.string.pesquisar_filmes));
-
-            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-                @Override
-                public boolean onQueryTextSubmit(String query) {
-                    adapter.filtrar(query);
-                    return true;
-                }
-                @Override
-                public boolean onQueryTextChange(String query) {
-                    adapter.filtrar(query);
-                    return true;
-                }
-            });
-        }
+            @Override
+            public boolean onQueryTextChange(String query) {
+                adapter.filtrar(query);
+                return true;
+            }
+        });
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
-        if (!ConnectionUtils.hasInternet(requireContext())) {
-            binding.viewFlipper.setDisplayedChild(1);
-            return;
-        }
-
-        binding.viewFlipper.setDisplayedChild(0);
-
-        filmesEmExibicao = Arrays.asList(
-            new Filme(1, "The Truman Show", "/CineLive/Web/frontend/web/uploads/posters/poster_68fa080f7e03f.jpg"),
-            new Filme(2, "The Social Network", "/CineLive/Web/frontend/web/uploads/posters/poster_69032dee2ed44.jpg"),
-            new Filme(3, "Carros 2", "/CineLive/Web/frontend/web/uploads/posters/poster_6910b6ad1f9ea.jpg"),
-            new Filme(4, "Inside Out 2", "/CineLive/Web/frontend/web/uploads/posters/poster_6918b4c3cf56d.jpg")
-        );
-
-        filmesKids = Arrays.asList(
-            new Filme(3, "Carros 2", "/CineLive/Web/frontend/web/uploads/posters/poster_6910b6ad1f9ea.jpg"),
-            new Filme(4, "Inside Out 2", "/CineLive/Web/frontend/web/uploads/posters/poster_6918b4c3cf56d.jpg")
-        );
-
-        filmesBrevemente = Arrays.asList(
-            new Filme(5, "Interstellar", "/CineLive/Web/frontend/web/uploads/posters/poster_68fa01aecd6d2.jpg"),
-            new Filme(6, "The Prestige", "/CineLive/Web/frontend/web/uploads/posters/poster_6918b2d190384.jpg")
-        );
-
         binding.rvFilmes.setLayoutManager(new GridLayoutManager(getContext(), 3));
-
         binding.btnEmExibicao.setChecked(true);
-        atualizarLista(filmesEmExibicao);
 
         View.OnClickListener filterClickListener = v -> {
             binding.btnEmExibicao.setChecked(v.getId() == R.id.btnEmExibicao);
@@ -136,9 +120,61 @@ public class FilmesFragment extends Fragment {
         binding.btnEmExibicao.setOnClickListener(filterClickListener);
         binding.btnKids.setOnClickListener(filterClickListener);
         binding.btnBrevemente.setOnClickListener(filterClickListener);
+
+        filmesManager = FilmesManager.getInstance();
+
+        load();
+    }
+
+    private void load() {
+        binding.viewFlipper.setDisplayedChild(0); // Loading
+
+        // Verificar se tem internet
+        if (!ConnectionUtils.hasInternet(requireContext())) {
+            // Se não tiver filmes carregados --> mostrar erro
+            if (filmesManager.getFilmesEmExibicao().isEmpty()) {
+                showError(ErrorPage.Type.INTERNET);
+                return;
+            }
+
+            // Se tiver filmes carregados --> mostrar lista em cache
+            Toast.makeText(requireActivity(), R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
+            filmesEmExibicao = filmesManager.getFilmesEmExibicao();
+            atualizarLista(filmesEmExibicao);
+            return;
+        }
+
+        // Verificar se tem cinema selecionado
+        if (new PreferencesManager(requireContext()).getCinemaId() == -1) {
+            showError(ErrorPage.Type.CINEMA_INVALIDO);
+            return;
+        }
+
+        // Obter filmes da API
+        filmesManager.getFilmesEmExibicao(requireContext(), new FilmeListener() {
+            @Override
+            public void onFilmesLoaded(List<Filme> filmes) {
+                isFilmesLoaded = true;
+                requireActivity().invalidateOptionsMenu();
+                filmesEmExibicao = filmes;
+                atualizarLista(filmesEmExibicao);
+            }
+            @Override
+            public void onInvalidCinema() {
+                showError(ErrorPage.Type.CINEMA_INVALIDO);
+            }
+            @Override
+            public void onError() {
+                showError(ErrorPage.Type.API);
+            }
+        });
     }
 
     private void atualizarLista(List<Filme> lista) {
+        if (binding == null || !isAdded()) return;
+
+        binding.viewFlipper.setDisplayedChild(2); // Main
+
         adapter = new FilmesAdapter(lista, filme -> {
             Intent intent = new Intent(getActivity(), DetalhesFilmeActivity.class);
             intent.putExtra("filme_id", filme.getId());
@@ -150,6 +186,26 @@ public class FilmesFragment extends Fragment {
         if (searchView != null) {
             adapter.filtrar(searchView.getQuery().toString());
         }
+    }
+
+    private void showError(ErrorPage.Type type) {
+        binding.viewFlipper.setDisplayedChild(1); // Error
+        ErrorPage.showError(binding.error, type);
+
+        // Action do botão
+        binding.error.btnAction.setOnClickListener(v -> {
+            switch (type) {
+                case INTERNET:
+                    load();
+                    break;
+                case API:
+                    startActivity(new Intent(requireContext(), ConfiguracoesActivity.class));
+                    break;
+                case CINEMA_INVALIDO:
+                    ((MainActivity)requireActivity()).navigateToFragment(R.id.navCinemas);
+                    break;
+            }
+        });
     }
 
     @Override

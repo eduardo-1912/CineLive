@@ -46,19 +46,20 @@ public class ConfiguracoesActivity extends AppCompatActivity {
         // Aceder às preferences
         preferences = new PreferencesManager(this);
 
-        // Testar ligação à API
-        testApiConnection(this, preferences.getApiUrl());
-
         // Colocar dados nos campos
         binding.etApiHost.setText(preferences.getApiHost());
         binding.etApiPath.setText(preferences.getApiPath());
 
+        // Testar ligação à API
+        testApiConnection(preferences.getApiUrl(), ConnectionUtils.FAST_TIMEOUT, false);
+
         // Botão Guardar
         binding.btnGuardar.setOnClickListener(v -> {
-            // Testar ligação à API
             String apiHost = String.valueOf(binding.etApiHost.getText());
             String apiPath = String.valueOf(binding.etApiPath.getText());
-            testApiConnection(this, apiHost + apiPath);
+
+            // Testar ligação à API
+            testApiConnection(apiHost + apiPath, ConnectionUtils.DEFAULT_TIMEOUT, true);
 
             // Guardar nas preferences
             preferences.setApiUrl(apiHost, apiPath);
@@ -69,22 +70,26 @@ public class ConfiguracoesActivity extends AppCompatActivity {
             // Reset para default
             preferences.resetApiUrl();
 
-            String apiHost = preferences.getApiHost();
-            String apiPath = preferences.getApiPath();
-            binding.etApiHost.setText(apiHost);
-            binding.etApiPath.setText(apiPath);
+            binding.etApiHost.setText(preferences.getApiHost());
+            binding.etApiPath.setText(preferences.getApiPath());
 
             // Testar ligação à API
-            testApiConnection(this, apiHost + apiPath);
+            testApiConnection(preferences.getApiUrl(), ConnectionUtils.DEFAULT_TIMEOUT, true);
         });
     }
 
-    private void testApiConnection(Context context, String url) {
-        binding.tvApiResponse.setVisibility(View.GONE);
-        showProgressBar(true);
+    private void testApiConnection(String url, int timeout, boolean blockUI) {
+
+        // Verificar ligação à internet
+        if (!ConnectionUtils.hasInternet(this)) {
+            Toast.makeText(this, R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        showProgressBar(blockUI);
         updateStatusIcon(0);
 
-        ConnectionUtils.testApiConnection(this, url, new ConnectionListener() {
+        ConnectionUtils.testApiConnection(this, url, timeout, new ConnectionListener() {
             @Override
             public void onSuccess(String response) {
                 showProgressBar(false);
@@ -92,24 +97,19 @@ public class ConfiguracoesActivity extends AppCompatActivity {
 
                 try {
                     JSONObject json = new JSONObject(response);
-                    String formatted = json.toString(3);
                     binding.tvApiResponse.setVisibility(View.VISIBLE);
-                    binding.tvApiResponse.setText(formatted);
+                    binding.tvApiResponse.setText(json.toString(3));
                 }
                 catch (Exception e) {
                     binding.tvApiResponse.setVisibility(View.GONE);
-                    Toast.makeText(context, R.string.msg_api_invalid_response, Toast.LENGTH_SHORT).show();
                 }
-
-                Toast.makeText(context, R.string.msg_api_success, Toast.LENGTH_SHORT).show();
             }
-
             @Override
             public void onError() {
                 binding.tvApiResponse.setVisibility(View.GONE);
                 showProgressBar(false);
                 updateStatusIcon(2);
-                Toast.makeText(context, R.string.msg_api_error, Toast.LENGTH_SHORT).show();
+                Toast.makeText(ConfiguracoesActivity.this, R.string.msg_erro_api, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -121,20 +121,12 @@ public class ConfiguracoesActivity extends AppCompatActivity {
     }
 
     private void showProgressBar(boolean show) {
+        binding.tvApiResponse.setVisibility(View.GONE);
         binding.progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
         binding.btnGuardar.setEnabled(!show);
         binding.btnRestaurar.setEnabled(!show);
         binding.etApiHost.setEnabled(!show);
         binding.etApiPath.setEnabled(!show);
-    }
-
-    @Override
-    public void onResume()
-    {
-        super.onResume();
-        if (!ConnectionUtils.hasInternet(this)) {
-            Toast.makeText(this, R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
-        }
     }
 
     @Override

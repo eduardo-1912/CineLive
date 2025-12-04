@@ -19,10 +19,7 @@ import pt.ipleiria.estg.dei.amsi.cinelive.utils.ApiRoutes;
 public class CinemasManager {
     private static CinemasManager instance = null;
     private static RequestQueue queue;
-
     private List<Cinema> cinemas = new ArrayList<>();
-
-    private CinemasManager() {}
 
     public static synchronized CinemasManager getInstance() {
         if (instance == null) {
@@ -32,28 +29,52 @@ public class CinemasManager {
         return instance;
     }
 
-    public List<Cinema> getCinemas() {
-        return cinemas;
+    public void clearCache() {
+        cinemas.clear();
     }
 
-    public void getCinemasList(Context context, CinemaListener listener) {
-        String url = new PreferencesManager(context).getApiUrl() + ApiRoutes.CINEMAS_LIST;
+    public void fetchCinemas(Context context, CinemaListener listener) {
+        String url = ApiRoutes.cinemas(new PreferencesManager(context).getApiUrl());
+
+        // Se tiver cache --> evitar pedido à API
+        if (!cinemas.isEmpty()) {
+            listener.onSuccess(cinemas);
+            return;
+        }
 
         JsonArrayRequest request = new JsonArrayRequest(
             Request.Method.GET, url, null, response -> {
+                // Limpar lista
                 cinemas.clear();
+
+                // Nenhum cinema foi encontrado
+                if (response.length() == 0) {
+                    listener.onEmpty();
+                    return;
+                }
+
+                // Obter cinemas
                 for (int i = 0; i < response.length(); i++) {
                     JSONObject obj = response.optJSONObject(i);
                     if (obj != null) {
-                        cinemas.add(new Cinema(obj.optInt("id"), obj.optString("nome")));
+                        cinemas.add(new Cinema(
+                            obj.optInt("id"),
+                            obj.optString("nome"),
+                            obj.optString("morada"),
+                            obj.optString("telefone"),
+                            obj.optString("email"),
+                            obj.optString("horario"),
+                            obj.optString("capacidade"),
+                            obj.optBoolean("has_sessoes")
+                        ));
                     }
                 }
 
-                listener.onCinemasLoaded(cinemas);
+                // Chamar o listener
+                listener.onSuccess(cinemas);
             },
-            error -> listener.onError("Erro ao obter cinemas")
+            error -> listener.onError()
         );
-
         Volley.newRequestQueue(context).add(request);
     }
 }

@@ -8,6 +8,12 @@
         <item name="android:orientation">vertical</item>
     </style>
 
+    <style name="VerticalLayout.Full">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+
     <style name="HorizontalLayout">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
@@ -32,6 +38,7 @@
         <item name="android:paddingStart">@dimen/container_padding_horizontal</item>
         <item name="android:paddingEnd">@dimen/container_padding_horizontal</item>
         <item name="android:paddingTop">@dimen/container_padding_vertical</item>
+        <item name="android:paddingBottom">@dimen/list_padding_bottom</item>
     </style>
 
     <style name="Container.Main" parent="Container.ForList">

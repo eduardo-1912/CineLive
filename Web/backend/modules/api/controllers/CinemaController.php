@@ -12,6 +12,11 @@ class CinemaController extends Controller
     {
         $cinemas = Cinema::findAtivos();
 
+        // Ordernar por sessões ativas
+        usort($cinemas, function($a, $b) {
+            return (bool)$b->getSessoesAtivas() <=> (bool)$a->getSessoesAtivas();
+        });
+
         return array_map(fn($cinema) => [
             'id' => $cinema->id,
             'nome' => $cinema->nome,
@@ -20,15 +25,8 @@ class CinemaController extends Controller
             'email' => $cinema->email,
             'horario' => $cinema->horario,
             'capacidade' => "{$cinema->numeroSalas} Salas • {$cinema->numeroLugares} Lugares",
+            'has_sessoes' => (bool)$cinema->getSessoesAtivas(),
         ], $cinemas);
-    }
-
-    public function actionList()
-    {
-        return array_map(fn($cinema) => [
-            'id' => $cinema->id,
-            'nome' => $cinema->nome,
-        ], Cinema::findAtivos());
     }
 
     public function actionView($id)
@@ -47,6 +45,7 @@ class CinemaController extends Controller
             'email' => $cinema->email,
             'horario' => $cinema->horario,
             'capacidade' => "{$cinema->numeroSalas} Salas • {$cinema->numeroLugares} Lugares",
+            'has_sessoes' => (bool)$cinema->getSessoesAtivas(),
         ];
     }
 

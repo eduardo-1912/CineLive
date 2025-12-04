@@ -6,11 +6,11 @@
     android:orientation="vertical"
     android:gravity="center">
 
-    <LinearLayout style="@style/Container.Main">
+    <LinearLayout style="@style/Container.Main"
+        android:layout_marginBottom="?attr/actionBarSize">
 
         <ImageView
             android:id="@+id/ivIcon"
-            android:src="@drawable/ic_wifi_off"
             android:layout_width="64dp"
             android:layout_height="64dp"
             app:tint="?attr/colorOutline" />
@@ -20,26 +20,15 @@
         <TextView
             android:id="@+id/tvTitulo"
             style="@style/Title"
-            android:textSize="28sp"
-            android:text="@string/erro_internet_titulo" />
+            android:textSize="28sp" />
 
         <TextView
             android:id="@+id/tvSubtitulo"
-            style="@style/Subtitle"
-            android:text="@string/erro_internet_subtitulo" />
+            style="@style/Subtitle" />
 
-        <Button android:id="@+id/btnConfiguracoes"
-            style="@style/Button.Primary"
-            android:visibility="gone"
-            android:text="@string/configuracoes" />
-
-        <Button android:id="@+id/btnReload"
-            style="@style/Button.Primary"
-            android:visibility="gone"
-            android:text="@string/btn_tentar_novamente"/>
+        <Button android:id="@+id/btnAction"
+            style="@style/Button.Primary" />
 
     </LinearLayout>
-
-    <Space style="@style/VerticalSpace.32" />
 
 </LinearLayout>

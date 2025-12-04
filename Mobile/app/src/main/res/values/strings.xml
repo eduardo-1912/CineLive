@@ -17,10 +17,9 @@
     <!-- messages -->
     <string name="msg_eliminar_conta">Tem a certeza de que pretende eliminar a sua conta? Esta ação é irreversível.</string>
     <string name="msg_api_success">Ligação bem sucedida</string>
-    <string name="msg_api_error">Erro ao ligar à API</string>
-    <string name="msg_api_invalid_response">Resposta inválida da API</string>
+    <string name="msg_erro_api">Erro ao ligar à API</string>
 
-    <!-- buttons -->
+    <!-- general buttons -->
     <string name="btn_login">Iniciar Sessão</string>
     <string name="btn_signup">Criar Conta</string>
     <string name="btn_editar_perfil">Editar Perfil</string>
@@ -29,10 +28,9 @@
     <string name="btn_guardar">Guardar</string>
     <string name="btn_restaurar">Restaurar</string>
     <string name="btn_cancelar">Cancelar</string>
-
-    <!-- activity_selecionar_cinema -->
-    <string name="selecionar_cinema_titulo">Selecione um cinema</string>
-    <string name="selecionar_cinema_subtitulo">Pode alterar esta escolha a qualquer momento</string>
+    <string name="btn_tentar_novamente">Tentar novamente</string>
+    <string name="btn_configuracoes_api">Configurações da API</string>
+    <string name="btn_ver_filmes">Ver filmes</string>
 
     <!-- fragment_filmes -->
     <string name="em_exibicao">Em exibição</string>
@@ -67,8 +65,9 @@
     <string name="label_email">Email</string>
     <string name="label_horario">Horário</string>
     <string name="label_capacidade">Capacidade</string>
-    <string name="btn_selecionar_cinema">Selecionar Cinema</string>
-    <string name="btn_cinema_selecionado">Cinema Selecionado</string>
+    <string name="btn_selecionar_cinema">Selecionar cinema</string>
+    <string name="btn_cinema_selecionado">Cinema selecionado</string>
+    <string name="btn_sem_sessoes_ativas">Sem sessões ativas</string>
 
     <!-- fragment_compras -->
     <string name="label_sessao">Sessão</string>
@@ -110,10 +109,16 @@
     <string name="configuracoes_hint_api_host">Host da API</string>
     <string name="configuracoes_hint_api_path">Caminho da API</string>
 
-    <!-- layout_connection_error -->
+    <!-- layout_error -->
     <string name="erro_internet_titulo">Sem ligação à Internet</string>
     <string name="erro_internet_subtitulo">Verifique a sua ligação e tente novamente.</string>
     <string name="erro_api_titulo">Sem ligação à API</string>
-    <string name="btn_tentar_novamente">Tentar novamente</string>
+    <string name="erro_api_subtitulo">Verifique as configurações e tente novamente.</string>
+    <string name="erro_cinema_invalido_titulo">Escolha um cinema</string>
+    <string name="erro_cinema_invalido_subtitulo">Precisa de escolher um cinema para ver filmes.</string>
+    <string name="erro_nenhum_cinema_titulo">Nenhum cinema disponível</string>
+    <string name="erro_nenhum_cinema_subtitulo">Não há cinemas ativos de momento.</string>
+    <string name="erro_nenhuma_compra_titulo">Ainda não tem compras</string>
+    <string name="erro_nenhuma_compra_subtitulo">Veja os filmes em exibição e compre bilhetes</string>
 
 </resources>

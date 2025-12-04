@@ -19,6 +19,11 @@ public class PreferencesManager {
 
     public PreferencesManager(Context context) {
         preferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
+
+        // Se o URL da API for null --> reset
+        if (this.getApiUrl() == null) {
+            this.resetApiUrl();
+        }
     }
 
     public int getCinemaId() {

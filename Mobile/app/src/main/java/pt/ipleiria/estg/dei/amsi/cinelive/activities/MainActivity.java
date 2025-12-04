@@ -67,12 +67,8 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    public void onResume()
-    {
-        super.onResume();
-        if (!ConnectionUtils.hasInternet(this)) {
-            Toast.makeText(this, R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
-        }
+    public void navigateToFragment(int fragment) {
+        binding.bottomNav.setSelectedItemId(fragment);
     }
+
 }

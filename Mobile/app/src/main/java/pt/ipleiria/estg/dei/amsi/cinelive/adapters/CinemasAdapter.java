@@ -18,7 +18,6 @@ public class CinemasAdapter extends RecyclerView.Adapter<CinemasAdapter.ViewHold
     private int cinemaSelecionado;
     private final OnCinemaClickListener listener;
 
-    // Notifica o fragment quando um cinema é escolhido
     public interface OnCinemaClickListener {
         void onCinemaSelected(Cinema cinema);
     }
@@ -53,7 +52,7 @@ public class CinemasAdapter extends RecyclerView.Adapter<CinemasAdapter.ViewHold
         // Ver se este cinema é o selecionado
         boolean isSelected = cinema.getId() == cinemaSelecionado;
 
-        // Preencher campos do layout com os dados do cinema
+        // Preencher layout com os dados do cinema
         holder.binding.tvNome.setText(cinema.getNome());
         holder.binding.tvMorada.setText(cinema.getMorada());
         holder.binding.tvTelefone.setText(cinema.getTelefone());
@@ -61,12 +60,19 @@ public class CinemasAdapter extends RecyclerView.Adapter<CinemasAdapter.ViewHold
         holder.binding.tvHorario.setText(cinema.getHorario());
         holder.binding.tvCapacidade.setText(cinema.getCapacidade());
 
-        // Atualiza estados visuais do botão de selecionar
+        // Estado do botão de selecionar
         holder.binding.btnSelecionar.setChecked(isSelected);
         holder.binding.btnSelecionar.setEnabled(!isSelected);
         holder.binding.btnSelecionar.setText(
             isSelected ? R.string.btn_cinema_selecionado : R.string.btn_selecionar_cinema
         );
+
+        // Não permitir selecionar cinemas sem sessões
+        if (!cinema.hasSessoes()) {
+            holder.binding.btnSelecionar.setEnabled(false);
+            holder.binding.btnSelecionar.setChecked(false);
+            holder.binding.btnSelecionar.setText(R.string.btn_sem_sessoes_ativas);
+        }
 
         // Botão foi clicado --> avisar o fragment
         holder.binding.btnSelecionar.setOnClickListener(v -> {
@@ -85,7 +91,6 @@ public class CinemasAdapter extends RecyclerView.Adapter<CinemasAdapter.ViewHold
     static class ViewHolder extends RecyclerView.ViewHolder {
         ItemCinemaBinding binding;
 
-        // Construtor do ViewHolder
         public ViewHolder(ItemCinemaBinding binding) {
             super(binding.getRoot());
             this.binding = binding;

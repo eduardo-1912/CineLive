@@ -39,9 +39,6 @@
             android:exported="false" />
         <activity
             android:name=".activities.MainActivity"
-            android:exported="true" />
-        <activity
-            android:name=".activities.SelecionarCinemaActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
