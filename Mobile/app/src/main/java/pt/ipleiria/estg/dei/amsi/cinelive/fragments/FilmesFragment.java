@@ -24,7 +24,7 @@ import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.adapters.FilmesAdapter;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.FragmentFilmesBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Filme;
-import pt.ipleiria.estg.dei.amsi.cinelive.utils.NetworkUtils;
+import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -56,7 +56,7 @@ public class FilmesFragment extends Fragment {
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
-        if (NetworkUtils.hasInternet(requireContext())) {
+        if (ConnectionUtils.hasInternet(requireContext())) {
             inflater.inflate(R.menu.menu_pesquisa, menu);
 
             try {
@@ -88,7 +88,7 @@ public class FilmesFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
-        if (!NetworkUtils.hasInternet(requireContext())) {
+        if (!ConnectionUtils.hasInternet(requireContext())) {
             binding.viewFlipper.setDisplayedChild(1);
             return;
         }

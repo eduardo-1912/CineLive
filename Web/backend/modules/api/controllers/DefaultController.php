@@ -10,6 +10,7 @@ class DefaultController extends Controller
     {
         return [
             'status' => 'success',
+            'time' => time(),
             'message' => 'CineLive API',
         ];
     }

@@ -21,7 +21,7 @@ import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityComprarBilhetesBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ItemLugarBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Sessao;
-import pt.ipleiria.estg.dei.amsi.cinelive.utils.NetworkUtils;
+import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
 
 public class ComprarBilhetesActivity extends AppCompatActivity {
 
@@ -155,7 +155,7 @@ public class ComprarBilhetesActivity extends AppCompatActivity {
     public void onResume()
     {
         super.onResume();
-        if (!NetworkUtils.hasInternet(this)) {
+        if (!ConnectionUtils.hasInternet(this)) {
             Toast.makeText(this, R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
         }
     }

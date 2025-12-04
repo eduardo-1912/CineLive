@@ -15,14 +15,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import pt.ipleiria.estg.dei.amsi.cinelive.activities.ConfiguracoesActivity;
 import pt.ipleiria.estg.dei.amsi.cinelive.activities.EditarPerfilActivity;
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.FragmentPerfilBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.managers.AuthManager;
-import pt.ipleiria.estg.dei.amsi.cinelive.utils.NetworkUtils;
+import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -46,7 +45,7 @@ public class PerfilFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (NetworkUtils.hasInternet(requireContext())) {
+        if (ConnectionUtils.hasInternet(requireContext())) {
             inflater.inflate(R.menu.menu_configuracoes, menu);
             super.onCreateOptionsMenu(menu, inflater);
         }
@@ -67,7 +66,7 @@ public class PerfilFragment extends Fragment {
 
         binding.form.tilPassword.setVisibility(GONE);
 
-        if (!NetworkUtils.hasInternet(requireContext())) {
+        if (!ConnectionUtils.hasInternet(requireContext())) {
             binding.btnEditarPerfil.setVisibility(GONE);
             binding.btnEliminarConta.setVisibility(GONE);
         }
@@ -92,7 +91,7 @@ public class PerfilFragment extends Fragment {
         binding.btnEliminarConta.setOnClickListener(v -> {
             new com.google.android.material.dialog.MaterialAlertDialogBuilder(v.getContext())
                 .setTitle(R.string.btn_eliminar_conta)
-                .setMessage(R.string.message_eliminar_conta)
+                .setMessage(R.string.msg_eliminar_conta)
                 .setPositiveButton(R.string.btn_eliminar_conta, (dialog, which) -> {
                     AuthManager.deleteAccount();
                 }).setNegativeButton(R.string.btn_cancelar, null).show();

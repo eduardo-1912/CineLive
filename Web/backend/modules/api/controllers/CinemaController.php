@@ -25,7 +25,10 @@ class CinemaController extends Controller
 
     public function actionList()
     {
-        return Cinema::findAtivosList();
+        return array_map(fn($cinema) => [
+            'id' => $cinema->id,
+            'nome' => $cinema->nome,
+        ], Cinema::findAtivos());
     }
 
     public function actionView($id)

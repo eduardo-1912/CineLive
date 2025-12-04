@@ -13,7 +13,7 @@ public class PreferencesManager {
     private static final String ACCESS_TOKEN = "access_token";
 
     private static final String DEFAULT_API_HOST = "http://172.22.21.212";
-    private static final String DEFAULT_API_PATH = "/CineLive/Web/backend/web/api/";
+    private static final String DEFAULT_API_PATH = "/CineLive/Web/backend/web/api";
     private static final String API_HOST = "api_host";
     private static final String API_PATH = "api_path";
 
@@ -22,6 +22,7 @@ public class PreferencesManager {
     }
 
     public int getCinemaId() {
+
         return preferences.getInt(CINEMA_ID, -1);
     }
 
@@ -57,8 +58,10 @@ public class PreferencesManager {
         preferences.edit().putString(API_PATH, apiPath).apply();
     }
 
-    public void resetApiUrl() {
+    public String resetApiUrl() {
         preferences.edit().putString(API_HOST, DEFAULT_API_HOST).apply();
         preferences.edit().putString(API_PATH, DEFAULT_API_PATH).apply();
+
+        return this.getApiUrl();
     }
 }

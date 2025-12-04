@@ -11,25 +11,41 @@
     <!-- Toolbar -->
     <include android:id="@+id/toolbar" layout="@layout/toolbar" />
 
-    <!-- Container -->
-    <LinearLayout style="@style/Container.Main">
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
 
-        <!-- Título -->
-        <TextView
-            style="@style/Title"
-            android:text="@string/selecionar_cinema_titulo" />
-
-        <!-- Subtítulo -->
-        <TextView
-            style="@style/Subtitle"
-            android:text="@string/selecionar_cinema_subtitulo" />
-
-        <!-- Lista de Cinemas -->
-        <ListView
-            android:id="@+id/lvCinemas"
+        <ViewFlipper
+            android:id="@+id/viewFlipper"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="match_parent">
 
-    </LinearLayout>
+            <!-- Container -->
+            <LinearLayout style="@style/Container.Main">
+
+                <!-- Título -->
+                <TextView
+                    style="@style/Title"
+                    android:text="@string/selecionar_cinema_titulo" />
+
+                <!-- Subtítulo -->
+                <TextView
+                    style="@style/Subtitle"
+                    android:text="@string/selecionar_cinema_subtitulo" />
+
+                <!-- Lista de Cinemas -->
+                <ListView
+                    android:id="@+id/lvCinemas"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+            <include layout="@layout/layout_connection_error" android:id="@+id/error" />
+
+        </ViewFlipper>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </LinearLayout>

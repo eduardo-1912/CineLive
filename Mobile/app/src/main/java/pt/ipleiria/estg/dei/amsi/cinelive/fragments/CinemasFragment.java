@@ -10,17 +10,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import java.util.Arrays;
 import java.util.List;
 
-import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.managers.PreferencesManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.adapters.CinemasAdapter;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.FragmentCinemasBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Cinema;
-import pt.ipleiria.estg.dei.amsi.cinelive.utils.NetworkUtils;
 
 /**
  * A simple {@link Fragment} subclass.

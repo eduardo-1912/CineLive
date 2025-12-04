@@ -9,22 +9,37 @@
     <LinearLayout style="@style/Container.Main">
 
         <ImageView
+            android:id="@+id/ivIcon"
             android:src="@drawable/ic_wifi_off"
             android:layout_width="64dp"
             android:layout_height="64dp"
             app:tint="?attr/colorOutline" />
 
-        <Space style="@style/VerticalSpace.20" />
+        <Space style="@style/VerticalSpace.24" />
 
         <TextView
+            android:id="@+id/tvTitulo"
             style="@style/Title"
             android:textSize="28sp"
             android:text="@string/erro_internet_titulo" />
 
         <TextView
+            android:id="@+id/tvSubtitulo"
             style="@style/Subtitle"
             android:text="@string/erro_internet_subtitulo" />
 
+        <Button android:id="@+id/btnConfiguracoes"
+            style="@style/Button.Primary"
+            android:visibility="gone"
+            android:text="@string/configuracoes" />
+
+        <Button android:id="@+id/btnReload"
+            style="@style/Button.Primary"
+            android:visibility="gone"
+            android:text="@string/btn_tentar_novamente"/>
+
     </LinearLayout>
+
+    <Space style="@style/VerticalSpace.32" />
 
 </LinearLayout>

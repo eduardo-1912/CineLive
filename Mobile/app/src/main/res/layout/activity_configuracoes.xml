@@ -62,6 +62,30 @@
             style="@style/Button.Text"
             android:text="@string/btn_restaurar" />
 
+        <Space style="@style/VerticalSpace.24" />
+
+        <!-- Progress Bar -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_gravity="center"
+            style="?android:attr/progressBarStyleLarge" />
+
+        <!-- Resposta da API -->
+        <TextView
+            android:id="@+id/tvApiResponse"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:textColor="@color/black"
+            android:textIsSelectable="true"
+            android:fontFamily="monospace"
+            android:background="@drawable/container_shape_medium"
+            android:textSize="16sp"
+            android:visibility="gone"/>
+
     </LinearLayout>
 
 </LinearLayout>

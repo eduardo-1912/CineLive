@@ -50,6 +50,8 @@ dependencies {
     implementation(libs.material)
     implementation(libs.navigation.fragment)
     implementation(libs.androidx.navigation.ui)
+    implementation(libs.androidx.swiperefreshlayout)
+
 
     implementation(libs.glide)
     implementation (libs.volley)

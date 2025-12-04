@@ -12,7 +12,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityMainBinding;
-import pt.ipleiria.estg.dei.amsi.cinelive.utils.NetworkUtils;
+import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
     public void onResume()
     {
         super.onResume();
-        if (!NetworkUtils.hasInternet(this)) {
+        if (!ConnectionUtils.hasInternet(this)) {
             Toast.makeText(this, R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
         }
     }

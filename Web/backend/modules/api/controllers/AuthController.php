@@ -55,6 +55,7 @@ class AuthController extends Controller
         }
 
         return [
+            'status' => 'success',
             'access-token' => $user->auth_key,
             'user' => [
                 'id' => $user->id,

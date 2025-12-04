@@ -2,7 +2,6 @@ package pt.ipleiria.estg.dei.amsi.cinelive.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,7 +18,6 @@ import pt.ipleiria.estg.dei.amsi.cinelive.adapters.BilhetesAdapter;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityDetalhesCompraBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Bilhete;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Compra;
-import pt.ipleiria.estg.dei.amsi.cinelive.utils.NetworkUtils;
 
 public class DetalhesCompraActivity extends AppCompatActivity {
 
@@ -61,10 +59,10 @@ public class DetalhesCompraActivity extends AppCompatActivity {
         binding.tvHoraFimSessao.setText(compra.getHoraFimSessao());
 
         List<Bilhete> bilhetes = Arrays.asList(
-            new Bilhete(1, "A54FWF", "A5", "8.00€", "Pendente"),
-            new Bilhete(2, "B56GFS", "A6", "8.00€", "Confirmado"),
-            new Bilhete(3, "ZFDS3D", "A7", "8.00€", "Cancelado"),
-            new Bilhete(4, "ZFDS3D", "A7", "8.00€", "Pendente")
+            new Bilhete(1, 1, "A54FWF", "A5", "8.00€", "Pendente"),
+            new Bilhete(2, 1, "B56GFS", "A6", "8.00€", "Confirmado"),
+            new Bilhete(3, 1, "ZFDS3D", "A7", "8.00€", "Cancelado"),
+            new Bilhete(4, 1, "ZFDS3D", "A7", "8.00€", "Pendente")
         );
 
         adapter = new BilhetesAdapter(bilhetes);

@@ -4,7 +4,6 @@ import static android.view.View.GONE;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,7 +13,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityLoginBinding;
-import pt.ipleiria.estg.dei.amsi.cinelive.utils.NetworkUtils;
+import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -55,7 +54,7 @@ public class LoginActivity extends AppCompatActivity {
     public void onResume()
     {
         super.onResume();
-        if (!NetworkUtils.hasInternet(this)) {
+        if (!ConnectionUtils.hasInternet(this)) {
             finish();
         }
     }

@@ -67,7 +67,7 @@
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
 
-        <include layout="@layout/layout_erro_internet" />
+        <include layout="@layout/layout_connection_error" />
 
     </ViewFlipper>
 

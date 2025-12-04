@@ -6,7 +6,6 @@ use common\helpers\Formatter;
 use common\models\Bilhete;
 use common\models\Compra;
 use common\models\Sessao;
-use Throwable;
 use Yii;
 use yii\filters\auth\CompositeAuth;
 use yii\filters\auth\HttpBearerAuth;
@@ -15,7 +14,6 @@ use yii\rest\Controller;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
-use yii\web\ServerErrorHttpException;
 
 class CompraController extends Controller
 {
@@ -46,12 +44,13 @@ class CompraController extends Controller
             'total' => Formatter::preco($compra->total),
             'estado' => $compra->displayEstado(),
             'filme_id' => $compra->sessao->filme_id,
-            'filme_nome' => $compra->sessao->filme->titulo,
+            'filme_titulo' => $compra->sessao->filme->titulo,
             'cinema_id' => $compra->sessao->cinema_id,
             'cinema_nome' => $compra->sessao->cinema->nome,
             'sessao_id' => $compra->sessao->id,
             'sessao_data' => Formatter::data($compra->sessao->data),
             'sessao_hora_inicio' => Formatter::hora($compra->sessao->hora_inicio),
+            'lugares' => $compra->lugares,
         ], $compras);
     }
 
@@ -77,7 +76,8 @@ class CompraController extends Controller
             'sala_nome' => $compra->sessao->sala->nome,
             'sessao_id' => $compra->sessao->id,
             'sessao_data' => Formatter::data($compra->sessao->data),
-            'sessao_horario' => $compra->sessao->horario,
+            'sessao_hora_inicio' => Formatter::hora($compra->sessao->horario),
+            'sessao_hora_fim' => Formatter::hora($compra->sessao->horario),
             'bilhetes' => array_map(fn($bilhete) => [
                 'id' => $bilhete->id,
                 'lugar' => $bilhete->lugar,
