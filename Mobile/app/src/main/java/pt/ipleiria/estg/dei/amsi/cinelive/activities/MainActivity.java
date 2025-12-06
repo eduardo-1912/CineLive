@@ -2,7 +2,6 @@ package pt.ipleiria.estg.dei.amsi.cinelive.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
@@ -12,13 +11,14 @@ import androidx.navigation.ui.NavigationUI;
 
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityMainBinding;
-import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
+import pt.ipleiria.estg.dei.amsi.cinelive.managers.AuthManager;
 
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
     private NavHostFragment navHostFragment;
     private NavController navController;
+    private AuthManager authManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,32 +43,37 @@ public class MainActivity extends AppCompatActivity {
         // BottomNavigation ligado ao NavController
         NavigationUI.setupWithNavController(binding.bottomNav, navController);
 
-        boolean isLoggedIn = true; // TODO: depois substituir por SharedPreferences/token
+        // Obter o auth manager
+        authManager = AuthManager.getInstance();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        boolean isLoggedIn = authManager.isLoggedIn(this);
 
         // Mostrar 'Entrar' ou 'Perfil'
         binding.bottomNav.getMenu().findItem(R.id.navPerfil).setTitle(isLoggedIn ? R.string.nav_perfil : R.string.nav_entrar);
 
-        // Mostrar 'Compras' se estiver logged in
+        // Mostrar 'Compras' se tiver compras
         binding.bottomNav.getMenu().findItem(R.id.navCompras).setVisible(isLoggedIn);
 
+        // Se não tiver sessão iniciada --> encaminhar para LoginActivity
         binding.bottomNav.setOnItemSelectedListener(item -> {
-
-            if (item.getItemId() == R.id.navPerfil) {
-                if (!isLoggedIn) {
-                    // Redirecionar para LoginActivity
-                    startActivity(new Intent(this, LoginActivity.class));
-                    return false;
-                }
+            if (item.getItemId() == R.id.navPerfil && !isLoggedIn) {
+                startActivity(new Intent(this, LoginActivity.class));
+                return false;
             }
 
             // Comportamento normal do NavigationUI
             NavigationUI.onNavDestinationSelected(item, navController);
             return true;
         });
+
     }
 
     public void navigateToFragment(int fragment) {
         binding.bottomNav.setSelectedItemId(fragment);
     }
-
 }

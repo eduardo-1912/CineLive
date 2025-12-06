@@ -29,18 +29,23 @@ public class CinemasManager {
         return instance;
     }
 
+    public List<Cinema> getCinemas() {
+        return cinemas;
+    }
+
     public void clearCache() {
         cinemas.clear();
     }
 
     public void fetchCinemas(Context context, CinemaListener listener) {
-        String url = ApiRoutes.cinemas(new PreferencesManager(context).getApiUrl());
-
         // Se tiver cache --> evitar pedido à API
         if (!cinemas.isEmpty()) {
             listener.onSuccess(cinemas);
             return;
         }
+
+        // Obter o URL
+        String url = ApiRoutes.cinemas(new PreferencesManager(context).getApiUrl());
 
         JsonArrayRequest request = new JsonArrayRequest(
             Request.Method.GET, url, null, response -> {
@@ -70,7 +75,6 @@ public class CinemasManager {
                     }
                 }
 
-                // Chamar o listener
                 listener.onSuccess(cinemas);
             },
             error -> listener.onError()

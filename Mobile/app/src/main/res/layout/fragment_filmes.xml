@@ -8,28 +8,27 @@
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefresh" style="@style/VerticalLayout.Full">
 
-        <ViewFlipper android:id="@+id/viewFlipper" style="@style/VerticalLayout.Full">
+        <ViewFlipper android:id="@+id/mainFlipper" style="@style/VerticalLayout.Full">
 
-            <!-- Loading -->
-            <include android:id="@+id/loading" layout="@layout/layout_loading" />
+            <!-- Main Loading -->
+            <include layout="@layout/layout_loading" />
 
-            <!-- Error -->
-            <include android:id="@+id/error" layout="@layout/layout_error" />
+            <!-- Main Error -->
+            <include android:id="@+id/mainError" layout="@layout/layout_error" />
 
-            <!-- Main -->
-            <androidx.core.widget.NestedScrollView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:fillViewport="true">
+            <!-- Main Content -->
+            <androidx.core.widget.NestedScrollView style="@style/VerticalLayout.Full"
+                android:scrollbars="vertical">
 
+                <!-- Filmes -->
                 <LinearLayout style="@style/VerticalLayout">
 
-                    <!-- Filter toggle -->
+                    <!-- Filter Toggle Group -->
                     <LinearLayout style="@style/Container.ForList">
                         <com.google.android.material.button.MaterialButtonToggleGroup
                             android:id="@+id/toggleGroup"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
+                            style="@style/HorizontalLayout.Full"
+                            app:checkedButton="@id/btnEmExibicao"
                             app:singleSelection="true">
 
                             <com.google.android.material.button.MaterialButton
@@ -52,19 +51,25 @@
                         </com.google.android.material.button.MaterialButtonToggleGroup>
                     </LinearLayout>
 
-                    <Space style="@style/VerticalSpace.8" />
+                    <ViewFlipper android:id="@+id/filmesFlipper" style="@style/VerticalLayout">
 
-                    <!-- Filmes -->
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rvFilmes"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:nestedScrollingEnabled="false"
-                        android:overScrollMode="never"
-                        android:clipToPadding="false"
-                        android:paddingHorizontal="18dp"
-                        android:paddingBottom="@dimen/list_padding_bottom"
-                        tools:listitem="@layout/item_filme" />
+                        <!-- Filmes Loading -->
+                        <include layout="@layout/layout_loading"
+                            android:layout_width="match_parent" android:layout_height="600dp" />
+
+                        <!-- Filmes Error -->
+                        <include android:id="@+id/errorFilmes" layout="@layout/layout_error" />
+
+                        <!-- Filmes Content -->
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rvFilmes"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:paddingHorizontal="18dp"
+                            android:paddingBottom="@dimen/list_padding_bottom"
+                            tools:listitem="@layout/item_filme" />
+
+                    </ViewFlipper>
 
                 </LinearLayout>
 

@@ -4,6 +4,7 @@ import static android.view.View.GONE;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,11 +14,14 @@ import androidx.core.view.WindowInsetsCompat;
 
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityLoginBinding;
+import pt.ipleiria.estg.dei.amsi.cinelive.listeners.LoginListener;
+import pt.ipleiria.estg.dei.amsi.cinelive.managers.AuthManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
 
 public class LoginActivity extends AppCompatActivity {
 
-    ActivityLoginBinding binding;
+    private ActivityLoginBinding binding;
+    private AuthManager authManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +44,24 @@ public class LoginActivity extends AppCompatActivity {
         binding.form.tilNome.setVisibility(GONE);
         binding.form.tilTelemovel.setVisibility(GONE);
 
+        authManager = AuthManager.getInstance();
+
         binding.btnLogin.setOnClickListener(v -> {
-            // TODO: DO LOGIN
+
+            String username = String.valueOf(binding.form.etUsername.getText());
+            String password = String.valueOf(binding.form.etPassword.getText());
+
+            authManager.login(this, username, password, new LoginListener() {
+                @Override
+                public void onSuccess() {
+                    finish();
+                }
+
+                @Override
+                public void onError() {
+                    Toast.makeText(LoginActivity.this, "erro", Toast.LENGTH_SHORT).show();
+                }
+            });
         });
 
         binding.btnSignup.setOnClickListener(v -> {

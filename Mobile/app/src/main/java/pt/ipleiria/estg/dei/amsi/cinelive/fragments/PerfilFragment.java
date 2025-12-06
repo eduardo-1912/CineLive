@@ -1,7 +1,5 @@
 package pt.ipleiria.estg.dei.amsi.cinelive.fragments;
 
-import static android.view.View.GONE;
-
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -19,28 +17,28 @@ import android.view.ViewGroup;
 import pt.ipleiria.estg.dei.amsi.cinelive.activities.ConfiguracoesActivity;
 import pt.ipleiria.estg.dei.amsi.cinelive.activities.EditarPerfilActivity;
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
+import pt.ipleiria.estg.dei.amsi.cinelive.activities.MainActivity;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.FragmentPerfilBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.managers.AuthManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link PerfilFragment} factory method to
- * create an instance of this fragment.
- */
 public class PerfilFragment extends Fragment {
     private FragmentPerfilBinding binding;
+    private AuthManager authManager;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+
+        // Obter o auth manager
+        authManager = AuthManager.getInstance();
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentPerfilBinding.inflate(inflater, container, false);
         return binding.getRoot();
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
     }
 
     @Override
@@ -64,11 +62,11 @@ public class PerfilFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
-        binding.form.tilPassword.setVisibility(GONE);
+        binding.form.tilPassword.setVisibility(View.GONE);
 
         if (!ConnectionUtils.hasInternet(requireContext())) {
-            binding.btnEditarPerfil.setVisibility(GONE);
-            binding.btnEliminarConta.setVisibility(GONE);
+            binding.btnEditarPerfil.setVisibility(View.GONE);
+            binding.btnEliminarConta.setVisibility(View.GONE);
         }
 
         // TODO: CHANGE THIS
@@ -97,6 +95,11 @@ public class PerfilFragment extends Fragment {
                 }).setNegativeButton(R.string.btn_cancelar, null).show();
         });
 
+        binding.btnLogout.setOnClickListener(v -> {
+            authManager.logout(requireContext());
+            ((MainActivity)requireActivity()).navigateToFragment(R.id.navFilmes);
+            //((MainActivity)requireActivity()).onResume();
+        });
     }
 
     @Override

@@ -20,11 +20,12 @@ public class FilmesManager {
     private static FilmesManager instance = null;
     private static RequestQueue queue;
 
-    public enum Filter {ALL, EM_EXIBICAO, KIDS, BREVEMENTE};
+    public enum Filter {EM_EXIBICAO, KIDS, BREVEMENTE};
+    private List<Filme> exibicao = new ArrayList<>();
+    private List<Filme> kids = new ArrayList<>();
+    private List<Filme> brevemente = new ArrayList<>();
 
-    private List<Filme> filmesEmExibicao = new ArrayList<>();
-    private List<Filme> filmesKids = new ArrayList<>();
-    private List<Filme> filmesBrevemente = new ArrayList<>();
+    List<Filme> filmes; // Cache
 
     public static synchronized FilmesManager getInstance() {
         if (instance == null) {
@@ -34,49 +35,73 @@ public class FilmesManager {
         return instance;
     }
 
-    public List<Filme> getFilmesEmExibicao() {
-        return filmesEmExibicao;
+    public List<Filme> getFilmes(Filter filter) {
+        if (filter == Filter.KIDS) return kids;
+        else if (filter == Filter.BREVEMENTE) return brevemente;
+        else return exibicao;
     }
 
-    public void getFilmesEmExibicao(Context context, FilmeListener listener) {
-        if (!filmesEmExibicao.isEmpty()) {
-            listener.onFilmesLoaded(filmesEmExibicao);
+    public void clearCache() {
+        exibicao.clear();
+        kids.clear();
+        brevemente.clear();
+    }
+
+    public void fetchFilmes(Context context, Filter filter, FilmeListener listener) {
+
+        // Obter a lista
+        if (filter == Filter.KIDS) filmes = kids;
+        else if (filter == Filter.BREVEMENTE) filmes = brevemente;
+        else filmes = exibicao;
+
+        // Se tiver cache --> evitar pedido à API
+        if (!filmes.isEmpty()) {
+            listener.onSuccess(filmes);
             return;
         }
 
+        // Obter URL
         PreferencesManager preferences = new PreferencesManager(context);
+        String apiUrl = preferences.getApiUrl();
+        int cinemaId = preferences.getCinemaId();
+        String url;
 
-        String url = preferences.getApiUrl() + ApiRoutes.FILMES_EM_EXIBICAO  + preferences.getCinemaId();
+        if (filter == Filter.BREVEMENTE) url = ApiRoutes.filmesBrevemente(apiUrl);
+        else if (filter == Filter.KIDS) url = ApiRoutes.filmesKids(apiUrl, cinemaId);
+        else url = ApiRoutes.filmesEmExibicao(apiUrl, cinemaId);
 
         JsonArrayRequest request = new JsonArrayRequest(
             Request.Method.GET, url, null, response -> {
-                filmesEmExibicao.clear();
+                // Limpar lista
+                filmes.clear();
 
-                if (response.length() == 0) {
+                // O cinema escolhido não tem sessões
+                if (filter != Filter.BREVEMENTE && response.length() == 0) {
                     listener.onInvalidCinema();
                     return;
                 }
 
+                // Obter filmes
                 for (int i = 0; i < response.length(); i++) {
                     JSONObject obj = response.optJSONObject(i);
                     if (obj != null) {
-                        filmesEmExibicao.add(new Filme(
+                        filmes.add(new Filme(
                             obj.optInt("id"),
                             obj.optString("titulo"),
                             obj.optString("poster_url")
                         ));
                     }
                 }
-                listener.onFilmesLoaded(filmesEmExibicao);
+
+                listener.onSuccess(filmes);
             },
             error -> {
-                int status = error.networkResponse != null ? error.networkResponse.statusCode : -1;
-
-                if (status == 404) {
-                    listener.onInvalidCinema();
-                } else {
-                    listener.onError();
+                if (filter != Filter.BREVEMENTE && error.networkResponse != null) {
+                    // O cinema não existe
+                    if (error.networkResponse.statusCode == 404) listener.onInvalidCinema();
                 }
+
+                else listener.onError();
             }
         );
         Volley.newRequestQueue(context).add(request);

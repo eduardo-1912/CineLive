@@ -9,13 +9,13 @@ public class PreferencesManager {
 
     private static final String PREFERENCES_NAME = "UserPreferences";
 
-    private static final String CINEMA_ID = "cinema_id";
-    private static final String ACCESS_TOKEN = "access_token";
+    private static final String CINEMA_ID = "cinemaId";
+    private static final String TOKEN = "token";
 
     private static final String DEFAULT_API_HOST = "http://172.22.21.212";
     private static final String DEFAULT_API_PATH = "/CineLive/Web/backend/web/api";
-    private static final String API_HOST = "api_host";
-    private static final String API_PATH = "api_path";
+    private static final String API_HOST = "apiHost";
+    private static final String API_PATH = "apiPath";
 
     public PreferencesManager(Context context) {
         preferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
@@ -24,23 +24,6 @@ public class PreferencesManager {
         if (this.getApiUrl() == null) {
             this.resetApiUrl();
         }
-    }
-
-    public int getCinemaId() {
-
-        return preferences.getInt(CINEMA_ID, -1);
-    }
-
-    public void setCinemaId(int id) {
-        preferences.edit().putInt(CINEMA_ID, id).apply();
-    }
-
-    public String getAccessToken() {
-        return preferences.getString(ACCESS_TOKEN, null);
-    }
-
-    public void setAccessToken(String accessToken) {
-        preferences.edit().putString(ACCESS_TOKEN, accessToken).apply();
     }
 
     public String getApiHost() {
@@ -55,6 +38,7 @@ public class PreferencesManager {
         if (getApiHost() != null && getApiPath() != null) {
             return getApiHost() + getApiPath();
         }
+
         return null;
     }
 
@@ -63,10 +47,29 @@ public class PreferencesManager {
         preferences.edit().putString(API_PATH, apiPath).apply();
     }
 
-    public String resetApiUrl() {
+    public void resetApiUrl() {
         preferences.edit().putString(API_HOST, DEFAULT_API_HOST).apply();
         preferences.edit().putString(API_PATH, DEFAULT_API_PATH).apply();
+    }
 
-        return this.getApiUrl();
+    public int getCinemaId() {
+
+        return preferences.getInt(CINEMA_ID, -1);
+    }
+
+    public void setCinemaId(int id) {
+        preferences.edit().putInt(CINEMA_ID, id).apply();
+    }
+
+    public String getToken() {
+        return preferences.getString(TOKEN, null);
+    }
+
+    public void setToken(String token) {
+        preferences.edit().putString(TOKEN, token).apply();
+    }
+
+    public void deleteToken() {
+        preferences.edit().remove(TOKEN).apply();
     }
 }

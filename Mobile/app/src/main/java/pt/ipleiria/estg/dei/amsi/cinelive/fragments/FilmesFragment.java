@@ -27,45 +27,33 @@ import pt.ipleiria.estg.dei.amsi.cinelive.adapters.FilmesAdapter;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.FragmentFilmesBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.FilmeListener;
 import pt.ipleiria.estg.dei.amsi.cinelive.managers.FilmesManager;
-import pt.ipleiria.estg.dei.amsi.cinelive.managers.PreferencesManager;
+import pt.ipleiria.estg.dei.amsi.cinelive.managers.FilmesManager.Filter;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Filme;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorPage;
+import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorPage.Type;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link FilmesFragment} factory method to
- * create an instance of this fragment.
- */
 public class FilmesFragment extends Fragment {
     private FragmentFilmesBinding binding;
     private FilmesManager filmesManager;
     private FilmesAdapter adapter;
     private SearchView searchView;
-
-    private boolean isFilmesLoaded;
-
-    private List<Filme> filmesEmExibicao;
-    private List<Filme> filmesKids;
-    private List<Filme> filmesBrevemente;
-
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        binding = FragmentFilmesBinding.inflate(inflater, container, false);
-
-        // Swipe refresh
-        binding.swipeRefresh.setOnRefreshListener(() -> {
-            binding.swipeRefresh.setRefreshing(false);
-            load();
-        });
-
-        return binding.getRoot();
-    }
+    private Filter filter = Filter.EM_EXIBICAO;
+    private boolean hasFilmes = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        // Obter o manager
+        filmesManager = FilmesManager.getInstance();
+    }
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        binding = FragmentFilmesBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
@@ -75,8 +63,7 @@ public class FilmesFragment extends Fragment {
         inflater.inflate(R.menu.menu_pesquisa, menu);
         MenuItem itemPesquisa = menu.findItem(R.id.itemPesquisa);
 
-        // Apenas mostrar item pesquisa se tiver filmes carregados
-        itemPesquisa.setVisible(isFilmesLoaded);
+        itemPesquisa.setVisible(hasFilmes);
 
         // Obter SearchView
         searchView = (SearchView) itemPesquisa.getActionView();
@@ -85,12 +72,18 @@ public class FilmesFragment extends Fragment {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                adapter.filtrar(query);
+                if (adapter != null) adapter.search(query);
                 return true;
             }
             @Override
             public boolean onQueryTextChange(String query) {
-                adapter.filtrar(query);
+                if (adapter != null) {
+                    adapter.search(query);
+
+                    if (adapter.getItemCount() == 0) showErrorFilmes(Type.NENHUM_FILME);
+                    else binding.filmesFlipper.setDisplayedChild(2); // Filmes Content
+                }
+
                 return true;
             }
         });
@@ -98,105 +91,115 @@ public class FilmesFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        binding.mainFlipper.setDisplayedChild(0); // Main Loading
+
+        // Configurar layout da recycler-view
         binding.rvFilmes.setLayoutManager(new GridLayoutManager(getContext(), 3));
-        binding.btnEmExibicao.setChecked(true);
 
-        View.OnClickListener filterClickListener = v -> {
-            binding.btnEmExibicao.setChecked(v.getId() == R.id.btnEmExibicao);
-            binding.btnKids.setChecked(v.getId() == R.id.btnKids);
-            binding.btnBrevemente.setChecked(v.getId() == R.id.btnBrevemente);
+        // Carregar filmes
+        loadFilmes(filter);
 
-            if (v.getId() == R.id.btnEmExibicao) {
-                atualizarLista(filmesEmExibicao);
-            }
-            else if (v.getId() == R.id.btnKids) {
-                atualizarLista(filmesKids);
-            }
-            else if (v.getId() == R.id.btnBrevemente) {
-                atualizarLista(filmesBrevemente);
-            }
-        };
+        // Swipe refresh
+        binding.swipeRefresh.setOnRefreshListener(() -> {
+            binding.swipeRefresh.setRefreshing(false);
 
-        binding.btnEmExibicao.setOnClickListener(filterClickListener);
-        binding.btnKids.setOnClickListener(filterClickListener);
-        binding.btnBrevemente.setOnClickListener(filterClickListener);
+            // Apenas limpar a cache de filmes se tiver internet
+            if (ConnectionUtils.hasInternet(requireContext())) filmesManager.clearCache();
 
-        filmesManager = FilmesManager.getInstance();
-
-        load();
+            // Carregar filmes
+            loadFilmes(filter);
+        });
     }
 
-    private void load() {
-        binding.viewFlipper.setDisplayedChild(0); // Loading
+    private void loadFilmes(Filter filter) {
+        binding.filmesFlipper.setDisplayedChild(0); // Filmes Loading
 
-        // Verificar se tem internet
-        if (!ConnectionUtils.hasInternet(requireContext())) {
-            // Se não tiver filmes carregados --> mostrar erro
-            if (filmesManager.getFilmesEmExibicao().isEmpty()) {
-                showError(ErrorPage.Type.INTERNET);
-                return;
-            }
-
-            // Se tiver filmes carregados --> mostrar lista em cache
-            Toast.makeText(requireActivity(), R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
-            filmesEmExibicao = filmesManager.getFilmesEmExibicao();
-            atualizarLista(filmesEmExibicao);
-            return;
-        }
-
-        // Verificar se tem cinema selecionado
-        if (new PreferencesManager(requireContext()).getCinemaId() == -1) {
-            showError(ErrorPage.Type.CINEMA_INVALIDO);
-            return;
-        }
+        // Obter estado da ligação à internet
+        boolean hasInternet = ConnectionUtils.hasInternet(requireContext());
 
         // Obter filmes da API
-        filmesManager.getFilmesEmExibicao(requireContext(), new FilmeListener() {
+        filmesManager.fetchFilmes(requireContext(), filter, new FilmeListener() {
             @Override
-            public void onFilmesLoaded(List<Filme> filmes) {
-                isFilmesLoaded = true;
-                requireActivity().invalidateOptionsMenu();
-                filmesEmExibicao = filmes;
-                atualizarLista(filmesEmExibicao);
+            public void onSuccess(List<Filme> filmes) {
+                setList(filmes);
+
+                // Tem cache mas não tem internet
+                if (!hasInternet) {
+                    Toast.makeText(requireActivity(), R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
+                }
             }
             @Override
             public void onInvalidCinema() {
-                showError(ErrorPage.Type.CINEMA_INVALIDO);
+                showError(Type.CINEMA_INVALIDO);
             }
             @Override
             public void onError() {
-                showError(ErrorPage.Type.API);
+                showError(hasInternet ? Type.API : Type.INTERNET);
+                filmesManager.clearCache();
             }
         });
     }
 
-    private void atualizarLista(List<Filme> lista) {
+    private void setList(List<Filme> filmes) {
+        // Evitar crash ao sair do fragment
         if (binding == null || !isAdded()) return;
 
-        binding.viewFlipper.setDisplayedChild(2); // Main
+        binding.mainFlipper.setDisplayedChild(2); // Main Content
+        binding.filmesFlipper.setDisplayedChild(2); // Filmes Content
 
-        adapter = new FilmesAdapter(lista, filme -> {
+        // Clicou num filme --> abrir detalhes
+        adapter = new FilmesAdapter(filmes, filme -> {
             Intent intent = new Intent(getActivity(), DetalhesFilmeActivity.class);
-            intent.putExtra("filme_id", filme.getId());
+            intent.putExtra("filmeId", filme.getId());
             startActivity(intent);
         });
 
         binding.rvFilmes.setAdapter(adapter);
 
+        // Mostrar item de pesquisa
+        showItemPesquisa(true);
+
+        // Pesquisa
         if (searchView != null) {
-            adapter.filtrar(searchView.getQuery().toString());
+            adapter.search(searchView.getQuery().toString());
         }
+
+        View.OnClickListener filterClickListener = v -> {
+            // Limpar pesquisa
+            clearSearch();
+
+            binding.btnEmExibicao.setChecked(v.getId() == R.id.btnEmExibicao);
+            binding.btnKids.setChecked(v.getId() == R.id.btnKids);
+            binding.btnBrevemente.setChecked(v.getId() == R.id.btnBrevemente);
+
+            if (v.getId() == R.id.btnEmExibicao) filter = Filter.EM_EXIBICAO;
+            else if (v.getId() == R.id.btnKids) filter = Filter.KIDS;
+            else if (v.getId() == R.id.btnBrevemente) filter = Filter.BREVEMENTE;
+
+            // Carregar filmes
+            loadFilmes(filter);
+        };
+
+        binding.btnEmExibicao.setOnClickListener(filterClickListener);
+        binding.btnKids.setOnClickListener(filterClickListener);
+        binding.btnBrevemente.setOnClickListener(filterClickListener);
     }
 
-    private void showError(ErrorPage.Type type) {
-        binding.viewFlipper.setDisplayedChild(1); // Error
-        ErrorPage.showError(binding.error, type);
+    private void showError(Type type) {
+        // Evitar crash ao sair do fragment
+        if (binding == null || !isAdded()) return;
+
+        binding.mainFlipper.setDisplayedChild(1); // Error
+        ErrorPage.showError(binding.mainError, type);
+
+        // Esconder item de pesquisa
+        showItemPesquisa(false);
 
         // Action do botão
-        binding.error.btnAction.setOnClickListener(v -> {
+        binding.mainError.btnAction.setOnClickListener(v -> {
             switch (type) {
                 case INTERNET:
-                    load();
+                    loadFilmes(filter);
                     break;
                 case API:
                     startActivity(new Intent(requireContext(), ConfiguracoesActivity.class));
@@ -206,6 +209,36 @@ public class FilmesFragment extends Fragment {
                     break;
             }
         });
+    }
+
+    private void showErrorFilmes(Type type) {
+        binding.filmesFlipper.setDisplayedChild(1);
+        ErrorPage.showError(binding.errorFilmes, type);
+    }
+
+    private void showItemPesquisa(boolean show)
+    {
+        hasFilmes = show;
+        requireActivity().invalidateOptionsMenu();
+    }
+
+    private void clearSearch() {
+        if (searchView != null) {
+            searchView.setQuery("", false);
+            searchView.clearFocus();
+        }
+        requireActivity().invalidateOptionsMenu();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // Carregar filmes
+        if (filmesManager.getFilmes(filter).isEmpty()) loadFilmes(filter);
+
+        // Limpar pesquisa
+        clearSearch();
     }
 
     @Override

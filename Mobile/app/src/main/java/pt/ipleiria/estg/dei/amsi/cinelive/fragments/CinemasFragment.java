@@ -1,8 +1,5 @@
 package pt.ipleiria.estg.dei.amsi.cinelive.fragments;
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -29,11 +26,6 @@ import pt.ipleiria.estg.dei.amsi.cinelive.models.Cinema;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorPage;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link CinemasFragment} factory method to
- * create an instance of this fragment.
- */
 public class CinemasFragment extends Fragment {
     private FragmentCinemasBinding binding;
     private CinemasAdapter adapter;
@@ -55,6 +47,12 @@ public class CinemasFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        // Configurar layout da recycler-view
+        binding.rvCinemas.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        // Carregar cinemas
+        loadCinemas();
+
         // Swipe refresh
         binding.swipeRefresh.setOnRefreshListener(() -> {
             binding.swipeRefresh.setRefreshing(false);
@@ -65,16 +63,10 @@ public class CinemasFragment extends Fragment {
             // Carregar cinemas
             loadCinemas();
         });
-
-        // Configurar layout da recycler-view
-        binding.rvCinemas.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        // Carregar cinemas
-        loadCinemas();
     }
 
     private void loadCinemas() {
-        binding.viewFlipper.setDisplayedChild(0); // Loading
+        binding.mainFlipper.setDisplayedChild(0); // Main Loading
 
         // Obter estado da ligação à internet
         boolean hasInternet = ConnectionUtils.hasInternet(requireContext());
@@ -83,7 +75,7 @@ public class CinemasFragment extends Fragment {
         cinemasManager.fetchCinemas(requireContext(), new CinemaListener() {
             @Override
             public void onSuccess(List<Cinema> cinemas) {
-                setAdapter(cinemas);
+                setList(cinemas);
 
                 // Tem cache mas não tem internet
                 if (!hasInternet) {
@@ -101,15 +93,16 @@ public class CinemasFragment extends Fragment {
         });
     }
 
-    private void setAdapter(List<Cinema> cinemas) {
+    private void setList(List<Cinema> cinemas) {
         // Evitar crash ao sair do fragment
         if (binding == null || !isAdded()) return;
-        binding.viewFlipper.setDisplayedChild(2); // Main
+
+        binding.mainFlipper.setDisplayedChild(2); // Main Content
 
         // Aceder às preferences
         PreferencesManager preferences = new PreferencesManager(requireContext());
 
-        // Se clicou num cinema --> selecionar e guardar nas preferences
+        // Clicou num cinema --> selecionar e guardar nas preferences
         adapter = new CinemasAdapter(cinemas, preferences.getCinemaId(), cinema -> {
             preferences.setCinemaId(cinema.getId());
             adapter.setCinemaSelecionado(cinema.getId());
@@ -122,11 +115,11 @@ public class CinemasFragment extends Fragment {
         // Evitar crash ao sair do fragment
         if (binding == null || !isAdded()) return;
 
-        binding.viewFlipper.setDisplayedChild(1); // Error
-        ErrorPage.showError(binding.error, type);
+        binding.mainFlipper.setDisplayedChild(1); // Main Error
+        ErrorPage.showError(binding.mainError, type);
 
-        // Ação do botão
-        binding.error.btnAction.setOnClickListener(v -> {
+        // Action do botão
+        binding.mainError.btnAction.setOnClickListener(v -> {
             switch (type) {
                 case INTERNET: case NENHUM_CINEMA:
                     loadCinemas();
@@ -141,7 +134,9 @@ public class CinemasFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        loadCinemas();
+
+        // Reload se não tiver cache
+        if (cinemasManager.getCinemas().isEmpty()) loadCinemas();
     }
 
     @Override

@@ -35,7 +35,7 @@ public class FilmesAdapter extends RecyclerView.Adapter<FilmesAdapter.ViewHolder
         this.listener = listener;
     }
 
-    public void filtrar(String q) {
+    public void search(String q) {
         String query = q.toLowerCase();
 
         filmesVisiveis = new ArrayList<>();

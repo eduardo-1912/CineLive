@@ -7,15 +7,15 @@
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefresh" style="@style/VerticalLayout.Full">
 
-        <ViewFlipper android:id="@+id/viewFlipper" style="@style/VerticalLayout.Full">
+        <ViewFlipper android:id="@+id/mainFlipper" style="@style/VerticalLayout.Full">
 
-            <!-- Loading -->
-            <include android:id="@+id/loading" layout="@layout/layout_loading" />
+            <!-- Main Loading -->
+            <include layout="@layout/layout_loading" />
 
-            <!-- Error -->
-            <include android:id="@+id/error" layout="@layout/layout_error" />
+            <!-- Main Error -->
+            <include android:id="@+id/mainError" layout="@layout/layout_error" />
 
-            <!-- Main -->
+            <!-- Main Content -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvCinemas"
                 tools:listitem="@layout/item_cinema"

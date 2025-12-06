@@ -114,6 +114,8 @@
     <string name="erro_internet_subtitulo">Verifique a sua ligação e tente novamente.</string>
     <string name="erro_api_titulo">Sem ligação à API</string>
     <string name="erro_api_subtitulo">Verifique as configurações e tente novamente.</string>
+    <string name="erro_nenhum_filme_titulo">Nenhum filme encontrado</string>
+    <string name="erro_nenhum_filme_subtitulo">Não foi encontrado um resultado para esta pesquisa.</string>
     <string name="erro_cinema_invalido_titulo">Escolha um cinema</string>
     <string name="erro_cinema_invalido_subtitulo">Precisa de escolher um cinema para ver filmes.</string>
     <string name="erro_nenhum_cinema_titulo">Nenhum cinema disponível</string>

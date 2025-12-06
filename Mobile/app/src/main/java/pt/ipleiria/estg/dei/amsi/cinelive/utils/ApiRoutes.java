@@ -1,12 +1,12 @@
 package pt.ipleiria.estg.dei.amsi.cinelive.utils;
 
 public class ApiRoutes {
-    public static String filmesEmExibicao (String url) {
-        return url + "/filmes?cinema_id=";
+    public static String filmesEmExibicao (String url, int cinemaId) {
+        return url + "/filmes?cinema_id=" + cinemaId;
     }
 
-    public static String filmesKids (String url) {
-        return url + "/filmes?filter=kids&cinema_id=";
+    public static String filmesKids (String url, int cinemaId) {
+        return url + "/filmes?filter=kids&cinema_id=" + cinemaId;
     }
 
     public static String filmesBrevemente (String url) {
@@ -25,5 +25,19 @@ public class ApiRoutes {
         return url + "/compras/" + id + "?access-token=" + token;
     }
 
-    public static String perfil ()
+    public static String perfil (String url, String token) {
+        return url + "/perfil" + "?access-token=" + token;
+    }
+
+    public static String login (String url) {
+        return url + "/auth/login";
+    }
+
+    public static String signup (String url) {
+        return url + "/auth/signup";
+    }
+
+    public static String validateToken (String url, String token) {
+        return url + "/auth/validate?access-token=" + token;
+    }
 }
