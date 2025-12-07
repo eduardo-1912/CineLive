@@ -5,6 +5,7 @@ import android.content.Context;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONObject;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.FilmeListener;
+import pt.ipleiria.estg.dei.amsi.cinelive.listeners.FilmesListener;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Filme;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ApiRoutes;
 
@@ -47,8 +49,7 @@ public class FilmesManager {
         brevemente.clear();
     }
 
-    public void fetchFilmes(Context context, Filter filter, FilmeListener listener) {
-
+    public void fetchFilmes(Context context, Filter filter, FilmesListener listener) {
         // Obter a lista
         if (filter == Filter.KIDS) filmes = kids;
         else if (filter == Filter.BREVEMENTE) filmes = brevemente;
@@ -104,6 +105,42 @@ public class FilmesManager {
                 else listener.onError();
             }
         );
+
+        Volley.newRequestQueue(context).add(request);
+    }
+
+    public void getFilme(Context context, int id, FilmeListener listener) {
+        // Obter URL
+        PreferencesManager preferences = new PreferencesManager(context);
+        String url = ApiRoutes.filme(preferences.getApiUrl(), id);
+
+        JsonObjectRequest request = new JsonObjectRequest(
+            Request.Method.GET, url, null, response -> {
+                // Obter os dados do filme
+                try {
+                    Filme filme = new Filme(
+                        response.optInt("id"),
+                        response.optString("titulo"),
+                        response.optString("poster_url"),
+                        response.optString("rating"),
+                        response.optString("generos"),
+                        response.optString("estreia"),
+                        response.optString("duracao"),
+                        response.optString("idioma"),
+                        response.optString("realizacao"),
+                        response.optString("sinopse"),
+                        response.optBoolean("has_sessoes")
+                    );
+
+                    listener.onSuccess(filme);
+                }
+                catch (Exception e) {
+                    listener.onError();
+                }
+            },
+            error -> listener.onError()
+        );
+
         Volley.newRequestQueue(context).add(request);
     }
 }

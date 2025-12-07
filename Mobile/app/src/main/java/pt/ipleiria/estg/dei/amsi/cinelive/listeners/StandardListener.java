@@ -1,6 +1,6 @@
 package pt.ipleiria.estg.dei.amsi.cinelive.listeners;
 
-public interface ValidateTokenListener {
+public interface StandardListener {
     void onSuccess();
     void onError();
 }

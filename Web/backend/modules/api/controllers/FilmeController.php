@@ -52,11 +52,12 @@ class FilmeController extends Controller
             'poster_url' => $filme->posterUrl,
             'rating' => $filme->rating,
             'generos' => implode(', ', array_map(fn($genero) => $genero->nome, $filme->generos)),
-            'estreia' => $filme->estreia,
+            'estreia' => Formatter::data($filme->estreia),
             'duracao' => Formatter::horas($filme->duracao),
             'idioma' => $filme->idioma,
             'realizacao' => $filme->realizacao,
             'sinopse' => $filme->sinopse,
+            'has_sessoes' => count($filme->getSessoesAtivas()) > 0,
         ];
     }
 

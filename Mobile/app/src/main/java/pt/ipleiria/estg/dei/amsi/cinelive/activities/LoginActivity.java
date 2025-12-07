@@ -15,9 +15,8 @@ import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityLoginBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.LoginListener;
 import pt.ipleiria.estg.dei.amsi.cinelive.managers.AuthManager;
+import pt.ipleiria.estg.dei.amsi.cinelive.models.User;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
-import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorPage;
-import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorPage.Type;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -57,22 +56,25 @@ public class LoginActivity extends AppCompatActivity {
         // Botão Iniciar Sessão
         binding.btnLogin.setOnClickListener(v -> {
             // Verificar se tem internet
-            if (!ConnectionUtils.hasInternet(LoginActivity.this)) {
-                Toast.makeText(LoginActivity.this, R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
+            if (!ConnectionUtils.hasInternet(this)) {
+                Toast.makeText(this, R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
             }
 
             // Obter dados
             String username = String.valueOf(binding.form.etUsername.getText());
             String password = String.valueOf(binding.form.etPassword.getText());
 
+            // Criar objeto user
+            User user = new User(username , password);
+
             // Validar dados
-            if (!validateFields(username, password)) return;
+            if (!validateFields(user)) return;
 
             // Fazer pedido de login
-            authManager.login(this, username, password, new LoginListener() {
+            authManager.login(this, user, new LoginListener() {
                 @Override
                 public void onSuccess() {
-                    Toast.makeText(LoginActivity.this, R.string.msg_login_success, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, R.string.msg_sucesso_login, Toast.LENGTH_SHORT).show();
                     finish();
                 }
                 @Override
@@ -81,7 +83,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
                 @Override
                 public void onError() {
-                    Toast.makeText(LoginActivity.this, R.string.erro_api_titulo, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, R.string.msg_erro_login, Toast.LENGTH_LONG).show();
                 }
             });
         });
@@ -93,18 +95,18 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private boolean validateFields(String username, String password) {
+    private boolean validateFields(User user) {
         boolean isValid = true;
 
         // Validar username
-        if (username.isEmpty()) {
+        if (user.getUsername().isEmpty()) {
             binding.form.tilUsername.setError(getString(R.string.msg_campo_obrigatorio));
             isValid = false;
         }
         else binding.form.tilUsername.setErrorEnabled(false);
 
         // Validar password
-        if (password.isEmpty()) {
+        if (user.getPassword().isEmpty()) {
             binding.form.tilPassword.setError(getString(R.string.msg_campo_obrigatorio));
             isValid = false;
         }

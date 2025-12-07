@@ -24,7 +24,11 @@ import java.util.Map;
 
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityDetalhesFilmeBinding;
+import pt.ipleiria.estg.dei.amsi.cinelive.listeners.FilmeListener;
+import pt.ipleiria.estg.dei.amsi.cinelive.listeners.SessaoListener;
+import pt.ipleiria.estg.dei.amsi.cinelive.managers.FilmesManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.managers.PreferencesManager;
+import pt.ipleiria.estg.dei.amsi.cinelive.managers.SessoesManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Filme;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Sessao;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
@@ -33,6 +37,8 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
 
     ActivityDetalhesFilmeBinding binding;
     PreferencesManager preferences;
+    FilmesManager filmesManager;
+    SessoesManager sessoesManager;
     Sessao sessaoSelecionada;
 
     @Override
@@ -52,22 +58,41 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
         setSupportActionBar(binding.toolbar.topAppBar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        // Obter ID do Filme
-        Intent intentFilmes = getIntent();
-        int idFilme = intentFilmes.getIntExtra("filme_id", -1);
+        // Obter o filmes manager
+        filmesManager = FilmesManager.getInstance();
 
-        getSupportActionBar().setTitle("TÍTULO DO FILME......"); // TODO: REPLACE THIS
-
-        // TODO: REPLACE MOCK-DATA
-        Filme filme = new Filme(1, "Carros 2", "M3", "Ação, Aventura",
-                "Um grande campeão das pistas é lançado numa corrida internacional enquanto o seu amigo Mate é apanhado num enredo de espionagem que põe à prova a amizade de ambos e mostra que coragem pode surgir dos lugares mais improváveis.",
-                "2h 32min", "25/11/2025", "Português", "John Lasseter", "/CineLive/Web/frontend/web/uploads/posters/poster_6910b6ad1f9ea.jpg", "Em exibição");
+        // Obter o sessões manager
+        sessoesManager = SessoesManager.getInstance();
 
         // Aceder às preferences
         preferences = new PreferencesManager(this);
 
+        // Carregar o filme
+        loadFilme();
+    }
+
+    private void loadFilme() {
+        filmesManager.getFilme(this, getIntent().getIntExtra("id", -1), new FilmeListener() {
+            @Override
+            public void onSuccess(Filme filme) {
+                setFilme(filme);
+                loadSessoes(filme);
+            }
+
+            @Override
+            public void onError() {
+                Toast.makeText(DetalhesFilmeActivity.this, "erro", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        });
+
+    }
+
+    private void setFilme(Filme filme) {
+        getSupportActionBar().setTitle(filme.getTitulo());
+
         // Carregar Poster
-        Glide.with(this)
+        Glide.with(DetalhesFilmeActivity.this)
                 .load(preferences.getApiHost() + filme.getPosterUrl())
                 .placeholder(R.drawable.poster_placeholder)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
@@ -82,68 +107,58 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
         binding.tvIdioma.setText(filme.getIdioma());
         binding.tvRealizacao.setText(filme.getRealizacao());
         binding.tvSinopse.setText(filme.getSinopse());
+    }
 
-        // Array associativo de sessões por data
-        Map<String, List<Sessao>> sessoesPorData = new LinkedHashMap<>();
-
-        // TODO: REPLACE MOCK DATA
-        sessoesPorData.put("28/11/2025", Arrays.asList(
-                new Sessao(7, "28/11/2025", "16:00"),
-                new Sessao(8, "28/11/2025", "21:30")
-        ));
-        sessoesPorData.put("29/11/2025", Arrays.asList(
-                new Sessao(9, "29/11/2025", "14:00"),
-                new Sessao(10, "29/11/2025", "18:00"),
-                new Sessao(11, "29/11/2025", "22:00")
-        ));
-
-        // Array de datas
-        List<String> datas = new ArrayList<>(sessoesPorData.keySet());
-
-        binding.spinnerData.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, datas));
-        binding.spinnerData.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+    private void loadSessoes(Filme filme) {
+        sessoesManager.getSessoes(this, filme.getId(), new SessaoListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            public void onSuccess(Map<String, List<Sessao>> sessoesPorData) {
 
-                // Obter data selecionada
-                String data = datas.get(position);
+                List<String> datas = new ArrayList<>(sessoesPorData.keySet());
 
-                // Obter sessões da data selecionada
-                List<Sessao> sessoes = sessoesPorData.get(data);
+                // Preenche spinner com datas reais
+                binding.spinnerData.setAdapter(
+                        new ArrayAdapter<>(DetalhesFilmeActivity.this,
+                                android.R.layout.simple_spinner_dropdown_item,
+                                datas)
+                );
 
-                // Adicionar todas as sessões à lista
-                List<String> horas = new ArrayList<>();
-                for (Sessao sessao : sessoes) horas.add(sessao.getHoraInicio());
+                binding.spinnerData.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
 
-                binding.lvHoras.setAdapter(new ArrayAdapter<>(DetalhesFilmeActivity.this, android.R.layout.simple_list_item_1, horas));
+                        String data = datas.get(pos);
+                        List<Sessao> sessoes = sessoesPorData.get(data);
 
-                // Selecionou uma sessão
-                binding.lvHoras.setOnItemClickListener((p, v, pos, i) -> {
-                    Sessao sessao = sessoes.get(pos);
-                    Intent intentSessao = new Intent(DetalhesFilmeActivity.this, ComprarBilhetesActivity.class);
+                        List<String> horas = new ArrayList<>();
+                        for (Sessao s : sessoes) horas.add(s.getHoraInicio());
 
-                    // Passar dados do filme e a sessão
-                    intentSessao.putExtra("sessao_id", sessao.getId());
-                    intentSessao.putExtra("titulo", filme.getTitulo());
-                    intentSessao.putExtra("rating", filme.getRating());
-                    intentSessao.putExtra("duracao", filme.getDuracao());
+                        binding.lvHoras.setAdapter(new ArrayAdapter<>(DetalhesFilmeActivity.this,
+                                android.R.layout.simple_list_item_1, horas));
 
-                    startActivity(intentSessao);
+                        binding.lvHoras.setOnItemClickListener((p, v2, pos2, i2) -> {
+
+                            Sessao sessao = sessoes.get(pos2);
+
+                            Intent intent = new Intent(DetalhesFilmeActivity.this,
+                                    ComprarBilhetesActivity.class);
+
+                            intent.putExtra("sessao_id", sessao.getId());
+                            startActivity(intent);
+                        });
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {}
                 });
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
+            public void onError() {
+                Toast.makeText(DetalhesFilmeActivity.this, "Erro ao carregar sessões", Toast.LENGTH_SHORT).show();
+            }
         });
-    }
 
-    @Override
-    public void onResume()
-    {
-        super.onResume();
-        if (!ConnectionUtils.hasInternet(this)) {
-            Toast.makeText(this, R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
-        }
     }
 
     @Override

@@ -2,7 +2,8 @@ package pt.ipleiria.estg.dei.amsi.cinelive.models;
 
 public class Filme {
     private int id;
-    private String titulo, rating, generos, sinopse, duracao, estreia, idioma, realizacao, trailerUrl, posterUrl, estado;
+    private String titulo, posterUrl, rating, generos, duracao, estreia, idioma, realizacao, sinopse;
+    private boolean hasSessoes;
 
     public Filme(int id, String titulo, String posterUrl) {
         this.id = id;
@@ -10,19 +11,18 @@ public class Filme {
         this.posterUrl = posterUrl;
     }
 
-    public Filme(int id, String titulo, String rating, String generos, String sinopse, String duracao, String estreia, String idioma, String realizacao, String posterUrl, String estado) {
+    public Filme(int id, String titulo, String posterUrl, String rating, String generos, String duracao, String estreia, String idioma, String realizacao, String sinopse, Boolean hasSessoes) {
         this.id = id;
         this.titulo = titulo;
+        this.posterUrl = posterUrl;
         this.rating = rating;
         this.generos = generos;
-        this.sinopse = sinopse;
-        this.duracao = duracao;
-        this.rating = rating;
         this.estreia = estreia;
+        this.duracao = duracao;
         this.idioma = idioma;
         this.realizacao = realizacao;
-        this.posterUrl = posterUrl;
-        this.estado = estado;
+        this.sinopse = sinopse;
+        this.hasSessoes = hasSessoes;
     }
 
     public int getId() {return id;}
@@ -35,7 +35,5 @@ public class Filme {
     public String getIdioma() {return idioma;}
     public String getRealizacao() {return realizacao;}
     public String getPosterUrl() {return posterUrl;}
-    public String getEstado() {return estado;}
-
-
+    public boolean hasSessoes() {return hasSessoes();}
 }

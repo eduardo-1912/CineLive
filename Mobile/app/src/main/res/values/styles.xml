@@ -129,10 +129,6 @@
         <item name="android:layout_marginBottom">8dp</item>
     </style>
 
-    <style name="TextInputLayoutDisabled" parent="TextInputLayout">
-        <item name="android:enabled">false</item>
-        <item name="android:textColorHint">?attr/colorPrimary</item>
-    </style>
 
     <!-- Buttons -->
     <style name="Button.Primary" parent="Widget.Material3.Button">

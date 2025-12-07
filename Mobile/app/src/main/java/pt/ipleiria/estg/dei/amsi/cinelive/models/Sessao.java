@@ -8,9 +8,8 @@ public class Sessao {
     private double precoBilhete;
     private List<String> lugaresOcupados;
 
-    public Sessao(int id, String data, String horaInicio) {
+    public Sessao(int id, String horaInicio) {
         this.id = id;
-        this.data = data;
         this.horaInicio = horaInicio;
     }
 

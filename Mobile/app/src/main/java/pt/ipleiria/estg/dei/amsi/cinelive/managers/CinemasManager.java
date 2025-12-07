@@ -12,7 +12,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import pt.ipleiria.estg.dei.amsi.cinelive.listeners.CinemaListener;
+import pt.ipleiria.estg.dei.amsi.cinelive.listeners.CinemasListener;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Cinema;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ApiRoutes;
 
@@ -37,7 +37,7 @@ public class CinemasManager {
         cinemas.clear();
     }
 
-    public void fetchCinemas(Context context, CinemaListener listener) {
+    public void fetchCinemas(Context context, CinemasListener listener) {
         // Se tiver cache --> evitar pedido à API
         if (!cinemas.isEmpty()) {
             listener.onSuccess(cinemas);
@@ -79,6 +79,7 @@ public class CinemasManager {
             },
             error -> listener.onError()
         );
+
         Volley.newRequestQueue(context).add(request);
     }
 }

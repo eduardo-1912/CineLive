@@ -12,16 +12,19 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-import pt.ipleiria.estg.dei.amsi.cinelive.listeners.ConnectionListener;
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.LoginListener;
-import pt.ipleiria.estg.dei.amsi.cinelive.listeners.ValidateTokenListener;
-import pt.ipleiria.estg.dei.amsi.cinelive.models.Perfil;
+import pt.ipleiria.estg.dei.amsi.cinelive.listeners.UserFormListener;
+import pt.ipleiria.estg.dei.amsi.cinelive.listeners.StandardListener;
+import pt.ipleiria.estg.dei.amsi.cinelive.models.User;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ApiRoutes;
-import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
 
 public class AuthManager {
     private static AuthManager instance = null;
     private static RequestQueue queue;
+
+    public static int MIN_LENGTH_USERNAME = 3;
+    public static int MIN_LENGTH_PASSWORD = 8;
+    public static int MIN_LENGTH_TELEMOVEL = 9;
 
     public static synchronized AuthManager getInstance() {
         if (instance == null) {
@@ -31,14 +34,14 @@ public class AuthManager {
         return instance;
     }
 
-    public void login(Context context, String username, String password, LoginListener listener) {
+    public void login(Context context, User user, LoginListener listener) {
         // Obter o URL
         PreferencesManager preferences = new PreferencesManager(context);
         String url = ApiRoutes.login(preferences.getApiUrl());
 
         Map<String, String> params = new HashMap<>();
-        params.put("username", username);
-        params.put("password", password);
+        params.put("username", user.getUsername());
+        params.put("password", user.getPassword());
 
         JsonObjectRequest request = new JsonObjectRequest(
             Request.Method.POST, url, new JSONObject(params),
@@ -48,17 +51,17 @@ public class AuthManager {
                 preferences.setToken(token);
 
                 // Obter dados do utilizador
-                JSONObject user = response.optJSONObject("user");
+                JSONObject perfil = response.optJSONObject("perfil");
 
                 // Guardar dados em cache
-                if (user != null) {
+                if (perfil != null) {
                     PerfilManager.getInstance().setPerfil(
-                        new Perfil(
-                            user.optInt("id"),
-                            user.optString("username"),
-                            user.optString("email"),
-                            user.optString("nome"),
-                            user.optString("telemovel")
+                        new User(
+                            perfil.optInt("id"),
+                            perfil.optString("username"),
+                            perfil.optString("email"),
+                            perfil.optString("nome"),
+                            perfil.optString("telemovel")
                         )
                     );
                 }
@@ -79,7 +82,66 @@ public class AuthManager {
         Volley.newRequestQueue(context).add(request);
     }
 
-    public void validateToken(Context context, ValidateTokenListener listener) {
+    public void signup(Context context, User user, UserFormListener listener) {
+        // Obter o URL
+        PreferencesManager preferences = new PreferencesManager(context);
+        String url = ApiRoutes.signup(preferences.getApiUrl());
+
+        Map<String, String> params = new HashMap<>();
+        params.put("username", user.getUsername());
+        params.put("password", user.getPassword());
+        params.put("email", user.getEmail());
+        params.put("nome", user.getNome());
+        params.put("telemovel", user.getTelemovel());
+
+        JsonObjectRequest request = new JsonObjectRequest(
+            Request.Method.POST, url, new JSONObject(params),
+            response -> {
+                // Verificar se tem erros
+                JSONObject errors = response.optJSONObject("errors");
+
+                // Obter erros
+                if (errors != null) {
+                    if (errors.has("username")) {
+                        listener.onUsernameTaken();
+                    }
+
+                    if (errors.has("email")) {
+                        listener.onEmailTaken();
+                    }
+
+                    return;
+                }
+
+                // Guardar o token (API verifica sempre se tem token válido)
+                String token = response.optString("access-token", null);
+                preferences.setToken(token);
+
+                // Obter dados do utilizador
+                JSONObject perfil = response.optJSONObject("perfil");
+
+                // Guardar dados em cache
+                if (perfil != null) {
+                    PerfilManager.getInstance().setPerfil(
+                        new User(
+                            perfil.optInt("id"),
+                            perfil.optString("username"),
+                            perfil.optString("email"),
+                            perfil.optString("nome"),
+                            perfil.optString("telemovel")
+                        )
+                    );
+                }
+
+                listener.onSuccess();
+            },
+            error -> {listener.onError();}
+        );
+
+        Volley.newRequestQueue(context).add(request);
+    }
+
+    public void validateToken(Context context, StandardListener listener) {
         // Obter o URL
         PreferencesManager preferences = new PreferencesManager(context);
         String url = ApiRoutes.validateToken(preferences.getApiUrl(), preferences.getToken());
@@ -89,7 +151,7 @@ public class AuthManager {
             response -> {
                 // Guardar dados em cache
                 PerfilManager.getInstance().setPerfil(
-                    new Perfil(
+                    new User(
                         response.optInt("id"),
                         response.optString("username"),
                         response.optString("email"),

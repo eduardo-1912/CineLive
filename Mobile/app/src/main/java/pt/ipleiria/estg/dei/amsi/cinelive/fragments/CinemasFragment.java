@@ -17,7 +17,7 @@ import java.util.List;
 
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.activities.ConfiguracoesActivity;
-import pt.ipleiria.estg.dei.amsi.cinelive.listeners.CinemaListener;
+import pt.ipleiria.estg.dei.amsi.cinelive.listeners.CinemasListener;
 import pt.ipleiria.estg.dei.amsi.cinelive.managers.CinemasManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.managers.PreferencesManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.adapters.CinemasAdapter;
@@ -72,7 +72,7 @@ public class CinemasFragment extends Fragment {
         boolean hasInternet = ConnectionUtils.hasInternet(requireContext());
 
         // Obter cinemas (API ou cache)
-        cinemasManager.fetchCinemas(requireContext(), new CinemaListener() {
+        cinemasManager.fetchCinemas(requireContext(), new CinemasListener() {
             @Override
             public void onSuccess(List<Cinema> cinemas) {
                 setList(cinemas);

@@ -58,7 +58,7 @@ class AuthController extends Controller
         return [
             'status' => 'success',
             'access-token' => $user->auth_key,
-            'user' => [
+            'perfil' => [
                 'id' => $user->id,
                 'username' => $user->username,
                 'nome' => $user->profile->nome ?? null,
@@ -124,7 +124,7 @@ class AuthController extends Controller
         return [
             'status' => 'success',
             'access-token' => $user->auth_key,
-            'user' => [
+            'perfil' => [
                 'id' => $user->id,
                 'username' => $user->username,
                 'nome' => $user->profile->nome ?? null,

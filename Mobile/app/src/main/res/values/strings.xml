@@ -14,16 +14,6 @@
     <string name="comprar_bilhetes">Comprar Bilhetes</string>
     <string name="detalhes_compra">Detalhes da Compra</string>
 
-    <!-- messages -->
-    <string name="msg_eliminar_conta">Tem a certeza de que pretende eliminar a sua conta? Esta ação é irreversível.</string>
-    <string name="msg_api_success">Ligação bem sucedida</string>
-
-    <!-- form messages -->
-    <string name="msg_login_success">Login com sucesso</string>
-
-    <string name="msg_campo_obrigatorio">Campo obrigatório</string>
-    <string name="msg_credenciais_invalidas">Credenciais inválidas</string>
-
     <!-- general buttons -->
     <string name="btn_login">Iniciar Sessão</string>
     <string name="btn_signup">Criar Conta</string>
@@ -49,6 +39,7 @@
     <string name="label_realizacao">Realização</string>
     <string name="label_sinopse">Sinopse</string>
     <string name="label_hora">Hora</string>
+    <string name="msg_erro_carregar_filme">Erro ao carregar o filme</string>
 
     <!-- activity_comprar_bilhetes -->
     <string name="label_cinema">Cinema</string>
@@ -87,6 +78,9 @@
 
     <!-- fragment_perfil -->
     <string name="perfil_titulo">Os meus dados</string>
+    <string name="msg_eliminar_conta">Tem a certeza de que pretende eliminar a sua conta? Esta ação é irreversível.</string>
+    <string name="msg_conta_eliminada">Conta eliminada com sucesso</string>
+    <string name="msg_erro_eliminar_conta">Erro ao eliminar a conta</string>
 
     <!-- activity_login -->
     <string name="login_titulo">Entre na sua conta</string>
@@ -107,6 +101,20 @@
     <string name="form_hint_nome">Nome</string>
     <string name="form_hint_telemovel">Telemóvel</string>
     <string name="form_hint_email">Email</string>
+
+    <!-- form_utilizador messages -->
+    <string name="msg_campo_obrigatorio">Este campo é obrigatório</string>
+    <string name="msg_min_caracteres">Este campo deve ter pelo menos %1$d caracteres.</string>
+    <string name="msg_credenciais_invalidas">Credenciais inválidas</string>
+    <string name="msg_username_indisponivel">Este username já não está disponível</string>
+    <string name="msg_email_indisponivel">Este email já não está disponível</string>
+    <string name="msg_email_invalido">O formatdo do email é inválido</string>
+    <string name="msg_sucesso_login">Login efetuado com sucesso</string>
+    <string name="msg_erro_login">Erro ao iniciar sessão</string>
+    <string name="msg_sucesso_signup">Conta criada com sucesso</string>
+    <string name="msg_erro_signup">Erro ao criar conta</string>
+    <string name="msg_sucesso_editar_perfil">Perfil atualizado com sucesso</string>
+    <string name="msg_erro_editar_perfil">Erro ao atualizar o perfil</string>
 
     <!-- activity_configuracoes -->
     <string name="configuracoes_titulo">Configurações da API</string>

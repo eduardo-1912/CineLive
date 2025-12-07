@@ -25,7 +25,7 @@ import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.activities.MainActivity;
 import pt.ipleiria.estg.dei.amsi.cinelive.adapters.FilmesAdapter;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.FragmentFilmesBinding;
-import pt.ipleiria.estg.dei.amsi.cinelive.listeners.FilmeListener;
+import pt.ipleiria.estg.dei.amsi.cinelive.listeners.FilmesListener;
 import pt.ipleiria.estg.dei.amsi.cinelive.managers.FilmesManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.managers.FilmesManager.Filter;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Filme;
@@ -118,7 +118,7 @@ public class FilmesFragment extends Fragment {
         boolean hasInternet = ConnectionUtils.hasInternet(requireContext());
 
         // Obter filmes da API
-        filmesManager.fetchFilmes(requireContext(), filter, new FilmeListener() {
+        filmesManager.fetchFilmes(requireContext(), filter, new FilmesListener() {
             @Override
             public void onSuccess(List<Filme> filmes) {
                 setList(filmes);
@@ -149,8 +149,14 @@ public class FilmesFragment extends Fragment {
 
         // Clicou num filme --> abrir detalhes
         adapter = new FilmesAdapter(filmes, filme -> {
+            // Verificar se tem internet
+            if (!ConnectionUtils.hasInternet(requireContext())) {
+                Toast.makeText(requireContext(), R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             Intent intent = new Intent(getActivity(), DetalhesFilmeActivity.class);
-            intent.putExtra("filmeId", filme.getId());
+            intent.putExtra("id", filme.getId());
             startActivity(intent);
         });
 

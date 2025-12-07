@@ -1,47 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
+    style="@style/VerticalLayout.Full"
     tools:context=".fragments.PerfilFragment">
 
-    <LinearLayout style="@style/Container.Main">
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefresh" style="@style/VerticalLayout.Full">
 
-        <TextView
-            style="@style/Title"
-            android:text="@string/perfil_titulo"/>
+        <ViewFlipper android:id="@+id/mainFlipper" style="@style/VerticalLayout.Full">
 
-        <Space style="@style/VerticalSpace.32" />
+            <!-- Main Loading -->
+            <include layout="@layout/layout_loading" />
 
-        <!-- Form Utilizador -->
-        <include android:id="@+id/form" layout="@layout/layout_form_utilizador" />
+            <!-- Main Error -->
+            <include android:id="@+id/mainError" layout="@layout/layout_error" />
 
-        <LinearLayout style="@style/HorizontalLayout.Full" >
+            <!-- Main Content -->
+            <LinearLayout style="@style/Container.Main">
 
-            <!-- Botão Editar Perfil -->
-            <Button style="@style/Button.Primary.Full"
-                android:id="@+id/btnEditarPerfil"
-                android:layout_weight="1"
-                android:text="@string/btn_editar_perfil" />
+                <TextView
+                    style="@style/Title"
+                    android:text="@string/perfil_titulo"/>
 
-            <Space android:layout_width="6dp" android:layout_height="match_parent" />
+                <Space style="@style/VerticalSpace.32" />
 
-            <!-- Botão Logout -->
-            <Button style="@style/Button.Secondary.Full"
-                android:id="@+id/btnLogout"
-                android:layout_weight="1"
-                android:text="@string/btn_logout" />
+                <!-- Form Utilizador -->
+                <include android:id="@+id/form" layout="@layout/layout_form_utilizador" />
 
-        </LinearLayout>
+                <LinearLayout style="@style/HorizontalLayout.Full" >
 
-        <!-- Botão Eliminar Conta -->
-        <Button style="@style/Button.Text"
-            android:id="@+id/btnEliminarConta"
-            android:textColor="?attr/colorError"
-            android:layout_marginTop="8dp"
-            android:text="@string/btn_eliminar_conta" />
+                    <!-- Botão Editar Perfil -->
+                    <Button style="@style/Button.Primary.Full"
+                        android:id="@+id/btnEditarPerfil"
+                        android:layout_weight="1"
+                        android:text="@string/btn_editar_perfil" />
 
-    </LinearLayout>
+                    <Space android:layout_width="6dp" android:layout_height="match_parent" />
+
+                    <!-- Botão Logout -->
+                    <Button style="@style/Button.Secondary.Full"
+                        android:id="@+id/btnLogout"
+                        android:layout_weight="1"
+                        android:text="@string/btn_logout" />
+
+                </LinearLayout>
+
+                <!-- Botão Eliminar Conta -->
+                <Button style="@style/Button.Text"
+                    android:id="@+id/btnEliminarConta"
+                    android:textColor="?attr/colorError"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/btn_eliminar_conta" />
+
+            </LinearLayout>
+
+        </ViewFlipper>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </LinearLayout>

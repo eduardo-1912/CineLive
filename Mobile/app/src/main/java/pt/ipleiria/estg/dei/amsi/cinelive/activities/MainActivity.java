@@ -12,8 +12,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityMainBinding;
-import pt.ipleiria.estg.dei.amsi.cinelive.listeners.ConnectionListener;
-import pt.ipleiria.estg.dei.amsi.cinelive.listeners.ValidateTokenListener;
+import pt.ipleiria.estg.dei.amsi.cinelive.listeners.StandardListener;
 import pt.ipleiria.estg.dei.amsi.cinelive.managers.AuthManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
 
@@ -52,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void load() {
         // Validar o token (se o tiver nas preferences)
-        if (authManager.isLoggedIn(this)) authManager.validateToken(this, new ValidateTokenListener() {
+        if (authManager.isLoggedIn(this)) authManager.validateToken(this, new StandardListener() {
             @Override
             public void onSuccess() {
                 updateBottomNav(true);
