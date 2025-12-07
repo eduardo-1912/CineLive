@@ -20,6 +20,13 @@
     <item
         android:id="@+id/navPerfil"
         android:icon="@drawable/ic_perfil"
-        android:title="@string/nav_perfil" />
+        android:title="@string/nav_perfil"
+        android:visible="false" />
+
+    <item
+        android:id="@+id/navEntrar"
+        android:icon="@drawable/ic_entrar"
+        android:title="@string/nav_entrar"
+        android:visible="false" />
 
 </menu>

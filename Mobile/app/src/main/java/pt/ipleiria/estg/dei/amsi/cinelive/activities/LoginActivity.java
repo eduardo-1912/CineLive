@@ -1,9 +1,8 @@
 package pt.ipleiria.estg.dei.amsi.cinelive.activities;
 
-import static android.view.View.GONE;
-
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -17,6 +16,8 @@ import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityLoginBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.LoginListener;
 import pt.ipleiria.estg.dei.amsi.cinelive.managers.AuthManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
+import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorPage;
+import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorPage.Type;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -40,43 +41,76 @@ public class LoginActivity extends AppCompatActivity {
         setSupportActionBar(binding.toolbar.topAppBar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        binding.form.tilEmail.setVisibility(GONE);
-        binding.form.tilNome.setVisibility(GONE);
-        binding.form.tilTelemovel.setVisibility(GONE);
+        // Esconder campos do form
+        binding.form.tilEmail.setVisibility(View.GONE);
+        binding.form.tilNome.setVisibility(View.GONE);
+        binding.form.tilTelemovel.setVisibility(View.GONE);
 
+        // Obter o manager
         authManager = AuthManager.getInstance();
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Botão Iniciar Sessão
         binding.btnLogin.setOnClickListener(v -> {
+            // Verificar se tem internet
+            if (!ConnectionUtils.hasInternet(LoginActivity.this)) {
+                Toast.makeText(LoginActivity.this, R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
+            }
 
+            // Obter dados
             String username = String.valueOf(binding.form.etUsername.getText());
             String password = String.valueOf(binding.form.etPassword.getText());
 
+            // Validar dados
+            if (!validateFields(username, password)) return;
+
+            // Fazer pedido de login
             authManager.login(this, username, password, new LoginListener() {
                 @Override
                 public void onSuccess() {
+                    Toast.makeText(LoginActivity.this, R.string.msg_login_success, Toast.LENGTH_SHORT).show();
                     finish();
                 }
-
+                @Override
+                public void onInvalidCredentials() {
+                    Toast.makeText(LoginActivity.this, R.string.msg_credenciais_invalidas, Toast.LENGTH_SHORT).show();
+                }
                 @Override
                 public void onError() {
-                    Toast.makeText(LoginActivity.this, "erro", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, R.string.erro_api_titulo, Toast.LENGTH_SHORT).show();
                 }
             });
         });
 
+        // Botão Criar Conta
         binding.btnSignup.setOnClickListener(v -> {
             startActivity(new Intent(LoginActivity.this, SignupActivity.class));
             finish();
         });
     }
 
-    @Override
-    public void onResume()
-    {
-        super.onResume();
-        if (!ConnectionUtils.hasInternet(this)) {
-            finish();
+    private boolean validateFields(String username, String password) {
+        boolean isValid = true;
+
+        // Validar username
+        if (username.isEmpty()) {
+            binding.form.tilUsername.setError(getString(R.string.msg_campo_obrigatorio));
+            isValid = false;
         }
+        else binding.form.tilUsername.setErrorEnabled(false);
+
+        // Validar password
+        if (password.isEmpty()) {
+            binding.form.tilPassword.setError(getString(R.string.msg_campo_obrigatorio));
+            isValid = false;
+        }
+        else binding.form.tilPassword.setErrorEnabled(false);
+
+        return isValid;
     }
 
     @Override

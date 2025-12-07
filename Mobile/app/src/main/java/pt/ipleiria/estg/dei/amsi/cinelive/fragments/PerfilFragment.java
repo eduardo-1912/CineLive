@@ -20,11 +20,15 @@ import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.activities.MainActivity;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.FragmentPerfilBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.managers.AuthManager;
+import pt.ipleiria.estg.dei.amsi.cinelive.managers.PerfilManager;
+import pt.ipleiria.estg.dei.amsi.cinelive.models.Perfil;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
 
 public class PerfilFragment extends Fragment {
     private FragmentPerfilBinding binding;
     private AuthManager authManager;
+    private PerfilManager perfilManager;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -33,6 +37,9 @@ public class PerfilFragment extends Fragment {
 
         // Obter o auth manager
         authManager = AuthManager.getInstance();
+
+        // Obter o perfil manager
+        perfilManager = PerfilManager.getInstance();
     }
 
     @Override
@@ -62,6 +69,7 @@ public class PerfilFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
+        // Esconder campo de password
         binding.form.tilPassword.setVisibility(View.GONE);
 
         if (!ConnectionUtils.hasInternet(requireContext())) {
@@ -69,20 +77,17 @@ public class PerfilFragment extends Fragment {
             binding.btnEliminarConta.setVisibility(View.GONE);
         }
 
-        // TODO: CHANGE THIS
-        binding.form.etUsername.setText("john.smith");
-        binding.form.etEmail.setText("john.smith@email.com");
-        binding.form.etNome.setText("John Smith");
-        binding.form.etTelemovel.setText("912345678");
+        Perfil perfil = perfilManager.getPerfil();
+
+        if (perfil != null) {
+            binding.form.etUsername.setText(perfil.getUsername());
+            binding.form.etEmail.setText(perfil.getEmail());
+            binding.form.etNome.setText(perfil.getNome());
+            binding.form.etTelemovel.setText(perfil.getTelemovel());
+        }
 
         binding.btnEditarPerfil.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), EditarPerfilActivity.class);
-
-            intent.putExtra("username", String.valueOf(binding.form.etUsername.getText()));
-            intent.putExtra("email", String.valueOf(binding.form.etEmail.getText()));
-            intent.putExtra("nome", String.valueOf(binding.form.etNome.getText()));
-            intent.putExtra("telemovel", String.valueOf(binding.form.etTelemovel.getText()));
-
             startActivity(intent);
         });
 
@@ -91,15 +96,25 @@ public class PerfilFragment extends Fragment {
                 .setTitle(R.string.btn_eliminar_conta)
                 .setMessage(R.string.msg_eliminar_conta)
                 .setPositiveButton(R.string.btn_eliminar_conta, (dialog, which) -> {
-                    AuthManager.deleteAccount();
+                    //AuthManager.deleteAccount();
                 }).setNegativeButton(R.string.btn_cancelar, null).show();
         });
 
         binding.btnLogout.setOnClickListener(v -> {
+            // Logout
             authManager.logout(requireContext());
-            ((MainActivity)requireActivity()).navigateToFragment(R.id.navFilmes);
-            //((MainActivity)requireActivity()).onResume();
+
+            // Reiniciar a MainActivity
+            Intent intent = new Intent(requireContext(), MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+
+            requireActivity().finish();
         });
+    }
+
+    public void loadPerfil() {
+
     }
 
     @Override

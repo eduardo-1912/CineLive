@@ -11,7 +11,7 @@
     <!-- Toolbar -->
     <include android:id="@+id/toolbar" layout="@layout/toolbar" />
 
-    <!-- Container -->
+    <!-- Main Content -->
     <LinearLayout style="@style/Container.Main">
 
         <!-- Título -->

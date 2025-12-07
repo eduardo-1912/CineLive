@@ -38,6 +38,6 @@ public class ApiRoutes {
     }
 
     public static String validateToken (String url, String token) {
-        return url + "/auth/validate?access-token=" + token;
+        return url + "/auth/validate-token?access-token=" + token;
     }
 }

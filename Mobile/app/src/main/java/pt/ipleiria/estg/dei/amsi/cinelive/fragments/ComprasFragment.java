@@ -60,6 +60,8 @@ public class ComprasFragment extends Fragment {
         binding.rvCompras.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.rvCompras.setAdapter(adapter);
 
+        // TODO: IF NOT LOGGED IN --> NAVIGATE TO FILMES + TOAST
+
     }
 
     @Override

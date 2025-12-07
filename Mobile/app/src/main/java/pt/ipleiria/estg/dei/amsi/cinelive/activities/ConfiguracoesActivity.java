@@ -109,7 +109,7 @@ public class ConfiguracoesActivity extends AppCompatActivity {
                 binding.tvApiResponse.setVisibility(View.GONE);
                 showProgressBar(false);
                 updateStatusIcon(2);
-                Toast.makeText(ConfiguracoesActivity.this, R.string.msg_erro_api, Toast.LENGTH_SHORT).show();
+                Toast.makeText(ConfiguracoesActivity.this, R.string.erro_api_titulo, Toast.LENGTH_SHORT).show();
             }
         });
     }

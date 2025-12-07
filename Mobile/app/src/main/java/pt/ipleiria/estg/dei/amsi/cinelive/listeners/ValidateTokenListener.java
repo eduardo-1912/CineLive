@@ -1,7 +1,6 @@
 package pt.ipleiria.estg.dei.amsi.cinelive.listeners;
 
-public interface LoginListener {
+public interface ValidateTokenListener {
     void onSuccess();
-    void onInvalidCredentials();
     void onError();
 }
