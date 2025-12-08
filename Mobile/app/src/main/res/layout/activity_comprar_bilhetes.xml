@@ -11,173 +11,186 @@
     <!-- Toolbar -->
     <include android:id="@+id/toolbar" layout="@layout/toolbar" />
 
-    <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
 
-        <LinearLayout style="@style/VerticalLayout">
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefresh" style="@style/VerticalLayout.Full">
 
-            <!-- Dados do filmes -->
-            <LinearLayout style="@style/Container.Main">
+        <ViewFlipper android:id="@+id/mainFlipper" style="@style/VerticalLayout.Full">
+
+            <!-- Main Loading -->
+            <include layout="@layout/layout_loading" />
+
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fillViewport="true">
 
                 <LinearLayout style="@style/VerticalLayout">
 
-                    <!-- Título -->
-                    <TextView android:id="@+id/tvTitulo"
-                        style="@style/Title.Bold"
-                        android:textSize="28sp" />
+                    <!-- Dados do filmes -->
+                    <LinearLayout style="@style/Container.Main">
 
-                    <LinearLayout style="@style/HorizontalLayout">
+                        <LinearLayout style="@style/VerticalLayout">
 
-                        <!-- Rating -->
-                        <TextView android:id="@+id/tvRating" style="@style/Text" />
+                            <!-- Título -->
+                            <TextView android:id="@+id/tvTitulo"
+                                style="@style/Title.Bold"
+                                android:textSize="28sp" />
 
-                        <TextView style="@style/Text" android:text=" • " />
+                            <LinearLayout style="@style/HorizontalLayout">
 
-                        <!-- Duração -->
-                        <TextView android:id="@+id/tvDuracao" style="@style/Text" />
+                                <!-- Rating -->
+                                <TextView android:id="@+id/tvRating" style="@style/Text" />
 
-                    </LinearLayout>
+                                <TextView style="@style/Text" android:text=" • " />
 
-                </LinearLayout>
+                                <!-- Duração -->
+                                <TextView android:id="@+id/tvDuracao" style="@style/Text" />
 
-                <Space style="@style/VerticalSpace.16" />
+                            </LinearLayout>
 
-                <LinearLayout style="@style/HorizontalLayout.Full">
-
-                    <LinearLayout android:layout_weight="1" style="@style/VerticalLayout">
-
-                        <!-- Cinema -->
-                        <TextView style="@style/Label" android:text="@string/label_cinema" />
-                        <TextView android:id="@+id/tvNomeCinema" style="@style/Text" />
+                        </LinearLayout>
 
                         <Space style="@style/VerticalSpace.16" />
 
-                        <!-- Data Sessão -->
-                        <TextView style="@style/Label" android:text="@string/label_data" />
-                        <TextView android:id="@+id/tvDataSessao" style="@style/Text" />
+                        <LinearLayout style="@style/HorizontalLayout.Full">
+
+                            <LinearLayout android:layout_weight="1" style="@style/VerticalLayout">
+
+                                <!-- Cinema -->
+                                <TextView style="@style/Label" android:text="@string/label_cinema" />
+                                <TextView android:id="@+id/tvNomeCinema" style="@style/Text" />
+
+                                <Space style="@style/VerticalSpace.16" />
+
+                                <!-- Data Sessão -->
+                                <TextView style="@style/Label" android:text="@string/label_data" />
+                                <TextView android:id="@+id/tvDataSessao" style="@style/Text" />
+
+                            </LinearLayout>
+
+                            <LinearLayout android:layout_weight="1" style="@style/VerticalLayout" >
+
+                                <!-- Sala -->
+                                <TextView style="@style/Label" android:text="@string/label_sala" />
+                                <TextView android:id="@+id/tvNomeSala" style="@style/Text" />
+
+                                <Space style="@style/VerticalSpace.16" />
+
+                                <!-- Horário Sessão -->
+                                <TextView style="@style/Label" android:text="@string/label_horario" />
+                                <LinearLayout style="@style/HorizontalLayout">
+                                    <TextView android:id="@+id/tvHoraInicio" style="@style/Text" />
+                                    <TextView android:text=" - " style="@style/Text" />
+                                    <TextView android:id="@+id/tvHoraFim" style="@style/Text" />
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+                        </LinearLayout>
 
                     </LinearLayout>
 
-                    <LinearLayout android:layout_weight="1" style="@style/VerticalLayout" >
+                    <View style="@style/Divider" />
 
-                        <!-- Sala -->
-                        <TextView style="@style/Label" android:text="@string/label_sala" />
-                        <TextView android:id="@+id/tvNomeSala" style="@style/Text" />
+                    <!-- Escolha de lugares -->
+                    <LinearLayout style="@style/Container.Main">
 
-                        <Space style="@style/VerticalSpace.16" />
+                        <LinearLayout android:gravity="center" style="@style/HorizontalLayout.Full" >
 
-                        <!-- Horário Sessão -->
-                        <TextView style="@style/Label" android:text="@string/label_horario" />
-                        <LinearLayout style="@style/HorizontalLayout">
-                            <TextView android:id="@+id/tvHoraInicio" style="@style/Text" />
-                            <TextView android:text=" - " style="@style/Text" />
-                            <TextView android:id="@+id/tvHoraFim" style="@style/Text" />
+                            <!-- Disponível -->
+                            <LinearLayout android:backgroundTint="?attr/colorSecondaryContainer"
+                                style="@style/BadgeContainer">
+                                <TextView android:text="@string/badge_disponivel" style="@style/BadgeText"
+                                    android:textColor="?attr/colorOnSecondaryContainer" />
+                            </LinearLayout>
+
+                            <Space style="@style/HorizontalSpace.6" />
+
+                            <!-- Selecionado -->
+                            <LinearLayout android:backgroundTint="?attr/colorPrimary"
+                                style="@style/BadgeContainer">
+                                <TextView android:text="@string/badge_selecionado" style="@style/BadgeText"/>
+                            </LinearLayout>
+
+                            <Space style="@style/HorizontalSpace.6" />
+
+                            <!-- Ocupado -->
+                            <LinearLayout android:backgroundTint="?attr/colorOutline"
+                                style="@style/BadgeContainer">
+                                <TextView android:text="@string/badge_ocupado" style="@style/BadgeText" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                        <Space style="@style/VerticalSpace.20" />
+
+                        <!-- Ecrã -->
+                        <TextView android:text="@string/label_ecra"
+                            style="@style/Label"
+                            android:textAlignment="center"
+                            android:layout_marginBottom="8dp" />
+                        <View android:layout_width="match_parent"
+                            android:layout_height="3dp"
+                            android:background="?attr/colorOnSurface"/>
+
+                        <Space style="@style/VerticalSpace.12" />
+
+                        <!-- Mapa de Lugares -->
+                        <HorizontalScrollView style="@style/HorizontalLayout.Full">
+
+                            <TableLayout
+                                android:id="@+id/mapaLugares"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:stretchColumns="*"
+                                android:layout_marginBottom="6dp" />
+
+                        </HorizontalScrollView>
+
+                        <Space style="@style/VerticalSpace.24" />
+
+                        <LinearLayout style="@style/VerticalLayout"
+                            android:padding="16dp" android:background="@drawable/container_shape_light">
+
+                            <LinearLayout style="@style/HorizontalLayout.Full">
+
+                                <LinearLayout android:layout_weight="0.35" style="@style/VerticalLayout">
+
+                                    <!-- Lugares -->
+                                    <TextView android:text="@string/label_lugares" style="@style/Label" />
+                                    <TextView android:id="@+id/tvLugares" style="@style/Text" />
+
+                                </LinearLayout>
+
+                                <LinearLayout android:layout_weight="0.65" style="@style/VerticalLayout">
+
+                                    <!-- Total -->
+                                    <TextView android:text="@string/label_total" style="@style/Label" android:textAlignment="textEnd"/>
+                                    <TextView android:id="@+id/tvTotal" style="@style/Text" android:textAlignment="textEnd" />
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+                            <Space style="@style/VerticalSpace.8" />
+
+                            <!-- Botão Pagar -->
+                            <Button android:id="@+id/btnPagar"
+                                style="@style/Button.Primary"
+                                android:layout_width="match_parent"
+                                android:text="@string/btn_selecione_lugares"/>
+
                         </LinearLayout>
 
                     </LinearLayout>
 
                 </LinearLayout>
 
-            </LinearLayout>
+            </androidx.core.widget.NestedScrollView>
 
-            <View style="@style/Divider" />
+        </ViewFlipper>
 
-            <!-- Escolha de lugares -->
-            <LinearLayout style="@style/Container.Main">
-
-                <LinearLayout android:gravity="center" style="@style/HorizontalLayout.Full" >
-
-                    <!-- Disponível -->
-                    <LinearLayout android:backgroundTint="?attr/colorSecondaryContainer"
-                        style="@style/BadgeContainer">
-                        <TextView android:text="@string/badge_disponivel" style="@style/BadgeText"
-                            android:textColor="?attr/colorOnSecondaryContainer" />
-                    </LinearLayout>
-
-                    <Space style="@style/HorizontalSpace.6" />
-
-                    <!-- Selecionado -->
-                    <LinearLayout android:backgroundTint="?attr/colorPrimary"
-                        style="@style/BadgeContainer">
-                        <TextView android:text="@string/badge_selecionado" style="@style/BadgeText"/>
-                    </LinearLayout>
-
-                    <Space style="@style/HorizontalSpace.6" />
-
-                    <!-- Ocupado -->
-                    <LinearLayout android:backgroundTint="?attr/colorOutline"
-                        style="@style/BadgeContainer">
-                        <TextView android:text="@string/badge_ocupado" style="@style/BadgeText" />
-                    </LinearLayout>
-
-                </LinearLayout>
-
-                <Space style="@style/VerticalSpace.20" />
-
-                <!-- Ecrã -->
-                <TextView android:text="@string/label_ecra"
-                    style="@style/Label"
-                    android:textAlignment="center"
-                    android:layout_marginBottom="8dp" />
-                <View android:layout_width="match_parent"
-                    android:layout_height="3dp"
-                    android:background="?attr/colorOnSurface"/>
-
-                <Space style="@style/VerticalSpace.12" />
-
-                <!-- Mapa de Lugares -->
-                <HorizontalScrollView style="@style/HorizontalLayout.Full">
-
-                    <TableLayout
-                        android:id="@+id/mapaLugares"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:stretchColumns="*"
-                        android:layout_marginBottom="6dp" />
-
-                </HorizontalScrollView>
-
-                <Space style="@style/VerticalSpace.24" />
-
-                <LinearLayout style="@style/VerticalLayout"
-                    android:padding="16dp" android:background="@drawable/container_shape_light">
-
-                    <LinearLayout style="@style/HorizontalLayout.Full">
-
-                        <LinearLayout android:layout_weight="0.35" style="@style/VerticalLayout">
-
-                            <!-- Lugares -->
-                            <TextView android:text="@string/label_lugares" style="@style/Label" />
-                            <TextView android:id="@+id/tvLugares" style="@style/Text" />
-
-                        </LinearLayout>
-
-                        <LinearLayout android:layout_weight="0.65" style="@style/VerticalLayout">
-
-                            <!-- Total -->
-                            <TextView android:text="@string/label_total" style="@style/Label" android:textAlignment="textEnd"/>
-                            <TextView android:id="@+id/tvTotal" style="@style/Text" android:textAlignment="textEnd" />
-
-                        </LinearLayout>
-
-                    </LinearLayout>
-
-                    <Space style="@style/VerticalSpace.8" />
-
-                    <!-- Botão Pagar -->
-                    <Button android:id="@+id/btnPagar"
-                        style="@style/Button.Primary"
-                        android:layout_width="match_parent"
-                        android:text="@string/btn_selecione_lugares"/>
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-    </androidx.core.widget.NestedScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </LinearLayout>

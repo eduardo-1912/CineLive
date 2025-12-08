@@ -40,6 +40,7 @@
     <string name="label_sinopse">Sinopse</string>
     <string name="label_hora">Hora</string>
     <string name="msg_erro_carregar_filme">Erro ao carregar o filme</string>
+    <string name="msg_erro_carregar_sessoes">Erro ao carregar as sessões</string>
 
     <!-- activity_comprar_bilhetes -->
     <string name="label_cinema">Cinema</string>
@@ -54,6 +55,7 @@
     <string name="label_total">Total</string>
     <string name="btn_selecione_lugares">Selecione lugares</string>
     <string name="btn_pagar">Proceder ao pagamento</string>
+    <string name="msg_erro_carregar_sessao">Erro ao carregar a sessão</string>
 
     <!-- fragment_cinemas -->
     <string name="label_morada">Morada</string>
@@ -135,5 +137,7 @@
     <string name="erro_nenhum_cinema_subtitulo">Não há cinemas ativos de momento.</string>
     <string name="erro_nenhuma_compra_titulo">Ainda não tem compras</string>
     <string name="erro_nenhuma_compra_subtitulo">Veja os filmes em exibição e compre bilhetes</string>
+    <string name="erro_token_invalido_titulo">Erro ao efetuar login</string>
+    <string name="erro_token_invalido_subtitulo">Verifique a ligação à API e tente novamente</string>
 
 </resources>

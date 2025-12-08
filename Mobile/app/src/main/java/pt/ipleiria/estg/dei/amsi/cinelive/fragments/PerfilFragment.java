@@ -92,6 +92,7 @@ public class PerfilFragment extends Fragment {
             loadPerfil();
         });
 
+        // Botão Editar Perfil
         binding.btnEditarPerfil.setOnClickListener(v -> {
             // Verificar se tem internet
             if (!ConnectionUtils.hasInternet(requireContext())) {
@@ -157,7 +158,7 @@ public class PerfilFragment extends Fragment {
 
             @Override
             public void onError() {
-                showError(hasInternet ? ErrorPage.Type.API : ErrorPage.Type.INTERNET);
+                showError(hasInternet ? ErrorPage.Type.TOKEN_INVALIDO : ErrorPage.Type.INTERNET);
             }
         });
 
@@ -187,8 +188,9 @@ public class PerfilFragment extends Fragment {
                 case INTERNET:
                     loadPerfil();
                     break;
-                case API:
-                    startActivity(new Intent(requireContext(), ConfiguracoesActivity.class));
+                case TOKEN_INVALIDO:
+                    authManager.logout(requireContext());
+                    resetActivity();
                     break;
             }
         });

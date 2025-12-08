@@ -11,7 +11,7 @@ public class Filme {
         this.posterUrl = posterUrl;
     }
 
-    public Filme(int id, String titulo, String posterUrl, String rating, String generos, String duracao, String estreia, String idioma, String realizacao, String sinopse, Boolean hasSessoes) {
+    public Filme(int id, String titulo, String posterUrl, String rating, String generos, String estreia, String duracao, String idioma, String realizacao, String sinopse, Boolean hasSessoes) {
         this.id = id;
         this.titulo = titulo;
         this.posterUrl = posterUrl;
@@ -35,5 +35,5 @@ public class Filme {
     public String getIdioma() {return idioma;}
     public String getRealizacao() {return realizacao;}
     public String getPosterUrl() {return posterUrl;}
-    public boolean hasSessoes() {return hasSessoes();}
+    public boolean hasSessoes() {return hasSessoes;}
 }

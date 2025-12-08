@@ -50,6 +50,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void load() {
+        // Se não tiver internet --> usar estado antigo
+        if (!ConnectionUtils.hasInternet(this)) updateBottomNav(authManager.isLoggedIn(this));
+
         // Validar o token (se o tiver nas preferences)
         if (authManager.isLoggedIn(this)) authManager.validateToken(this, new StandardListener() {
             @Override
@@ -62,7 +65,6 @@ public class MainActivity extends AppCompatActivity {
                 updateBottomNav(false);
             }
         });
-        else updateBottomNav(false);
 
         // Ação do botão de login
         binding.bottomNav.setOnItemSelectedListener(item -> {

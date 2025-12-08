@@ -20,12 +20,17 @@ import java.util.List;
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityComprarBilhetesBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ItemLugarBinding;
+import pt.ipleiria.estg.dei.amsi.cinelive.listeners.SessaoListener;
+import pt.ipleiria.estg.dei.amsi.cinelive.managers.SessoesManager;
+import pt.ipleiria.estg.dei.amsi.cinelive.models.Compra;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Sessao;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
 
 public class ComprarBilhetesActivity extends AppCompatActivity {
 
     private ActivityComprarBilhetesBinding binding;
+    private SessoesManager sessoesManager;
+    int id;
     private final List<String> lugaresSelecionados = new ArrayList<>();
     private double precoBilhete, total;
 
@@ -47,21 +52,55 @@ public class ComprarBilhetesActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(R.string.comprar_bilhetes);
 
+        sessoesManager = SessoesManager.getInstance();
+
         // Obter ID da sessão
         Intent intent = getIntent();
-        int idSessao = intent.getIntExtra("sessao_id", -1);
+        id = intent.getIntExtra("id", -1);
 
         // Preencher dados do filme
         binding.tvTitulo.setText(intent.getStringExtra("titulo"));
         binding.tvRating.setText(intent.getStringExtra("rating"));
         binding.tvDuracao.setText(intent.getStringExtra("duracao"));
 
+        // Carregar a sessão
+        loadSessao();
 
-        // TODO: REPLACE MOCK DATA
-        List<String> lugaresOcupados = Arrays.asList("A5", "A6", "A7", "C3", "E4");
+        // Swipe refresh
+        binding.swipeRefresh.setOnRefreshListener(() -> {
+            binding.swipeRefresh.setRefreshing(false);
+            loadSessao();
+        });
+    }
 
-        Sessao sessao = new Sessao(idSessao, "CineLive Leiria", "Sala 3", "29/11/2025", "10:00", "12:32", 8.00, 10, 12, lugaresOcupados);
+    private void loadSessao() {
+        binding.mainFlipper.setDisplayedChild(0); // Main Loading
 
+        // Verificar se tem internet
+        if (!ConnectionUtils.hasInternet(this)) {
+            Toast.makeText(this, R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
+            finish();
+        }
+
+        // Obter sessão da API
+        sessoesManager.getSessao(this, id, new SessaoListener() {
+            @Override
+            public void onSuccess(Sessao sessao) {
+                setSessao(sessao);
+            }
+
+            @Override
+            public void onError() {
+                Toast.makeText(ComprarBilhetesActivity.this, R.string.msg_erro_carregar_sessao, Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        });
+    }
+
+    private void setSessao(Sessao sessao) {
+        binding.mainFlipper.setDisplayedChild(1); // Main Content
+
+        // Preencher campos
         binding.tvNomeCinema.setText(sessao.getNomeCinema());
         binding.tvNomeSala.setText(sessao.getNomeSala());
         binding.tvDataSessao.setText(sessao.getData());
@@ -70,29 +109,28 @@ public class ComprarBilhetesActivity extends AppCompatActivity {
         precoBilhete = sessao.getPrecoBilhete();
 
         // Mapa de lugares
+        binding.mapaLugares.removeAllViews();
+        lugaresSelecionados.clear();
         gerarMapaLugares(sessao.getNumFilas(), sessao.getNumColunas(), sessao.getLugaresOcupados());
         atualizarResumo();
 
         // Botão Pagar
         binding.btnPagar.setOnClickListener(v -> {
-            String[] opcoesPagamento = {"Cartão", "MB Way", "PayPal"};
+            String[] optionsPagamaneto = {"Cartão", "MB Way", "PayPal"};
 
             new MaterialAlertDialogBuilder(this)
                 .setTitle("Escolha o método de pagamento")
-                .setItems(opcoesPagamento, (dialog, which) -> {
-                    String metodoSelecionado = opcoesPagamento[which];
+                .setItems(optionsPagamaneto, (dialog, which) -> {
 
-                    // TODO: criar compra e bilhetes para api
+                    Compra compra = new Compra(id, optionsPagamaneto[which], lugaresSelecionados);
 
                 })
                 .setNegativeButton("Cancelar", null)
                 .show();
         });
-
     }
 
     private void gerarMapaLugares(int numFilas, int numColunas, List<String> lugaresOcupados) {
-
         // Criar fila
         for (int i = 0; i < numFilas; i++) {
             TableRow fila = new TableRow(this);
@@ -149,15 +187,6 @@ public class ComprarBilhetesActivity extends AppCompatActivity {
         // Botão Pagar
         binding.btnPagar.setEnabled(hasLugares);
         binding.btnPagar.setText(hasLugares ? R.string.btn_pagar : R.string.btn_selecione_lugares);
-    }
-
-    @Override
-    public void onResume()
-    {
-        super.onResume();
-        if (!ConnectionUtils.hasInternet(this)) {
-            Toast.makeText(this, R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
-        }
     }
 
     @Override

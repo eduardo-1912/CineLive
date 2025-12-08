@@ -13,13 +13,13 @@ public class Sessao {
         this.horaInicio = horaInicio;
     }
 
-    public Sessao(int id, String nomeCinema, String nomeSala, String data, String horaInicio, String horaFim, double precoBilhete, int numFilas, int numColunas, List<String> lugaresOcupados) {
+    public Sessao(int id, String data, String horaInicio, String horaFim, String nomeCinema, String nomeSala, double precoBilhete, int numFilas, int numColunas, List<String> lugaresOcupados) {
         this.id = id;
-        this.nomeCinema = nomeCinema;
-        this.nomeSala = nomeSala;
         this.data = data;
         this.horaInicio = horaInicio;
         this.horaFim = horaFim;
+        this.nomeCinema = nomeCinema;
+        this.nomeSala = nomeSala;
         this.precoBilhete = precoBilhete;
         this.numFilas = numFilas;
         this.numColunas = numColunas;

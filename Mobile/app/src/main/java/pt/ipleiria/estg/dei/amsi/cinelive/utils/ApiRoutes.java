@@ -21,6 +21,10 @@ public class ApiRoutes {
         return url + "/filmes/" + filmeId + "/sessoes?cinema_id=" + cinemaId ;
     }
 
+    public static String sessao (String url, int id) {
+        return url + "/sessoes/" + id;
+    }
+
     public static String cinemas (String url) {
         return url + "/cinemas";
     }

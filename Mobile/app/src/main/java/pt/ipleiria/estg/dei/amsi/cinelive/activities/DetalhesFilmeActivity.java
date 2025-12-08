@@ -17,15 +17,13 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityDetalhesFilmeBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.FilmeListener;
-import pt.ipleiria.estg.dei.amsi.cinelive.listeners.SessaoListener;
+import pt.ipleiria.estg.dei.amsi.cinelive.listeners.SessoesListener;
 import pt.ipleiria.estg.dei.amsi.cinelive.managers.FilmesManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.managers.PreferencesManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.managers.SessoesManager;
@@ -39,7 +37,6 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
     PreferencesManager preferences;
     FilmesManager filmesManager;
     SessoesManager sessoesManager;
-    Sessao sessaoSelecionada;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,34 +66,51 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
 
         // Carregar o filme
         loadFilme();
+
+        // Swipe refresh
+        binding.swipeRefresh.setOnRefreshListener(() -> {
+            binding.swipeRefresh.setRefreshing(false);
+            loadFilme();
+        });
     }
 
     private void loadFilme() {
+        binding.mainFlipper.setDisplayedChild(0); // Main Loading
+
+        // Verificar se tem internet
+        if (!ConnectionUtils.hasInternet(this)) {
+            Toast.makeText(this, R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
+            finish();
+        }
+
+        // Obter o filme à API
         filmesManager.getFilme(this, getIntent().getIntExtra("id", -1), new FilmeListener() {
             @Override
             public void onSuccess(Filme filme) {
                 setFilme(filme);
-                loadSessoes(filme);
+                if (filme.hasSessoes()) loadSessoes(filme);
             }
 
             @Override
             public void onError() {
-                Toast.makeText(DetalhesFilmeActivity.this, "erro", Toast.LENGTH_SHORT).show();
+                Toast.makeText(DetalhesFilmeActivity.this, R.string.msg_erro_carregar_filme, Toast.LENGTH_SHORT).show();
                 finish();
             }
         });
-
     }
 
     private void setFilme(Filme filme) {
+        binding.mainFlipper.setDisplayedChild(1); // Main Content
+
+        // Atualizar title da toolbar
         getSupportActionBar().setTitle(filme.getTitulo());
 
-        // Carregar Poster
+        // Carregar o poster
         Glide.with(DetalhesFilmeActivity.this)
-                .load(preferences.getApiHost() + filme.getPosterUrl())
-                .placeholder(R.drawable.poster_placeholder)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .into(binding.ivPoster);
+            .load(preferences.getApiHost() + filme.getPosterUrl())
+            .placeholder(R.drawable.poster_placeholder)
+            .diskCacheStrategy(DiskCacheStrategy.ALL)
+            .into(binding.ivPoster);
 
         // Dados do filmes
         binding.tvTitulo.setText(filme.getTitulo());
@@ -110,44 +124,61 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
     }
 
     private void loadSessoes(Filme filme) {
-        sessoesManager.getSessoes(this, filme.getId(), new SessaoListener() {
+        // Verificar se tem internet
+        if (!ConnectionUtils.hasInternet(this)) {
+            Toast.makeText(this, R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Mostrar conteúdo
+        binding.mainSessoes.setVisibility(View.VISIBLE);
+
+        // Obter sessões à API
+        sessoesManager.getSessoes(this, filme.getId(), new SessoesListener() {
             @Override
             public void onSuccess(Map<String, List<Sessao>> sessoesPorData) {
-
+                // Lista de datas
                 List<String> datas = new ArrayList<>(sessoesPorData.keySet());
 
-                // Preenche spinner com datas reais
+                // Preencher o spinner com as datas
                 binding.spinnerData.setAdapter(
-                        new ArrayAdapter<>(DetalhesFilmeActivity.this,
-                                android.R.layout.simple_spinner_dropdown_item,
-                                datas)
+                    new ArrayAdapter<>(DetalhesFilmeActivity.this, android.R.layout.simple_spinner_dropdown_item, datas)
                 );
 
+                // Se clicou numa data --> atualizar sessões
                 binding.spinnerData.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+                    public void onItemSelected(AdapterView<?> parent, View view, int posData, long id) {
+                        // Verificar se tem internet
+                        if (!ConnectionUtils.hasInternet(DetalhesFilmeActivity.this)) {
+                            Toast.makeText(DetalhesFilmeActivity.this, R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
+                            finish();
+                        }
 
-                        String data = datas.get(pos);
-                        List<Sessao> sessoes = sessoesPorData.get(data);
+                        // Obter as sessões da data selecionada
+                        List<Sessao> sessoes = sessoesPorData.get(datas.get(posData));
 
+                        // Obter as horas
                         List<String> horas = new ArrayList<>();
-                        for (Sessao s : sessoes) horas.add(s.getHoraInicio());
+                        for (Sessao sessao : sessoes) horas.add(sessao.getHoraInicio());
 
-                        binding.lvHoras.setAdapter(new ArrayAdapter<>(DetalhesFilmeActivity.this,
-                                android.R.layout.simple_list_item_1, horas));
+                        // Colocar as horas na ListView
+                        binding.lvHoras.setAdapter(new ArrayAdapter<>(DetalhesFilmeActivity.this, android.R.layout.simple_list_item_1, horas));
 
-                        binding.lvHoras.setOnItemClickListener((p, v2, pos2, i2) -> {
+                        // Se clicou numa hora --> ir para essa sessão
+                        binding.lvHoras.setOnItemClickListener((p, viewHora, posHora, idSessao) -> {
+                            // Obter a sessão correspondente
+                            Sessao sessao = sessoes.get(posHora);
 
-                            Sessao sessao = sessoes.get(pos2);
-
-                            Intent intent = new Intent(DetalhesFilmeActivity.this,
-                                    ComprarBilhetesActivity.class);
-
-                            intent.putExtra("sessao_id", sessao.getId());
+                            // Ir para comprar bilhetes
+                            Intent intent = new Intent(DetalhesFilmeActivity.this, ComprarBilhetesActivity.class);
+                            intent.putExtra("id", sessao.getId());
+                            intent.putExtra("titulo", filme.getTitulo());
+                            intent.putExtra("rating", filme.getRating());
+                            intent.putExtra("duracao", filme.getDuracao());
                             startActivity(intent);
                         });
                     }
-
                     @Override
                     public void onNothingSelected(AdapterView<?> parent) {}
                 });
@@ -155,10 +186,9 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
 
             @Override
             public void onError() {
-                Toast.makeText(DetalhesFilmeActivity.this, "Erro ao carregar sessões", Toast.LENGTH_SHORT).show();
+                Toast.makeText(DetalhesFilmeActivity.this, R.string.msg_erro_carregar_sessoes, Toast.LENGTH_SHORT).show();
             }
         });
-
     }
 
     @Override

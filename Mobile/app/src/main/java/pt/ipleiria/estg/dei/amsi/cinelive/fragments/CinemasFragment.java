@@ -19,6 +19,7 @@ import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.activities.ConfiguracoesActivity;
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.CinemasListener;
 import pt.ipleiria.estg.dei.amsi.cinelive.managers.CinemasManager;
+import pt.ipleiria.estg.dei.amsi.cinelive.managers.FilmesManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.managers.PreferencesManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.adapters.CinemasAdapter;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.FragmentCinemasBinding;
@@ -106,6 +107,9 @@ public class CinemasFragment extends Fragment {
         adapter = new CinemasAdapter(cinemas, preferences.getCinemaId(), cinema -> {
             preferences.setCinemaId(cinema.getId());
             adapter.setCinemaSelecionado(cinema.getId());
+
+            // Limpar cache de filmes
+            FilmesManager.getInstance().clearCache();
         });
 
         binding.rvCinemas.setAdapter(adapter);

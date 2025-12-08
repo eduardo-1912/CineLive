@@ -6,7 +6,7 @@ import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.LayoutErrorBinding;
 
 public class ErrorPage {
-    public enum Type {INTERNET, API, NENHUM_FILME, CINEMA_INVALIDO, NENHUM_CINEMA, NENHUMA_COMPRA};
+    public enum Type {INTERNET, API, NENHUM_FILME, CINEMA_INVALIDO, NENHUM_CINEMA, NENHUMA_COMPRA, TOKEN_INVALIDO};
 
     public static void showError(LayoutErrorBinding binding, Type type) {
         switch(type) {
@@ -44,6 +44,12 @@ public class ErrorPage {
                 binding.tvTitulo.setText(R.string.erro_nenhuma_compra_titulo);
                 binding.tvSubtitulo.setText(R.string.erro_nenhuma_compra_subtitulo);
                 binding.btnAction.setText(R.string.btn_ver_filmes);
+                break;
+            case TOKEN_INVALIDO:
+                binding.ivIcon.setImageResource(R.drawable.ic_perfil);
+                binding.tvTitulo.setText(R.string.erro_token_invalido_titulo);
+                binding.tvSubtitulo.setText(R.string.erro_token_invalido_subtitulo);
+                binding.btnAction.setText(R.string.btn_logout);
                 break;
         }
     }
