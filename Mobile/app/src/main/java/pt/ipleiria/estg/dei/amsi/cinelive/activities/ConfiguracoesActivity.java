@@ -1,9 +1,7 @@
 package pt.ipleiria.estg.dei.amsi.cinelive.activities;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,9 +13,10 @@ import org.json.JSONObject;
 
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityConfiguracoesBinding;
-import pt.ipleiria.estg.dei.amsi.cinelive.listeners.ConnectionListener;
+import pt.ipleiria.estg.dei.amsi.cinelive.listeners.ApiResponseListener;
 import pt.ipleiria.estg.dei.amsi.cinelive.managers.PreferencesManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
+import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorUtils;
 
 public class ConfiguracoesActivity extends AppCompatActivity {
 
@@ -40,93 +39,85 @@ public class ConfiguracoesActivity extends AppCompatActivity {
 
         setSupportActionBar(binding.toolbar.topAppBar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(R.string.configuracoes);
-        binding.toolbar.statusIcon.setVisibility(View.VISIBLE);
 
         // Aceder às preferences
         preferences = new PreferencesManager(this);
 
-        // Colocar dados nos campos
+        // Testar ligação à API
+        testApiConnection(preferences.getApiUrl(), ConnectionUtils.FAST_TIMEOUT);
+
+        // Preencher campos e configurar listeners
+        setFields();
+        setOnClickListeners();
+    }
+
+    private void setFields() {
         binding.etApiHost.setText(preferences.getApiHost());
         binding.etApiPath.setText(preferences.getApiPath());
+    }
 
-        // Testar ligação à API
-        testApiConnection(preferences.getApiUrl(), ConnectionUtils.FAST_TIMEOUT, false);
-
-        // Botão Guardar
+    private void setOnClickListeners() {
+        // Botão guardar
         binding.btnGuardar.setOnClickListener(v -> {
+            // Obter valores
             String apiHost = String.valueOf(binding.etApiHost.getText());
             String apiPath = String.valueOf(binding.etApiPath.getText());
 
             // Testar ligação à API
-            testApiConnection(apiHost + apiPath, ConnectionUtils.DEFAULT_TIMEOUT, true);
+            testApiConnection(apiHost + apiPath, ConnectionUtils.DEFAULT_TIMEOUT);
 
             // Guardar nas preferences
             preferences.setApiUrl(apiHost, apiPath);
         });
 
-        // Botão Restaurar
+        // Botão restaurar
         binding.btnRestaurar.setOnClickListener(v -> {
-            // Reset para default
             preferences.resetApiUrl();
-
-            binding.etApiHost.setText(preferences.getApiHost());
-            binding.etApiPath.setText(preferences.getApiPath());
+            setFields();
 
             // Testar ligação à API
-            testApiConnection(preferences.getApiUrl(), ConnectionUtils.DEFAULT_TIMEOUT, true);
+            testApiConnection(preferences.getApiUrl(), ConnectionUtils.DEFAULT_TIMEOUT);
         });
     }
 
-    private void testApiConnection(String url, int timeout, boolean blockUI) {
-
+    private void testApiConnection(String url, int timeout) {
         // Verificar ligação à internet
         if (!ConnectionUtils.hasInternet(this)) {
-            Toast.makeText(this, R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
+            ErrorUtils.showToast(this, ErrorUtils.Type.NO_INTERNET);
             return;
         }
 
-        showProgressBar(blockUI);
-        updateStatusIcon(0);
+        showLoading(true);
 
-        ConnectionUtils.testApiConnection(this, url, timeout, new ConnectionListener() {
+        ConnectionUtils.testApiConnection(this, url, timeout, new ApiResponseListener() {
             @Override
             public void onSuccess(String response) {
-                showProgressBar(false);
-                updateStatusIcon(1);
+                showLoading(false);
 
                 try {
-                    JSONObject json = new JSONObject(response);
+                    // Mostrar resposta da API
+                    binding.tvApiResponse.setText(new JSONObject(response).toString(3));
                     binding.tvApiResponse.setVisibility(View.VISIBLE);
-                    binding.tvApiResponse.setText(json.toString(3));
                 }
                 catch (Exception e) {
-                    binding.tvApiResponse.setVisibility(View.GONE);
+                    ErrorUtils.showToast(getApplicationContext(), ErrorUtils.Type.API_ERROR);
                 }
             }
             @Override
             public void onError() {
-                binding.tvApiResponse.setVisibility(View.GONE);
-                showProgressBar(false);
-                updateStatusIcon(2);
-                Toast.makeText(ConfiguracoesActivity.this, R.string.erro_api_titulo, Toast.LENGTH_SHORT).show();
+                showLoading(false);
+                ErrorUtils.showToast(getApplicationContext(), ErrorUtils.Type.API_ERROR);
             }
         });
     }
 
-    private void updateStatusIcon(int status) {
-        if (status == 0) binding.toolbar.statusIcon.setImageResource(R.drawable.circle_gray);
-        else if (status == 1) binding.toolbar.statusIcon.setImageResource(R.drawable.circle_green);
-        else binding.toolbar.statusIcon.setImageResource(R.drawable.circle_red);
-    }
-
-    private void showProgressBar(boolean show) {
-        binding.tvApiResponse.setVisibility(View.GONE);
-        binding.progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
+    private void showLoading(boolean show) {
         binding.btnGuardar.setEnabled(!show);
         binding.btnRestaurar.setEnabled(!show);
         binding.etApiHost.setEnabled(!show);
         binding.etApiPath.setEnabled(!show);
+        binding.progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
+        binding.tvApiResponse.setVisibility(View.GONE);
     }
 
     @Override

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Layouts -->
+    <!-- region Layouts -->
     <style name="VerticalLayout">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
@@ -25,9 +25,10 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:orientation">horizontal</item>
     </style>
+    <!-- endregion -->
 
 
-    <!-- Containers -->
+    <!-- region Containers -->
     <style name="Container">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
@@ -45,9 +46,10 @@
         <item name="android:paddingBottom">@dimen/container_padding_vertical</item>
         <item name="android:gravity">center_horizontal</item>
     </style>
+    <!-- endregion -->
 
 
-    <!-- Typography -->
+    <!-- region Typography -->
     <style name="Title" parent="TextAppearance.Material3.DisplaySmall">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
@@ -94,17 +96,18 @@
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">?attr/colorOnBackground</item>
     </style>
+    <!-- endregion -->
 
 
-    <!-- Badges -->
+    <!-- region Badges -->
     <style name="BadgeContainer">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:background">@drawable/badge_shape</item>
-        <item name="android:paddingTop">@dimen/badge_padding_vertical</item>
-        <item name="android:paddingBottom">@dimen/badge_padding_vertical</item>
-        <item name="android:paddingStart">@dimen/badge_padding_horizontal</item>
-        <item name="android:paddingEnd">@dimen/badge_padding_horizontal</item>
+        <item name="android:paddingTop">4dp</item>
+        <item name="android:paddingBottom">4dp</item>
+        <item name="android:paddingStart">14dp</item>
+        <item name="android:paddingEnd">14dp</item>
     </style>
 
     <style name="BadgeText">
@@ -114,23 +117,28 @@
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">?attr/colorOnSurfaceInverse</item>
     </style>
+    <!-- endregion -->
 
 
+    <!-- region Dividers -->
     <style name="Divider">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">1dp</item>
         <item name="android:background">?attr/colorSurfaceContainerHighest</item>
     </style>
+    <!-- endregion -->
 
 
+    <!-- region Inputs -->
     <style name="TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginBottom">8dp</item>
     </style>
+    <!-- endregion -->
 
 
-    <!-- Buttons -->
+    <!-- region Buttons -->
     <style name="Button.Primary" parent="Widget.Material3.Button">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
@@ -170,9 +178,10 @@
         <item name="android:textColor">@color/toggle_button_text</item>
         <item name="android:backgroundTint">@color/toggle_button_background</item>
     </style>
+    <!-- endregion -->
 
 
-    <!-- Images -->
+    <!-- region Images -->
     <style name="MoviePoster">
         <item name="android:adjustViewBounds">true</item>
         <item name="android:clipToOutline" tools:targetApi="31">true</item>
@@ -180,9 +189,10 @@
         <item name="android:background">@drawable/poster_shape</item>
         <item name="android:src">@drawable/poster_placeholder</item>
     </style>
+    <!-- endregion -->
 
 
-    <!-- Vertical Spaces -->
+    <!-- region Vertical Spaces -->
     <style name="VerticalSpace">
         <item name="android:layout_width">match_parent</item>
     </style>
@@ -214,9 +224,10 @@
     <style name="VerticalSpace.32" parent="VerticalSpace">
         <item name="android:layout_height">32dp</item>
     </style>
+    <!-- endregion -->
 
 
-    <!-- Horizontal Spaces -->
+    <!-- region Horizontal Spaces -->
     <style name="HorizontalSpace">
         <item name="android:layout_height">match_parent</item>
     </style>
@@ -244,5 +255,6 @@
     <style name="HorizontalSpace.16">
         <item name="android:layout_width">16dp</item>
     </style>
+    <!-- endregion -->
 
 </resources>

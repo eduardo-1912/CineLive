@@ -10,7 +10,7 @@ public class Compra {
     public Compra(int sessaoId, String pagamento, List<String> lugaresSelecionados) {
         this.sessaoId = sessaoId;
         this.pagamento = pagamento;
-        this.lugaresSelecionados = lugaresSelecionados
+        this.lugaresSelecionados = lugaresSelecionados;
     }
 
     public Compra(int id, String tituloFilme, String dataCompra, String nomeCinema, String nomeSala, String estado, String total, String dataSessao, String horaInicioSessao, String horaFimSessao, String lugares) {

@@ -17,6 +17,7 @@ import pt.ipleiria.estg.dei.amsi.cinelive.listeners.LoginListener;
 import pt.ipleiria.estg.dei.amsi.cinelive.managers.AuthManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.User;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
+import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorUtils;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -40,58 +41,64 @@ public class LoginActivity extends AppCompatActivity {
         setSupportActionBar(binding.toolbar.topAppBar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        // Esconder campos do form
+        // Esconder campos do layout form
         binding.form.tilEmail.setVisibility(View.GONE);
         binding.form.tilNome.setVisibility(View.GONE);
         binding.form.tilTelemovel.setVisibility(View.GONE);
 
-        // Obter o manager
+        // Obter o auth manager
         authManager = AuthManager.getInstance();
+
+        // Configurar os listeners
+        setOnClickListeners();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
+    private User getUser() {
+        String username = String.valueOf(binding.form.etUsername.getText()).trim();
+        String password = String.valueOf(binding.form.etPassword.getText());
 
-        // Botão Iniciar Sessão
+        // Devolver objeto user
+        return new User(username , password);
+    }
+
+    private void setOnClickListeners() {
+        // Iniciar sessão
         binding.btnLogin.setOnClickListener(v -> {
             // Verificar se tem internet
             if (!ConnectionUtils.hasInternet(this)) {
-                Toast.makeText(this, R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
+                ErrorUtils.showToast(this, ErrorUtils.Type.NO_INTERNET);
             }
 
-            // Obter dados
-            String username = String.valueOf(binding.form.etUsername.getText());
-            String password = String.valueOf(binding.form.etPassword.getText());
-
-            // Criar objeto user
-            User user = new User(username , password);
-
-            // Validar dados
+            // Obter e validar dados
+            User user = getUser();
             if (!validateFields(user)) return;
 
-            // Fazer pedido de login
-            authManager.login(this, user, new LoginListener() {
-                @Override
-                public void onSuccess() {
-                    Toast.makeText(LoginActivity.this, R.string.msg_sucesso_login, Toast.LENGTH_SHORT).show();
-                    finish();
-                }
-                @Override
-                public void onInvalidCredentials() {
-                    Toast.makeText(LoginActivity.this, R.string.msg_credenciais_invalidas, Toast.LENGTH_SHORT).show();
-                }
-                @Override
-                public void onError() {
-                    Toast.makeText(LoginActivity.this, R.string.msg_erro_login, Toast.LENGTH_LONG).show();
-                }
-            });
+            // Login
+            login(user);
         });
 
-        // Botão Criar Conta
+        // Criar conta
         binding.btnSignup.setOnClickListener(v -> {
-            startActivity(new Intent(LoginActivity.this, SignupActivity.class));
+            startActivity(new Intent(this, SignupActivity.class));
             finish();
+        });
+    }
+
+    private void login(User user) {
+        authManager.login(this, user, new LoginListener() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(getApplicationContext(), R.string.msg_sucesso_login, Toast.LENGTH_SHORT).show();
+                finish();
+            }
+            @Override
+            public void onInvalidCredentials() {
+                Toast.makeText(getApplicationContext(), R.string.msg_credenciais_invalidas, Toast.LENGTH_SHORT).show();
+            }
+            @Override
+            public void onError() {
+                Toast.makeText(getApplicationContext(), R.string.msg_erro_login, Toast.LENGTH_LONG).show();
+            }
         });
     }
 

@@ -15,7 +15,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import java.util.List;
 
@@ -28,10 +27,10 @@ import pt.ipleiria.estg.dei.amsi.cinelive.databinding.FragmentFilmesBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.FilmesListener;
 import pt.ipleiria.estg.dei.amsi.cinelive.managers.FilmesManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.managers.FilmesManager.Filter;
+import pt.ipleiria.estg.dei.amsi.cinelive.managers.PreferencesManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Filme;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
-import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorPage;
-import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorPage.Type;
+import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorUtils;
 
 public class FilmesFragment extends Fragment {
     private FragmentFilmesBinding binding;
@@ -67,7 +66,7 @@ public class FilmesFragment extends Fragment {
 
         // Obter SearchView
         searchView = (SearchView) itemPesquisa.getActionView();
-        searchView.setQueryHint(getString(R.string.pesquisar_filmes));
+        searchView.setQueryHint(getString(R.string.searchview_pesquisar_filmes));
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -80,7 +79,7 @@ public class FilmesFragment extends Fragment {
                 if (adapter != null) {
                     adapter.search(query);
 
-                    if (adapter.getItemCount() == 0) showErrorFilmes(Type.NENHUM_FILME);
+                    if (adapter.getItemCount() == 0) showErrorFilmes(ErrorUtils.Type.NENHUM_FILME);
                     else binding.filmesFlipper.setDisplayedChild(2); // Filmes Content
                 }
 
@@ -117,24 +116,26 @@ public class FilmesFragment extends Fragment {
         // Obter estado da ligação à internet
         boolean hasInternet = ConnectionUtils.hasInternet(requireContext());
 
+        if (new PreferencesManager(requireContext()).getCinemaId() == -1) {
+            showError(ErrorUtils.Type.CINEMA_INVALIDO);
+        }
+
         // Obter filmes da API
-        filmesManager.fetchFilmes(requireContext(), filter, new FilmesListener() {
+        filmesManager.getFilmes(requireContext(), filter, new FilmesListener() {
             @Override
             public void onSuccess(List<Filme> filmes) {
                 setList(filmes);
 
                 // Tem cache mas não tem internet
-                if (!hasInternet) {
-                    Toast.makeText(requireActivity(), R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
-                }
+                if (!hasInternet) ErrorUtils.showToast(requireContext(), ErrorUtils.Type.NO_INTERNET);
             }
             @Override
             public void onInvalidCinema() {
-                showError(Type.CINEMA_INVALIDO);
+                showError(ErrorUtils.Type.CINEMA_INVALIDO);
             }
             @Override
             public void onError() {
-                showError(hasInternet ? Type.API : Type.INTERNET);
+                showError(hasInternet ? ErrorUtils.Type.API_ERROR : ErrorUtils.Type.NO_INTERNET);
                 filmesManager.clearCache();
             }
         });
@@ -147,11 +148,11 @@ public class FilmesFragment extends Fragment {
         binding.mainFlipper.setDisplayedChild(2); // Main Content
         binding.filmesFlipper.setDisplayedChild(2); // Filmes Content
 
-        // Clicou num filme --> abrir detalhes
+        // Se clicou num filme --> abrir detalhes
         adapter = new FilmesAdapter(filmes, filme -> {
             // Verificar se tem internet
             if (!ConnectionUtils.hasInternet(requireContext())) {
-                Toast.makeText(requireContext(), R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
+                ErrorUtils.showToast(requireContext(), ErrorUtils.Type.NO_INTERNET);
                 return;
             }
 
@@ -191,12 +192,12 @@ public class FilmesFragment extends Fragment {
         binding.btnBrevemente.setOnClickListener(filterClickListener);
     }
 
-    private void showError(Type type) {
+    private void showError(ErrorUtils.Type type) {
         // Evitar crash ao sair do fragment
         if (binding == null || !isAdded()) return;
 
         binding.mainFlipper.setDisplayedChild(1); // Error
-        ErrorPage.showError(binding.mainError, type);
+        ErrorUtils.showLayout(binding.mainError, type);
 
         // Esconder item de pesquisa
         showItemPesquisa(false);
@@ -204,10 +205,10 @@ public class FilmesFragment extends Fragment {
         // Action do botão
         binding.mainError.btnAction.setOnClickListener(v -> {
             switch (type) {
-                case INTERNET:
+                case NO_INTERNET:
                     loadFilmes(filter);
                     break;
-                case API:
+                case API_ERROR:
                     startActivity(new Intent(requireContext(), ConfiguracoesActivity.class));
                     break;
                 case CINEMA_INVALIDO:
@@ -217,13 +218,12 @@ public class FilmesFragment extends Fragment {
         });
     }
 
-    private void showErrorFilmes(Type type) {
+    private void showErrorFilmes(ErrorUtils.Type type) {
         binding.filmesFlipper.setDisplayedChild(1);
-        ErrorPage.showError(binding.errorFilmes, type);
+        ErrorUtils.showLayout(binding.errorFilmes, type);
     }
 
-    private void showItemPesquisa(boolean show)
-    {
+    private void showItemPesquisa(boolean show) {
         hasFilmes = show;
         requireActivity().invalidateOptionsMenu();
     }
@@ -240,8 +240,8 @@ public class FilmesFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        // Carregar filmes
-        if (filmesManager.getFilmes(filter).isEmpty()) loadFilmes(filter);
+        // Carregar filmes se não tiver cache
+        if (filmesManager.getCache(filter).isEmpty()) loadFilmes(filter);
 
         // Limpar pesquisa
         clearSearch();

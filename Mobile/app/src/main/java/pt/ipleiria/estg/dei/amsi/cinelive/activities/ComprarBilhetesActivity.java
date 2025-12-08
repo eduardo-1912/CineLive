@@ -21,10 +21,13 @@ import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityComprarBilhetesBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ItemLugarBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.SessaoListener;
+import pt.ipleiria.estg.dei.amsi.cinelive.listeners.StandardListener;
+import pt.ipleiria.estg.dei.amsi.cinelive.managers.ComprasManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.managers.SessoesManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Compra;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Sessao;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
+import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorUtils;
 
 public class ComprarBilhetesActivity extends AppCompatActivity {
 
@@ -50,7 +53,7 @@ public class ComprarBilhetesActivity extends AppCompatActivity {
 
         setSupportActionBar(binding.toolbar.topAppBar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(R.string.comprar_bilhetes);
+        getSupportActionBar().setTitle(R.string.title_comprar_bilhetes);
 
         sessoesManager = SessoesManager.getInstance();
 
@@ -78,7 +81,7 @@ public class ComprarBilhetesActivity extends AppCompatActivity {
 
         // Verificar se tem internet
         if (!ConnectionUtils.hasInternet(this)) {
-            Toast.makeText(this, R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
+            ErrorUtils.showToast(this, ErrorUtils.Type.NO_INTERNET);
             finish();
         }
 
@@ -116,16 +119,31 @@ public class ComprarBilhetesActivity extends AppCompatActivity {
 
         // Botão Pagar
         binding.btnPagar.setOnClickListener(v -> {
-            String[] optionsPagamaneto = {"Cartão", "MB Way", "PayPal"};
+            String[] optionsPagamaneto = {getString(R.string.label_cartao), getString(R.string.label_mbway), getString(R.string.label_paypal)};
 
             new MaterialAlertDialogBuilder(this)
-                .setTitle("Escolha o método de pagamento")
+                .setTitle(R.string.title_escolha_pagamento)
                 .setItems(optionsPagamaneto, (dialog, which) -> {
 
-                    Compra compra = new Compra(id, optionsPagamaneto[which], lugaresSelecionados);
+                    Compra compra = new Compra(id, getEnumPagamaneto(optionsPagamaneto[which]), lugaresSelecionados);
+
+                    ComprasManager.getInstance().createCompra(this, compra, new StandardListener() {
+                            @Override
+                            public void onSuccess() {
+                                Toast.makeText(ComprarBilhetesActivity.this, R.string.msg_sucesso_criar_compra, Toast.LENGTH_SHORT).show();
+                                setResult(RESULT_OK);
+                                finish();
+                            }
+
+                            @Override
+                            public void onError() {
+                                Toast.makeText(ComprarBilhetesActivity.this, R.string.msg_erro_criar_compra, Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    );
 
                 })
-                .setNegativeButton("Cancelar", null)
+                .setNegativeButton(R.string.btn_cancelar, null)
                 .show();
         });
     }
@@ -187,6 +205,12 @@ public class ComprarBilhetesActivity extends AppCompatActivity {
         // Botão Pagar
         binding.btnPagar.setEnabled(hasLugares);
         binding.btnPagar.setText(hasLugares ? R.string.btn_pagar : R.string.btn_selecione_lugares);
+    }
+
+    private String getEnumPagamaneto(String option) {
+        if (option == "Cartão") return "mbway";
+        if (option == "MB WAY") return "mbway";
+        else return "paypal";
     }
 
     @Override

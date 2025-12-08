@@ -24,9 +24,13 @@
         android:visible="false" />
 
     <item
+        android:id="@+id/navConfiguracoes"
+        android:icon="@drawable/ic_configuracoes"
+        android:title="@string/nav_configuracoes" />
+
+    <item
         android:id="@+id/navEntrar"
         android:icon="@drawable/ic_entrar"
-        android:title="@string/nav_entrar"
-        android:visible="false" />
+        android:title="@string/nav_entrar" />
 
 </menu>

@@ -5,15 +5,11 @@
     <dimen name="container_padding_horizontal">24dp</dimen>
 
     <dimen name="list_padding_bottom">16dp</dimen>
-
-    <dimen name="badge_padding_vertical">4dp</dimen>
-    <dimen name="badge_padding_horizontal">14dp</dimen>
+    <dimen name="list_item_margin_bottom">32dp</dimen>
 
     <dimen name="text_size_regular">16sp</dimen>
     <dimen name="text_size_large">18sp</dimen>
-    <dimen name="button_full_padding">16dp</dimen>
 
-    <dimen name="lugar_margin">4dp</dimen>
-    <dimen name="lugar_size">48dp</dimen>
+    <dimen name="button_full_padding">16dp</dimen>
 
 </resources>

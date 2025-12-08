@@ -18,7 +18,6 @@ import java.util.Map;
 
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.SessaoListener;
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.SessoesListener;
-import pt.ipleiria.estg.dei.amsi.cinelive.models.Filme;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Sessao;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ApiRoutes;
 
@@ -27,10 +26,7 @@ public class SessoesManager {
     private static RequestQueue queue;
 
     public static synchronized SessoesManager getInstance() {
-        if (instance == null) {
-            instance = new SessoesManager();
-        }
-
+        if (instance == null) instance = new SessoesManager();
         return instance;
     }
 

@@ -1,48 +1,42 @@
 <resources>
     <string name="app_name">CineLive</string>
 
-    <!-- menu_bottom_nav-->
+    <!-- Dividers -->
+    <string name="bullet_divider">\u0020•\u0020</string>
+    <string name="dash_divider">\u0020-\u0020</string>
+
+    <!-- Bottom Navigation -->
     <string name="nav_filmes">Filmes</string>
     <string name="nav_cinemas">Cinemas</string>
     <string name="nav_compras">Compras</string>
-    <string name="nav_entrar">Entrar</string>
     <string name="nav_perfil">Perfil</string>
+    <string name="nav_configuracoes">Configurações</string>
+    <string name="nav_entrar">Entrar</string>
 
-    <!-- toolbar -->
-    <string name="pesquisar_filmes">Pesquisar filmes...</string>
-    <string name="configuracoes">Configurações</string>
-    <string name="comprar_bilhetes">Comprar Bilhetes</string>
-    <string name="detalhes_compra">Detalhes da Compra</string>
-
-    <!-- general buttons -->
-    <string name="btn_login">Iniciar Sessão</string>
-    <string name="btn_signup">Criar Conta</string>
-    <string name="btn_editar_perfil">Editar Perfil</string>
-    <string name="btn_logout">Logout</string>
-    <string name="btn_eliminar_conta">Eliminar Conta</string>
+    <!-- General Buttons -->
     <string name="btn_guardar">Guardar</string>
     <string name="btn_restaurar">Restaurar</string>
     <string name="btn_cancelar">Cancelar</string>
     <string name="btn_tentar_novamente">Tentar novamente</string>
-    <string name="btn_configuracoes_api">Configurações da API</string>
-    <string name="btn_ver_filmes">Ver filmes</string>
+    <string name="btn_configuracoes">Configurações da API</string>
 
-    <!-- fragment_filmes -->
-    <string name="em_exibicao">Em exibição</string>
-    <string name="kids">Kids</string>
-    <string name="brevemente">Brevemente</string>
+    <!-- Fragment Filmes -->
+    <string name="searchview_pesquisar_filmes">Pesquisar filmes…</string>
+    <string name="btn_em_exibicao">Em exibição</string>
+    <string name="btn_kids">Kids</string>
+    <string name="btn_brevemente">Brevemente</string>
 
-    <!-- activity_detalhes_filme -->
+    <!-- Activity Detalhes Filme -->
     <string name="label_estreia">Estreia</string>
     <string name="label_duracao">Duração</string>
     <string name="label_idioma">Idioma</string>
     <string name="label_realizacao">Realização</string>
     <string name="label_sinopse">Sinopse</string>
-    <string name="label_hora">Hora</string>
     <string name="msg_erro_carregar_filme">Erro ao carregar o filme</string>
     <string name="msg_erro_carregar_sessoes">Erro ao carregar as sessões</string>
 
-    <!-- activity_comprar_bilhetes -->
+    <!-- Activity Comprar Bilhetes -->
+    <string name="title_comprar_bilhetes">Comprar Bilhetes</string>
     <string name="label_cinema">Cinema</string>
     <string name="label_data">Data</string>
     <string name="label_hora_inicio">Hora Início</string>
@@ -56,8 +50,14 @@
     <string name="btn_selecione_lugares">Selecione lugares</string>
     <string name="btn_pagar">Proceder ao pagamento</string>
     <string name="msg_erro_carregar_sessao">Erro ao carregar a sessão</string>
+    <string name="msg_sucesso_criar_compra">Compra criada com sucesso</string>
+    <string name="msg_erro_criar_compra">Erro ao criar a compra</string>
+    <string name="title_escolha_pagamento">Escolha o método de pagamento</string>
+    <string name="label_cartao">Cartão</string>
+    <string name="label_mbway">MB WAY</string>
+    <string name="label_paypal">PayPal</string>
 
-    <!-- fragment_cinemas -->
+    <!-- Fragment Cinemas -->
     <string name="label_morada">Morada</string>
     <string name="label_telefone">Telefone</string>
     <string name="label_email">Email</string>
@@ -67,36 +67,43 @@
     <string name="btn_cinema_selecionado">Cinema selecionado</string>
     <string name="btn_sem_sessoes_ativas">Sem sessões ativas</string>
 
-    <!-- fragment_compras -->
+    <!-- Fragment Compras -->
     <string name="label_sessao">Sessão</string>
     <string name="btn_detalhes">Detalhes</string>
+    <string name="btn_ver_filmes">Ver filmes</string>
 
-    <!-- activity_detalhes_compra -->
+    <!-- Activity Detalhes Compra -->
+    <string name="title_detalhes_compra">Detalhes da Compra</string>
     <string name="label_sala">Sala</string>
     <string name="label_estado">Estado</string>
     <string name="label_lugar">Lugar</string>
     <string name="label_preco">Preço</string>
-    <string name="label_bilhetes">Bilhetes</string>
+    <string name="title_bilhetes">Bilhetes</string>
 
-    <!-- fragment_perfil -->
-    <string name="perfil_titulo">Os meus dados</string>
+    <!-- Fragment Perfil -->
+    <string name="title_perfil">Os meus dados</string>
+    <string name="btn_editar_perfil">Editar Perfil</string>
+    <string name="btn_logout">Logout</string>
+    <string name="btn_eliminar_conta">Eliminar Conta</string>
     <string name="msg_eliminar_conta">Tem a certeza de que pretende eliminar a sua conta? Esta ação é irreversível.</string>
-    <string name="msg_conta_eliminada">Conta eliminada com sucesso</string>
+    <string name="msg_sucesso_eliminar_conta">Conta eliminada com sucesso</string>
     <string name="msg_erro_eliminar_conta">Erro ao eliminar a conta</string>
 
-    <!-- activity_login -->
-    <string name="login_titulo">Entre na sua conta</string>
-    <string name="login_subtitulo">Preencha os seguintes campos para iniciar sessão</string>
+    <!-- Activity Login -->
+    <string name="title_login">Entre na sua conta</string>
+    <string name="subtitle_login">Preencha os seguintes campos para iniciar sessão</string>
+    <string name="btn_login">Iniciar Sessão</string>
 
-    <!-- activity_signup -->
-    <string name="signup_titulo">Crie uma conta</string>
-    <string name="signup_subtitulo">Preencha os seguintes campos para se registar</string>
+    <!-- Activity Signup -->
+    <string name="title_signup">Crie uma conta</string>
+    <string name="subtitle_signup">Preencha os seguintes campos para se registar</string>
+    <string name="btn_signup">Criar Conta</string>
 
-    <!-- activity_signup -->
-    <string name="editar_perfil_titulo">Edite o seu perfil</string>
-    <string name="editar_perfil_subtitulo">Pode alterar qualquer um destes dados</string>
+    <!-- Activity Editar Perfil -->
+    <string name="title_editar_perfil">Edite o seu perfil</string>
+    <string name="subtitle_editar_perfil">Pode alterar qualquer um destes dados</string>
 
-    <!-- form_utilizador -->
+    <!-- Layout User Form -->
     <string name="form_hint_username">Username</string>
     <string name="form_hint_password">Password</string>
     <string name="form_hint_password_opcional">Password (opcional)</string>
@@ -104,40 +111,42 @@
     <string name="form_hint_telemovel">Telemóvel</string>
     <string name="form_hint_email">Email</string>
 
-    <!-- form_utilizador messages -->
+    <!-- Messages User Form -->
     <string name="msg_campo_obrigatorio">Este campo é obrigatório</string>
     <string name="msg_min_caracteres">Este campo deve ter pelo menos %1$d caracteres.</string>
     <string name="msg_credenciais_invalidas">Credenciais inválidas</string>
     <string name="msg_username_indisponivel">Este username já não está disponível</string>
     <string name="msg_email_indisponivel">Este email já não está disponível</string>
-    <string name="msg_email_invalido">O formatdo do email é inválido</string>
+    <string name="msg_email_invalido">O formato do email é inválido</string>
     <string name="msg_sucesso_login">Login efetuado com sucesso</string>
-    <string name="msg_erro_login">Erro ao iniciar sessão</string>
+    <string name="msg_erro_login">Erro ao iniciar sessão, verifique a ligação à API</string>
     <string name="msg_sucesso_signup">Conta criada com sucesso</string>
-    <string name="msg_erro_signup">Erro ao criar conta</string>
+    <string name="msg_erro_signup">Erro ao criar conta, verifique a ligação à API</string>
     <string name="msg_sucesso_editar_perfil">Perfil atualizado com sucesso</string>
     <string name="msg_erro_editar_perfil">Erro ao atualizar o perfil</string>
 
-    <!-- activity_configuracoes -->
-    <string name="configuracoes_titulo">Configurações da API</string>
-    <string name="configuracoes_subtitulo">Defina o URL da API utilizada pela aplicação.</string>
-    <string name="configuracoes_hint_api_host">Host da API</string>
-    <string name="configuracoes_hint_api_path">Caminho da API</string>
+    <!-- Activity Configurações -->
+    <string name="title_configuracoes">Configurações da API</string>
+    <string name="subtitle_configuracoes">Defina o URL da API utilizada pela aplicação.</string>
+    <string name="hint_api_host">Host da API</string>
+    <string name="hint_api_path">Caminho da API</string>
 
-    <!-- layout_error -->
-    <string name="erro_internet_titulo">Sem ligação à Internet</string>
-    <string name="erro_internet_subtitulo">Verifique a sua ligação e tente novamente.</string>
-    <string name="erro_api_titulo">Sem ligação à API</string>
-    <string name="erro_api_subtitulo">Verifique as configurações e tente novamente.</string>
-    <string name="erro_nenhum_filme_titulo">Nenhum filme encontrado</string>
-    <string name="erro_nenhum_filme_subtitulo">Não foi encontrado um resultado para esta pesquisa.</string>
-    <string name="erro_cinema_invalido_titulo">Escolha um cinema</string>
-    <string name="erro_cinema_invalido_subtitulo">Precisa de escolher um cinema para ver filmes.</string>
-    <string name="erro_nenhum_cinema_titulo">Nenhum cinema disponível</string>
-    <string name="erro_nenhum_cinema_subtitulo">Não há cinemas ativos de momento.</string>
-    <string name="erro_nenhuma_compra_titulo">Ainda não tem compras</string>
-    <string name="erro_nenhuma_compra_subtitulo">Veja os filmes em exibição e compre bilhetes</string>
-    <string name="erro_token_invalido_titulo">Erro ao efetuar login</string>
-    <string name="erro_token_invalido_subtitulo">Verifique a ligação à API e tente novamente</string>
+    <!-- Layout Error -->
+    <string name="title_generic_error">Ocorreu um erro</string>
+    <string name="subtitle_generic_error">Por favor tente novamente mais tarde.</string>
+    <string name="title_erro_internet">Sem ligação à Internet</string>
+    <string name="subtitle_erro_internet">Verifique a sua ligação e tente novamente.</string>
+    <string name="title_erro_api">Sem ligação à API</string>
+    <string name="subtitle_erro_api">Verifique as configurações e tente novamente.</string>
+    <string name="title_erro_nenhum_filme">Nenhum filme encontrado</string>
+    <string name="subtitle_erro_nenhum_filme">Não foi encontrado um resultado para esta pesquisa.</string>
+    <string name="title_erro_cinema_invalido">Escolha um cinema</string>
+    <string name="subtitle_erro_cinema_invalido">Precisa de escolher um cinema para ver filmes.</string>
+    <string name="title_erro_nenhum_cinema">Nenhum cinema disponível</string>
+    <string name="subtitle_erro_nenhum_cinema">Não há cinemas ativos neste momento.</string>
+    <string name="title_erro_nenhuma_compra">Ainda não tem compras</string>
+    <string name="subtitle_erro_nenhuma_compra">Veja os filmes em exibição e compre bilhetes</string>
+    <string name="title_erro_token_invalido">Erro ao efetuar login</string>
+    <string name="subtitle_erro_token_invalido">Verifique a ligação à API e tente novamente</string>
 
 </resources>

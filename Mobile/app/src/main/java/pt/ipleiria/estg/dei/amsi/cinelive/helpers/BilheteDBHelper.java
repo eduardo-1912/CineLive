@@ -46,7 +46,6 @@ public class BilheteDBHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    // CRUD #region
     public void addBilhete(Bilhete bilhete) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -97,5 +96,4 @@ public class BilheteDBHelper extends SQLiteOpenHelper {
         cursor.close();
         return bilhetes;
     }
-    // endregion
 }

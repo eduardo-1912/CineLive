@@ -1,23 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginBottom="32dp"
-    android:orientation="vertical">
+    style="@style/VerticalLayout.Full"
+    android:layout_marginBottom="@dimen/list_item_margin_bottom">
 
-    <!-- Nome -->
-    <TextView
-        android:id="@+id/tvNome"
-        style="@style/Title.Bold"
-        android:textSize="28sp" />
+    <!-- Nome do cinema -->
+    <TextView android:id="@+id/tvNome" style="@style/Title.Bold" android:textSize="28sp" />
 
     <Space style="@style/VerticalSpace.12" />
 
     <!-- Morada -->
     <TextView style="@style/Label" android:text="@string/label_morada" />
-    <TextView
-        android:id="@+id/tvMorada"
-        style="@style/Text" />
+    <TextView android:id="@+id/tvMorada" style="@style/Text" />
 
     <Space style="@style/VerticalSpace.16" />
 
@@ -27,17 +20,13 @@
 
             <!-- Telefone -->
             <TextView android:text="@string/label_telefone" style="@style/Label" />
-            <TextView
-                android:id="@+id/tvTelefone"
-                style="@style/Text" />
+            <TextView android:id="@+id/tvTelefone" style="@style/Text" />
 
             <Space style="@style/VerticalSpace.16" />
 
             <!-- Horário -->
             <TextView android:text="@string/label_horario" style="@style/Label" />
-            <TextView
-                android:id="@+id/tvHorario"
-                style="@style/Text" />
+            <TextView android:id="@+id/tvHorario" style="@style/Text" />
 
         </LinearLayout>
 
@@ -45,17 +34,13 @@
 
             <!-- Email -->
             <TextView android:text="@string/label_email" style="@style/Label" />
-            <TextView
-                android:id="@+id/tvEmail"
-                style="@style/Text" />
+            <TextView android:id="@+id/tvEmail" style="@style/Text" />
 
             <Space style="@style/VerticalSpace.16" />
 
             <!-- Capacidade -->
             <TextView android:text="@string/label_capacidade" style="@style/Label" />
-            <TextView
-                android:id="@+id/tvCapacidade"
-                style="@style/Text" />
+            <TextView android:id="@+id/tvCapacidade" style="@style/Text" />
 
         </LinearLayout>
 

@@ -9,21 +9,20 @@ public class PreferencesManager {
 
     private static final String PREFERENCES_NAME = "UserPreferences";
 
+    private static final String DEFAULT_API_HOST = "http://172.22.21.212";
+    private static final String DEFAULT_API_PATH = "/CineLive/Web/backend/web/api";
+
+    private static final String API_HOST = "apiHost";
+    private static final String API_PATH = "apiPath";
     private static final String CINEMA_ID = "cinemaId";
     private static final String TOKEN = "token";
 
-    private static final String DEFAULT_API_HOST = "http://172.22.21.212";
-    private static final String DEFAULT_API_PATH = "/CineLive/Web/backend/web/api";
-    private static final String API_HOST = "apiHost";
-    private static final String API_PATH = "apiPath";
 
     public PreferencesManager(Context context) {
         preferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
 
-        // Se o URL da API for null --> reset
-        if (this.getApiUrl() == null) {
-            this.resetApiUrl();
-        }
+        // Restaurar URL da API se for null
+        if (getApiUrl() == null) resetApiUrl();
     }
 
     public String getApiHost() {
@@ -53,7 +52,6 @@ public class PreferencesManager {
     }
 
     public int getCinemaId() {
-
         return preferences.getInt(CINEMA_ID, -1);
     }
 

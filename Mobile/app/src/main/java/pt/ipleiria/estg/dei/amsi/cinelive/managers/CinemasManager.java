@@ -19,28 +19,30 @@ import pt.ipleiria.estg.dei.amsi.cinelive.utils.ApiRoutes;
 public class CinemasManager {
     private static CinemasManager instance = null;
     private static RequestQueue queue;
-    private List<Cinema> cinemas = new ArrayList<>();
+    private List<Cinema> cache = new ArrayList<>();
 
     public static synchronized CinemasManager getInstance() {
-        if (instance == null) {
-            instance = new CinemasManager();
-        }
-
+        if (instance == null) instance = new CinemasManager();
         return instance;
     }
 
-    public List<Cinema> getCinemas() {
-        return cinemas;
+    private static RequestQueue getRequestQueue(Context context) {
+        if (queue == null) queue = Volley.newRequestQueue(context.getApplicationContext());
+        return queue;
+    }
+
+    public List<Cinema> getCache() {
+        return cache;
     }
 
     public void clearCache() {
-        cinemas.clear();
+        cache.clear();
     }
 
-    public void fetchCinemas(Context context, CinemasListener listener) {
-        // Se tiver cache --> evitar pedido à API
-        if (!cinemas.isEmpty()) {
-            listener.onSuccess(cinemas);
+    public void getCinemas(Context context, CinemasListener listener) {
+        // Evitar pedido à API se tiver cache
+        if (!cache.isEmpty()) {
+            listener.onSuccess(cache);
             return;
         }
 
@@ -50,7 +52,7 @@ public class CinemasManager {
         JsonArrayRequest request = new JsonArrayRequest(
             Request.Method.GET, url, null, response -> {
                 // Limpar lista
-                cinemas.clear();
+                cache.clear();
 
                 // Nenhum cinema foi encontrado
                 if (response.length() == 0) {
@@ -58,28 +60,27 @@ public class CinemasManager {
                     return;
                 }
 
-                // Obter cinemas
+                // Guardar cinemas em cache
                 for (int i = 0; i < response.length(); i++) {
                     JSONObject obj = response.optJSONObject(i);
-                    if (obj != null) {
-                        cinemas.add(new Cinema(
-                            obj.optInt("id"),
-                            obj.optString("nome"),
-                            obj.optString("morada"),
-                            obj.optString("telefone"),
-                            obj.optString("email"),
-                            obj.optString("horario"),
-                            obj.optString("capacidade"),
-                            obj.optBoolean("has_sessoes")
-                        ));
-                    }
+                    if (obj == null) continue;
+                    cache.add(new Cinema(
+                        obj.optInt("id"),
+                        obj.optString("nome"),
+                        obj.optString("morada"),
+                        obj.optString("telefone"),
+                        obj.optString("email"),
+                        obj.optString("horario"),
+                        obj.optString("capacidade"),
+                        obj.optBoolean("has_sessoes")
+                    ));
                 }
 
-                listener.onSuccess(cinemas);
+                listener.onSuccess(cache);
             },
             error -> listener.onError()
         );
 
-        Volley.newRequestQueue(context).add(request);
+        getRequestQueue(context).add(request);
     }
 }

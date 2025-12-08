@@ -2,7 +2,6 @@ package pt.ipleiria.estg.dei.amsi.cinelive.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
@@ -15,6 +14,7 @@ import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityMainBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.StandardListener;
 import pt.ipleiria.estg.dei.amsi.cinelive.managers.AuthManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
+import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorUtils;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -50,10 +50,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void load() {
-        // Se não tiver internet --> usar estado antigo
+        // Verificar ligação à internet
         if (!ConnectionUtils.hasInternet(this)) updateBottomNav(authManager.isLoggedIn(this));
 
-        // Validar o token (se o tiver nas preferences)
+        // Validar o token se tiver sessão iniciada
         if (authManager.isLoggedIn(this)) authManager.validateToken(this, new StandardListener() {
             @Override
             public void onSuccess() {
@@ -66,14 +66,28 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Ação do botão de login
         binding.bottomNav.setOnItemSelectedListener(item -> {
-            if (item.getItemId() == R.id.navEntrar && !authManager.isLoggedIn(this)) {
-                // Verificar se tem internet
+            // Configurações
+            if (item.getItemId() == R.id.navConfiguracoes && !authManager.isLoggedIn(this)) {
+                // Verificar ligação à internet
                 if (!ConnectionUtils.hasInternet(this)) {
-                    Toast.makeText(this, R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
+                    ErrorUtils.showToast(this, ErrorUtils.Type.NO_INTERNET);
+                    return false;
                 }
-                else startActivity(new Intent(this, LoginActivity.class));
+
+                startActivity(new Intent(this, ConfiguracoesActivity.class));
+                return false;
+            }
+
+            // Login
+            if (item.getItemId() == R.id.navEntrar && !authManager.isLoggedIn(this)) {
+                // Verificar ligação à internet
+                if (!ConnectionUtils.hasInternet(this)) {
+                    ErrorUtils.showToast(this, ErrorUtils.Type.NO_INTERNET);
+                    return false;
+                }
+
+                startActivity(new Intent(this, LoginActivity.class));
                 return false;
             }
 
@@ -92,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
     private void updateBottomNav(boolean isLoggedIn) {
         binding.bottomNav.getMenu().findItem(R.id.navCompras).setVisible(isLoggedIn);
         binding.bottomNav.getMenu().findItem(R.id.navPerfil).setVisible(isLoggedIn);
+        binding.bottomNav.getMenu().findItem(R.id.navConfiguracoes).setVisible(!isLoggedIn);
         binding.bottomNav.getMenu().findItem(R.id.navEntrar).setVisible(!isLoggedIn);
     }
 

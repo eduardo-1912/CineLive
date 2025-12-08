@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
+    style="@style/VerticalLayout.Full"
     tools:context=".activities.ConfiguracoesActivity">
 
     <!-- Toolbar -->
@@ -15,19 +12,15 @@
     <LinearLayout style="@style/Container.Main">
 
         <!-- Título -->
-        <TextView android:id="@+id/tvTitulo"
-            android:text="@string/configuracoes_titulo"
-            style="@style/Title" />
+        <TextView android:text="@string/title_configuracoes" style="@style/Title" />
 
         <!-- Subtítulo -->
-        <TextView android:id="@+id/tvSubtitulo"
-            android:text="@string/configuracoes_subtitulo"
-            style="@style/Subtitle" />
+        <TextView android:text="@string/subtitle_configuracoes" style="@style/Subtitle" />
 
         <!-- Host da API -->
         <com.google.android.material.textfield.TextInputLayout
             style="@style/TextInputLayout"
-            android:hint="@string/configuracoes_hint_api_host">
+            android:hint="@string/hint_api_host">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etApiHost"
@@ -39,7 +32,7 @@
         <!-- Caminho da API -->
         <com.google.android.material.textfield.TextInputLayout
             style="@style/TextInputLayout"
-            android:hint="@string/configuracoes_hint_api_path">
+            android:hint="@string/hint_api_path">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etApiPath"
@@ -48,26 +41,26 @@
                 android:inputType="textUri" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Botão Guardar -->
+        <!-- Botão guardar -->
         <Button android:id="@+id/btnGuardar"
             style="@style/Button.Primary.Full"
             android:text="@string/btn_guardar" />
 
-        <!-- Botão Restaurar -->
+        <!-- Botão restaurar -->
         <Button android:id="@+id/btnRestaurar"
             style="@style/Button.Text"
             android:text="@string/btn_restaurar" />
 
         <Space style="@style/VerticalSpace.24" />
 
-        <!-- Progress Bar -->
+        <!-- Loading -->
         <ProgressBar android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingTop="20dp"
-            android:visibility="gone"
             android:layout_gravity="center"
-            style="?android:attr/progressBarStyleLarge" />
+            android:paddingTop="20dp"
+            android:visibility="gone" />
 
         <!-- Resposta da API -->
         <TextView android:id="@+id/tvApiResponse"

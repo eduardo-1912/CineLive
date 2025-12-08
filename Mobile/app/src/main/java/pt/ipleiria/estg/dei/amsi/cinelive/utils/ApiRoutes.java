@@ -1,28 +1,28 @@
 package pt.ipleiria.estg.dei.amsi.cinelive.utils;
 
 public class ApiRoutes {
-    public static String filmesEmExibicao (String url, int id) {
-        return url + "/filmes?cinema_id=" + id;
+    public static String filmesEmExibicao (String url, int cinemaId) {
+        return url + "/filmes?cinema_id=" + cinemaId;
     }
 
-    public static String filmesKids (String url, int id) {
-        return url + "/filmes?filter=kids&cinema_id=" + id;
+    public static String filmesKids (String url, int cinemaId) {
+        return url + "/filmes?filter=kids&cinema_id=" + cinemaId;
     }
 
     public static String filmesBrevemente (String url) {
         return url + "/filmes?filter=brevemente";
     }
 
-    public static String filme (String url, int id) {
-        return url + "/filmes/" + id;
+    public static String filme (String url, int filmeId) {
+        return url + "/filmes/" + filmeId;
     }
 
     public static String sessoes (String url, int filmeId, int cinemaId) {
         return url + "/filmes/" + filmeId + "/sessoes?cinema_id=" + cinemaId ;
     }
 
-    public static String sessao (String url, int id) {
-        return url + "/sessoes/" + id;
+    public static String sessao (String url, int sessaoId) {
+        return url + "/sessoes/" + sessaoId;
     }
 
     public static String cinemas (String url) {
@@ -33,8 +33,8 @@ public class ApiRoutes {
         return url + "/compras?access-token=" + token;
     }
 
-    public static String compra (String url, int id, String token) {
-        return url + "/compras/" + id + "?access-token=" + token;
+    public static String compra (String url, int compraId, String token) {
+        return url + "/compras/" + compraId + "?access-token=" + token;
     }
 
     public static String perfil (String url, String token) {

@@ -8,15 +8,4 @@
     app:title="@string/app_name"
     android:elevation="4dp"
     android:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge"
-    app:titleCentered="false">
-
-    <ImageView
-        android:id="@+id/statusIcon"
-        android:layout_width="14dp"
-        android:layout_height="14dp"
-        android:src="@drawable/circle_gray"
-        android:layout_gravity="end|center_vertical"
-        android:layout_marginEnd="20dp"
-        android:visibility="gone" />
-
-</com.google.android.material.appbar.MaterialToolbar>
+    app:titleCentered="false" />

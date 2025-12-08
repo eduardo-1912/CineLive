@@ -25,7 +25,7 @@ import pt.ipleiria.estg.dei.amsi.cinelive.adapters.CinemasAdapter;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.FragmentCinemasBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Cinema;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
-import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorPage;
+import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorUtils;
 
 public class CinemasFragment extends Fragment {
     private FragmentCinemasBinding binding;
@@ -36,7 +36,7 @@ public class CinemasFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Obter o manager
+        // Obter o cinemas manager
         cinemasManager = CinemasManager.getInstance();
     }
 
@@ -73,23 +73,21 @@ public class CinemasFragment extends Fragment {
         boolean hasInternet = ConnectionUtils.hasInternet(requireContext());
 
         // Obter cinemas (API ou cache)
-        cinemasManager.fetchCinemas(requireContext(), new CinemasListener() {
+        cinemasManager.getCinemas(requireContext(), new CinemasListener() {
             @Override
             public void onSuccess(List<Cinema> cinemas) {
                 setList(cinemas);
 
                 // Tem cache mas não tem internet
-                if (!hasInternet) {
-                    Toast.makeText(requireActivity(), R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
-                }
+                if (!hasInternet) ErrorUtils.showToast(requireContext(), ErrorUtils.Type.NO_INTERNET);
             }
             @Override
             public void onEmpty() {
-                showError(ErrorPage.Type.NENHUM_CINEMA);
+                showError(ErrorUtils.Type.EMPTY_CINEMAS);
             }
             @Override
             public void onError() {
-                showError(hasInternet ? ErrorPage.Type.API : ErrorPage.Type.INTERNET);
+                showError(hasInternet ? ErrorUtils.Type.API_ERROR : ErrorUtils.Type.NO_INTERNET);
             }
         });
     }
@@ -97,13 +95,12 @@ public class CinemasFragment extends Fragment {
     private void setList(List<Cinema> cinemas) {
         // Evitar crash ao sair do fragment
         if (binding == null || !isAdded()) return;
-
         binding.mainFlipper.setDisplayedChild(2); // Main Content
 
         // Aceder às preferences
         PreferencesManager preferences = new PreferencesManager(requireContext());
 
-        // Clicou num cinema --> selecionar e guardar nas preferences
+        // Se clicou num cinema --> selecionar e guardar nas preferences
         adapter = new CinemasAdapter(cinemas, preferences.getCinemaId(), cinema -> {
             preferences.setCinemaId(cinema.getId());
             adapter.setCinemaSelecionado(cinema.getId());
@@ -115,20 +112,19 @@ public class CinemasFragment extends Fragment {
         binding.rvCinemas.setAdapter(adapter);
     }
 
-    private void showError(ErrorPage.Type type) {
+    private void showError(ErrorUtils.Type type) {
         // Evitar crash ao sair do fragment
         if (binding == null || !isAdded()) return;
-
         binding.mainFlipper.setDisplayedChild(1); // Main Error
-        ErrorPage.showError(binding.mainError, type);
+        ErrorUtils.showLayout(binding.mainError, type);
 
         // Action do botão
         binding.mainError.btnAction.setOnClickListener(v -> {
             switch (type) {
-                case INTERNET: case NENHUM_CINEMA:
+                case NO_INTERNET: case EMPTY_CINEMAS:
                     loadCinemas();
                     break;
-                case API:
+                case API_ERROR:
                     startActivity(new Intent(requireContext(), ConfiguracoesActivity.class));
                     break;
             }
@@ -139,8 +135,8 @@ public class CinemasFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        // Reload se não tiver cache
-        if (cinemasManager.getCinemas().isEmpty()) loadCinemas();
+        // Recarregar se não tiver cache
+        if (cinemasManager.getCache().isEmpty()) loadCinemas();
     }
 
     @Override

@@ -1,19 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:layout_margin="@dimen/lugar_margin">
+    android:layout_margin="4dp">
 
     <com.google.android.material.button.MaterialButton
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/btnLugar"
         style="@style/Button.Toggle"
-        android:minWidth="0dp"
-        android:minHeight="0dp"
-        android:layout_width="@dimen/lugar_size"
-        android:layout_height="@dimen/lugar_size"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:insetLeft="0dp"
         android:insetTop="0dp"
         android:insetRight="0dp"
@@ -22,6 +19,5 @@
         android:textSize="14sp"
         android:gravity="center"
         app:cornerRadius="10dp" />
-
 
 </LinearLayout>

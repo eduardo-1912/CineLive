@@ -29,7 +29,7 @@ import pt.ipleiria.estg.dei.amsi.cinelive.managers.AuthManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.managers.PerfilManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.User;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
-import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorPage;
+import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorUtils;
 
 public class PerfilFragment extends Fragment {
     private FragmentPerfilBinding binding;
@@ -75,93 +75,33 @@ public class PerfilFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        disableFields();
         binding.mainFlipper.setDisplayedChild(0); // Main Loading
 
-        // Carregar perfil
+        // Carregar perfil e configurar listeners
         loadPerfil();
+        setOnClickListeners();
 
-        // Swipe refresh
-        binding.swipeRefresh.setOnRefreshListener(() -> {
-            binding.swipeRefresh.setRefreshing(false);
-
-            // Apenas limpar a cache se tiver internet
-            if (ConnectionUtils.hasInternet(requireContext())) perfilManager.clearCache();
-
-            // Carregar perfil
-            loadPerfil();
-        });
-
-        // Botão Editar Perfil
-        binding.btnEditarPerfil.setOnClickListener(v -> {
-            // Verificar se tem internet
-            if (!ConnectionUtils.hasInternet(requireContext())) {
-                Toast.makeText(requireContext(), R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            Intent intent = new Intent(getActivity(), EditarPerfilActivity.class);
-            startActivity(intent);
-        });
-
-        // Botão Eliminar Conta
-        binding.btnEliminarConta.setOnClickListener(v -> {
-            // Verificar se tem internet
-            if (!ConnectionUtils.hasInternet(requireContext())) {
-                Toast.makeText(requireContext(), R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            new MaterialAlertDialogBuilder(v.getContext())
-                .setTitle(R.string.btn_eliminar_conta)
-                .setMessage(R.string.msg_eliminar_conta)
-                .setPositiveButton(R.string.btn_eliminar_conta, (dialog, which) -> {
-                    perfilManager.deleteAccount(requireContext(), new StandardListener() {
-                        @Override
-                        public void onSuccess() {
-                            Toast.makeText(requireContext(), R.string.msg_conta_eliminada, Toast.LENGTH_SHORT).show();
-                            resetActivity();
-                        }
-
-                        @Override
-                        public void onError() {
-                            Toast.makeText(requireContext(), R.string.msg_erro_eliminar_conta, Toast.LENGTH_SHORT).show();
-                            resetActivity();
-                        }
-                    });
-                }).setNegativeButton(R.string.btn_cancelar, null).show();
-        });
-
-        // Botão Logout
-        binding.btnLogout.setOnClickListener(v -> {
-            authManager.logout(requireContext());
-            resetActivity();
-        });
+        // Desativar campos
+        disableFields();
     }
 
     private void loadPerfil() {
         binding.mainFlipper.setDisplayedChild(0); // Main Loading
-
-        // Obter estado da ligação à internet
         boolean hasInternet = ConnectionUtils.hasInternet(requireContext());
 
-        perfilManager.fetchPerfil(requireContext(), new PerfilListener() {
+        perfilManager.getPerfil(requireContext(), new PerfilListener() {
             @Override
             public void onSuccess(User perfil) {
-                setFields(perfil);
-
                 // Tem cache mas não tem internet
-                if (!hasInternet) {
-                    Toast.makeText(requireActivity(), R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
-                }
+                if (!hasInternet) ErrorUtils.showToast(requireContext(), ErrorUtils.Type.NO_INTERNET);
+                setFields(perfil);
             }
 
             @Override
             public void onError() {
-                showError(hasInternet ? ErrorPage.Type.TOKEN_INVALIDO : ErrorPage.Type.INTERNET);
+                showError(hasInternet ? ErrorUtils.Type.INVALID_TOKEN : ErrorUtils.Type.NO_INTERNET);
             }
         });
-
     }
 
     private void setFields(User perfil) {
@@ -175,20 +115,80 @@ public class PerfilFragment extends Fragment {
         }
     }
 
-    private void showError(ErrorPage.Type type) {
+    private void setOnClickListeners() {
+        // Swipe refresh
+        binding.swipeRefresh.setOnRefreshListener(() -> {
+            binding.swipeRefresh.setRefreshing(false);
+
+            // Apenas limpar a cache se tiver internet
+            if (ConnectionUtils.hasInternet(requireContext())) perfilManager.clearCache();
+
+            // Carregar perfil
+            loadPerfil();
+        });
+
+        // Botão editar perfil
+        binding.btnEditarPerfil.setOnClickListener(v -> {
+            // Verificar se tem internet
+            if (!ConnectionUtils.hasInternet(requireContext())) {
+                ErrorUtils.showToast(requireContext(), ErrorUtils.Type.NO_INTERNET);
+                return;
+            }
+
+            Intent intent = new Intent(getActivity(), EditarPerfilActivity.class);
+            startActivity(intent);
+        });
+
+        // Botão logout
+        binding.btnLogout.setOnClickListener(v -> {
+            authManager.logout(requireContext());
+            resetActivity();
+        });
+
+        // Botão eliminar conta
+        binding.btnEliminarConta.setOnClickListener(v -> {
+            // Verificar se tem internet
+            if (!ConnectionUtils.hasInternet(requireContext())) {
+                ErrorUtils.showToast(requireContext(), ErrorUtils.Type.NO_INTERNET);
+                return;
+            }
+
+            new MaterialAlertDialogBuilder(v.getContext())
+                .setTitle(R.string.btn_eliminar_conta)
+                .setMessage(R.string.msg_eliminar_conta)
+                .setPositiveButton(R.string.btn_eliminar_conta, (dialog, which) -> {
+                    perfilManager.deletePerfil(requireContext(), new StandardListener() {
+                        @Override
+                        public void onSuccess() {
+                            Toast.makeText(requireContext(), R.string.msg_sucesso_eliminar_conta, Toast.LENGTH_SHORT).show();
+                            resetActivity();
+                        }
+
+                        @Override
+                        public void onError() {
+                            Toast.makeText(requireContext(), R.string.msg_erro_eliminar_conta, Toast.LENGTH_SHORT).show();
+                            resetActivity();
+                        }
+                    });
+                }
+            ).setNegativeButton(R.string.btn_cancelar, null).show();
+        });
+    }
+
+    private void showError(ErrorUtils.Type type) {
         // Evitar crash ao sair do fragment
         if (binding == null || !isAdded()) return;
 
         binding.mainFlipper.setDisplayedChild(1); // Error
-        ErrorPage.showError(binding.mainError, type);
+        ErrorUtils.showLayout(binding.mainError, type);
 
         // Action do botão
         binding.mainError.btnAction.setOnClickListener(v -> {
             switch (type) {
-                case INTERNET:
+                case NO_INTERNET:
                     loadPerfil();
                     break;
-                case TOKEN_INVALIDO:
+                case INVALID_TOKEN:
                     authManager.logout(requireContext());
                     resetActivity();
                     break;
@@ -221,9 +221,7 @@ public class PerfilFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-
-        // Carregar perfil
-        if (perfilManager.getPerfil() == null) loadPerfil();
+        if (perfilManager.getCache() == null) loadPerfil();
     }
 
     @Override

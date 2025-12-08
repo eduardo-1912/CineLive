@@ -1,6 +1,6 @@
 package pt.ipleiria.estg.dei.amsi.cinelive.listeners;
 
-public interface UserFormListener {
+public interface UserValidationListener {
     void onSuccess();
     void onUsernameTaken();
     void onEmailTaken();

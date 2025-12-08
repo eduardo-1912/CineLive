@@ -35,18 +35,18 @@ public class CompraDBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         String sql = "CREATE TABLE " + TABLE_NAME + " (" +
-                ID + " INTEGER PRIMARY KEY, " +
-                DATA + " TEXT, " +
-                TOTAL + " TEXT, " +
-                ESTADO + " TEXT, " +
-                FILME_TITULO + " TEXT, " +
-                CINEMA_NOME + " TEXT, " +
-                SALA_NOME + " TEXT, " +
-                SESSAO_DATA + " TEXT, " +
-                SESSAO_HORA_INICIO + " TEXT, " +
-                SESSAO_HORA_FIM + " TEXT, " +
-                LUGARES + " TEXT" +
-                ");";
+            ID + " INTEGER PRIMARY KEY, " +
+            DATA + " TEXT, " +
+            TOTAL + " TEXT, " +
+            ESTADO + " TEXT, " +
+            FILME_TITULO + " TEXT, " +
+            CINEMA_NOME + " TEXT, " +
+            SALA_NOME + " TEXT, " +
+            SESSAO_DATA + " TEXT, " +
+            SESSAO_HORA_INICIO + " TEXT, " +
+            SESSAO_HORA_FIM + " TEXT, " +
+            LUGARES + " TEXT" +
+            ");";
         db.execSQL(sql);
     }
 
@@ -56,7 +56,7 @@ public class CompraDBHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    // CRUD #region
+    // region CRUD
     public void addCompra(Compra compra) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();

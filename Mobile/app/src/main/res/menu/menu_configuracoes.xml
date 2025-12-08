@@ -5,7 +5,7 @@
     <item
         android:id="@+id/itemConfiguracoes"
         android:icon="@drawable/ic_configuracoes"
-        android:title="@string/configuracoes"
+        android:title="@string/title_configuracoes"
         app:showAsAction="ifRoom"
         app:iconTint="?attr/colorOnSurface" />
 

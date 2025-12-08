@@ -22,59 +22,61 @@ public class FilmesManager {
     private static FilmesManager instance = null;
     private static RequestQueue queue;
 
-    public enum Filter {EM_EXIBICAO, KIDS, BREVEMENTE};
-    private List<Filme> exibicao = new ArrayList<>();
+    public enum Filter {EM_EXIBICAO, KIDS, BREVEMENTE}
+    private List<Filme> em_exibicao = new ArrayList<>();
     private List<Filme> kids = new ArrayList<>();
     private List<Filme> brevemente = new ArrayList<>();
 
-    List<Filme> filmes; // Cache
+    List<Filme> cache; // Aponta para a lista atual
 
     public static synchronized FilmesManager getInstance() {
-        if (instance == null) {
-            instance = new FilmesManager();
-        }
-
+        if (instance == null) instance = new FilmesManager();
         return instance;
     }
 
-    public List<Filme> getFilmes(Filter filter) {
+    private static RequestQueue getRequestQueue(Context context) {
+        if (queue == null) queue = Volley.newRequestQueue(context.getApplicationContext());
+        return queue;
+    }
+
+    public List<Filme> getCache(Filter filter) {
         if (filter == Filter.KIDS) return kids;
         else if (filter == Filter.BREVEMENTE) return brevemente;
-        else return exibicao;
+        else return em_exibicao;
+    }
+
+    public String getFilterUrl(Context context, Filter filter) {
+        PreferencesManager preferences = new PreferencesManager(context);
+        String apiUrl = preferences.getApiUrl();
+        int cinemaId = preferences.getCinemaId();
+
+        // Obter o filtro
+        if (filter == Filter.BREVEMENTE) return ApiRoutes.filmesBrevemente(apiUrl);
+        else if (filter == Filter.KIDS) return ApiRoutes.filmesKids(apiUrl, cinemaId);
+        return ApiRoutes.filmesEmExibicao(apiUrl, cinemaId);
     }
 
     public void clearCache() {
-        exibicao.clear();
+        em_exibicao.clear();
         kids.clear();
         brevemente.clear();
     }
 
-    public void fetchFilmes(Context context, Filter filter, FilmesListener listener) {
-        // Obter a lista
-        if (filter == Filter.KIDS) filmes = kids;
-        else if (filter == Filter.BREVEMENTE) filmes = brevemente;
-        else filmes = exibicao;
-
-        // Se tiver cache --> evitar pedido à API
-        if (!filmes.isEmpty()) {
-            listener.onSuccess(filmes);
+    public void getFilmes(Context context, Filter filter, FilmesListener listener) {
+        // Evitar pedido à API se tiver cache
+        cache = getCache(filter);
+        if (!cache.isEmpty()) {
+            listener.onSuccess(cache);
             return;
         }
 
         // Obter URL
-        PreferencesManager preferences = new PreferencesManager(context);
-        String apiUrl = preferences.getApiUrl();
-        int cinemaId = preferences.getCinemaId();
-        String url;
-
-        if (filter == Filter.BREVEMENTE) url = ApiRoutes.filmesBrevemente(apiUrl);
-        else if (filter == Filter.KIDS) url = ApiRoutes.filmesKids(apiUrl, cinemaId);
-        else url = ApiRoutes.filmesEmExibicao(apiUrl, cinemaId);
+        String url = getFilterUrl(context, filter);
 
         JsonArrayRequest request = new JsonArrayRequest(
             Request.Method.GET, url, null, response -> {
                 // Limpar lista
-                filmes.clear();
+                cache.clear();
 
                 // O cinema escolhido não tem sessões
                 if (filter != Filter.BREVEMENTE && response.length() == 0) {
@@ -82,37 +84,38 @@ public class FilmesManager {
                     return;
                 }
 
-                // Obter filmes
+                // Guardar filmes em cache
                 for (int i = 0; i < response.length(); i++) {
                     JSONObject obj = response.optJSONObject(i);
-                    if (obj != null) {
-                        filmes.add(new Filme(
-                            obj.optInt("id"),
-                            obj.optString("titulo"),
-                            obj.optString("poster_url")
-                        ));
+                    if (obj == null) continue;
+                    cache.add(new Filme(
+                        obj.optInt("id"),
+                        obj.optString("titulo"),
+                        obj.optString("poster_url")
+                    ));
+                }
+
+                listener.onSuccess(cache);
+            },
+            error -> {
+                // O cinema não existe
+                if (filter != Filter.BREVEMENTE && error.networkResponse != null) {
+                    if (error.networkResponse.statusCode == 404) {
+                        listener.onInvalidCinema();
+                        return;
                     }
                 }
 
-                listener.onSuccess(filmes);
-            },
-            error -> {
-                if (filter != Filter.BREVEMENTE && error.networkResponse != null) {
-                    // O cinema não existe
-                    if (error.networkResponse.statusCode == 404) listener.onInvalidCinema();
-                }
-
-                else listener.onError();
+                listener.onError();
             }
         );
 
-        Volley.newRequestQueue(context).add(request);
+        getRequestQueue(context).add(request);
     }
 
     public void getFilme(Context context, int id, FilmeListener listener) {
         // Obter URL
-        PreferencesManager preferences = new PreferencesManager(context);
-        String url = ApiRoutes.filme(preferences.getApiUrl(), id);
+        String url = ApiRoutes.filme(new PreferencesManager(context).getApiUrl(), id);
 
         JsonObjectRequest request = new JsonObjectRequest(
             Request.Method.GET, url, null, response -> {
@@ -141,6 +144,6 @@ public class FilmesManager {
             error -> listener.onError()
         );
 
-        Volley.newRequestQueue(context).add(request);
+        getRequestQueue(context).add(request);
     }
 }

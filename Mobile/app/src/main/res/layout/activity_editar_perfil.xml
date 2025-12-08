@@ -1,43 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
+    style="@style/VerticalLayout.Full"
     tools:context=".activities.SignupActivity">
 
     <!-- Toolbar -->
     <include android:id="@+id/toolbar" layout="@layout/toolbar" />
 
-    <!-- Container -->
+    <!-- Main Content -->
     <LinearLayout style="@style/Container.Main">
 
         <!-- Título -->
-        <TextView
-            style="@style/Title"
-            android:text="@string/editar_perfil_titulo" />
+        <TextView android:text="@string/title_editar_perfil" style="@style/Title" />
 
         <!-- Subtítulo -->
-        <TextView
-            style="@style/Subtitle"
-            android:text="@string/editar_perfil_subtitulo" />
+        <TextView android:text="@string/subtitle_editar_perfil" style="@style/Subtitle" />
 
-        <!-- Form Utilizador -->
-        <include android:id="@+id/form" layout="@layout/layout_form_utilizador" />
+        <!-- Form -->
+        <include android:id="@+id/form" layout="@layout/layout_user_form" />
 
-        <!-- Botão Guardar -->
-        <Button
-            android:id="@+id/btnGuardar"
-            android:text="@string/btn_guardar"
-            style="@style/Button.Primary.Full" />
+        <!-- Guardar -->
+        <Button android:id="@+id/btnGuardar" android:text="@string/btn_guardar" style="@style/Button.Primary.Full" />
 
-        <!-- Botão Cancelar -->
-        <Button
-            android:id="@+id/btnCancelar"
-            android:text="@string/btn_cancelar"
-            style="@style/Button.Text" />
+        <!-- Cancelar -->
+        <Button android:id="@+id/btnCancelar" android:text="@string/btn_cancelar" style="@style/Button.Text" />
 
     </LinearLayout>
 

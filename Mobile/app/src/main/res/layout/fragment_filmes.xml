@@ -17,13 +17,12 @@
             <include android:id="@+id/mainError" layout="@layout/layout_error" />
 
             <!-- Main Content -->
-            <androidx.core.widget.NestedScrollView style="@style/VerticalLayout.Full"
-                android:scrollbars="vertical">
+            <androidx.core.widget.NestedScrollView style="@style/VerticalLayout.Full" android:scrollbars="vertical">
 
                 <!-- Filmes -->
                 <LinearLayout style="@style/VerticalLayout">
 
-                    <!-- Filter Toggle Group -->
+                    <!-- Filter Toggle -->
                     <LinearLayout style="@style/Container.ForList">
                         <com.google.android.material.button.MaterialButtonToggleGroup
                             android:id="@+id/toggleGroup"
@@ -35,19 +34,19 @@
                                 android:id="@+id/btnEmExibicao"
                                 style="@style/Button.Toggle"
                                 android:layout_weight="0.35"
-                                android:text="@string/em_exibicao" />
+                                android:text="@string/btn_em_exibicao" />
 
                             <com.google.android.material.button.MaterialButton
                                 android:id="@+id/btnKids"
                                 style="@style/Button.Toggle"
                                 android:layout_weight="0.3"
-                                android:text="@string/kids" />
+                                android:text="@string/btn_kids" />
 
                             <com.google.android.material.button.MaterialButton
                                 android:id="@+id/btnBrevemente"
                                 style="@style/Button.Toggle"
                                 android:layout_weight="0.35"
-                                android:text="@string/brevemente" />
+                                android:text="@string/btn_brevemente" />
                         </com.google.android.material.button.MaterialButtonToggleGroup>
                     </LinearLayout>
 
@@ -55,7 +54,9 @@
 
                         <!-- Filmes Loading -->
                         <include layout="@layout/layout_loading"
-                            android:layout_width="match_parent" android:layout_height="600dp" />
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginVertical="200dp" />
 
                         <!-- Filmes Error -->
                         <include android:id="@+id/errorFilmes" layout="@layout/layout_error" />
@@ -64,7 +65,7 @@
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/rvFilmes"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_height="wrap_content"
                             android:paddingHorizontal="18dp"
                             android:paddingBottom="@dimen/list_padding_bottom"
                             tools:listitem="@layout/item_filme" />

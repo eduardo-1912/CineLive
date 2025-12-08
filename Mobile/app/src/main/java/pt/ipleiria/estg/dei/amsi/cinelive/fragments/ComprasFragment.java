@@ -21,17 +21,22 @@ import pt.ipleiria.estg.dei.amsi.cinelive.activities.DetalhesFilmeActivity;
 import pt.ipleiria.estg.dei.amsi.cinelive.adapters.CinemasAdapter;
 import pt.ipleiria.estg.dei.amsi.cinelive.adapters.ComprasAdapter;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.FragmentComprasBinding;
+import pt.ipleiria.estg.dei.amsi.cinelive.listeners.ComprasListener;
+import pt.ipleiria.estg.dei.amsi.cinelive.managers.ComprasManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Cinema;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Compra;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ComprasFragment} factory method to
- * create an instance of this fragment.
- */
 public class ComprasFragment extends Fragment {
     private FragmentComprasBinding binding;
+    private ComprasManager comprasManager;
     private ComprasAdapter adapter;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        comprasManager = ComprasManager.getInstance();
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -42,26 +47,38 @@ public class ComprasFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
-        List<Compra> compras = Arrays.asList(
-            new Compra(1, "Interstellar", "05/11/2025", "CineLive Leiria", "Sala 3", "Confirmada", "10.00€", "07/11/2025", "10:00", "12:00", "A5, A6, A7"),
-            new Compra(2, "Interstellar", "05/11/2025", "CineLive Leiria", "Sala 3", "Confirmada", "10.00€", "07/11/2025", "10:00", "12:00", "A5, A6, A7"),
-            new Compra(3, "Interstellar", "05/11/2025", "CineLive Leiria", "Sala 3", "Confirmada", "10.00€", "07/11/2025", "10:00", "12:00", "A5, A6, A7"),
-            new Compra(4, "Interstellar", "05/11/2025", "CineLive Leiria", "Sala 3", "Confirmada", "10.00€", "07/11/2025", "10:00", "12:00", "A5, A6, A7")
-        );
-
-        adapter = new ComprasAdapter(
-            compras, compra -> {
-                Intent intent = new Intent(getActivity(), DetalhesCompraActivity.class);
-                intent.putExtra("compra_id", compra.getId());
-                startActivity(intent);
-            }
-        );
-
         binding.rvCompras.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        loadCompras();
+    }
+
+    private void loadCompras() {
+        comprasManager.fetchCompras(getContext(), new ComprasListener() {
+            @Override
+            public void onSuccess(List<Compra> compras) {
+                setList(compras);
+            }
+
+            @Override
+            public void onEmpty() {
+
+            }
+
+            @Override
+            public void onError() {
+
+            }
+        });
+    }
+
+    private void setList(List<Compra> compras) {
+        adapter = new ComprasAdapter(compras, compra -> {
+            Intent intent = new Intent(getActivity(), DetalhesCompraActivity.class);
+            intent.putExtra("id", compra.getId());
+            startActivity(intent);
+        });
+
         binding.rvCompras.setAdapter(adapter);
-
-        // TODO: IF NOT LOGGED IN --> NAVIGATE TO FILMES + TOAST
-
     }
 
     @Override

@@ -1,43 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
+    style="@style/VerticalLayout.Full"
     tools:context=".activities.SignupActivity">
 
     <!-- Toolbar -->
     <include android:id="@+id/toolbar" layout="@layout/toolbar" />
 
-    <!-- Container -->
+    <!-- Main Content -->
     <LinearLayout style="@style/Container.Main">
 
         <!-- Título -->
-        <TextView
-            style="@style/Title"
-            android:text="@string/signup_titulo" />
+        <TextView style="@style/Title" android:text="@string/title_signup" />
 
         <!-- Subtítulo -->
-        <TextView
-            style="@style/Subtitle"
-            android:text="@string/signup_subtitulo" />
+        <TextView style="@style/Subtitle" android:text="@string/subtitle_signup" />
 
-        <!-- Form Utilizador -->
-        <include android:id="@+id/form" layout="@layout/layout_form_utilizador" />
+        <!-- Form -->
+        <include android:id="@+id/form" layout="@layout/layout_user_form" />
 
-        <!-- Botão Signup -->
-        <Button
-            android:id="@+id/btnSignup"
-            android:text="@string/btn_signup"
-            style="@style/Button.Primary.Full" />
+        <!-- Signup -->
+        <Button android:id="@+id/btnSignup" android:text="@string/btn_signup" style="@style/Button.Primary.Full" />
 
-        <!-- Botão Login -->
-        <Button
-            android:id="@+id/btnLogin"
-            android:text="@string/btn_login"
-            style="@style/Button.Text" />
+        <!-- Login -->
+        <Button android:id="@+id/btnLogin" android:text="@string/btn_login" style="@style/Button.Text" />
 
     </LinearLayout>
 

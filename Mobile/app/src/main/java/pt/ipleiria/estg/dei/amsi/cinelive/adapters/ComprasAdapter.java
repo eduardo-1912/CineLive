@@ -43,7 +43,6 @@ public class ComprasAdapter extends RecyclerView.Adapter<ComprasAdapter.ViewHold
         holder.binding.tvTituloFilme.setText(compra.getTituloFilme());
         holder.binding.tvDataCompra.setText(compra.getDataCompra());
         holder.binding.tvNomeCinema.setText(compra.getNomeCinema());
-        holder.binding.tvEstado.setText(compra.getEstado());
         holder.binding.tvTotal.setText(compra.getTotal());
         holder.binding.tvDataSessao.setText(compra.getDataSessao());
         holder.binding.tvHoraInicioSessao.setText(compra.getHoraInicioSessao());

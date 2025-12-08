@@ -47,9 +47,12 @@ class CompraController extends Controller
             'filme_titulo' => $compra->sessao->filme->titulo,
             'cinema_id' => $compra->sessao->cinema_id,
             'cinema_nome' => $compra->sessao->cinema->nome,
+            'sala_id' => $compra->sessao->sala_id,
+            'sala_nome' => $compra->sessao->sala->nome,
             'sessao_id' => $compra->sessao->id,
             'sessao_data' => Formatter::data($compra->sessao->data),
             'sessao_hora_inicio' => Formatter::hora($compra->sessao->hora_inicio),
+            'sessao_hora_fim' => Formatter::hora($compra->sessao->hora_fim),
             'lugares' => $compra->lugares,
         ], $compras);
     }
@@ -76,10 +79,11 @@ class CompraController extends Controller
             'sala_nome' => $compra->sessao->sala->nome,
             'sessao_id' => $compra->sessao->id,
             'sessao_data' => Formatter::data($compra->sessao->data),
-            'sessao_hora_inicio' => Formatter::hora($compra->sessao->horario),
-            'sessao_hora_fim' => Formatter::hora($compra->sessao->horario),
+            'sessao_hora_inicio' => Formatter::hora($compra->sessao->hora_inicio),
+            'sessao_hora_fim' => Formatter::hora($compra->sessao->hora_fim),
             'bilhetes' => array_map(fn($bilhete) => [
                 'id' => $bilhete->id,
+                'codigo' => $bilhete->codigo,
                 'lugar' => $bilhete->lugar,
                 'preco' => Formatter::preco($bilhete->preco),
                 'estado' => $bilhete->displayEstado(),

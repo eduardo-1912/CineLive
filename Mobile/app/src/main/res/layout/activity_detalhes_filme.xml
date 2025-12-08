@@ -132,7 +132,7 @@
                         style="@style/Title.Bold"
                         android:textSize="24sp"
                         android:layout_width="match_parent"
-                        android:text="@string/comprar_bilhetes"/>
+                        android:text="@string/title_comprar_bilhetes"/>
 
                     <Space style="@style/VerticalSpace.12" />
 

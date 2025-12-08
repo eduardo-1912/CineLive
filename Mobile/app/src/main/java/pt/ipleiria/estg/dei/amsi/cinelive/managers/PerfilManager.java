@@ -9,57 +9,47 @@ import com.android.volley.toolbox.Volley;
 
 import org.json.JSONObject;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.PerfilListener;
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.StandardListener;
-import pt.ipleiria.estg.dei.amsi.cinelive.listeners.UserFormListener;
+import pt.ipleiria.estg.dei.amsi.cinelive.listeners.UserValidationListener;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.User;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ApiRoutes;
 
 public class PerfilManager {
     private static PerfilManager instance = null;
     private static RequestQueue queue;
-    private User perfil;
+    private User cache;
 
     public static synchronized PerfilManager getInstance() {
-        if (instance == null) {
-            instance = new PerfilManager();
-        }
-
+        if (instance == null) instance = new PerfilManager();
         return instance;
     }
 
-    public User getPerfil() {
-        return perfil;
+    private static RequestQueue getRequestQueue(Context context) {
+        if (queue == null) queue = Volley.newRequestQueue(context.getApplicationContext());
+        return queue;
     }
 
-    public void setPerfil(User perfil) {
-        this.perfil = perfil;
+    public User getCache() {
+        return cache;
+    }
+
+    public void setCache(User cache) {
+        this.cache = cache;
     }
 
     public void clearCache() {
-        perfil = null;
+        cache = null;
     }
 
-    private Map<String, String> getEditedFields(User original, User edited) {
-        Map<String, String> params = new HashMap<>();
-
-        if (!edited.getUsername().equals(original.getUsername())) params.put("username", edited.getUsername());
-        if (!edited.getEmail().equals(original.getEmail())) params.put("email", edited.getEmail());
-        if (!edited.getNome().equals(original.getNome())) params.put("nome", edited.getNome());
-        if (!edited.getTelemovel().equals(original.getTelemovel())) params.put("telemovel", edited.getTelemovel());
-        if (!edited.getPassword().isEmpty()) params.put("password", edited.getPassword());
-
-        return params;
-    }
-
-    public void fetchPerfil(Context context, PerfilListener listener) {
-        // Se tiver cache --> evitar pedido à API
-        if (perfil != null) {
-            listener.onSuccess(perfil);
+    // region Requests
+    public void getPerfil(Context context, PerfilListener listener) {
+        // Evitar pedido à API se tiver cache
+        if (cache != null) {
+            listener.onSuccess(cache);
             return;
         }
 
@@ -69,27 +59,24 @@ public class PerfilManager {
 
         JsonObjectRequest request = new JsonObjectRequest(
             Request.Method.GET, url, null, response -> {
-
-            setPerfil(
-                new User(
+                // Guardar em cache
+                setCache(new User(
                     response.optInt("id"),
                     response.optString("username"),
                     response.optString("email"),
                     response.optString("nome"),
                     response.optString("telemovel")
-                )
-            );
+                ));
 
-            listener.onSuccess(getPerfil());
+                listener.onSuccess(cache);
             },
-
             error -> listener.onError()
         );
 
-        Volley.newRequestQueue(context).add(request);
+        getRequestQueue(context).add(request);
     }
 
-    public void updatePerfil(Context context, User original, User edited, UserFormListener listener) {
+    public void updatePerfil(Context context, User original, User edited, UserValidationListener listener) {
         // Obter URL
         PreferencesManager preferences = new PreferencesManager(context);
         String url = ApiRoutes.perfil(preferences.getApiUrl(), preferences.getToken());
@@ -97,28 +84,19 @@ public class PerfilManager {
         // Obter campos editados
         Map<String, String> params = getEditedFields(original, edited);
 
-        // Se não houver alterações --> voltar
+        // Voltar se não houver alterações
         if (params.isEmpty()) {
             listener.onSuccess();
             return;
         }
 
         JsonObjectRequest request = new JsonObjectRequest(
-            Request.Method.PUT, url, new JSONObject(params),
-            response -> {
-                // Verificar se tem erros
-                JSONObject errors = response.optJSONObject("errors");
-
+            Request.Method.PUT, url, new JSONObject(params), response -> {
                 // Obter erros
+                JSONObject errors = response.optJSONObject("errors");
                 if (errors != null) {
-                    if (errors.has("username")) {
-                        listener.onUsernameTaken();
-                    }
-
-                    if (errors.has("email")) {
-                        listener.onEmailTaken();
-                    }
-
+                    if (errors.has("username")) listener.onUsernameTaken();
+                    if (errors.has("email")) listener.onEmailTaken();
                     return;
                 }
 
@@ -126,15 +104,13 @@ public class PerfilManager {
                 clearCache();
                 listener.onSuccess();
             },
-            error -> {
-                listener.onError();
-            }
+            error -> listener.onError()
         );
 
-        Volley.newRequestQueue(context).add(request);
+        getRequestQueue(context).add(request);
     }
 
-    public void deleteAccount(Context context, StandardListener listener) {
+    public void deletePerfil(Context context, StandardListener listener) {
         // Obter o URL
         PreferencesManager preferences = new PreferencesManager(context);
         String url = ApiRoutes.perfil(preferences.getApiUrl(), preferences.getToken());
@@ -148,9 +124,8 @@ public class PerfilManager {
                 listener.onSuccess();
             },
             error -> {
-                // O perfil não existe
+                // Eliminar token e limpar cache se o perfil não existe
                 if (error.networkResponse != null && error.networkResponse.statusCode == 404) {
-                    // Eliminar token e limpar cache
                     preferences.deleteToken();
                     clearCache();
                 }
@@ -159,6 +134,24 @@ public class PerfilManager {
             }
         );
 
-        Volley.newRequestQueue(context).add(request);
+        getRequestQueue(context).add(request);
+    }
+    // endregion
+
+    private Map<String, String> getEditedFields(User original, User edited) {
+        Map<String, String> params = new HashMap<>();
+
+        if (!edited.getUsername().equals(original.getUsername()))
+            params.put("username", edited.getUsername());
+        if (!edited.getEmail().equals(original.getEmail()))
+            params.put("email", edited.getEmail());
+        if (!edited.getNome().equals(original.getNome()))
+            params.put("nome", edited.getNome());
+        if (!edited.getTelemovel().equals(original.getTelemovel()))
+            params.put("telemovel", edited.getTelemovel());
+        if (!edited.getPassword().isEmpty())
+            params.put("password", edited.getPassword());
+
+        return params;
     }
 }

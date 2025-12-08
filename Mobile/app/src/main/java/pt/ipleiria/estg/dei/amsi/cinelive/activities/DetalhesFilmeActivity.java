@@ -30,6 +30,7 @@ import pt.ipleiria.estg.dei.amsi.cinelive.managers.SessoesManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Filme;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Sessao;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
+import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorUtils;
 
 public class DetalhesFilmeActivity extends AppCompatActivity {
 
@@ -79,7 +80,7 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
 
         // Verificar se tem internet
         if (!ConnectionUtils.hasInternet(this)) {
-            Toast.makeText(this, R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
+            ErrorUtils.showToast(this, ErrorUtils.Type.NO_INTERNET);
             finish();
         }
 
@@ -126,8 +127,8 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
     private void loadSessoes(Filme filme) {
         // Verificar se tem internet
         if (!ConnectionUtils.hasInternet(this)) {
-            Toast.makeText(this, R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
-            return;
+            ErrorUtils.showToast(this, ErrorUtils.Type.NO_INTERNET);
+            finish();
         }
 
         // Mostrar conteúdo
@@ -150,8 +151,8 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int posData, long id) {
                         // Verificar se tem internet
-                        if (!ConnectionUtils.hasInternet(DetalhesFilmeActivity.this)) {
-                            Toast.makeText(DetalhesFilmeActivity.this, R.string.erro_internet_titulo, Toast.LENGTH_SHORT).show();
+                        if (!ConnectionUtils.hasInternet(getApplicationContext())) {
+                            ErrorUtils.showToast(getApplicationContext(), ErrorUtils.Type.NO_INTERNET);
                             finish();
                         }
 
@@ -176,7 +177,7 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
                             intent.putExtra("titulo", filme.getTitulo());
                             intent.putExtra("rating", filme.getRating());
                             intent.putExtra("duracao", filme.getDuracao());
-                            startActivity(intent);
+                            startActivityForResult(intent, 1);
                         });
                     }
                     @Override
@@ -189,6 +190,14 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
                 Toast.makeText(DetalhesFilmeActivity.this, R.string.msg_erro_carregar_sessoes, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            finish();
+        }
     }
 
     @Override

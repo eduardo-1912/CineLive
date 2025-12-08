@@ -6,6 +6,7 @@ public class Bilhete {
 
     public Bilhete(int id, int compraId, String codigo, String lugar, String preco, String estado) {
         this.id = id;
+        this.compraId = compraId;
         this.codigo = codigo;
         this.lugar = lugar;
         this.preco = preco;

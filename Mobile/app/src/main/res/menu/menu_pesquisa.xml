@@ -5,7 +5,7 @@
     <item
         android:id="@+id/itemPesquisa"
         android:icon="@drawable/ic_pesquisa"
-        android:title="@string/pesquisar_filmes"
+        android:title="@string/searchview_pesquisar_filmes"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         app:showAsAction="ifRoom" />
 
