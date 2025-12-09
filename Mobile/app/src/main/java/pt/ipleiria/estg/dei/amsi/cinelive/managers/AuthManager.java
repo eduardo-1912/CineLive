@@ -12,6 +12,8 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import pt.ipleiria.estg.dei.amsi.cinelive.helpers.BilheteDBHelper;
+import pt.ipleiria.estg.dei.amsi.cinelive.helpers.CompraDBHelper;
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.LoginListener;
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.UserValidationListener;
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.StandardListener;
@@ -38,11 +40,25 @@ public class AuthManager {
     }
 
     public boolean isLoggedIn(Context context) {
-        return new PreferencesManager(context).getToken() != null;
+        String token = new PreferencesManager(context).getToken();
+        return token != null && !token.trim().isEmpty() && !token.equals("null");
     }
 
     public void logout(Context context) {
         new PreferencesManager(context).deleteToken();
+
+        // Limpar cache
+        FilmesManager.getInstance().clearCache();
+        CinemasManager.getInstance().clearCache();
+        ComprasManager.getInstance().clearCache();
+        PerfilManager.getInstance().clearCache();
+
+        // Limpar dados locais
+        new CompraDBHelper(context).delete();
+
+        // Cancelar requests
+        RequestQueue queue = getRequestQueue(context);
+        queue.cancelAll(request -> true);
     }
 
     // region Requests

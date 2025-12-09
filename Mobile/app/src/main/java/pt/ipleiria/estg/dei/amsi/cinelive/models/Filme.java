@@ -5,12 +5,14 @@ public class Filme {
     private String titulo, posterUrl, rating, generos, duracao, estreia, idioma, realizacao, sinopse;
     private boolean hasSessoes;
 
+    // Lista
     public Filme(int id, String titulo, String posterUrl) {
         this.id = id;
         this.titulo = titulo;
         this.posterUrl = posterUrl;
     }
 
+    // Detalhes
     public Filme(int id, String titulo, String posterUrl, String rating, String generos, String estreia, String duracao, String idioma, String realizacao, String sinopse, Boolean hasSessoes) {
         this.id = id;
         this.titulo = titulo;

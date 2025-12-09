@@ -8,14 +8,10 @@
         <LinearLayout android:layout_weight="2" style="@style/VerticalLayout">
 
             <!-- Título do filme -->
-            <TextView
-                android:id="@+id/tvTituloFilme"
-                style="@style/Text.Bold" />
+            <TextView android:id="@+id/tvTituloFilme" style="@style/Text.Bold" />
 
             <!-- Nome do cinema -->
-            <TextView
-                android:id="@+id/tvNomeCinema"
-                style="@style/Text.Small" />
+            <TextView android:id="@+id/tvNomeCinema" style="@style/Text.Small" />
 
             <Space style="@style/VerticalSpace.16" />
 
@@ -57,7 +53,7 @@
 
     <Space style="@style/VerticalSpace.12" />
 
-    <!-- Botão Detalhes -->
+    <!-- Detalhes -->
     <Button android:id="@+id/btnDetalhes"
         style="@style/Button.Secondary"
         android:layout_width="match_parent"

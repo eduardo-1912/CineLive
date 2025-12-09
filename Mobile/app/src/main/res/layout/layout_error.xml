@@ -4,28 +4,25 @@
     style="@style/VerticalLayout.Full"
     android:gravity="center">
 
-    <LinearLayout style="@style/Container.Main"
-        android:layout_marginBottom="?attr/actionBarSize">
+    <LinearLayout style="@style/Container.Main">
 
-        <ImageView
-            android:id="@+id/ivIcon"
+        <!-- Icon -->
+        <ImageView android:id="@+id/ivIcon"
             android:layout_width="64dp"
             android:layout_height="64dp"
+            android:contentDescription="@string/title_erro_generico"
             app:tint="?attr/colorOutline" />
 
         <Space style="@style/VerticalSpace.24" />
 
-        <TextView
-            android:id="@+id/tvTitulo"
-            style="@style/Title"
-            android:textSize="28sp" />
+        <!-- Título -->
+        <TextView android:id="@+id/tvTitulo" style="@style/Title" android:textSize="28sp" />
 
-        <TextView
-            android:id="@+id/tvSubtitulo"
-            style="@style/Subtitle" />
+        <!-- Subtítulo -->
+        <TextView android:id="@+id/tvSubtitulo" style="@style/Subtitle" />
 
-        <Button android:id="@+id/btnAction"
-            style="@style/Button.Primary" />
+        <!-- Action -->
+        <Button android:id="@+id/btnAction" style="@style/Button.Primary" />
 
     </LinearLayout>
 

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     style="@style/VerticalLayout.Full"
@@ -97,27 +96,24 @@
                         <LinearLayout android:gravity="center" style="@style/HorizontalLayout.Full" >
 
                             <!-- Disponível -->
-                            <LinearLayout android:backgroundTint="?attr/colorSecondaryContainer"
-                                style="@style/BadgeContainer">
-                                <TextView android:text="@string/badge_disponivel" style="@style/BadgeText"
-                                    android:textColor="?attr/colorOnSecondaryContainer" />
-                            </LinearLayout>
+                            <TextView android:text="@string/badge_disponivel"
+                                style="@style/Badge"
+                                android:backgroundTint="?attr/colorSecondaryContainer"
+                                android:textColor="?attr/colorOnSecondaryContainer"/>
 
                             <Space style="@style/HorizontalSpace.6" />
 
                             <!-- Selecionado -->
-                            <LinearLayout android:backgroundTint="?attr/colorPrimary"
-                                style="@style/BadgeContainer">
-                                <TextView android:text="@string/badge_selecionado" style="@style/BadgeText"/>
-                            </LinearLayout>
+                            <TextView android:text="@string/badge_selecionado"
+                                style="@style/Badge"
+                                android:backgroundTint="?attr/colorPrimary" />
 
                             <Space style="@style/HorizontalSpace.6" />
 
                             <!-- Ocupado -->
-                            <LinearLayout android:backgroundTint="?attr/colorOutline"
-                                style="@style/BadgeContainer">
-                                <TextView android:text="@string/badge_ocupado" style="@style/BadgeText" />
-                            </LinearLayout>
+                            <TextView android:text="@string/badge_ocupado"
+                                style="@style/Badge"
+                                android:backgroundTint="?attr/colorOutline" />
 
                         </LinearLayout>
 

@@ -19,7 +19,6 @@
             <!-- Main Content -->
             <LinearLayout style="@style/VerticalLayout.Full">
 
-                <!-- Dados do Filme -->
                 <LinearLayout style="@style/Container.Main">
 
                     <LinearLayout style="@style/HorizontalLayout.Full">
@@ -27,37 +26,31 @@
                         <!-- Poster -->
                         <ImageView android:id="@+id/ivPoster"
                             style="@style/MoviePoster"
-                            android:layout_width="56dp"
+                            android:layout_width="64dp"
                             android:layout_height="wrap_content" />
 
                         <Space style="@style/HorizontalSpace.12" />
 
                         <LinearLayout style="@style/VerticalLayout">
 
-                            <LinearLayout style="@style/HorizontalLayout.Full"
-                                android:gravity="center_vertical">
+                            <LinearLayout style="@style/HorizontalLayout.Full" android:gravity="center_vertical">
 
                                 <!-- Título -->
-                                <TextView android:id="@+id/tvTitulo"
-                                    style="@style/Title.Bold"
-                                    android:textSize="24sp" />
+                                <TextView android:id="@+id/tvTitulo" style="@style/Title.Bold" android:textSize="24sp" />
 
                                 <Space style="@style/HorizontalSpace.8" />
 
                                 <!-- Rating -->
-                                <LinearLayout style="@style/BadgeContainer">
-                                    <TextView android:id="@+id/tvRating"
-                                        style="@style/BadgeText"
-                                        android:textSize="18sp" />
-                                </LinearLayout>
+                                <TextView android:id="@+id/tvRating"
+                                    style="@style/Badge"
+                                    android:textSize="@dimen/text_size_regular" />
 
                             </LinearLayout>
 
                             <Space style="@style/VerticalSpace.4" />
 
                             <!-- Géneros -->
-                            <TextView android:id="@+id/tvGeneros"
-                                style="@style/Text.Small" />
+                            <TextView android:id="@+id/tvGeneros" style="@style/Text.Small" />
 
                         </LinearLayout>
 
@@ -67,43 +60,31 @@
 
                     <LinearLayout style="@style/HorizontalLayout.Full">
 
-                        <LinearLayout
-                            android:layout_weight="1"
-                            style="@style/VerticalLayout">
+                        <LinearLayout android:layout_weight="1" style="@style/VerticalLayout">
 
                             <!-- Estreia -->
                             <TextView android:text="@string/label_estreia" style="@style/Label" />
-                            <TextView
-                                android:id="@+id/tvEstreia"
-                                style="@style/Text" />
+                            <TextView android:id="@+id/tvEstreia" style="@style/Text" />
 
                             <Space style="@style/VerticalSpace.16" />
 
                             <!-- Idioma -->
                             <TextView android:text="@string/label_idioma" style="@style/Label" />
-                            <TextView
-                                android:id="@+id/tvIdioma"
-                                style="@style/Text" />
+                            <TextView android:id="@+id/tvIdioma" style="@style/Text" />
 
                         </LinearLayout>
 
-                        <LinearLayout
-                            android:layout_weight="1"
-                            style="@style/VerticalLayout">
+                        <LinearLayout android:layout_weight="1" style="@style/VerticalLayout">
 
                             <!-- Estreia -->
                             <TextView android:text="@string/label_duracao" style="@style/Label" />
-                            <TextView
-                                android:id="@+id/tvDuracao"
-                                style="@style/Text" />
+                            <TextView android:id="@+id/tvDuracao" style="@style/Text" />
 
                             <Space style="@style/VerticalSpace.16" />
 
                             <!-- Realização -->
                             <TextView android:text="@string/label_realizacao" style="@style/Label" />
-                            <TextView
-                                android:id="@+id/tvRealizacao"
-                                style="@style/Text" />
+                            <TextView android:id="@+id/tvRealizacao" style="@style/Text" />
 
                         </LinearLayout>
 
@@ -116,10 +97,7 @@
 
                     <Space style="@style/VerticalSpace.4" />
 
-                    <TextView
-                        android:id="@+id/tvSinopse"
-                        style="@style/Text"
-                        android:layout_width="match_parent" />
+                    <TextView android:id="@+id/tvSinopse" style="@style/Text" android:layout_width="match_parent" />
 
                 </LinearLayout>
 
@@ -128,8 +106,7 @@
                 <!-- Comprar Bilhetes -->
                 <LinearLayout android:id="@+id/mainSessoes" style="@style/Container.Main" android:visibility="gone">
 
-                    <TextView
-                        style="@style/Title.Bold"
+                    <TextView style="@style/Title.Bold"
                         android:textSize="24sp"
                         android:layout_width="match_parent"
                         android:text="@string/title_comprar_bilhetes"/>
@@ -137,8 +114,7 @@
                     <Space style="@style/VerticalSpace.12" />
 
                     <!-- Escolher Data da Sessão -->
-                    <Spinner
-                        android:id="@+id/spinnerData"
+                    <Spinner android:id="@+id/spinnerData"
                         android:layout_marginStart="5dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
@@ -146,8 +122,7 @@
                     <View android:layout_marginVertical="4dp" style="@style/Divider" />
 
                     <!-- Escolher Hora da Sessão -->
-                    <ListView
-                        android:id="@+id/lvHoras"
+                    <ListView android:id="@+id/lvHoras"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
 

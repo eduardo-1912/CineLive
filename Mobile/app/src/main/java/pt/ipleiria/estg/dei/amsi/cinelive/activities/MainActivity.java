@@ -13,6 +13,7 @@ import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityMainBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.StandardListener;
 import pt.ipleiria.estg.dei.amsi.cinelive.managers.AuthManager;
+import pt.ipleiria.estg.dei.amsi.cinelive.managers.ComprasManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorUtils;
 
@@ -47,11 +48,24 @@ public class MainActivity extends AppCompatActivity {
 
         // Obter o auth manager
         authManager = AuthManager.getInstance();
+
+        // Iniciar base de dados local
+        ComprasManager.getInstance().init(getApplicationContext());
     }
 
     private void load() {
+        setOnNavItemSelectedListener();
+
         // Verificar ligação à internet
-        if (!ConnectionUtils.hasInternet(this)) updateBottomNav(authManager.isLoggedIn(this));
+        if (!ConnectionUtils.hasInternet(this)) {
+            updateBottomNav(authManager.isLoggedIn(this));
+            return;
+        }
+
+        if (!authManager.isLoggedIn(this)) {
+            updateBottomNav(false);
+            return;
+        }
 
         // Validar o token se tiver sessão iniciada
         if (authManager.isLoggedIn(this)) authManager.validateToken(this, new StandardListener() {
@@ -65,7 +79,9 @@ public class MainActivity extends AppCompatActivity {
                 updateBottomNav(false);
             }
         });
+    }
 
+    private void setOnNavItemSelectedListener() {
         binding.bottomNav.setOnItemSelectedListener(item -> {
             // Configurações
             if (item.getItemId() == R.id.navConfiguracoes && !authManager.isLoggedIn(this)) {
@@ -97,20 +113,20 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        load();
-    }
-
     private void updateBottomNav(boolean isLoggedIn) {
-        binding.bottomNav.getMenu().findItem(R.id.navCompras).setVisible(isLoggedIn);
-        binding.bottomNav.getMenu().findItem(R.id.navPerfil).setVisible(isLoggedIn);
         binding.bottomNav.getMenu().findItem(R.id.navConfiguracoes).setVisible(!isLoggedIn);
         binding.bottomNav.getMenu().findItem(R.id.navEntrar).setVisible(!isLoggedIn);
+        binding.bottomNav.getMenu().findItem(R.id.navCompras).setVisible(isLoggedIn);
+        binding.bottomNav.getMenu().findItem(R.id.navPerfil).setVisible(isLoggedIn);
     }
 
     public void navigateToFragment(int fragment) {
         binding.bottomNav.setSelectedItemId(fragment);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        load();
     }
 }

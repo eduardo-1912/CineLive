@@ -14,7 +14,6 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
@@ -33,7 +32,7 @@ public class ComprarBilhetesActivity extends AppCompatActivity {
 
     private ActivityComprarBilhetesBinding binding;
     private SessoesManager sessoesManager;
-    int id;
+    int sessaoId;
     private final List<String> lugaresSelecionados = new ArrayList<>();
     private double precoBilhete, total;
 
@@ -55,16 +54,17 @@ public class ComprarBilhetesActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(R.string.title_comprar_bilhetes);
 
+        // Obter o sessões manager
         sessoesManager = SessoesManager.getInstance();
 
-        // Obter ID da sessão
+        // Obter Intent
         Intent intent = getIntent();
-        id = intent.getIntExtra("id", -1);
+        sessaoId = intent.getIntExtra("sessaoId", -1);
 
         // Preencher dados do filme
-        binding.tvTitulo.setText(intent.getStringExtra("titulo"));
-        binding.tvRating.setText(intent.getStringExtra("rating"));
-        binding.tvDuracao.setText(intent.getStringExtra("duracao"));
+        binding.tvTitulo.setText(intent.getStringExtra("tituloFilme"));
+        binding.tvRating.setText(intent.getStringExtra("ratingFilme"));
+        binding.tvDuracao.setText(intent.getStringExtra("duracaoFilme"));
 
         // Carregar a sessão
         loadSessao();
@@ -72,7 +72,7 @@ public class ComprarBilhetesActivity extends AppCompatActivity {
         // Swipe refresh
         binding.swipeRefresh.setOnRefreshListener(() -> {
             binding.swipeRefresh.setRefreshing(false);
-            loadSessao();
+            if (ConnectionUtils.hasInternet(this)) loadSessao();
         });
     }
 
@@ -86,7 +86,7 @@ public class ComprarBilhetesActivity extends AppCompatActivity {
         }
 
         // Obter sessão da API
-        sessoesManager.getSessao(this, id, new SessaoListener() {
+        sessoesManager.getSessao(this, sessaoId, new SessaoListener() {
             @Override
             public void onSuccess(Sessao sessao) {
                 setSessao(sessao);
@@ -94,7 +94,7 @@ public class ComprarBilhetesActivity extends AppCompatActivity {
 
             @Override
             public void onError() {
-                Toast.makeText(ComprarBilhetesActivity.this, R.string.msg_erro_carregar_sessao, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), R.string.msg_erro_carregar_sessao, Toast.LENGTH_SHORT).show();
                 finish();
             }
         });
@@ -117,34 +117,22 @@ public class ComprarBilhetesActivity extends AppCompatActivity {
         gerarMapaLugares(sessao.getNumFilas(), sessao.getNumColunas(), sessao.getLugaresOcupados());
         atualizarResumo();
 
-        // Botão Pagar
+        // Pagar
         binding.btnPagar.setOnClickListener(v -> {
-            String[] optionsPagamaneto = {getString(R.string.label_cartao), getString(R.string.label_mbway), getString(R.string.label_paypal)};
+            String[] options = {
+                getString(R.string.label_cartao),
+                getString(R.string.label_mbway),
+                getString(R.string.label_paypal)
+            };
+            String[] metodos = {"cartao", "mbway", "paypal"};
 
-            new MaterialAlertDialogBuilder(this)
-                .setTitle(R.string.title_escolha_pagamento)
-                .setItems(optionsPagamaneto, (dialog, which) -> {
-
-                    Compra compra = new Compra(id, getEnumPagamaneto(optionsPagamaneto[which]), lugaresSelecionados);
-
-                    ComprasManager.getInstance().createCompra(this, compra, new StandardListener() {
-                            @Override
-                            public void onSuccess() {
-                                Toast.makeText(ComprarBilhetesActivity.this, R.string.msg_sucesso_criar_compra, Toast.LENGTH_SHORT).show();
-                                setResult(RESULT_OK);
-                                finish();
-                            }
-
-                            @Override
-                            public void onError() {
-                                Toast.makeText(ComprarBilhetesActivity.this, R.string.msg_erro_criar_compra, Toast.LENGTH_LONG).show();
-                            }
-                        }
-                    );
-
-                })
-                .setNegativeButton(R.string.btn_cancelar, null)
-                .show();
+            // Modal de pagamento
+            new MaterialAlertDialogBuilder(this).setTitle(R.string.title_escolha_pagamento)
+                .setItems(options, (dialog, which) -> {
+                    // Enviar pedido de compra à API
+                    createCompra(new Compra(sessaoId, metodos[which], lugaresSelecionados));
+                }
+            ).setNegativeButton(R.string.btn_cancelar, null).show();
         });
     }
 
@@ -207,10 +195,20 @@ public class ComprarBilhetesActivity extends AppCompatActivity {
         binding.btnPagar.setText(hasLugares ? R.string.btn_pagar : R.string.btn_selecione_lugares);
     }
 
-    private String getEnumPagamaneto(String option) {
-        if (option == "Cartão") return "mbway";
-        if (option == "MB WAY") return "mbway";
-        else return "paypal";
+    private void createCompra(Compra compra) {
+        ComprasManager.getInstance().createCompra(this, compra, new StandardListener() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(getApplicationContext(), R.string.msg_sucesso_criar_compra, Toast.LENGTH_SHORT).show();
+                setResult(RESULT_OK);
+                finish();
+            }
+
+            @Override
+            public void onError() {
+                Toast.makeText(getApplicationContext(), R.string.msg_erro_criar_compra, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     @Override

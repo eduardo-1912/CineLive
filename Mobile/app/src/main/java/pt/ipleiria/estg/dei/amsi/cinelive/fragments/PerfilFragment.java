@@ -57,15 +57,18 @@ public class PerfilFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (ConnectionUtils.hasInternet(requireContext())) {
-            inflater.inflate(R.menu.menu_configuracoes, menu);
-            super.onCreateOptionsMenu(menu, inflater);
-        }
+        inflater.inflate(R.menu.menu_configuracoes, menu);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.itemConfiguracoes) {
+            if (!ConnectionUtils.hasInternet(requireContext())) {
+                ErrorUtils.showToast(requireContext(), ErrorUtils.Type.NO_INTERNET);
+                return false;
+            }
+
             startActivity(new Intent(getActivity(), ConfiguracoesActivity.class));
             return true;
         }

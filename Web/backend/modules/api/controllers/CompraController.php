@@ -43,6 +43,7 @@ class CompraController extends Controller
             'data' => Formatter::data($compra->data),
             'total' => Formatter::preco($compra->total),
             'estado' => $compra->displayEstado(),
+            'pagamento' => $compra->displayPagamento(),
             'filme_id' => $compra->sessao->filme_id,
             'filme_titulo' => $compra->sessao->filme->titulo,
             'cinema_id' => $compra->sessao->cinema_id,
@@ -71,6 +72,7 @@ class CompraController extends Controller
             'data' => Formatter::data($compra->data),
             'total' => Formatter::preco($compra->total),
             'estado' => $compra->displayEstado(),
+            'pagamento' => $compra->displayPagamento(),
             'filme_id' => $compra->sessao->filme_id,
             'filme_titulo' => $compra->sessao->filme->titulo,
             'cinema_id' => $compra->sessao->cinema_id,
@@ -89,6 +91,23 @@ class CompraController extends Controller
                 'estado' => $bilhete->displayEstado(),
             ], $compra->bilhetes)
         ];
+    }
+
+    public function actionBilhetes($id)
+    {
+        $compra = Compra::findOne($id);
+
+        if (!$compra || $compra->cliente_id != Yii::$app->user->id) {
+            throw new NotFoundHttpException("Compra não encontrada.");
+        }
+
+        return array_map(fn($bilhete) => [
+            'id' => $bilhete->id,
+            'codigo' => $bilhete->codigo,
+            'lugar' => $bilhete->lugar,
+            'preco' => Formatter::preco($bilhete->preco),
+            'estado' => $bilhete->displayEstado(),
+        ], $compra->bilhetes);
     }
 
     public function actionCreate()

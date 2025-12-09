@@ -4,12 +4,28 @@
     style="@style/VerticalLayout.Full"
     tools:context=".fragments.ComprasFragment">
 
-    <!-- Compras -->
-    <ScrollView style="@style/VerticalLayout">
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvCompras"
-            style="@style/Container.ForList"
-            tools:listitem="@layout/item_compra" />
-    </ScrollView>
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefresh" style="@style/VerticalLayout.Full">
+
+        <ViewFlipper android:id="@+id/mainFlipper" style="@style/VerticalLayout.Full">
+
+            <!-- Main Loading -->
+            <include layout="@layout/layout_loading" />
+
+            <!-- Main Error -->
+            <include android:id="@+id/mainError" layout="@layout/layout_error" />
+
+            <!-- Main Content -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvCompras"
+                tools:listitem="@layout/item_compra"
+                style="@style/Container.ForList"
+                android:scrollbarStyle="outsideOverlay"
+                android:scrollbars="vertical"
+                android:clipToPadding="false" />
+
+        </ViewFlipper>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </LinearLayout>

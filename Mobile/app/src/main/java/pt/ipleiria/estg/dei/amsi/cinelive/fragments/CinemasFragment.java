@@ -11,11 +11,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import java.util.List;
 
-import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.activities.ConfiguracoesActivity;
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.CinemasListener;
 import pt.ipleiria.estg.dei.amsi.cinelive.managers.CinemasManager;
@@ -29,8 +27,8 @@ import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorUtils;
 
 public class CinemasFragment extends Fragment {
     private FragmentCinemasBinding binding;
-    private CinemasAdapter adapter;
     private CinemasManager cinemasManager;
+    private CinemasAdapter adapter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -129,14 +127,6 @@ public class CinemasFragment extends Fragment {
                     break;
             }
         });
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        // Recarregar se não tiver cache
-        if (cinemasManager.getCache().isEmpty()) loadCinemas();
     }
 
     @Override

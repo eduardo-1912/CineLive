@@ -102,6 +102,9 @@ return [
                 [
                     'class' => 'yii\rest\UrlRule',
                     'controller' => ['api/compra'],
+                    'extraPatterns' => [
+                        'GET {id}/bilhetes' => 'bilhetes',
+                    ],
                 ],
                 [
                     'class' => 'yii\rest\UrlRule',

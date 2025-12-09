@@ -100,21 +100,16 @@
 
 
     <!-- region Badges -->
-    <style name="BadgeContainer">
+    <style name="Badge">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:background">@drawable/badge_shape</item>
         <item name="android:paddingTop">4dp</item>
         <item name="android:paddingBottom">4dp</item>
         <item name="android:paddingStart">14dp</item>
         <item name="android:paddingEnd">14dp</item>
-    </style>
-
-    <style name="BadgeText">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:textSize">14sp</item>
+        <item name="android:background">@drawable/badge_shape</item>
         <item name="android:textStyle">bold</item>
+        <item name="android:textSize">14sp</item>
         <item name="android:textColor">?attr/colorOnSurfaceInverse</item>
     </style>
     <!-- endregion -->

@@ -55,6 +55,7 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
 
         setSupportActionBar(binding.toolbar.topAppBar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle(R.string.title_detalhes_filme);
 
         // Obter o filmes manager
         filmesManager = FilmesManager.getInstance();
@@ -71,6 +72,11 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
         // Swipe refresh
         binding.swipeRefresh.setOnRefreshListener(() -> {
             binding.swipeRefresh.setRefreshing(false);
+            if (!ConnectionUtils.hasInternet(this)) {
+                ErrorUtils.showToast(this, ErrorUtils.Type.NO_INTERNET);
+                return;
+            }
+
             loadFilme();
         });
     }
@@ -85,35 +91,33 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
         }
 
         // Obter o filme à API
-        filmesManager.getFilme(this, getIntent().getIntExtra("id", -1), new FilmeListener() {
+        filmesManager.getFilme(this, getIntent().getIntExtra("filmeId", -1), new FilmeListener() {
             @Override
             public void onSuccess(Filme filme) {
                 setFilme(filme);
+
+                // Carregar sessões se estiver em exibição
                 if (filme.hasSessoes()) loadSessoes(filme);
+                else binding.mainFlipper.setDisplayedChild(1); // Main Content
             }
 
             @Override
             public void onError() {
-                Toast.makeText(DetalhesFilmeActivity.this, R.string.msg_erro_carregar_filme, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), R.string.msg_erro_carregar_filme, Toast.LENGTH_SHORT).show();
                 finish();
             }
         });
     }
 
     private void setFilme(Filme filme) {
-        binding.mainFlipper.setDisplayedChild(1); // Main Content
-
-        // Atualizar title da toolbar
-        getSupportActionBar().setTitle(filme.getTitulo());
-
         // Carregar o poster
-        Glide.with(DetalhesFilmeActivity.this)
+        Glide.with(getApplicationContext())
             .load(preferences.getApiHost() + filme.getPosterUrl())
             .placeholder(R.drawable.poster_placeholder)
             .diskCacheStrategy(DiskCacheStrategy.ALL)
             .into(binding.ivPoster);
 
-        // Dados do filmes
+        // Preencher dados
         binding.tvTitulo.setText(filme.getTitulo());
         binding.tvRating.setText(filme.getRating());
         binding.tvGeneros.setText(filme.getGeneros());
@@ -141,60 +145,71 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
                 // Lista de datas
                 List<String> datas = new ArrayList<>(sessoesPorData.keySet());
 
-                // Preencher o spinner com as datas
-                binding.spinnerData.setAdapter(
-                    new ArrayAdapter<>(DetalhesFilmeActivity.this, android.R.layout.simple_spinner_dropdown_item, datas)
-                );
+                // Configurar o adapter com as datas das sessões
+                binding.spinnerData.setAdapter(new ArrayAdapter<>(
+                    getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, datas
+                ));
+
+                binding.mainFlipper.setDisplayedChild(1); // Main Content
 
                 // Se clicou numa data --> atualizar sessões
-                binding.spinnerData.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int posData, long id) {
-                        // Verificar se tem internet
-                        if (!ConnectionUtils.hasInternet(getApplicationContext())) {
-                            ErrorUtils.showToast(getApplicationContext(), ErrorUtils.Type.NO_INTERNET);
-                            finish();
-                        }
-
-                        // Obter as sessões da data selecionada
-                        List<Sessao> sessoes = sessoesPorData.get(datas.get(posData));
-
-                        // Obter as horas
-                        List<String> horas = new ArrayList<>();
-                        for (Sessao sessao : sessoes) horas.add(sessao.getHoraInicio());
-
-                        // Colocar as horas na ListView
-                        binding.lvHoras.setAdapter(new ArrayAdapter<>(DetalhesFilmeActivity.this, android.R.layout.simple_list_item_1, horas));
-
-                        // Se clicou numa hora --> ir para essa sessão
-                        binding.lvHoras.setOnItemClickListener((p, viewHora, posHora, idSessao) -> {
-                            // Obter a sessão correspondente
-                            Sessao sessao = sessoes.get(posHora);
-
-                            // Ir para comprar bilhetes
-                            Intent intent = new Intent(DetalhesFilmeActivity.this, ComprarBilhetesActivity.class);
-                            intent.putExtra("id", sessao.getId());
-                            intent.putExtra("titulo", filme.getTitulo());
-                            intent.putExtra("rating", filme.getRating());
-                            intent.putExtra("duracao", filme.getDuracao());
-                            startActivityForResult(intent, 1);
-                        });
-                    }
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {}
-                });
+                setOnDataSelectedListener(filme, datas, sessoesPorData);
             }
 
             @Override
             public void onError() {
-                Toast.makeText(DetalhesFilmeActivity.this, R.string.msg_erro_carregar_sessoes, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), R.string.msg_erro_carregar_sessoes, Toast.LENGTH_SHORT).show();
             }
+        });
+    }
+
+    private void setOnDataSelectedListener(Filme filme, List<String> datas, Map<String, List<Sessao>> sessoesPorData) {
+        binding.spinnerData.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int posData, long id) {
+                // Obter as sessões da data selecionada
+                List<Sessao> sessoes = sessoesPorData.get(datas.get(posData));
+
+                // Obter as horas
+                List<String> horas = new ArrayList<>();
+                for (Sessao sessao : sessoes) horas.add(sessao.getHoraInicio());
+
+                // Configurar o adapter com as horas
+                binding.lvHoras.setAdapter(new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1, horas));
+
+                // Se clicou numa hora --> ir para a sessão da hora
+                setOnHoraSelectedListener(filme, sessoes);
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+    }
+
+    private void setOnHoraSelectedListener(Filme filme, List<Sessao> sessoes) {
+        binding.lvHoras.setOnItemClickListener((p, viewHora, posHora, idSessao) -> {
+            // Verificar se tem internet
+            if (!ConnectionUtils.hasInternet(getApplicationContext())) {
+                ErrorUtils.showToast(getApplicationContext(), ErrorUtils.Type.NO_INTERNET);
+                return;
+            }
+
+            // Obter a sessão correspondente
+            Sessao sessao = sessoes.get(posHora);
+
+            // Ir para comprar bilhetes
+            Intent intent = new Intent(getApplicationContext(), ComprarBilhetesActivity.class);
+            intent.putExtra("sessaoId", sessao.getId());
+            intent.putExtra("tituloFilme", filme.getTitulo());
+            intent.putExtra("ratingFilme", filme.getRating());
+            intent.putExtra("duracaoFilme", filme.getDuracao());
+            startActivityForResult(intent, 1);
         });
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        // O utilizador comprou bilhetes
         if (requestCode == 1 && resultCode == RESULT_OK) {
             finish();
         }

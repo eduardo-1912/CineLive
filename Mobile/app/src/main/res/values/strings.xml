@@ -27,6 +27,7 @@
     <string name="btn_brevemente">Brevemente</string>
 
     <!-- Activity Detalhes Filme -->
+    <string name="title_detalhes_filme">Detalhes do Filme</string>
     <string name="label_estreia">Estreia</string>
     <string name="label_duracao">Duração</string>
     <string name="label_idioma">Idioma</string>
@@ -68,17 +69,20 @@
     <string name="btn_sem_sessoes_ativas">Sem sessões ativas</string>
 
     <!-- Fragment Compras -->
+    <string name="title_compras_locais">Compras Locais</string>
     <string name="label_sessao">Sessão</string>
-    <string name="btn_detalhes">Detalhes</string>
+    <string name="btn_detalhes">Ver detalhes</string>
     <string name="btn_ver_filmes">Ver filmes</string>
 
     <!-- Activity Detalhes Compra -->
     <string name="title_detalhes_compra">Detalhes da Compra</string>
+    <string name="title_detalhes_compra_local">Detalhes da Compra (Local)</string>
     <string name="label_sala">Sala</string>
     <string name="label_estado">Estado</string>
     <string name="label_lugar">Lugar</string>
     <string name="label_preco">Preço</string>
     <string name="title_bilhetes">Bilhetes</string>
+    <string name="msg_erro_carregar_compra">Erro ao carregar a compra</string>
 
     <!-- Fragment Perfil -->
     <string name="title_perfil">Os meus dados</string>
@@ -132,8 +136,8 @@
     <string name="hint_api_path">Caminho da API</string>
 
     <!-- Layout Error -->
-    <string name="title_generic_error">Ocorreu um erro</string>
-    <string name="subtitle_generic_error">Por favor tente novamente mais tarde.</string>
+    <string name="title_erro_generico">Ocorreu um erro</string>
+    <string name="subtitle_erro_generico">Por favor tente novamente mais tarde.</string>
     <string name="title_erro_internet">Sem ligação à Internet</string>
     <string name="subtitle_erro_internet">Verifique a sua ligação e tente novamente.</string>
     <string name="title_erro_api">Sem ligação à API</string>

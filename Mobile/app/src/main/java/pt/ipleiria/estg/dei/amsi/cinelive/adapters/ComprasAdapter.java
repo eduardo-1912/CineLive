@@ -41,7 +41,7 @@ public class ComprasAdapter extends RecyclerView.Adapter<ComprasAdapter.ViewHold
 
         // Preencher campos do layout com os dados da compra
         holder.binding.tvTituloFilme.setText(compra.getTituloFilme());
-        holder.binding.tvDataCompra.setText(compra.getDataCompra());
+        holder.binding.tvDataCompra.setText(compra.getData());
         holder.binding.tvNomeCinema.setText(compra.getNomeCinema());
         holder.binding.tvTotal.setText(compra.getTotal());
         holder.binding.tvDataSessao.setText(compra.getDataSessao());
@@ -65,7 +65,6 @@ public class ComprasAdapter extends RecyclerView.Adapter<ComprasAdapter.ViewHold
     static class ViewHolder extends RecyclerView.ViewHolder {
         ItemCompraBinding binding;
 
-        // Construtor do ViewHolder
         public ViewHolder(ItemCompraBinding binding) {
             super(binding.getRoot());
             this.binding = binding;

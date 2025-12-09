@@ -8,11 +8,13 @@ public class Sessao {
     private double precoBilhete;
     private List<String> lugaresOcupados;
 
+    // Lista
     public Sessao(int id, String horaInicio) {
         this.id = id;
         this.horaInicio = horaInicio;
     }
 
+    // Detalhes
     public Sessao(int id, String data, String horaInicio, String horaFim, String nomeCinema, String nomeSala, double precoBilhete, int numFilas, int numColunas, List<String> lugaresOcupados) {
         this.id = id;
         this.data = data;

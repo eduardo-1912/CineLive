@@ -50,7 +50,6 @@ public class BilhetesAdapter extends RecyclerView.Adapter<BilhetesAdapter.ViewHo
     static class ViewHolder extends RecyclerView.ViewHolder {
         ItemBilheteBinding binding;
 
-        // Construtor do ViewHolder
         public ViewHolder(ItemBilheteBinding binding) {
             super(binding.getRoot());
             this.binding = binding;

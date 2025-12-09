@@ -3,16 +3,14 @@
     style="@style/Container"
     android:padding="6dp">
 
-    <ImageView
-        android:id="@+id/ivPoster"
+    <ImageView android:id="@+id/ivPoster"
         style="@style/MoviePoster"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:layout_marginBottom="2dp" />
 
-    <TextView
-        android:id="@+id/tvTitulo"
+    <TextView android:id="@+id/tvTitulo"
         style="@style/Text"
         android:textSize="12sp"
         android:textAlignment="center"

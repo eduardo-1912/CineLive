@@ -45,7 +45,7 @@ public class FilmesFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        // Obter o manager
+        // Obter o filmes manager
         filmesManager = FilmesManager.getInstance();
     }
 
@@ -79,7 +79,7 @@ public class FilmesFragment extends Fragment {
                 if (adapter != null) {
                     adapter.search(query);
 
-                    if (adapter.getItemCount() == 0) showErrorFilmes(ErrorUtils.Type.NENHUM_FILME);
+                    if (adapter.getItemCount() == 0) showErrorFilmes(ErrorUtils.Type.NO_FILME_FOUND);
                     else binding.filmesFlipper.setDisplayedChild(2); // Filmes Content
                 }
 
@@ -117,7 +117,8 @@ public class FilmesFragment extends Fragment {
         boolean hasInternet = ConnectionUtils.hasInternet(requireContext());
 
         if (new PreferencesManager(requireContext()).getCinemaId() == -1) {
-            showError(ErrorUtils.Type.CINEMA_INVALIDO);
+            showError(ErrorUtils.Type.INVALID_CINEMA);
+            return;
         }
 
         // Obter filmes da API
@@ -131,7 +132,7 @@ public class FilmesFragment extends Fragment {
             }
             @Override
             public void onInvalidCinema() {
-                showError(ErrorUtils.Type.CINEMA_INVALIDO);
+                showError(ErrorUtils.Type.INVALID_CINEMA);
             }
             @Override
             public void onError() {
@@ -145,23 +146,22 @@ public class FilmesFragment extends Fragment {
         // Evitar crash ao sair do fragment
         if (binding == null || !isAdded()) return;
 
-        binding.mainFlipper.setDisplayedChild(2); // Main Content
-        binding.filmesFlipper.setDisplayedChild(2); // Filmes Content
-
         // Se clicou num filme --> abrir detalhes
         adapter = new FilmesAdapter(filmes, filme -> {
-            // Verificar se tem internet
+            // Verificar ligação à internet
             if (!ConnectionUtils.hasInternet(requireContext())) {
                 ErrorUtils.showToast(requireContext(), ErrorUtils.Type.NO_INTERNET);
                 return;
             }
 
             Intent intent = new Intent(getActivity(), DetalhesFilmeActivity.class);
-            intent.putExtra("id", filme.getId());
+            intent.putExtra("filmeId", filme.getId());
             startActivity(intent);
         });
 
         binding.rvFilmes.setAdapter(adapter);
+        binding.mainFlipper.setDisplayedChild(2); // Main Content
+        binding.filmesFlipper.setDisplayedChild(2); // Filmes Content
 
         // Mostrar item de pesquisa
         showItemPesquisa(true);
@@ -171,6 +171,11 @@ public class FilmesFragment extends Fragment {
             adapter.search(searchView.getQuery().toString());
         }
 
+        // Configurar listeners dos filtros
+        setOnFilterClickListeners();
+    }
+
+    private void setOnFilterClickListeners() {
         View.OnClickListener filterClickListener = v -> {
             // Limpar pesquisa
             clearSearch();
@@ -211,7 +216,7 @@ public class FilmesFragment extends Fragment {
                 case API_ERROR:
                     startActivity(new Intent(requireContext(), ConfiguracoesActivity.class));
                     break;
-                case CINEMA_INVALIDO:
+                case INVALID_CINEMA:
                     ((MainActivity)requireActivity()).navigateToFragment(R.id.navCinemas);
                     break;
             }
@@ -242,8 +247,6 @@ public class FilmesFragment extends Fragment {
 
         // Carregar filmes se não tiver cache
         if (filmesManager.getCache(filter).isEmpty()) loadFilmes(filter);
-
-        // Limpar pesquisa
         clearSearch();
     }
 

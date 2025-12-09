@@ -62,6 +62,7 @@ public class FilmesManager {
         brevemente.clear();
     }
 
+    // region Requests
     public void getFilmes(Context context, Filter filter, FilmesListener listener) {
         // Evitar pedido à API se tiver cache
         cache = getCache(filter);
@@ -146,4 +147,5 @@ public class FilmesManager {
 
         getRequestQueue(context).add(request);
     }
+    // endregion
 }

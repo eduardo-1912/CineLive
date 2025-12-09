@@ -8,134 +8,131 @@
     <!-- Toolbar -->
     <include android:id="@+id/toolbar" layout="@layout/toolbar" />
 
-    <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefresh" style="@style/VerticalLayout.Full">
 
-        <LinearLayout style="@style/VerticalLayout">
+        <ViewFlipper android:id="@+id/mainFlipper" style="@style/VerticalLayout.Full">
 
-            <!-- Dados da Compra -->
-            <LinearLayout style="@style/Container.Main">
+            <!-- Main Loading -->
+            <include layout="@layout/layout_loading" />
 
-                <LinearLayout style="@style/HorizontalLayout.Full" android:baselineAligned="false">
+            <!-- Main Content -->
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fillViewport="true">
 
-                    <LinearLayout style="@style/VerticalLayout"
-                        android:layout_weight="0.4">
+                <LinearLayout style="@style/VerticalLayout">
 
-                        <!-- Título Filme -->
-                        <TextView
-                            android:id="@+id/tvTituloFilme"
-                            style="@style/Text.Bold" />
+                    <LinearLayout style="@style/Container.Main">
 
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
+                        <LinearLayout style="@style/HorizontalLayout.Full" android:baselineAligned="false">
 
-                            <!-- Nome do Cinema -->
-                            <TextView
-                                android:id="@+id/tvNomeCinema"
-                                style="@style/Text"
-                                android:textSize="16sp" />
+                            <LinearLayout style="@style/VerticalLayout" android:layout_weight="0.4">
 
-                            <TextView
-                                style="@style/Text"
-                                android:text=" - "
-                                android:textSize="16sp" />
+                                <!-- Título do filme -->
+                                <TextView android:id="@+id/tvTituloFilme" style="@style/Text.Bold" />
 
-                            <!-- Nome da Sala -->
-                            <TextView
-                                android:id="@+id/tvNomeSala"
-                                style="@style/Text"
-                                android:textSize="16sp" />
+                                <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content">
+
+                                    <!-- Nome do cinema -->
+                                    <TextView android:id="@+id/tvNomeCinema"
+                                        style="@style/Text"
+                                        android:textSize="@dimen/text_size_regular" />
+
+                                    <TextView style="@style/Text" android:text="@string/bullet_divider" android:textSize="@dimen/text_size_regular" />
+
+                                    <!-- Nome da sala -->
+                                    <TextView android:id="@+id/tvNomeSala"
+                                        style="@style/Text"
+                                        android:textSize="@dimen/text_size_regular" />
+
+                                </LinearLayout>
+
+                                <Space style="@style/VerticalSpace.16" />
+
+                                <!-- Data da sessão -->
+                                <TextView style="@style/Label" android:text="@string/label_sessao" />
+                                <TextView android:id="@+id/tvDataSessao" style="@style/Text" />
+
+                            </LinearLayout>
+
+                            <LinearLayout style="@style/VerticalLayout" android:layout_weight="0.6" android:gravity="end">
+
+                                <!-- Estado -->
+                                <TextView android:id="@+id/tvEstado" style="@style/Text.Bold" android:textAlignment="textEnd" />
+
+                                <!-- Total -->
+                                <LinearLayout style="@style/HorizontalLayout">
+
+                                    <!-- Pagamento -->
+                                    <TextView android:id="@+id/tvPagamento"
+                                        style="@style/Text"
+                                        android:textSize="@dimen/text_size_regular" />
+
+                                    <TextView style="@style/Text" android:text="@string/bullet_divider" android:textSize="@dimen/text_size_regular" />
+
+                                    <!-- Total -->
+                                    <TextView android:id="@+id/tvTotal"
+                                        style="@style/Text"
+                                        android:textSize="@dimen/text_size_regular" />
+
+                                </LinearLayout>
+
+                                <Space style="@style/VerticalSpace.16" />
+
+                                <!-- Horário -->
+                                <TextView android:text="@string/label_horario" style="@style/Label" android:textAlignment="textEnd" />
+
+                                <LinearLayout style="@style/HorizontalLayout">
+
+                                    <!-- Hora início da sessão-->
+                                    <TextView android:id="@+id/tvHoraInicioSessao" style="@style/Text" />
+
+                                    <TextView style="@style/Text" android:text="@string/dash_divider" />
+
+                                    <!-- Hora fim da sessão -->
+                                    <TextView android:id="@+id/tvHoraFimSessao" style="@style/Text" />
+
+                                </LinearLayout>
+
+                            </LinearLayout>
 
                         </LinearLayout>
 
-                        <Space style="@style/VerticalSpace.16" />
-
-                        <!-- Data Sessão -->
-                        <TextView style="@style/Label" android:text="@string/label_sessao" />
-                        <TextView
-                            android:id="@+id/tvDataSessao"
-                            style="@style/Text" />
+                        <Space style="@style/VerticalSpace.8" />
 
                     </LinearLayout>
 
-                    <LinearLayout style="@style/VerticalLayout"
-                        android:layout_weight="0.6"
-                        android:gravity="end">
+                    <View style="@style/Divider"/>
 
-                        <!-- Estado -->
-                        <TextView
-                            android:id="@+id/tvEstado"
-                            style="@style/Text.Bold"
-                            android:textAlignment="textEnd" />
+                    <!-- Bilhetes -->
+                    <LinearLayout style="@style/Container.ForList">
 
-                        <!-- Total -->
-                        <TextView
-                            android:id="@+id/tvTotal"
-                            style="@style/Text"
-                            android:textSize="16sp"
-                            android:textAlignment="textEnd" />
+                        <TextView style="@style/Title.Bold"
+                            android:textSize="28sp"
+                            android:layout_width="match_parent"
+                            android:text="@string/title_bilhetes" />
 
                         <Space style="@style/VerticalSpace.16" />
 
-                        <!-- Horário -->
-                        <TextView
-                            android:text="@string/label_horario"
-                            style="@style/Label"
-                            android:textAlignment="textEnd" />
-
-                        <LinearLayout style="@style/HorizontalLayout">
-
-                            <!-- Hora Início -->
-                            <TextView
-                                android:id="@+id/tvHoraInicioSessao"
-                                style="@style/Text" />
-
-                            <TextView style="@style/Text" android:text=" - " />
-
-                            <TextView
-                                android:id="@+id/tvHoraFimSessao"
-                                style="@style/Text" />
-
-                        </LinearLayout>
+                        <!-- Bilhetes -->
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rvBilhetes"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:nestedScrollingEnabled="false"
+                            android:overScrollMode="never"
+                            tools:listitem="@layout/item_bilhete" />
 
                     </LinearLayout>
 
                 </LinearLayout>
 
-                <Space style="@style/VerticalSpace.8" />
+            </androidx.core.widget.NestedScrollView>
 
-            </LinearLayout>
+        </ViewFlipper>
 
-            <View style="@style/Divider"/>
-
-            <!-- Bilhetes da Compra -->
-            <LinearLayout style="@style/Container.ForList">
-
-                <TextView
-                    style="@style/Title.Bold"
-                    android:textSize="28sp"
-                    android:layout_width="match_parent"
-                    android:text="@string/title_bilhetes" />
-
-                <Space style="@style/VerticalSpace.16" />
-
-                <!-- Bilhetes -->
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvBilhetes"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false"
-                    android:overScrollMode="never"
-                    tools:listitem="@layout/item_bilhete" />
-
-            </LinearLayout>
-
-
-        </LinearLayout>
-
-    </androidx.core.widget.NestedScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </LinearLayout>

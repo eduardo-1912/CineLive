@@ -10,19 +10,19 @@ public class User {
         this.password = password;
     }
 
-    // Perfil
-    public User(int id, String username, String email, String nome, String telemovel) {
-        this.id = id;
+    // Signup
+    public User(String username, String password, String email, String nome, String telemovel) {
         this.username = username;
+        this.password = password;
         this.email = email;
         this.nome = nome;
         this.telemovel = telemovel;
     }
 
-    // Signup
-    public User(String username, String password, String email, String nome, String telemovel) {
+    // Perfil
+    public User(int id, String username, String email, String nome, String telemovel) {
+        this.id = id;
         this.username = username;
-        this.password = password;
         this.email = email;
         this.nome = nome;
         this.telemovel = telemovel;

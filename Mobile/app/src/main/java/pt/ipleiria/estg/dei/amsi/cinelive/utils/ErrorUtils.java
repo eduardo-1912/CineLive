@@ -8,7 +8,7 @@ import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.LayoutErrorBinding;
 
 public class ErrorUtils {
-    public enum Type {NO_INTERNET, API_ERROR, NENHUM_FILME, CINEMA_INVALIDO, EMPTY_CINEMAS, NENHUMA_COMPRA, INVALID_TOKEN}
+    public enum Type {NO_INTERNET, API_ERROR, NO_FILME_FOUND, INVALID_CINEMA, EMPTY_CINEMAS, EMPTY_COMPRAS, INVALID_TOKEN}
 
     public static void showToast(Context context, Type type) {
         int stringRes;
@@ -21,7 +21,7 @@ public class ErrorUtils {
                 stringRes = R.string.title_erro_api;
                 break;
             default:
-                stringRes = R.string.title_generic_error;
+                stringRes = R.string.title_erro_generico;
                 break;
         }
         
@@ -42,12 +42,12 @@ public class ErrorUtils {
                 binding.tvSubtitulo.setText(R.string.subtitle_erro_api);
                 binding.btnAction.setText(R.string.btn_configuracoes);
                 break;
-            case NENHUM_FILME:
+            case NO_FILME_FOUND:
                 binding.tvTitulo.setText(R.string.title_erro_nenhum_filme);
                 binding.tvSubtitulo.setText(R.string.subtitle_erro_nenhum_filme);
                 binding.btnAction.setVisibility(View.INVISIBLE);
                 break;
-            case CINEMA_INVALIDO:
+            case INVALID_CINEMA:
                 binding.ivIcon.setImageResource(R.drawable.ic_cinemas);
                 binding.tvTitulo.setText(R.string.title_erro_cinema_invalido);
                 binding.tvSubtitulo.setText(R.string.subtitle_erro_cinema_invalido);
@@ -59,7 +59,7 @@ public class ErrorUtils {
                 binding.tvSubtitulo.setText(R.string.subtitle_erro_nenhum_cinema);
                 binding.btnAction.setText(R.string.btn_tentar_novamente);
                 break;
-            case NENHUMA_COMPRA:
+            case EMPTY_COMPRAS:
                 binding.ivIcon.setImageResource(R.drawable.ic_compras);
                 binding.tvTitulo.setText(R.string.title_erro_nenhuma_compra);
                 binding.tvSubtitulo.setText(R.string.subtitle_erro_nenhuma_compra);
@@ -70,6 +70,12 @@ public class ErrorUtils {
                 binding.tvTitulo.setText(R.string.title_erro_token_invalido);
                 binding.tvSubtitulo.setText(R.string.subtitle_erro_token_invalido);
                 binding.btnAction.setText(R.string.btn_logout);
+                break;
+            default:
+                binding.ivIcon.setImageResource(R.drawable.ic_erro);
+                binding.tvTitulo.setText(R.string.title_erro_generico);
+                binding.tvSubtitulo.setText(R.string.subtitle_erro_generico);
+                binding.btnAction.setText(R.string.btn_tentar_novamente);
                 break;
         }
     }

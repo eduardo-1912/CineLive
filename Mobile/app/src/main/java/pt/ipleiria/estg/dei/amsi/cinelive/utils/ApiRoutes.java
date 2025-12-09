@@ -37,6 +37,10 @@ public class ApiRoutes {
         return url + "/compras/" + compraId + "?access-token=" + token;
     }
 
+    public static String bilhetes (String url, int compraId, String token) {
+        return url + "/compras/" + compraId + "/bilhetes?access-token=" + token;
+    }
+
     public static String perfil (String url, String token) {
         return url + "/perfil" + "?access-token=" + token;
     }

@@ -4,64 +4,42 @@
     android:layout_marginBottom="@dimen/list_padding_bottom">
 
     <LinearLayout style="@style/HorizontalLayout.Full"
+        android:baselineAligned="false"
         android:paddingHorizontal="20dp"
         android:paddingVertical="12dp"
         android:background="@drawable/container_shape_light">
 
         <!-- Lugar -->
         <LinearLayout android:layout_weight="1" style="@style/VerticalLayout">
-
             <TextView android:text="@string/label_lugar" style="@style/Label" />
-            <TextView
-                android:id="@+id/tvLugar"
-                style="@style/Text" />
-
+            <TextView android:id="@+id/tvLugar" style="@style/Text" />
         </LinearLayout>
 
         <!-- Preço -->
         <LinearLayout android:layout_weight="1" style="@style/VerticalLayout">
-
-            <TextView
-                android:text="@string/label_estado"
-                style="@style/Label"
-                android:textAlignment="center" />
-
-            <TextView
-                android:id="@+id/tvEstado"
-                style="@style/Text"
-                android:textAlignment="center" />
+            <TextView android:text="@string/label_estado" style="@style/Label" android:textAlignment="center" />
+            <TextView android:id="@+id/tvEstado" style="@style/Text" android:textAlignment="center" />
         </LinearLayout>
 
         <!-- Estado -->
         <LinearLayout android:layout_weight="1" style="@style/VerticalLayout">
-
-            <TextView
-                android:text="@string/label_preco"
-                style="@style/Label"
-                android:textAlignment="textEnd" />
-
-            <TextView
-                android:id="@+id/tvPreco"
-                style="@style/Text"
-                android:textAlignment="textEnd" />
+            <TextView android:text="@string/label_preco" style="@style/Label" android:textAlignment="textEnd" />
+            <TextView android:id="@+id/tvPreco" style="@style/Text" android:textAlignment="textEnd" />
         </LinearLayout>
 
     </LinearLayout>
 
     <Space style="@style/VerticalSpace.4" />
 
-    <LinearLayout
-        style="@style/VerticalLayout"
+    <!-- Código -->
+    <LinearLayout style="@style/VerticalLayout"
         android:paddingVertical="16dp"
         android:background="@drawable/container_shape_medium">
 
-        <!-- Código -->
-        <TextView
-            android:id="@+id/tvCodigo"
+        <TextView android:id="@+id/tvCodigo"
             style="@style/Title.Bold"
             android:layout_width="match_parent"
             android:textAlignment="center" />
-
     </LinearLayout>
 
 </LinearLayout>

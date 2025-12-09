@@ -48,7 +48,7 @@
 
     <Space style="@style/VerticalSpace.16" />
 
-    <!-- Botão Selecionar Cinema -->
+    <!-- Selecionar cinema -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnSelecionar"
         style="@style/Button.Toggle"

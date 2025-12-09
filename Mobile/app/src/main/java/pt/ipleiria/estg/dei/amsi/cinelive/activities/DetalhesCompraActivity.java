@@ -1,6 +1,5 @@
 package pt.ipleiria.estg.dei.amsi.cinelive.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -11,23 +10,25 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import java.util.Arrays;
 import java.util.List;
 
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.adapters.BilhetesAdapter;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityDetalhesCompraBinding;
+import pt.ipleiria.estg.dei.amsi.cinelive.listeners.BilhetesListener;
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.CompraListener;
 import pt.ipleiria.estg.dei.amsi.cinelive.managers.ComprasManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Bilhete;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Compra;
+import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
+import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorUtils;
 
 public class DetalhesCompraActivity extends AppCompatActivity {
 
     ActivityDetalhesCompraBinding binding;
     ComprasManager comprasManager;
     private BilhetesAdapter adapter;
-    int id;
+    int compraId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,40 +48,84 @@ public class DetalhesCompraActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(R.string.title_detalhes_compra);
 
+        // Configurar layout da recycler-view (bilhetes)
+        binding.rvBilhetes.setLayoutManager(new LinearLayoutManager(DetalhesCompraActivity.this));
+
+        // Obter o compras manager
         comprasManager = ComprasManager.getInstance();
 
         // Obter ID da compra
-        Intent intent = getIntent();
-        id = intent.getIntExtra("id", -1);
+        compraId = getIntent().getIntExtra("compraId", -1);
 
-        loadCompra();
+        // Carregar a compra
+        loadCompra(true);
+
+        // Swipe refresh
+        binding.swipeRefresh.setOnRefreshListener(() -> {
+            binding.swipeRefresh.setRefreshing(false);
+
+            // Apenas recarregar sem cache se tiver internet
+            if (ConnectionUtils.hasInternet(this)) loadCompra(false);
+        });
     }
 
-    private void loadCompra() {
-        comprasManager.getCompra(this, id, new CompraListener() {
+    private void loadCompra(boolean useCache) {
+        binding.mainFlipper.setDisplayedChild(0); // Main Loading
+        getSupportActionBar().setTitle(R.string.title_detalhes_compra);
+
+        // Obter compra de cache se tiver
+        Compra compra = comprasManager.getCompraFromList(comprasManager.getCache(), compraId);
+
+        if (useCache && compra != null) {
+            // Obter bilhetes da compra
+            comprasManager.getBilhetesByCompraId(this, compraId, new BilhetesListener() {
+                @Override
+                public void onSuccess(List<Bilhete> bilhetes) {
+                    setCompra(compra, bilhetes);
+                }
+                @Override
+                public void onError() {}
+            });
+        }
+
+        // Obter compra completa
+        comprasManager.getCompra(this, compraId, new CompraListener() {
             @Override
             public void onSuccess(Compra compra, List<Bilhete> bilhetes) {
-
-                binding.tvTituloFilme.setText(compra.getTituloFilme());
-                binding.tvNomeCinema.setText(compra.getNomeCinema());
-                binding.tvNomeSala.setText(compra.getNomeSala());
-                binding.tvEstado.setText(compra.getEstado());
-                binding.tvTotal.setText(compra.getTotal());
-                binding.tvDataSessao.setText(compra.getDataSessao());
-                binding.tvHoraInicioSessao.setText(compra.getHoraInicioSessao());
-                binding.tvHoraFimSessao.setText(compra.getHoraFimSessao());
-
-                adapter = new BilhetesAdapter(bilhetes);
-
-                binding.rvBilhetes.setLayoutManager(new LinearLayoutManager(DetalhesCompraActivity.this));
-                binding.rvBilhetes.setAdapter(adapter);
+                setCompra(compra, bilhetes);
             }
+            @Override
+            public void onLocal(Compra compra, List<Bilhete> bilhetes) {
+                setCompra(compra, bilhetes);
 
+                // Mudar texto da toolbar
+                getSupportActionBar().setTitle(R.string.title_detalhes_compra_local);
+            }
             @Override
             public void onError() {
-                Toast.makeText(DetalhesCompraActivity.this, "erro", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), R.string.msg_erro_carregar_compra, Toast.LENGTH_SHORT).show();
+                finish();
             }
         });
+    }
+
+    private void setCompra(Compra compra, List<Bilhete> bilhetes) {
+        binding.mainFlipper.setDisplayedChild(1); // Main Content
+
+        // Preencher dados
+        binding.tvTituloFilme.setText(compra.getTituloFilme());
+        binding.tvNomeCinema.setText(compra.getNomeCinema());
+        binding.tvNomeSala.setText(compra.getNomeSala());
+        binding.tvEstado.setText(compra.getEstado());
+        binding.tvPagamento.setText(compra.getPagamento());
+        binding.tvTotal.setText(compra.getTotal());
+        binding.tvDataSessao.setText(compra.getDataSessao());
+        binding.tvHoraInicioSessao.setText(compra.getHoraInicioSessao());
+        binding.tvHoraFimSessao.setText(compra.getHoraFimSessao());
+
+        // Configurar adapter
+        adapter = new BilhetesAdapter(bilhetes);
+        binding.rvBilhetes.setAdapter(adapter);
     }
 
     @Override

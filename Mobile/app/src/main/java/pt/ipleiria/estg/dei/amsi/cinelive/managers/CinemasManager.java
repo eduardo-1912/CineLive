@@ -51,7 +51,7 @@ public class CinemasManager {
 
         JsonArrayRequest request = new JsonArrayRequest(
             Request.Method.GET, url, null, response -> {
-                // Limpar lista
+                // Limpar cache
                 cache.clear();
 
                 // Nenhum cinema foi encontrado
@@ -64,6 +64,7 @@ public class CinemasManager {
                 for (int i = 0; i < response.length(); i++) {
                     JSONObject obj = response.optJSONObject(i);
                     if (obj == null) continue;
+
                     cache.add(new Cinema(
                         obj.optInt("id"),
                         obj.optString("nome"),

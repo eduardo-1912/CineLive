@@ -30,6 +30,12 @@ public class SessoesManager {
         return instance;
     }
 
+    private static RequestQueue getRequestQueue(Context context) {
+        if (queue == null) queue = Volley.newRequestQueue(context.getApplicationContext());
+        return queue;
+    }
+
+    // region Requests
     public void getSessoes(Context context, int filmeId, SessoesListener listener) {
         // Obter URL
         PreferencesManager preferences = new PreferencesManager(context);
@@ -38,27 +44,24 @@ public class SessoesManager {
         JsonObjectRequest request = new JsonObjectRequest(
             Request.Method.GET, url, null, response -> {
                 try {
+                    // Obter array associativo de sessões por data
                     Map<String, List<Sessao>> sessoesPorData = new LinkedHashMap<>();
-
                     Iterator<String> keys = response.keys();
 
+                    // Percorrer cada data
                     while (keys.hasNext()) {
                         String data = keys.next();
-
-                        JSONArray arr = response.getJSONArray(data);
+                        JSONArray arraySessoes = response.getJSONArray(data);
                         List<Sessao> sessoes = new ArrayList<>();
 
-                        for (int i = 0; i < arr.length(); i++) {
-                            JSONObject obj = arr.getJSONObject(i);
-
-                            Sessao s = new Sessao(
-                                    obj.getInt("id"),
-                                    obj.getString("hora_inicio")
-                            );
-
-                            sessoes.add(s);
+                        // Para cada sessão desta data
+                        for (int i = 0; i < arraySessoes.length(); i++) {
+                            JSONObject obj = arraySessoes.getJSONObject(i);
+                            Sessao sessao = new Sessao(obj.getInt("id"), obj.getString("hora_inicio"));
+                            sessoes.add(sessao);
                         }
 
+                        // Associar a sessão à data
                         sessoesPorData.put(data, sessoes);
                     }
 
@@ -71,17 +74,16 @@ public class SessoesManager {
             error -> listener.onError()
         );
 
-        Volley.newRequestQueue(context).add(request);
+        getRequestQueue(context).add(request);
     }
 
     public void getSessao(Context context, int id, SessaoListener listener) {
         // Obter o URL
-        PreferencesManager preferences = new PreferencesManager(context);
-        String url = ApiRoutes.sessao(preferences.getApiUrl(), id);
+        String url = ApiRoutes.sessao(new PreferencesManager(context).getApiUrl(), id);
 
         JsonObjectRequest request = new JsonObjectRequest(
             Request.Method.GET, url, null, response -> {
-                // Obter sala
+                // Obter o objeto sala
                 JSONObject sala = response.optJSONObject("sala");
                 if (sala == null) {
                     listener.onError();
@@ -89,12 +91,12 @@ public class SessoesManager {
                 }
 
                 // Converter lugares ocupados
-                JSONArray arrayOcupados = sala.optJSONArray("lugares_ocupados");
+                JSONArray arrayLugaresOcupados = sala.optJSONArray("lugares_ocupados");
                 List<String> lugaresOcupados = new ArrayList<>();
 
-                if (arrayOcupados != null) {
-                    for (int i = 0; i < arrayOcupados.length(); i++) {
-                        lugaresOcupados.add(arrayOcupados.optString(i));
+                if (arrayLugaresOcupados != null) {
+                    for (int i = 0; i < arrayLugaresOcupados.length(); i++) {
+                        lugaresOcupados.add(arrayLugaresOcupados.optString(i));
                     }
                 }
 
@@ -122,6 +124,7 @@ public class SessoesManager {
             error -> listener.onError()
         );
 
-        Volley.newRequestQueue(context).add(request);
+        getRequestQueue(context).add(request);
     }
+    // endregion
 }
