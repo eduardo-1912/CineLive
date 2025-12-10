@@ -3,6 +3,7 @@
 namespace common\models;
 
 use common\helpers\Formatter;
+use common\helpers\MqttService;
 use DateTime;
 use Yii;
 
@@ -84,6 +85,38 @@ class AluguerSala extends \yii\db\ActiveRecord
             'tipo_evento' => 'Tipo de Evento',
             'observacoes' => 'Observações',
         ];
+    }
+
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+
+        // Só publica mensagem se o campo estado tiver sido alterado
+        if (!$insert && array_key_exists('estado', $changedAttributes)) {
+
+            // Mensagem que o cliente recebe
+            $toast = match (strtolower($this->estado)) {
+                self::ESTADO_CONFIRMADO => "O seu pedido de aluguer #{$this->id} foi confirmado.",
+                self::ESTADO_CANCELADO  => "O seu pedido de aluguer #{$this->id} foi cancelado.",
+                default => "O estado do seu aluguer #{$this->id} foi atualizado."
+            };
+
+            // Topic de alugueres de este cliente
+            $topic = "cinelive/aluguer/{$this->cliente_id}";
+
+            // Criar a mensagem a enviar
+            $message = json_encode([
+                'id' => $this->id,
+                'estado' => $this->estado,
+                'mensagem' => $toast,
+                'data' => $this->data,
+                'hora_inicio' => $this->hora_inicio,
+                'hora_fim' => $this->hora_fim,
+            ]);
+
+            // Publicar via serviço MQTT
+            MqttService::publish($topic, $message);
+        }
     }
 
     public function getNome(): string

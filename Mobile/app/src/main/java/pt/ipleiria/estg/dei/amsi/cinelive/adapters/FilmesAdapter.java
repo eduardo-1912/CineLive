@@ -69,10 +69,10 @@ public class FilmesAdapter extends RecyclerView.Adapter<FilmesAdapter.ViewHolder
 
         // Carregar Poster
         Glide.with(holder.itemView.getContext())
-                .load(preferences.getApiHost() + filme.getPosterUrl())
-                .placeholder(R.drawable.poster_placeholder)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .into(holder.binding.ivPoster);
+            .load(preferences.getApiHost() + filme.getPosterUrl())
+            .placeholder(R.drawable.poster_placeholder)
+            .diskCacheStrategy(DiskCacheStrategy.ALL)
+            .into(holder.binding.ivPoster);
 
         holder.itemView.setOnClickListener(v -> listener.onFilmeClick(filme));
     }

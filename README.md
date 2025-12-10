@@ -18,8 +18,10 @@ TesP Programação de Sistemas de Informação – `2025/26` | `PL2`
 **– Requisitos de Funcionamento:**
 
 **WEB**
+* [x] PHP
 * [x] Composer
 * [x] Servidor Local (Wamp, Xampp)
+* [x] Cliente MySQL
 
 **MOBILE**
 * [x] Android Studio
@@ -34,10 +36,11 @@ TesP Programação de Sistemas de Informação – `2025/26` | `PL2`
 composer install
 php init
 ```
-3. Criar a base de dados com nome `cinelive` no `PhpMyAdmin`.
-4. Transferir e importar a base de dados do ficheiro `CineLive`.
-5. Ligar o servidor local (Wamp ou Xampp).
-6. Ir ao browser e aceder a URL de modo a correr a aplicação no servidor local.
+3. Ligar o servidor local.
+4. Criar uma base de dados nova no seu cliente de SQL.
+5. Transferir e importar a base de dados do ficheiro `cinelive.sql`.
+6. Alterar o ficheiro `common/config/main-local.php` e mudar o nome da BD e credenciais.
+7. Ir ao browser e aceder a URL de modo a correr a aplicação no servidor local.
 ```
 {localhost}/CineLive/Web/frontend/web
 ```
@@ -46,7 +49,7 @@ php init
 2. Abrir a pasta `Mobile` no Android Studio.
 3. Correr o projeto.
 ---
-❓ Qualquer dúvida ou questão, contactar o responsável pelo projeto `[Eduardo Carvalho | 2024147217]` através do seu email institucional ou no **Microsoft Teams**.
+❓ Qualquer dúvida ou questão, contactar o responsável pelo projeto `Eduardo Carvalho` através do seu email institucional (**2241868@my.ipleiria.pt**) ou no **Microsoft Teams**.
 
 ---
 ![IPLEIRIA](https://upload.wikimedia.org/wikipedia/commons/9/9a/Log%C3%B3tipo_Polit%C3%A9cnico_Leiria_01.png)

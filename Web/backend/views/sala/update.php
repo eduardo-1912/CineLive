@@ -25,6 +25,7 @@ $this->params['breadcrumbs'][] = 'Editar';
                         'gerirSalasCinema' => $gerirSalasCinema,
                         'userCinemaId' => $userCinema->id ?? null,
                         'cinemaOptions' => $cinemaOptions,
+                        'proximoNumero' => null,
                     ]) ?>
                 </div>
             </div>

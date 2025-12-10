@@ -310,7 +310,7 @@ class CompraController extends Controller
 
         return [
             'filme_id' => $filme_id,
-            'filme_titulo' => Filme::findOne($filme)->titulo,
+            'filme_titulo' => Filme::findOne($filme_id)->titulo,
             'count' => $count,
         ];
     }

@@ -12,8 +12,6 @@ use yii\bootstrap4\ActiveForm;
 /* @var $userCinemaId int */
 /* @var $proximoNumero int|null */
 
-$proximoNumero = null;
-
 ?>
 
 <div class="sala-form">
@@ -41,10 +39,7 @@ $proximoNumero = null;
         <?= $form->field($model, 'cinema_id')->hiddenInput()->label(false) ?>
     <?php endif; ?>
 
-    <?php if ($proximoNumero && $model->isNewRecord): ?>
-        <?= $form->field($model, 'numero')->textInput(['value' => $proximoNumero]) ?>
-    <?php endif; ?>
-
+    <?= $form->field($model, 'numero')->textInput(['value' => $proximoNumero]) ?>
     <?= $form->field($model, 'num_filas')->textInput(['disabled' => !$model->isClosable() && !$model->isNewRecord]) ?>
     <?= $form->field($model, 'num_colunas')->textInput(['disabled' => !$model->isClosable() && !$model->isNewRecord]) ?>
     <?= $form->field($model, 'preco_bilhete')->textInput(['maxlength' => true]) ?>
