@@ -83,7 +83,9 @@ public class EditarPerfilActivity extends AppCompatActivity {
 
             // Obter e validar novos dados
             User edited = getEdited();
-            if (!validateFields(edited)) return;
+            if (!AuthManager.getInstance().validateFields(this, binding.form, edited, false)) {
+                return;
+            }
 
             // Atualizar perfil
             updatePerfil(edited);
@@ -115,48 +117,6 @@ public class EditarPerfilActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), R.string.msg_erro_editar_perfil, Toast.LENGTH_LONG).show();
             }
         });
-    }
-
-    private boolean validateFields(User user) {
-        boolean isValid = true;
-        int minLengthUsername = AuthManager.MIN_LENGTH_USERNAME;
-        int minLengthPassword = AuthManager.MIN_LENGTH_PASSWORD;
-        int minLengthTelemovel = AuthManager.MIN_LENGTH_TELEMOVEL;
-
-        // Validar username
-        if (user.getUsername().length() < minLengthUsername) {
-            binding.form.tilUsername.setError(getString(R.string.msg_min_caracteres, minLengthUsername));
-            isValid = false;
-        } else binding.form.tilUsername.setErrorEnabled(false);
-
-        // Validar password
-        if (!user.getPassword().isEmpty() && user.getPassword().length() < minLengthPassword) {
-            binding.form.tilPassword.setError(getString(R.string.msg_min_caracteres, minLengthPassword));
-            isValid = false;
-        } else binding.form.tilPassword.setErrorEnabled(false);
-
-        // Validar email
-        if (user.getEmail().isEmpty()) {
-            binding.form.tilEmail.setError(getString(R.string.msg_campo_obrigatorio));
-            isValid = false;
-        } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(user.getEmail()).matches()) {
-            binding.form.tilEmail.setError(getString(R.string.msg_email_invalido));
-            isValid = false;
-        } else binding.form.tilEmail.setErrorEnabled(false);
-
-        // Validar nome
-        if (user.getNome().isEmpty()) {
-            binding.form.tilNome.setError(getString(R.string.msg_campo_obrigatorio));
-            isValid = false;
-        } else binding.form.tilNome.setErrorEnabled(false);
-
-        // Validar telemóvel
-        if (user.getTelemovel().length() < 9) {
-            binding.form.tilTelemovel.setError(getString(R.string.msg_min_caracteres, minLengthTelemovel));
-            isValid = false;
-        } else binding.form.tilTelemovel.setErrorEnabled(false);
-
-        return isValid;
     }
 
     @Override

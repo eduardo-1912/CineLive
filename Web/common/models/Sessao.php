@@ -3,7 +3,6 @@
 namespace common\models;
 
 use common\helpers\Formatter;
-use common\helpers\MqttService;
 use DateTime;
 use Yii;
 
@@ -79,36 +78,6 @@ class Sessao extends \yii\db\ActiveRecord
             'cinema_id' => 'Cinema',
             'numeroLugaresDisponiveis' => 'Lugares Disponíveis',
         ];
-    }
-
-    public function afterSave($insert, $changedAttributes)
-    {
-        parent::afterSave($insert, $changedAttributes);
-
-        // Só publica mensagem se estiver esgotada
-        if (array_key_exists('estado', $changedAttributes) &&
-            $this->estado === self::ESTADO_ESGOTADA) {
-
-            // Mensagem que o cliente recebe
-            $toast = "A sessão #{$this->id} esta esgotada.";
-            // Topic de alugueres de este cliente
-            $topic = "cinelive/sessoes/esgotadas";
-
-            // Criar a mensagem a enviar
-            $message = json_encode([
-                'id' => $this->id,
-                'estado' => $this->estado,
-                'mensagem' => $toast,
-                'titulo' => $this->filme->titulo,
-                'sala' => $this->sala->nome,
-                'cinema' => $this->cinema->nome,
-                'data' => $this->data,
-                'hora_inicio' => $this->hora_inicio,
-            ]);
-
-            // Publicar via serviço MQTT
-            MqttService::publish($topic, $message);
-        }
     }
 
     public function getNome(): string

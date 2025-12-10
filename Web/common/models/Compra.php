@@ -2,6 +2,9 @@
 
 namespace common\models;
 
+use common\helpers\MqttService;
+use Yii;
+
 /**
  * This is the model class for table "compra".
  *
@@ -13,8 +16,9 @@ namespace common\models;
  * @property string $lugares
  * @property string $estado
  *
- * @property-read $nome
+ * @property-read string $nome
  * @property-read float $total
+ * @property-read int $numeroBilhetes
  *
  * @property Bilhete[] $bilhetes
  * @property Sessao $sessao
@@ -75,6 +79,43 @@ class Compra extends \yii\db\ActiveRecord
             'total' => 'Total',
         ];
     }
+
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+
+        // Notificar quando uma nova compra é criada
+        if ($insert) {
+
+            $sessao = $this->sessao;
+            $cinema = $sessao->cinema;
+            $cliente = $this->cliente;
+
+            $messageText = "Nova compra realizada no cinema '{$cinema->nome}' para o filme '{$sessao->filme->titulo}'.";
+
+            $topic = "cinelive/cinema/{$cinema->id}/compras";
+
+            $message = json_encode([
+                'compra_id' => $this->id,
+                'cinema_id' => $cinema->id,
+                'cinema' => $cinema->nome,
+                'sessao_id' => $sessao->id,
+                'filme' => $sessao->filme->titulo,
+                'data' => $this->data,
+                'cliente_id' => $cliente->id,
+                'cliente_nome' => $cliente->username,
+                'bilhetes' => $this->numeroBilhetes,
+                'mensagem' => $messageText,
+            ]);
+
+            try {
+                MqttService::publish($topic, $message);
+            } catch (\Throwable $e) {
+                Yii::error("MQTT Error: " . $e->getMessage());
+            }
+        }
+    }
+
 
     public function getNome(): string
     {

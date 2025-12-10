@@ -21,6 +21,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import pt.ipleiria.estg.dei.amsi.cinelive.activities.ConfiguracoesActivity;
 import pt.ipleiria.estg.dei.amsi.cinelive.activities.EditarPerfilActivity;
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
+import pt.ipleiria.estg.dei.amsi.cinelive.activities.LoginActivity;
 import pt.ipleiria.estg.dei.amsi.cinelive.activities.MainActivity;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.FragmentPerfilBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.PerfilListener;
@@ -157,24 +158,26 @@ public class PerfilFragment extends Fragment {
             }
 
             new MaterialAlertDialogBuilder(v.getContext())
-                .setTitle(R.string.btn_eliminar_conta)
-                .setMessage(R.string.msg_eliminar_conta)
+                .setTitle(R.string.btn_eliminar_conta).setMessage(R.string.msg_eliminar_conta)
                 .setPositiveButton(R.string.btn_eliminar_conta, (dialog, which) -> {
-                    perfilManager.deletePerfil(requireContext(), new StandardListener() {
-                        @Override
-                        public void onSuccess() {
-                            Toast.makeText(requireContext(), R.string.msg_sucesso_eliminar_conta, Toast.LENGTH_SHORT).show();
-                            resetActivity();
-                        }
-
-                        @Override
-                        public void onError() {
-                            Toast.makeText(requireContext(), R.string.msg_erro_eliminar_conta, Toast.LENGTH_SHORT).show();
-                            resetActivity();
-                        }
-                    });
+                    deletePerfil();
                 }
             ).setNegativeButton(R.string.btn_cancelar, null).show();
+        });
+    }
+
+    private void deletePerfil() {
+        perfilManager.deletePerfil(requireContext(), new StandardListener() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(requireContext(), R.string.msg_sucesso_eliminar_conta, Toast.LENGTH_SHORT).show();
+                resetActivity();
+            }
+            @Override
+            public void onError() {
+                Toast.makeText(requireContext(), R.string.msg_erro_eliminar_conta, Toast.LENGTH_SHORT).show();
+                resetActivity();
+            }
         });
     }
 
@@ -199,17 +202,9 @@ public class PerfilFragment extends Fragment {
         });
     }
 
-    private void resetActivity() {
-        Intent intent = new Intent(requireContext(), MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-
-        requireActivity().finish();
-    }
-
     private void disableFields() {
         EditText[] fields = {
-                binding.form.etUsername, binding.form.etEmail, binding.form.etNome, binding.form.etTelemovel
+            binding.form.etUsername, binding.form.etEmail, binding.form.etNome, binding.form.etTelemovel
         };
 
         for (EditText et : fields) {
@@ -219,6 +214,13 @@ public class PerfilFragment extends Fragment {
         }
 
         binding.form.tilPassword.setVisibility(View.GONE);
+    }
+
+    private void resetActivity() {
+        Intent intent = new Intent(requireContext(), MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        requireActivity().finish();
     }
 
     @Override

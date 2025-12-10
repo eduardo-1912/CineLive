@@ -64,7 +64,6 @@ public class ComprasManager {
         return !bilhetesDB.getBilhetesByCompraId(compraId).isEmpty();
     }
 
-
     private void updateCache(Compra updatedCompra) {
         for (int i = 0; i < cache.size(); i++) {
             if (cache.get(i).getId() == updatedCompra.getId()) {
@@ -299,6 +298,5 @@ public class ComprasManager {
 
         getRequestQueue(context).add(request);
     }
-
     // endregion
 }

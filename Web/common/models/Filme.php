@@ -114,30 +114,29 @@ class Filme extends \yii\db\ActiveRecord
     {
         parent::afterSave($insert, $changedAttributes);
 
-        // Só publica mensagem se o campo estado tiver sido alterado
-        if ($insert || array_key_exists('estado', $changedAttributes)) {
+        // Notificar quando o filme é criado ou o estado muda para terminado
+        if ($insert || ($this->estado === self::ESTADO_TERMINADO
+            && array_key_exists('estado', $changedAttributes))) {
 
-            // Mensagem que o cliente recebe
-            $toast = match (strtolower($this->estado)) {
-                self::ESTADO_BREVEMENTE => "O filme '{$this->titulo}' foi adicionado ao catálogo e estreará em breve.",
-                self::ESTADO_EM_EXIBICAO  => "O filme '{$this->titulo}' esta em exibição!.",
-                self::ESTADO_TERMINADO => "O filme '{$this->titulo}' foi terminado.",
-                default => "Um novo filme foi adicionado: {$this->titulo}.",
-            };
+            $messageText = $insert
+                ? "Um novo filme foi adicionado: {$this->titulo}."
+                : "O filme '{$this->titulo}' foi marcado como terminado.";
 
-            // Topic de alugueres de este cliente
-            $topic = "cinelive/filmes/";
+            $topic = "cinelive/filmes";
 
-            // Criar a mensagem a enviar
             $message = json_encode([
-                'id' => $this->id,
-                'estado' => $this->estado,
-                'mensagem' => $toast,
-                'estreia' => $this->estreia,
+                'filme_id' => $this->id,
+                'estado'   => $this->estado,
+                'titulo'   => $this->titulo,
+                'mensagem' => $messageText,
+                'estreia'  => $this->estreia,
             ]);
 
-            // Publicar via serviço MQTT
-            MqttService::publish($topic, $message);
+            try {
+                MqttService::publish($topic, $message);
+            } catch (\Throwable $e) {
+                Yii::error("MQTT Error: " . $e->getMessage());
+            }
         }
     }
 

@@ -22,7 +22,7 @@ class MqttService
         // Atribuir um id único
         $clientId = 'cinelive_publisher_' . uniqid();
 
-        // Criar cliente MQTT (usa a lib phpMQTT)
+        // Criar cliente MQTT
         $mqtt = new phpMQTT(self::$server, self::$port, $clientId);
 
         // Tentar conectar
