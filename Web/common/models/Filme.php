@@ -3,6 +3,7 @@
 namespace common\models;
 
 use common\helpers\Formatter;
+use common\helpers\MqttService;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\web\UploadedFile;
@@ -107,6 +108,37 @@ class Filme extends \yii\db\ActiveRecord
     {
         parent::afterFind();
         $this->generosSelecionados = ArrayHelper::getColumn($this->generos, 'id');
+    }
+
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+
+        // Só publica mensagem se o campo estado tiver sido alterado
+        if ($insert || array_key_exists('estado', $changedAttributes)) {
+
+            // Mensagem que o cliente recebe
+            $toast = match (strtolower($this->estado)) {
+                self::ESTADO_BREVEMENTE => "O filme '{$this->titulo}' foi adicionado ao catálogo e estreará em breve.",
+                self::ESTADO_EM_EXIBICAO  => "O filme '{$this->titulo}' esta em exibição!.",
+                self::ESTADO_TERMINADO => "O filme '{$this->titulo}' foi terminado.",
+                default => "Um novo filme foi adicionado: {$this->titulo}.",
+            };
+
+            // Topic de alugueres de este cliente
+            $topic = "cinelive/filmes/";
+
+            // Criar a mensagem a enviar
+            $message = json_encode([
+                'id' => $this->id,
+                'estado' => $this->estado,
+                'mensagem' => $toast,
+                'estreia' => $this->estreia,
+            ]);
+
+            // Publicar via serviço MQTT
+            MqttService::publish($topic, $message);
+        }
     }
 
     public function getNomesGeneros(): string
