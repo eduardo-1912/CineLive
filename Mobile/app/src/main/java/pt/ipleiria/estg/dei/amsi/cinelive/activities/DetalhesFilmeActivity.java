@@ -135,9 +135,6 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
             finish();
         }
 
-        // Mostrar conteúdo
-        binding.mainSessoes.setVisibility(View.VISIBLE);
-
         // Obter sessões à API
         sessoesManager.getSessoes(this, filme.getId(), new SessoesListener() {
             @Override
@@ -150,6 +147,7 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
                     getApplicationContext(), android.R.layout.simple_spinner_dropdown_item, datas
                 ));
 
+                binding.mainSessoes.setVisibility(View.VISIBLE);
                 binding.mainFlipper.setDisplayedChild(1); // Main Content
 
                 // Se clicou numa data --> atualizar sessões
@@ -159,6 +157,7 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
             @Override
             public void onError() {
                 Toast.makeText(getApplicationContext(), R.string.msg_erro_carregar_sessoes, Toast.LENGTH_SHORT).show();
+                binding.mainFlipper.setDisplayedChild(1); // Main Content
             }
         });
     }

@@ -97,15 +97,11 @@ class Sessao extends \yii\db\ActiveRecord
         $inicio = new DateTime("{$this->data} {$this->hora_inicio}");
         $fim = new DateTime("{$this->data} {$this->hora_fim}");
 
-        if (!$this->sala) return self::ESTADO_ATIVA;
-
-        $lugaresOcupados = count($this->lugaresOcupados);
-
         if ($now > $fim) return self::ESTADO_TERMINADA;
 
         if ($now > $inicio && $fim > $now) return self::ESTADO_A_DECORRER;
 
-        if ($lugaresOcupados >= $this->sala->lugares) return self::ESTADO_ESGOTADA;
+        if (count($this->lugaresOcupados) >= $this->sala->numeroLugares) return self::ESTADO_ESGOTADA;
 
         return self::ESTADO_ATIVA;
     }
@@ -133,11 +129,12 @@ class Sessao extends \yii\db\ActiveRecord
             ->andWhere(['!=', 'estado', Bilhete::ESTADO_CANCELADO])
             ->scalar() ?: null;
     }
+
     public function getLugaresOcupados(): array
     {
         return $this->getBilhetes()
             ->select('lugar')
-            ->andWhere(['estado' => Bilhete::ESTADO_PENDENTE])
+            ->andWhere(['!=', 'estado', Bilhete::ESTADO_CANCELADO])
             ->column();
     }
 

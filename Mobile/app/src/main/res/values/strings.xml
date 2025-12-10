@@ -124,9 +124,9 @@
     <string name="msg_email_indisponivel">Este email já não está disponível</string>
     <string name="msg_email_invalido">O formato do email é inválido</string>
     <string name="msg_sucesso_login">Login efetuado com sucesso</string>
-    <string name="msg_erro_login">Erro ao iniciar sessão, verifique a ligação à API</string>
+    <string name="msg_erro_login">Erro ao iniciar sessão</string>
     <string name="msg_sucesso_signup">Conta criada com sucesso</string>
-    <string name="msg_erro_signup">Erro ao criar conta, verifique a ligação à API</string>
+    <string name="msg_erro_signup">Erro ao criar conta</string>
     <string name="msg_sucesso_editar_perfil">Perfil atualizado com sucesso</string>
     <string name="msg_erro_editar_perfil">Erro ao atualizar o perfil</string>
 

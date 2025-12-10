@@ -3,11 +3,13 @@
 namespace backend\modules\api\controllers;
 
 use common\models\Cinema;
+use common\models\Sessao;
 use yii\rest\Controller;
 use yii\web\NotFoundHttpException;
 
 class CinemaController extends Controller
 {
+    // region CRUD
     public function actionIndex()
     {
         $cinemas = Cinema::findAtivos();
@@ -48,7 +50,10 @@ class CinemaController extends Controller
             'has_sessoes' => (bool)$cinema->getSessoesAtivas(),
         ];
     }
+    // endregion
 
+    // region ExtraPatterns
+    // Filmes em exibição do cinema
     public function actionFilmes($id, $filter = null, $q =null)
     {
         $cinema = Cinema::findOne($id);
@@ -57,6 +62,7 @@ class CinemaController extends Controller
             throw new NotFoundHttpException("Cinema não encontrado.");
         }
 
+        // Obter filmes com sessões ativas desse cinema
         $filmes = $cinema->getFilmesComSessoesAtivas($filter === 'kids', $q);
 
         return array_map(fn($filme) => [
@@ -65,4 +71,30 @@ class CinemaController extends Controller
             'poster_url' => $filme->posterUrl,
         ], $filmes);
     }
+
+    // Procurar cinema por nome
+    public function actionPorNome($q)
+    {
+        $cinemas = Cinema::find()
+            ->where(['like', 'nome', $q])
+            ->orWhere(['like', 'email', $q])
+            ->orWhere(['like', 'cidade', $q])
+            ->all();
+
+        return array_map(fn($c) => [
+            'id' => $c->id,
+            'nome' => $c->nome,
+            'morada' => $c->morada,
+            'email' => $c->email,
+        ], $cinemas);
+    }
+
+    // Contar sessões
+    public function actionCountSessoes($id)
+    {
+        $cinema = Cinema::findOne($id);
+
+        return Sessao::find()->where(['cinema_id' => $id])->count();
+    }
+    // endregion
 }

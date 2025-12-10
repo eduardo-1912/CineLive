@@ -6,6 +6,7 @@ use common\models\AluguerSala;
 use common\models\Cinema;
 use common\models\Sala;
 use Yii;
+use yii\filters\AccessControl;
 use yii\filters\auth\CompositeAuth;
 use yii\filters\auth\HttpBearerAuth;
 use yii\filters\auth\QueryParamAuth;
@@ -29,29 +30,22 @@ class AluguerSalaController extends Controller
             ],
         ];
 
+        $behaviors['access'] = [
+            'class' => AccessControl::class,
+            'rules' => [
+                [
+                    'allow' => true,
+                    'roles' => ['cliente'],
+                ],
+            ],
+        ];
+
         return $behaviors;
     }
 
     public function actionIndex()
     {
-        $user = Yii::$app->user;
-        $userCinema = $user->identity->profile->cinema ?? null;
-
-        $gerirAlugueres = $user->can('gerirAlugueres');
-        $gerirAlugueresCinema = $user->can('gerirAlugueresCinema', ['model' => $userCinema]);
-        $verAlugueresCinema = $user->can('verAlugueresCinema', ['model' => $userCinema]);
-
-        if ($gerirAlugueres) {
-            $alugueres = AluguerSala::find()->all();
-        }
-        if (($gerirAlugueresCinema || $verAlugueresCinema) && $userCinema) {
-            $alugueres = $userCinema->aluguerSalas;
-        }
-        else {
-            $alugueres = $user->identity->aluguerSalas;
-        }
-
-        return $alugueres;
+        return Yii::$app->user->identity->aluguerSalas;
     }
 
     public function actionView($id)
@@ -59,57 +53,41 @@ class AluguerSalaController extends Controller
         $user = Yii::$app->user;
         $model = AluguerSala::findOne($id);
 
-        if (!$model) {
+        if (!$model || $model->cliente_id != $user->id) {
             throw new NotFoundHttpException("Aluguer não encontrado.");
         }
 
-        $gerirAlugueres = $user->can('gerirAlugueres');
-        $gerirAlugueresCinema = $user->can('gerirAlugueresCinema', ['model' => $model->cinema]);
-        $verAlugueresCinema = $user->can('verAlugueresCinema', ['model' => $model->cinema]);
-        $verAlugueres = $user->can('verAlugueres', ['model' => $model]);
-
-        if ($gerirAlugueres || $gerirAlugueresCinema || $verAlugueresCinema || $verAlugueres) {
-            return $model;
-        }
-
-        throw new NotFoundHttpException("Aluguer não encontrado.");
+        return $model;
     }
 
     public function actionCreate()
     {
         $user = Yii::$app->user;
-
-        if (!$user->can('criarAluguer')) {
-            throw new ForbiddenHttpException("Não tem permissão para criar alugueres.");
-        }
-
         $body = Yii::$app->request->bodyParams;
 
-        $data = $body['data'] ?? null;
-        $hora_inicio = $body['hora_inicio'] ?? null;
-        $hora_fim = $body['hora_fim'] ?? null;
-        $cinema_id = $body['cinema_id'] ?? null;
-        $sala_id = $body['sala_id'] ?? null;
-        $tipo_evento = $body['tipo_evento'] ?? null;
-        $observacoes = $body['observacoes'] ?? null;
+        // Verificar se todos os campos foram enviados
+        $campos = ['data', 'hora_inicio', 'hora_fim', 'cinema_id', 'sala_id', 'tipo_evento', 'observacoes'];
+        foreach ($campos as $campo) {
+            $$campo = $body[$campo] ?? null;
 
-        if (!$data || !$hora_inicio || !$hora_fim || !$cinema_id || !$sala_id || !$tipo_evento || !$observacoes) {
-            throw new BadRequestHttpException('Faltam campos obrigatórios.');
+            if (empty($$campo)) {
+                throw new BadRequestHttpException("O campo '$campo' é obrigatório.");
+            }
         }
 
+        // Verificar se o cinema é válido
         $cinema = Cinema::findOne($cinema_id);
-
         if (!$cinema || !$cinema->isEstadoAtivo()) {
             throw new BadRequestHttpException('Cinema não encontrado.');
         }
 
-        $sala = Sala::findOne($sala_id);
+        // Verificar se a sala é válida
         $salasDisponiveis = $cinema->getSalasDisponiveis($data, $hora_inicio, $hora_fim);
-
-        if (!in_array($sala, $salasDisponiveis)) {
-            throw new BadRequestHttpException('A sala escolhida não está disponível no horário selecionado.');
+        if (!in_array(Sala::findOne($sala_id), $salasDisponiveis)) {
+            throw new BadRequestHttpException("A sala escolhida não está disponível no horário selecionado.");
         }
 
+        // Criar aluguer
         $model = new AluguerSala();
         $model->cliente_id = $user->id;
         $model->data = $data;
@@ -122,57 +100,54 @@ class AluguerSalaController extends Controller
         $model->estado = $model::ESTADO_PENDENTE;
 
         if (!$model->validateHorario()) {
-            throw new BadRequestHttpException('O horário selecionado não é válido.');
+            throw new BadRequestHttpException("O horário selecionado não é válido.");
         }
 
         $model->save();
+        return [
+            'status' => 'success',
+            'id' => $model->id,
+        ];
     }
 
     public function actionUpdate($id)
     {
         $user = Yii::$app->user;
+        $body = Yii::$app->request->bodyParams;
         $model = AluguerSala::findOne($id);
 
-        if (!$model) {
+        if (!$model || $model->cliente_id != $user->id) {
             throw new NotFoundHttpException("Aluguer não encontrado.");
         }
-
-        $gerirAlugueres = $user->can('gerirAlugueres');
-        $gerirAlugueresCinema = $user->can('gerirAlugueresCinema', ['model' => $model->cinema]);
-
-        if (!$gerirAlugueres && !$gerirAlugueresCinema) {
-            throw new UnauthorizedHttpException("Não tem permissão para editar este aluguer.");
-        }
-
-        $body = Yii::$app->request->bodyParams;
 
         $sala_id = $body['sala_id'] ?? null;
         $estado = $body['estado'] ?? null;
 
+        // Verificar se todos os campos foram enviados
         if (!$sala_id && !$estado) {
-            throw new BadRequestHttpException('Faltam campos obrigatórios.');
+            throw new BadRequestHttpException("Faltam campos obrigatórios.");
         }
 
-        $sala = Sala::findOne($sala_id);
+        // Verificar se a sala é válida
         $salasDisponiveis = $model->cinema->getSalasDisponiveis($model->data, $model->hora_inicio, $model->hora_fim, $model->sala_id);
-
-        if (!in_array($sala, $salasDisponiveis)) {
-            throw new BadRequestHttpException('A sala escolhida não está disponível no horário selecionado.');
+        if (!in_array(Sala::findOne($sala_id), $salasDisponiveis)) {
+            throw new BadRequestHttpException("A sala escolhida não está disponível no horário selecionado.");
         }
 
+        // Verificar se o estado é válido
         if (!in_array($estado, array_keys(AluguerSala::optsEstadoBD()))) {
-            throw new BadRequestHttpException('O estado inserido não é válido.');
+            throw new BadRequestHttpException("O estado inserido não é válido.");
         }
 
-        if ($sala) {
-            $model->sala_id = $sala_id;
-        }
-
-        if ($estado) {
-            $model->estado = $estado;
-        }
-
+        // Atualizar dados
+        if ($sala_id) $model->sala_id = $sala_id;
+        if ($estado) $model->estado = $estado;
         $model->save();
+
+        return [
+            'status' => 'success',
+            'id' => $model->id,
+        ];
     }
 
     public function actionDelete($id)
@@ -180,20 +155,14 @@ class AluguerSalaController extends Controller
         $user = Yii::$app->user;
         $model = AluguerSala::findOne($id);
 
-        if (!$model) {
+        if (!$model || $model->cliente_id != $user->id) {
             throw new NotFoundHttpException("Aluguer não encontrado.");
         }
 
-        $gerirAlugueres = $user->can('gerirAlugueres');
-        $gerirAlugueresCinema = $user->can('gerirAlugueresCinema', ['model' => $model->cinema]);
-        $verAlugueres = $user->can('verAlugueres', ['model' => $model]);
-
-        if (!$gerirAlugueres && !$gerirAlugueresCinema && !$verAlugueres) {
-            throw new ForbiddenHttpException('Só pode eliminar alugueres pendentes ou cancelados.');
+        if (!$model->isEstadoPendente() && !$model->isEstadoCancelado()) {
+            throw new ForbiddenHttpException("Só pode eliminar alugueres pendentes ou cancelados.");
         }
 
-        if ($model->isEstadoPendente() || $model->isEstadoCancelado()) {
-            $model->delete();
-        }
+        $model->delete();
     }
 }

@@ -3,6 +3,7 @@
 namespace backend\modules\api\controllers;
 
 use Yii;
+use yii\filters\AccessControl;
 use yii\filters\auth\CompositeAuth;
 use yii\filters\auth\HttpBearerAuth;
 use yii\filters\auth\QueryParamAuth;
@@ -21,6 +22,16 @@ class PerfilController extends Controller
             'authMethods' => [
                 HttpBearerAuth::class,
                 QueryParamAuth::class,
+            ],
+        ];
+
+        $behaviors['access'] = [
+            'class' => AccessControl::class,
+            'rules' => [
+                [
+                    'allow' => true,
+                    'roles' => ['cliente'],
+                ],
             ],
         ];
 
@@ -52,7 +63,6 @@ class PerfilController extends Controller
 
         // Atualizar user
         $user->load($body, '');
-
         if (!$user->save()) {
             return [
                 'status' => 'error',
@@ -65,7 +75,6 @@ class PerfilController extends Controller
 
         // Atualizar profile
         $profile->load($body, '');
-
         if (!$profile->save()) {
             return [
                 'status' => 'error',

@@ -66,12 +66,53 @@ return [
                 ],
                 [
                     'class' => 'yii\rest\UrlRule',
-                    'controller' => ['api/auth'],
+                    'controller' => ['api/filme'],
+                    'extraPatterns' => [
+                        'GET {id}/sessoes' => 'sessoes',
+                        'GET por-titulo' => 'por-titulo',
+                        'GET count' => 'count',
+                        'GET {id}/count-sessoes' => 'count-sessoes',
+                        'GET mais-vistos' => 'mais-vistos',
+                        'GET estreiam-hoje' => 'estreiam-hoje',
+                        'GET por-genero' => 'por-genero',
+                        'GET por-idioma' => 'por-idioma',
+                    ],
+                ],
+                [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => ['api/sessoes'],
                     'pluralize' => false,
                 ],
                 [
                     'class' => 'yii\rest\UrlRule',
+                    'controller' => ['api/cinema'],
+                    'extraPatterns' => [
+                        'GET {id}/filmes' => 'filmes',
+                        'GET por-nome' => 'por-nome',
+                        'GET {id}/count-sessoes' => 'count-sessoes',
+                    ],
+                ],
+                [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => ['api/compra'],
+                    'extraPatterns' => [
+                        'GET {id}/bilhetes' => 'bilhetes',
+                        'GET com-bilhetes' => 'com-bilhetes',
+                        'GET total' => 'total',
+                        'GET count' => 'count',
+                        'GET {id}/count-bilhetes' => 'count-bilhetes',
+                        'GET count-por-filme' => 'count-por-filme',
+                        'GET count-por-cinema' => 'count-por-cinema',
+                    ],
+                ],
+                [
+                    'class' => 'yii\rest\UrlRule',
                     'controller' => ['api/aluguer-sala'],
+                    'pluralize' => false,
+                ],
+                [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => ['api/auth'],
                     'pluralize' => false,
                 ],
                 [
@@ -86,34 +127,7 @@ return [
                 ],
                 [
                     'class' => 'yii\rest\UrlRule',
-                    'controller' => ['api/cinema'],
-                    'extraPatterns' => [
-                        'GET {id}/filmes' => 'filmes',
-                        'GET list' => 'list',
-                    ],
-                ],
-                [
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => ['api/filme'],
-                    'extraPatterns' => [
-                        'GET {id}/sessoes' => 'sessoes',
-                    ],
-                ],
-                [
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => ['api/compra'],
-                    'extraPatterns' => [
-                        'GET {id}/bilhetes' => 'bilhetes',
-                    ],
-                ],
-                [
-                    'class' => 'yii\rest\UrlRule',
                     'controller' => ['api/genero'],
-                ],
-                [
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => ['api/sessoes'],
-                    'pluralize' => false,
                 ],
             ],
         ],

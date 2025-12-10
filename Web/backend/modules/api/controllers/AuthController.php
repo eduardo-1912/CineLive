@@ -11,7 +11,6 @@ use yii\filters\auth\HttpBearerAuth;
 use yii\filters\auth\QueryParamAuth;
 use yii\rest\Controller;
 use yii\web\BadRequestHttpException;
-use yii\web\NotFoundHttpException;
 use yii\web\UnauthorizedHttpException;
 
 class AuthController extends Controller
@@ -45,7 +44,7 @@ class AuthController extends Controller
 
         $user = User::findByUsername($username);
 
-        if (!$user || !$user->validatePassword($password)) {
+        if (!$user || !$user->validatePassword($password) || !$user->isCliente()) {
             throw new UnauthorizedHttpException("Credenciais inválidas.");
         }
 
@@ -72,9 +71,9 @@ class AuthController extends Controller
     {
         $body = Yii::$app->request->bodyParams;
 
+        // Verificar se todos os campos foram enviados
         $campos = ['username', 'password', 'email', 'nome', 'telemovel'];
         foreach ($campos as $campo) {
-            // Criar variável com o nome do campo
             $$campo = $body[$campo] ?? null;
 
             if (empty($$campo)) {
@@ -114,11 +113,7 @@ class AuthController extends Controller
         // Atribuir role RBAC
         $auth = Yii::$app->authManager;
         $role = $auth->getRole('cliente');
-
-        if (!$role) {
-            throw new Exception("Role 'cliente' não existe no RBAC.");
-        }
-
+        if (!$role) throw new Exception("Role 'cliente' não existe no RBAC.");
         $auth->assign($role, $user->id);
 
         return [
