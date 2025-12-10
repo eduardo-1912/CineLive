@@ -33,14 +33,14 @@ public class BilheteDBHelper {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.delete(TABLE_NAME, COMPRA_ID + " = ?", new String[]{String.valueOf(compraId)});
 
-        for (Bilhete b : bilhetes) {
+        for (Bilhete bilhete : bilhetes) {
             ContentValues values = new ContentValues();
-            values.put(ID, b.getId());
+            values.put(ID, bilhete.getId());
             values.put(COMPRA_ID, compraId);
-            values.put(CODIGO, b.getCodigo());
-            values.put(LUGAR, b.getLugar());
-            values.put(PRECO, b.getPreco());
-            values.put(ESTADO, b.getEstado());
+            values.put(CODIGO, bilhete.getCodigo());
+            values.put(LUGAR, bilhete.getLugar());
+            values.put(PRECO, bilhete.getPreco());
+            values.put(ESTADO, bilhete.getEstado());
 
             db.insert(TABLE_NAME, null, values);
         }
@@ -72,18 +72,10 @@ public class BilheteDBHelper {
         return list;
     }
 
-    public boolean hasBilhetes(int compraId) {
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-
-        Cursor cursor = db.rawQuery("SELECT 1 FROM " + TABLE_NAME + " WHERE " + COMPRA_ID + " = ? LIMIT 1",
-            new String[]{String.valueOf(compraId)}
-        );
-
-        boolean exists = cursor.moveToFirst();
-
-        cursor.close();
+    public void delete() {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        db.delete(TABLE_NAME, null, null);
         db.close();
-        return exists;
     }
     // endregion
 }

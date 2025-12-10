@@ -82,6 +82,7 @@ public class CinemasFragment extends Fragment {
             @Override
             public void onEmpty() {
                 showError(ErrorUtils.Type.EMPTY_CINEMAS);
+                FilmesManager.getInstance().clearCache();
             }
             @Override
             public void onError() {
@@ -127,6 +128,14 @@ public class CinemasFragment extends Fragment {
                     break;
             }
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // Carregar cinemas se não tiver cache
+        if (cinemasManager.getCache().isEmpty()) loadCinemas();
     }
 
     @Override

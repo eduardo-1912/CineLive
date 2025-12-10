@@ -43,7 +43,7 @@ public class DBHelper extends SQLiteOpenHelper {
             BilheteDBHelper.PRECO + " TEXT, " +
             BilheteDBHelper.ESTADO + " TEXT, " +
             "FOREIGN KEY(" + BilheteDBHelper.COMPRA_ID + ") REFERENCES " +
-            CompraDBHelper.TABLE_NAME + "(" + CompraDBHelper.ID + ") ON DELETE CASCADE" +
+            CompraDBHelper.TABLE_NAME + "(" + CompraDBHelper.ID + ")" +
         ");";
 
         db.execSQL(compra);

@@ -15,13 +15,11 @@ import java.util.List;
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.adapters.BilhetesAdapter;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityDetalhesCompraBinding;
-import pt.ipleiria.estg.dei.amsi.cinelive.listeners.BilhetesListener;
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.CompraListener;
 import pt.ipleiria.estg.dei.amsi.cinelive.managers.ComprasManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Bilhete;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Compra;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
-import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorUtils;
 
 public class DetalhesCompraActivity extends AppCompatActivity {
 
@@ -73,23 +71,8 @@ public class DetalhesCompraActivity extends AppCompatActivity {
         binding.mainFlipper.setDisplayedChild(0); // Main Loading
         getSupportActionBar().setTitle(R.string.title_detalhes_compra);
 
-        // Obter compra de cache se tiver
-        Compra compra = comprasManager.getCompraFromList(comprasManager.getCache(), compraId);
-
-        if (useCache && compra != null) {
-            // Obter bilhetes da compra
-            comprasManager.getBilhetesByCompraId(this, compraId, new BilhetesListener() {
-                @Override
-                public void onSuccess(List<Bilhete> bilhetes) {
-                    setCompra(compra, bilhetes);
-                }
-                @Override
-                public void onError() {}
-            });
-        }
-
-        // Obter compra completa
-        comprasManager.getCompra(this, compraId, new CompraListener() {
+        // Obter compra
+        comprasManager.getCompra(this, compraId, useCache, new CompraListener() {
             @Override
             public void onSuccess(Compra compra, List<Bilhete> bilhetes) {
                 setCompra(compra, bilhetes);

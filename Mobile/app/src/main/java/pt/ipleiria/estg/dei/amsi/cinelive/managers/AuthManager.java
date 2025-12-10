@@ -54,6 +54,7 @@ public class AuthManager {
         PerfilManager.getInstance().clearCache();
 
         // Limpar dados locais
+        new BilheteDBHelper(context).delete();
         new CompraDBHelper(context).delete();
 
         // Cancelar requests

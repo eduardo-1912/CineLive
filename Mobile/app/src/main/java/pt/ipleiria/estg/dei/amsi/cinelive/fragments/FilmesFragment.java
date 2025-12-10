@@ -133,6 +133,7 @@ public class FilmesFragment extends Fragment {
             @Override
             public void onInvalidCinema() {
                 showError(ErrorUtils.Type.INVALID_CINEMA);
+                filmesManager.clearCache();
             }
             @Override
             public void onError() {

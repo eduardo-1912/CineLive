@@ -17,6 +17,7 @@
     <string name="btn_guardar">Guardar</string>
     <string name="btn_restaurar">Restaurar</string>
     <string name="btn_cancelar">Cancelar</string>
+    <string name="btn_indisponivel">Indisponível</string>
     <string name="btn_tentar_novamente">Tentar novamente</string>
     <string name="btn_configuracoes">Configurações da API</string>
 

@@ -28,8 +28,9 @@ public class ConnectionUtils {
             Request.Method.GET, url, listener::onSuccess, error -> listener.onError()
         );
 
+        // Timeout
         request.setRetryPolicy(new DefaultRetryPolicy(
-                timeout, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+            timeout, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
         ));
 
         getRequestQueue(context).add(request);

@@ -27,7 +27,6 @@
     </style>
     <!-- endregion -->
 
-
     <!-- region Containers -->
     <style name="Container">
         <item name="android:layout_width">match_parent</item>
@@ -47,7 +46,6 @@
         <item name="android:gravity">center_horizontal</item>
     </style>
     <!-- endregion -->
-
 
     <!-- region Typography -->
     <style name="Title" parent="TextAppearance.Material3.DisplaySmall">
@@ -98,7 +96,6 @@
     </style>
     <!-- endregion -->
 
-
     <!-- region Badges -->
     <style name="Badge">
         <item name="android:layout_width">wrap_content</item>
@@ -114,7 +111,6 @@
     </style>
     <!-- endregion -->
 
-
     <!-- region Dividers -->
     <style name="Divider">
         <item name="android:layout_width">match_parent</item>
@@ -123,7 +119,6 @@
     </style>
     <!-- endregion -->
 
-
     <!-- region Inputs -->
     <style name="TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
         <item name="android:layout_width">match_parent</item>
@@ -131,7 +126,6 @@
         <item name="android:layout_marginBottom">8dp</item>
     </style>
     <!-- endregion -->
-
 
     <!-- region Buttons -->
     <style name="Button.Primary" parent="Widget.Material3.Button">
@@ -175,7 +169,6 @@
     </style>
     <!-- endregion -->
 
-
     <!-- region Images -->
     <style name="MoviePoster">
         <item name="android:adjustViewBounds">true</item>
@@ -185,7 +178,6 @@
         <item name="android:src">@drawable/poster_placeholder</item>
     </style>
     <!-- endregion -->
-
 
     <!-- region Vertical Spaces -->
     <style name="VerticalSpace">
@@ -220,7 +212,6 @@
         <item name="android:layout_height">32dp</item>
     </style>
     <!-- endregion -->
-
 
     <!-- region Horizontal Spaces -->
     <style name="HorizontalSpace">

@@ -76,11 +76,11 @@ public class ComprasFragment extends Fragment {
         comprasManager.getCompras(requireContext(), new ComprasListener() {
             @Override
             public void onSuccess(List<Compra> compras) {
-                setList(compras);
+                setList(compras, false);
             }
             @Override
             public void onLocal(List<Compra> compras) {
-                setList(compras);
+                setList(compras, true);
 
                 // Mudar texto da toolbar se as compras forem locais
                 updateToolbarTitle(R.string.title_compras_locais);
@@ -96,13 +96,13 @@ public class ComprasFragment extends Fragment {
         });
     }
 
-    private void setList(List<Compra> compras) {
+    private void setList(List<Compra> compras, boolean isLocal) {
         // Evitar crash ao sair do fragment
         if (binding == null || !isAdded()) return;
         binding.mainFlipper.setDisplayedChild(2); // Main Content
 
         // Se clicou numa compra --> ir para detalhes
-        adapter = new ComprasAdapter(compras, compra -> {
+        adapter = new ComprasAdapter(compras, isLocal, compra -> {
             Intent intent = new Intent(getActivity(), DetalhesCompraActivity.class);
             intent.putExtra("compraId", compra.getId());
             startActivity(intent);

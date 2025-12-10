@@ -8,19 +8,23 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
+import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ItemCompraBinding;
+import pt.ipleiria.estg.dei.amsi.cinelive.managers.ComprasManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Compra;
 
 public class ComprasAdapter extends RecyclerView.Adapter<ComprasAdapter.ViewHolder> {
-    private final List<Compra> compras;
-    private final OnCompraClickListener listener;
+    private List<Compra> compras;
+    private boolean isLocal;
+    private OnCompraClickListener listener;
 
     public interface OnCompraClickListener {
         void onCompraSelected(Compra compra);
     }
 
-    public ComprasAdapter(List<Compra> compras, OnCompraClickListener listener) {
+    public ComprasAdapter(List<Compra> compras, boolean isLocal, OnCompraClickListener listener) {
         this.compras = compras;
+        this.isLocal = isLocal;
         this.listener = listener;
     }
 
@@ -47,6 +51,13 @@ public class ComprasAdapter extends RecyclerView.Adapter<ComprasAdapter.ViewHold
         holder.binding.tvDataSessao.setText(compra.getDataSessao());
         holder.binding.tvHoraInicioSessao.setText(compra.getHoraInicioSessao());
         holder.binding.tvLugares.setText(compra.getLugares());
+
+        // Verificar se tem bilhete se as compras forem locais
+        if (isLocal && !ComprasManager.getInstance().hasBilhetesStored(compra.getId())) {
+            holder.binding.btnDetalhes.setEnabled(false);
+            holder.binding.btnDetalhes.setText(R.string.btn_indisponivel);
+            return;
+        }
 
         // Botão foi clicado --> avisar o fragment
         holder.binding.btnDetalhes.setOnClickListener(v -> {

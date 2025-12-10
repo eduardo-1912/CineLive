@@ -60,6 +60,11 @@ public class ComprasManager {
         return null;
     }
 
+    public boolean hasBilhetesStored(int compraId) {
+        return !bilhetesDB.getBilhetesByCompraId(compraId).isEmpty();
+    }
+
+
     private void updateCache(Compra updatedCompra) {
         for (int i = 0; i < cache.size(); i++) {
             if (cache.get(i).getId() == updatedCompra.getId()) {
@@ -163,10 +168,11 @@ public class ComprasManager {
         getRequestQueue(context).add(request);
     }
 
-    public void getCompra(Context context, int compraId, CompraListener listener) {
+    public void getCompra(Context context, int compraId, boolean useCache, CompraListener listener) {
         PreferencesManager preferences = new PreferencesManager(context);
         String url = ApiRoutes.compra(preferences.getApiUrl(), compraId, preferences.getToken());
 
+        // Não tem internet --> usar compra guardada localmente se tiver
         if (!ConnectionUtils.hasInternet(context)) {
             Compra compra = getCompraFromList(comprasDB.getCompras(), compraId);
             List<Bilhete> bilhetes = bilhetesDB.getBilhetesByCompraId(compraId);
@@ -174,6 +180,27 @@ public class ComprasManager {
             if (compra != null && !bilhetes.isEmpty()) {
                 listener.onLocal(compra, bilhetes);
                 return;
+            }
+        }
+
+        // Usar cache
+        if (useCache) {
+            Compra compra = getCompraFromList(cache, compraId);
+            if (compra != null) {
+                getBilhetesByCompraId(context, compraId, new BilhetesListener() {
+                    @Override
+                    public void onSuccess(List<Bilhete> bilhetes) {
+                        listener.onSuccess(compra, bilhetes);
+
+                        // Guardar localmente
+                        comprasDB.saveCompra(compra);
+                        bilhetesDB.saveBilhetes(compraId, bilhetes);
+                    }
+
+                    @Override
+                    public void onError() {
+                    }
+                });
             }
         }
 

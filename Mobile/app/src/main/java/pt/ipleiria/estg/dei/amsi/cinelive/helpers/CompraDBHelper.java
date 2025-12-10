@@ -57,7 +57,6 @@ public class CompraDBHelper {
 
     public void saveCompras(List<Compra> compras) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        db.delete(TABLE_NAME, null, null);
 
         for (Compra compra : compras) {
             ContentValues values = new ContentValues();
@@ -74,7 +73,7 @@ public class CompraDBHelper {
             values.put(SESSAO_HORA_FIM, compra.getHoraFimSessao());
             values.put(LUGARES, compra.getLugares());
 
-            db.insert(TABLE_NAME, null, values);
+            db.insertWithOnConflict(TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_REPLACE);
         }
 
         db.close();
