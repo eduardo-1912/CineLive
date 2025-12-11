@@ -3,9 +3,20 @@ return [
     'id' => 'app-common-tests',
     'basePath' => dirname(__DIR__),
     'components' => [
+        'mailer' => [
+            'useFileTransport' => true,
+        ],
+        'request' => [
+            'cookieValidationKey' => 'test-key',
+            'enableCsrfValidation' => false,
+        ],
         'user' => [
-            'class' => \yii\web\User::class,
-            'identityClass' => 'common\models\User',
+            'identityClass' => \common\models\User::class,
+            'enableSession' => false,
+        ],
+        'session' => [
+            'class' => \yii\web\Session::class,
+            'useCookies' => false,
         ],
     ],
 ];

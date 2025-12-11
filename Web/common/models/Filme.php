@@ -68,7 +68,7 @@ class Filme extends \yii\db\ActiveRecord
         return [
             [['titulo', 'sinopse', 'duracao', 'rating', 'estreia', 'idioma', 'realizacao', 'trailer_url', 'estado'], 'required'],
             [['sinopse', 'estado'], 'string'],
-            [['duracao'], 'integer'],
+            ['duracao', 'integer', 'min' => 1],
             [['estreia', 'generosSelecionados'], 'safe'],
             [['titulo', 'trailer_url', 'poster_path'], 'string', 'max' => 255],
             [['idioma'], 'string', 'max' => 50],
