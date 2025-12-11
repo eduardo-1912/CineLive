@@ -142,7 +142,7 @@ class SiteController extends Controller
             $currentUser = Yii::$app->user->identity;
 
             // Se for cliente
-            if ($currentUser->isCliente()) {
+            if (!$currentUser->isAdmin() && !$currentUser->isGerente() && !$currentUser->isFuncionario()) {
                 Yii::$app->user->logout();
                 Yii::$app->session->setFlash('error', 'Não pode aceder à página de administração.');
                 return $this->redirect(['login']);

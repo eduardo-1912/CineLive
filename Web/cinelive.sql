@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Dec 03, 2025 at 11:13 AM
+-- Generation Time: Dec 11, 2025 at 05:50 PM
 -- Server version: 9.1.0
--- PHP Version: 8.3.14
+-- PHP Version: 8.4.13
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -36,9 +36,9 @@ CREATE TABLE IF NOT EXISTS `aluguer_sala` (
   `data` date NOT NULL,
   `hora_inicio` time NOT NULL,
   `hora_fim` time NOT NULL,
-  `estado` enum('pendente','confirmado','cancelado') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
-  `tipo_evento` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
-  `observacoes` text CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `estado` enum('pendente','confirmado','cancelado') NOT NULL,
+  `tipo_evento` varchar(100) NOT NULL,
+  `observacoes` text NOT NULL,
   PRIMARY KEY (`id`),
   KEY `idx-aluguer_sala-cliente_id` (`cliente_id`),
   KEY `idx-aluguer_sala-sala_id` (`sala_id`),
@@ -63,8 +63,8 @@ INSERT INTO `aluguer_sala` (`id`, `cliente_id`, `cinema_id`, `sala_id`, `data`, 
 
 DROP TABLE IF EXISTS `auth_assignment`;
 CREATE TABLE IF NOT EXISTS `auth_assignment` (
-  `item_name` varchar(64) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `user_id` varchar(64) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
+  `item_name` varchar(64) COLLATE utf8mb3_unicode_ci NOT NULL,
+  `user_id` varchar(64) COLLATE utf8mb3_unicode_ci NOT NULL,
   `created_at` int DEFAULT NULL,
   PRIMARY KEY (`item_name`,`user_id`),
   KEY `idx-auth_assignment-user_id` (`user_id`)
@@ -100,10 +100,10 @@ INSERT INTO `auth_assignment` (`item_name`, `user_id`, `created_at`) VALUES
 
 DROP TABLE IF EXISTS `auth_item`;
 CREATE TABLE IF NOT EXISTS `auth_item` (
-  `name` varchar(64) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
+  `name` varchar(64) COLLATE utf8mb3_unicode_ci NOT NULL,
   `type` smallint NOT NULL,
-  `description` text CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci,
-  `rule_name` varchar(64) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci DEFAULT NULL,
+  `description` text COLLATE utf8mb3_unicode_ci,
+  `rule_name` varchar(64) COLLATE utf8mb3_unicode_ci DEFAULT NULL,
   `data` blob,
   `created_at` int DEFAULT NULL,
   `updated_at` int DEFAULT NULL,
@@ -162,8 +162,8 @@ INSERT INTO `auth_item` (`name`, `type`, `description`, `rule_name`, `data`, `cr
 
 DROP TABLE IF EXISTS `auth_item_child`;
 CREATE TABLE IF NOT EXISTS `auth_item_child` (
-  `parent` varchar(64) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `child` varchar(64) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
+  `parent` varchar(64) COLLATE utf8mb3_unicode_ci NOT NULL,
+  `child` varchar(64) COLLATE utf8mb3_unicode_ci NOT NULL,
   PRIMARY KEY (`parent`,`child`),
   KEY `child` (`child`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
@@ -215,7 +215,7 @@ INSERT INTO `auth_item_child` (`parent`, `child`) VALUES
 
 DROP TABLE IF EXISTS `auth_rule`;
 CREATE TABLE IF NOT EXISTS `auth_rule` (
-  `name` varchar(64) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
+  `name` varchar(64) COLLATE utf8mb3_unicode_ci NOT NULL,
   `data` blob,
   `created_at` int DEFAULT NULL,
   `updated_at` int DEFAULT NULL,
@@ -241,10 +241,10 @@ DROP TABLE IF EXISTS `bilhete`;
 CREATE TABLE IF NOT EXISTS `bilhete` (
   `id` int NOT NULL AUTO_INCREMENT,
   `compra_id` int NOT NULL,
-  `lugar` varchar(3) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `lugar` varchar(3) NOT NULL,
   `preco` decimal(5,2) NOT NULL,
-  `codigo` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
-  `estado` enum('pendente','confirmado','cancelado') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `codigo` varchar(45) NOT NULL,
+  `estado` enum('pendente','confirmado','cancelado') NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `codigo` (`codigo`),
   KEY `idx-bilhete-compra_id` (`compra_id`)
@@ -306,17 +306,17 @@ INSERT INTO `bilhete` (`id`, `compra_id`, `lugar`, `preco`, `codigo`, `estado`) 
 DROP TABLE IF EXISTS `cinema`;
 CREATE TABLE IF NOT EXISTS `cinema` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `nome` varchar(80) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
-  `rua` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
-  `codigo_postal` varchar(8) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
-  `cidade` varchar(50) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `nome` varchar(80) NOT NULL,
+  `rua` varchar(100) NOT NULL,
+  `codigo_postal` varchar(8) NOT NULL,
+  `cidade` varchar(50) NOT NULL,
   `latitude` decimal(10,6) NOT NULL,
   `longitude` decimal(10,6) NOT NULL,
-  `email` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
-  `telefone` int NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `telefone` varchar(9) NOT NULL,
   `horario_abertura` time NOT NULL,
   `horario_fecho` time NOT NULL,
-  `estado` enum('ativo','encerrado') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `estado` enum('ativo','encerrado') NOT NULL,
   `gerente_id` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx-cinema-gerente_id` (`gerente_id`)
@@ -327,9 +327,9 @@ CREATE TABLE IF NOT EXISTS `cinema` (
 --
 
 INSERT INTO `cinema` (`id`, `nome`, `rua`, `codigo_postal`, `cidade`, `latitude`, `longitude`, `email`, `telefone`, `horario_abertura`, `horario_fecho`, `estado`, `gerente_id`) VALUES
-(1, 'CineLive Leiria', 'Rua Dr. Francisco Sá Carneiro Nº25', '2400-149', 'Leiria', 39.743620, -8.807049, 'leiria@cinelive.pt', 244123456, '10:00:00', '23:30:00', 'ativo', 2),
-(2, 'CineLive Lisboa', 'Avenida da Liberdade Nº180', '1250-146', 'Lisboa', 38.720345, -9.144021, 'lisboa@cinelive.pt', 213456789, '09:30:00', '23:30:00', 'ativo', 3),
-(3, 'CineLive Porto', 'Rua de Santa Catarina Nº428', '4000-446', 'Porto', 41.149610, -8.606277, 'porto@cinelive.pt', 222456789, '10:00:00', '23:45:00', 'encerrado', 4);
+(1, 'CineLive Leiria', 'Rua Dr. João Carneiro Nº25', '2400-149', 'Leiria', 39.743620, -8.807049, 'leiria@cinelive.pt', '244123456', '10:00:00', '23:30:00', 'ativo', 2),
+(2, 'CineLive Lisboa', 'Avenida Livre Nº180', '1250-146', 'Lisboa', 38.720345, -9.144021, 'lisboa@cinelive.pt', '213456789', '09:30:00', '23:30:00', 'ativo', 3),
+(3, 'CineLive Porto', 'Rua Santa Catarina Nº428', '4000-446', 'Porto', 41.149610, -8.606277, 'porto@cinelive.pt', '222456789', '10:00:00', '23:45:00', 'ativo', 4);
 
 -- --------------------------------------------------------
 
@@ -343,8 +343,8 @@ CREATE TABLE IF NOT EXISTS `compra` (
   `cliente_id` int DEFAULT NULL,
   `sessao_id` int NOT NULL,
   `data` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `pagamento` enum('mbway','cartao','multibanco') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
-  `estado` enum('confirmada','cancelada') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `pagamento` enum('mbway','cartao','multibanco') NOT NULL,
+  `estado` enum('confirmada','cancelada') NOT NULL,
   PRIMARY KEY (`id`),
   KEY `idx-compra-cliente_id` (`cliente_id`),
   KEY `sessao_id` (`sessao_id`)
@@ -374,16 +374,16 @@ INSERT INTO `compra` (`id`, `cliente_id`, `sessao_id`, `data`, `pagamento`, `est
 DROP TABLE IF EXISTS `filme`;
 CREATE TABLE IF NOT EXISTS `filme` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `titulo` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
-  `sinopse` text CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `titulo` varchar(255) NOT NULL,
+  `sinopse` text NOT NULL,
   `duracao` int NOT NULL,
-  `rating` enum('Todos','M3','M6','M12','M14','M16','M18') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `rating` enum('Todos','M3','M6','M12','M14','M16','M18') NOT NULL,
   `estreia` date NOT NULL,
-  `idioma` varchar(50) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
-  `realizacao` varchar(80) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
-  `trailer_url` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
-  `poster_path` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
-  `estado` enum('brevemente','em_exibicao','terminado') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `idioma` varchar(50) NOT NULL,
+  `realizacao` varchar(80) NOT NULL,
+  `trailer_url` varchar(255) NOT NULL,
+  `poster_path` varchar(255) NOT NULL,
+  `estado` enum('brevemente','em_exibicao','terminado') NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb3;
 
@@ -398,9 +398,9 @@ INSERT INTO `filme` (`id`, `titulo`, `sinopse`, `duracao`, `rating`, `estreia`, 
 (4, 'The Social Network', 'Um brilhante, porém socialmente desajeitado estudante de Harvard cria uma plataforma online inicialmente pensada para conectar universitários, mas o projeto cresce com uma velocidade explosiva e rapidamente evolui para aquilo que se tornaria o Facebook.', 120, 'M12', '2010-10-01', 'Inglês', 'David Fincher', 'https://www.youtube.com/watch?v=lB95KLmpLR4', 'poster_69032dee2ed44.jpg', 'em_exibicao'),
 (5, 'Prisoners', 'Duas raparigas desaparecem durante um feriado em família, deixando todos em pânico.Enquanto a polícia segue pistas incertas, o pai de uma delas decide investigar por conta própria.Consumido pelo desespero, ele cruza limites perigosos numa busca que ameaça destruir tudo à sua volta.', 153, 'M16', '2013-09-20', 'Inglês', 'Denis Villeneuve', 'https://www.youtube.com/watch?v=bpXfcTF6iVk', 'poster_69032e821fed0.jpg', 'brevemente'),
 (6, 'Zodiac', 'Um desenhador de cartoons de São Francisco torna-se obcecado em decifrar a identidade do assassino em série apelidado de “Zodíaco”, que aterroriza a área da baía com cartas cifradas, assassinatos e o troçar da polícia.', 157, 'M16', '2007-03-02', 'Inglês', 'David Fincher', 'https://www.youtube.com/watch?v=yNncHPl1UXg', 'poster_69032f4f900e9.jpg', 'brevemente'),
-(7, 'Toy Story', 'Um brinquedo vê a sua posição ameaçada quando um novo boneco espacial chega ao quarto, desencadeando uma aventura onde ambos terão de superar rivalidades e trabalhar juntos para regressar a casa do dono.', 81, 'M6', '1996-03-29', 'Português', 'John Lasseter', 'https://www.youtube.com/watch?v=v-PjgYDrg70', 'poster_6910b61fbd2d6.jpg', 'brevemente'),
+(7, 'Toy Story', 'Um brinquedo vê a sua posição ameaçada quando um novo boneco espacial chega ao quarto, desencadeando uma aventura onde ambos terão de superar rivalidades e trabalhar juntos para regressar a casa do dono.', 81, 'M6', '1996-03-29', 'Português', 'John Lasseter', 'https://www.youtube.com/watch?v=v-PjgYDrg70', 'poster_6910b61fbd2d6.jpg', 'em_exibicao'),
 (8, 'Carros 2', 'Um grande campeão das pistas é lançado numa corrida internacional enquanto o seu amigo Mate é apanhado num enredo de espionagem que põe à prova a amizade de ambos e mostra que coragem pode surgir dos lugares mais improváveis.', 106, 'M6', '2011-06-14', 'Português', 'John Lasseter', 'https://www.youtube.com/watch?v=oFTfAdauCOo', 'poster_6910b6ad1f9ea.jpg', 'em_exibicao'),
-(9, 'The Prestige', 'Dois mágicos rivais da era vitoriana competem obsessivamente para superar-se, à medida que o truque se torna cada vez mais perigoso, ambos descobrem que o preço da obsessão pode ser a própria identidade.', 130, 'M14', '2006-12-28', 'Inglês', 'Christopher Nolan', 'https://www.youtube.com/watch?v=RLtaA9fFNXU', 'poster_6918b2d190384.jpg', 'em_exibicao'),
+(9, 'The Prestige', 'Dois mágicos rivais da era vitoriana competem obsessivamente para superar-se, à medida que o truque se torna cada vez mais perigoso, ambos descobrem que o preço da obsessão pode ser a própria identidade.', 130, 'M14', '2006-12-28', 'Inglês', 'Christopher Nolan', 'https://www.youtube.com/watch?v=RLtaA9fFNXU', 'poster_6918b2d190384.jpg', 'brevemente'),
 (10, 'Seven', 'Quando um serial killer começa a cometer assassinatos meticulosamente inspirados nos sete pecados capitais, cada cena do crime se transforma em um ritual macabro, carregado de simbolismos e de uma crueldade calculada.', 127, 'M16', '1996-02-02', 'Inglês', 'David Fincher', 'https://www.youtube.com/watch?v=znmZoVkCjpI', 'poster_6918b3d09bd73.jpg', 'em_exibicao'),
 (11, 'Divertida-Mente', 'Riley tem 11 anos e muda-se com a família para São Francisco. No quartel-general da sua mente vivem as emoções Alegria, Tristeza, Medo, Raiva e Repulsa, que tentam orientar-na, mas quando os sentimentos entram em conflito, Riley afronta uma nova vida, nova escola e a incerteza de crescer.', 94, 'Todos', '2015-06-18', 'Português', 'Pete Docter', 'https://www.youtube.com/watch?v=yRUAzGQ3nSY', 'poster_6918b4c3cf56d.jpg', 'brevemente'),
 (12, 'Monstros e Companhia', 'Na fábrica Monstros S.A., os monstros recolhem gritos de crianças para gerar energia, mas tudo muda quando uma menina humana entra no mundo dos monstros, obrigando Sulley e Mike a enfrentarem medos, conspirações e a descobrir que a amizade pode ser a força mais poderosa de todas.', 92, 'M3', '2002-03-14', 'Português', 'Pete Docter', 'https://www.youtube.com/watch?v=CGbgaHoapFM', 'poster_6918b5ace5025.jpg', 'brevemente'),
@@ -486,7 +486,7 @@ INSERT INTO `filme_genero` (`filme_id`, `genero_id`) VALUES
 DROP TABLE IF EXISTS `genero`;
 CREATE TABLE IF NOT EXISTS `genero` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `nome` varchar(80) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `nome` varchar(80) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `nome` (`nome`)
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb3;
@@ -515,7 +515,7 @@ INSERT INTO `genero` (`id`, `nome`) VALUES
 
 DROP TABLE IF EXISTS `migration`;
 CREATE TABLE IF NOT EXISTS `migration` (
-  `version` varchar(180) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `version` varchar(180) NOT NULL,
   `apply_time` int DEFAULT NULL,
   PRIMARY KEY (`version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
@@ -548,7 +548,7 @@ CREATE TABLE IF NOT EXISTS `sala` (
   `num_filas` int NOT NULL,
   `num_colunas` int NOT NULL,
   `preco_bilhete` decimal(5,2) NOT NULL,
-  `estado` enum('ativa','encerrada') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `estado` enum('ativa','encerrada') NOT NULL,
   PRIMARY KEY (`id`),
   KEY `idx-sala-cinema_id` (`cinema_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb3;
@@ -568,12 +568,12 @@ INSERT INTO `sala` (`id`, `cinema_id`, `numero`, `num_filas`, `num_colunas`, `pr
 (8, 2, 2, 10, 10, 8.00, 'ativa'),
 (9, 2, 3, 8, 10, 12.00, 'ativa'),
 (10, 2, 4, 10, 10, 6.00, 'ativa'),
-(11, 3, 1, 12, 14, 8.00, 'encerrada'),
-(12, 3, 2, 10, 10, 10.00, 'encerrada'),
-(13, 3, 3, 12, 12, 6.00, 'encerrada'),
-(14, 3, 4, 10, 10, 6.00, 'encerrada'),
-(15, 3, 5, 10, 12, 8.00, 'encerrada'),
-(16, 3, 6, 10, 12, 12.00, 'encerrada');
+(11, 3, 1, 12, 14, 8.00, 'ativa'),
+(12, 3, 2, 10, 10, 10.00, 'ativa'),
+(13, 3, 3, 12, 12, 6.00, 'ativa'),
+(14, 3, 4, 10, 10, 6.00, 'ativa'),
+(15, 3, 5, 10, 12, 8.00, 'ativa'),
+(16, 3, 6, 10, 12, 12.00, 'ativa');
 
 -- --------------------------------------------------------
 
@@ -630,20 +630,20 @@ INSERT INTO `sessao` (`id`, `data`, `hora_inicio`, `hora_fim`, `filme_id`, `sala
 DROP TABLE IF EXISTS `user`;
 CREATE TABLE IF NOT EXISTS `user` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `username` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `auth_key` varchar(32) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `password_hash` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `password_reset_token` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci DEFAULT NULL,
-  `email` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
+  `username` varchar(255) COLLATE utf8mb3_unicode_ci NOT NULL,
+  `auth_key` varchar(32) COLLATE utf8mb3_unicode_ci NOT NULL,
+  `password_hash` varchar(255) COLLATE utf8mb3_unicode_ci NOT NULL,
+  `password_reset_token` varchar(255) COLLATE utf8mb3_unicode_ci DEFAULT NULL,
+  `email` varchar(255) COLLATE utf8mb3_unicode_ci NOT NULL,
   `status` smallint NOT NULL DEFAULT '10',
   `created_at` int NOT NULL,
   `updated_at` int NOT NULL,
-  `verification_token` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci DEFAULT NULL,
+  `verification_token` varchar(255) COLLATE utf8mb3_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `email` (`email`),
   UNIQUE KEY `password_reset_token` (`password_reset_token`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
 
 --
 -- Dumping data for table `user`
@@ -653,17 +653,17 @@ INSERT INTO `user` (`id`, `username`, `auth_key`, `password_hash`, `password_res
 (1, 'admin', 'RiJaKAf7Hp424dBk1iQOV1vVBCH9JPtg', '$2y$13$MOGtdUncKuf2Ha0vfkZLbeeclpAAZZKLvTNK8Xq3tCDw36Vy0MetO', NULL, 'admin@cinelive.pt', 10, 1761155589, 1761852169, 'y0Xwr7YzzzQDbI9pyjshvWWe8vkNsDnE_1761155589'),
 (2, 'gerente_leiria', 'U7lb3yNGR61TWnaV-JKGQEXpBbBlESaN', '$2y$13$hyMYwc1Xh8Yzgbz7bCbyXuFERsN6cov/L9YUqgkVvz08d3B89YWWS', NULL, 'joao.santos@cinelive.pt', 10, 1761566974, 1764696349, 'WX40mKBrd5X42eoDi89ebQiOWVOoEE01_1761566974'),
 (3, 'gerente_lisboa', 'D2gMIv_2TEHAR0LZvdfcoQdRW1bk2Dqo', '$2y$13$RAEqwyWe8IXsmqmKNKwX7OnaVLqSiFkIJw8lSqoovnT.y2BorI1ae', NULL, 'ana.costa@cinelive.pt', 10, 1761567081, 1762543597, 'txaOr3YHbo46trhQNh5Zbcp4XORyCuz9_1761567081'),
-(4, 'gerente_porto', 'kzSJHLcffp4AgkJ8K_EsE3owsm1I7n4V', '$2y$13$o5wT5jDBuhUEwlNU9crq5eJBJdtNKsgWbGuTS4brEY/f9DuFKaxGG', NULL, 'jose.lopes@cinelive.pt', 9, 1761567155, 1761658002, 'Y4gdxRCr8ivtj3GylOPMqhmS1bGnni0G_1761567155'),
+(4, 'gerente_porto', 'kzSJHLcffp4AgkJ8K_EsE3owsm1I7n4V', '$2y$13$o5wT5jDBuhUEwlNU9crq5eJBJdtNKsgWbGuTS4brEY/f9DuFKaxGG', NULL, 'jose.lopes@cinelive.pt', 10, 1761567155, 1761658002, 'Y4gdxRCr8ivtj3GylOPMqhmS1bGnni0G_1761567155'),
 (5, 'funcionario1_leiria', 'DKliNxbAxkV0AS1k9a6iOUhwihcX1yRI', '$2y$13$TMdaGK8E56AYDaTuwK2.subQR4YjLe8X8QykBynB2HQpaciQQDetC', NULL, 'pedro.gaspar@cinelive.pt', 10, 1761567277, 1762535118, 'mzJQdLRZ46gM83QEnGPHyf0_zSBKytD-_1761567277'),
 (6, 'funcionario2_leiria', 'bOq92Yc4xgkx8r5gZIlQZmPXcybcNPTB', '$2y$13$WXJqNUuruvEP2t4nBa8Eg.Mtyy39mxIA71TGJygIswDmanCuneLuO', NULL, 'mario.lopes@cinelive.pt', 10, 1761739108, 1762108148, 'MiBN8jQSLjsJnC-Xk6VtnHL5mMGjeG8M_1761739108'),
 (7, 'funcionario3_leiria', 'EMxEfUEPGMctUh8-s99OdgHqaXjEhOHk', '$2y$13$W/vkfQLvB2AGxTcs3d3pSuKzWrZ8WvUMJlg/jaVzKQnMwRnLvNp4e', NULL, 'joana.matos@cinelive.pt', 10, 1761843131, 1764707487, 'a90HbTqSLK7WPgpFg10jkJLYu6Ujriy6_1761843131'),
 (8, 'funcionario1_lisboa', 'z2GqE3NcqpkUTceDye_sboypxEmVTglQ', '$2y$13$AUAV5/fqdDuxHawP2snZC.RUVqdHqs27kEmXOb1Ix/xmWEm9PELBm', NULL, 'nuno.borges@cinelive.pt', 10, 1761843283, 1761858274, 'ivjsG6OhTExYJ0lgpuyR4NBnmmgL2BAS_1761843283'),
 (9, 'funcionario2_lisboa', 'sIojR6MIsPTDqlhPeEq1vh0dBLZDGa2h', '$2y$13$PMEOqBqxFkVSpiwQKA/aW.5c0eHH1cicSPbrNwU4ACy2jCHQRCu42', NULL, 'tiago.silva@cinelive.pt', 10, 1761899566, 1761899566, 'VLg3DAHhUIROGS8IWvb08kB_9oVNeTyz_1761899566'),
 (10, 'funcionario3_lisboa', '3j4zo6Ppo6QZw-Ryj6Vq-sSWQkoAztcM', '$2y$13$BmeXq.fZ6INZrjUEvQwDwOBoLYCY.pmhwo8H9wga2pWR2IKcC.Hzu', NULL, 'joao.pereira@cinelive.pt', 10, 1761899622, 1762528324, 'ZIGTe969TCk-xPbVNL2tW_woMU_Xd_ai_1761899622'),
-(11, 'funcionario1_porto', 'fWDeR3W4Oz1y_-lTFb3SQJA_mNZ2sZbC', '$2y$13$VxxddZCR/LXbcxkhLOBI2.3Q2PiARz37s/dacQZizcah60jRCpn5G', NULL, 'marta.costa@cinelive.pt', 9, 1761899669, 1761899669, 'XmigJ8rUfPT0PuJHE5YLdve1FyQwoy25_1761899669'),
-(12, 'funcionario2_porto', 'wmqDy7TILwqyTMGL8oLX4SpLs0nEVogZ', '$2y$13$tfkNqWtTTnjgqbhyyy2qmOOvIrP5ky.lzywbuzumhZ/eFw8s7taty', NULL, 'pedro.santos@cinelive.pt', 9, 1761899704, 1761899704, 'W0IOZCEoEOeTpipvqhcN-qimarrNRFXH_1761899704'),
-(13, 'funcionario3_porto', 'ltOPHO_e-vKwB_aC3NuDy9nvJRRJH23W', '$2y$13$2oYlbWTxZuKmX2OdixSh3.mYvhWng6.4QBmzKd.tYTGdhV1o9RFia', NULL, 'ana.oliveira@cinelive.pt', 9, 1761899749, 1761899749, 'cmvPY0EH0N_XgTKdIZC0JaxQt_fGvfrG_1761899749'),
-(14, 'cliente1', 'k62J4TvTccg2tW0zRtOWrZXHcwhBlNpZ', '$2y$13$3MNx8IRC3SE81J/Ju2Bgm.gPc4UYaIxav2Oc.bk.YFCx85kY6w1Ou', NULL, 'miguel.ribeiro@email.com', 10, 1761946487, 1764757753, NULL),
+(11, 'funcionario1_porto', 'fWDeR3W4Oz1y_-lTFb3SQJA_mNZ2sZbC', '$2y$13$VxxddZCR/LXbcxkhLOBI2.3Q2PiARz37s/dacQZizcah60jRCpn5G', NULL, 'marta.costa@cinelive.pt', 10, 1761899669, 1761899669, 'XmigJ8rUfPT0PuJHE5YLdve1FyQwoy25_1761899669'),
+(12, 'funcionario2_porto', 'wmqDy7TILwqyTMGL8oLX4SpLs0nEVogZ', '$2y$13$tfkNqWtTTnjgqbhyyy2qmOOvIrP5ky.lzywbuzumhZ/eFw8s7taty', NULL, 'pedro.santos@cinelive.pt', 10, 1761899704, 1761899704, 'W0IOZCEoEOeTpipvqhcN-qimarrNRFXH_1761899704'),
+(13, 'funcionario3_porto', 'ltOPHO_e-vKwB_aC3NuDy9nvJRRJH23W', '$2y$13$2oYlbWTxZuKmX2OdixSh3.mYvhWng6.4QBmzKd.tYTGdhV1o9RFia', NULL, 'ana.oliveira@cinelive.pt', 10, 1761899749, 1761899749, 'cmvPY0EH0N_XgTKdIZC0JaxQt_fGvfrG_1761899749'),
+(14, 'cliente1', 'B3BmNn_leTEb-maw16V0vOqZIYABiY54', '$2y$13$7GePk56MTJ1DK3DfO0PTZuWn2yNyJRmdixpa2J2fnR0IJRkSC3KbC', NULL, 'miguel.ribeiro@email.com', 10, 1761946487, 1764442055, NULL),
 (15, 'cliente2', 'fMlyme1W2HIpj0ifglLZmSQ7J1f4MLdI', '$2y$13$j2E.l0WhJWfNhW6W5uCSF.9dCvXARYOrZGAmC140gLqPiFkYOYXRm', NULL, 'luis.marques@email.com', 10, 1764708269, 1764708269, 'lReE4fICppu6YHBvBGo-vClLFL1sBBX6_1764708269'),
 (16, 'cliente3', 'z1kKgBz1X4ZTbiHTDV0Vq036KqgLOQhi', '$2y$13$73gH5tKRKSRD6VqWtvgg5OPvKdiHrDCYyDYxjFyYJgXrQOgMzqeGK', NULL, 'rodrigo.costa@email.com', 10, 1764708322, 1764708322, 'jzlDxup_UK664pyU_5DwEFIttWkMxwKo_1764708322');
 
@@ -678,12 +678,12 @@ CREATE TABLE IF NOT EXISTS `user_profile` (
   `id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL,
   `cinema_id` int DEFAULT NULL,
-  `nome` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
-  `telemovel` varchar(9) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `nome` varchar(100) NOT NULL,
+  `telemovel` varchar(9) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx-user_profile-user_id` (`user_id`),
   KEY `idx-user_profile-cinema_id` (`cinema_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb3;
 
 --
 -- Dumping data for table `user_profile`
@@ -715,9 +715,9 @@ INSERT INTO `user_profile` (`id`, `user_id`, `cinema_id`, `nome`, `telemovel`) V
 -- Constraints for table `aluguer_sala`
 --
 ALTER TABLE `aluguer_sala`
-  ADD CONSTRAINT `aluguer_sala_ibfk_1` FOREIGN KEY (`cinema_id`) REFERENCES `cinema` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  ADD CONSTRAINT `fk-aluguer_sala-cliente_id` FOREIGN KEY (`cliente_id`) REFERENCES `user` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
-  ADD CONSTRAINT `fk-aluguer_sala-sala_id` FOREIGN KEY (`sala_id`) REFERENCES `sala` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+  ADD CONSTRAINT `aluguer_sala_ibfk_1` FOREIGN KEY (`cinema_id`) REFERENCES `cinema` (`id`),
+  ADD CONSTRAINT `fk-aluguer_sala-cliente_id` FOREIGN KEY (`cliente_id`) REFERENCES `user` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `fk-aluguer_sala-sala_id` FOREIGN KEY (`sala_id`) REFERENCES `sala` (`id`);
 
 --
 -- Constraints for table `auth_assignment`
@@ -742,48 +742,48 @@ ALTER TABLE `auth_item_child`
 -- Constraints for table `bilhete`
 --
 ALTER TABLE `bilhete`
-  ADD CONSTRAINT `fk-bilhete-compra_id` FOREIGN KEY (`compra_id`) REFERENCES `compra` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
+  ADD CONSTRAINT `fk-bilhete-compra_id` FOREIGN KEY (`compra_id`) REFERENCES `compra` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `cinema`
 --
 ALTER TABLE `cinema`
-  ADD CONSTRAINT `fk-cinema-gerente_id` FOREIGN KEY (`gerente_id`) REFERENCES `user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+  ADD CONSTRAINT `fk-cinema-gerente_id` FOREIGN KEY (`gerente_id`) REFERENCES `user` (`id`);
 
 --
 -- Constraints for table `compra`
 --
 ALTER TABLE `compra`
-  ADD CONSTRAINT `compra_ibfk_1` FOREIGN KEY (`sessao_id`) REFERENCES `sessao` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  ADD CONSTRAINT `compra_ibfk_2` FOREIGN KEY (`cliente_id`) REFERENCES `user` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT;
+  ADD CONSTRAINT `compra_ibfk_1` FOREIGN KEY (`sessao_id`) REFERENCES `sessao` (`id`),
+  ADD CONSTRAINT `compra_ibfk_2` FOREIGN KEY (`cliente_id`) REFERENCES `user` (`id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `filme_genero`
 --
 ALTER TABLE `filme_genero`
-  ADD CONSTRAINT `fk-filme_genero-filme_id` FOREIGN KEY (`filme_id`) REFERENCES `filme` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
-  ADD CONSTRAINT `fk-filme_genero-genero_id` FOREIGN KEY (`genero_id`) REFERENCES `genero` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
+  ADD CONSTRAINT `fk-filme_genero-filme_id` FOREIGN KEY (`filme_id`) REFERENCES `filme` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk-filme_genero-genero_id` FOREIGN KEY (`genero_id`) REFERENCES `genero` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `sala`
 --
 ALTER TABLE `sala`
-  ADD CONSTRAINT `fk-sala-cinema_id` FOREIGN KEY (`cinema_id`) REFERENCES `cinema` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+  ADD CONSTRAINT `fk-sala-cinema_id` FOREIGN KEY (`cinema_id`) REFERENCES `cinema` (`id`);
 
 --
 -- Constraints for table `sessao`
 --
 ALTER TABLE `sessao`
-  ADD CONSTRAINT `fk-sessao-cinema_id` FOREIGN KEY (`cinema_id`) REFERENCES `cinema` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  ADD CONSTRAINT `fk-sessao-filme_id` FOREIGN KEY (`filme_id`) REFERENCES `filme` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
-  ADD CONSTRAINT `fk-sessao-sala_id` FOREIGN KEY (`sala_id`) REFERENCES `sala` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+  ADD CONSTRAINT `fk-sessao-cinema_id` FOREIGN KEY (`cinema_id`) REFERENCES `cinema` (`id`),
+  ADD CONSTRAINT `fk-sessao-filme_id` FOREIGN KEY (`filme_id`) REFERENCES `filme` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk-sessao-sala_id` FOREIGN KEY (`sala_id`) REFERENCES `sala` (`id`);
 
 --
 -- Constraints for table `user_profile`
 --
 ALTER TABLE `user_profile`
-  ADD CONSTRAINT `fk-user_profile-cinema_id` FOREIGN KEY (`cinema_id`) REFERENCES `cinema` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  ADD CONSTRAINT `fk-user_profile-user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
+  ADD CONSTRAINT `fk-user_profile-cinema_id` FOREIGN KEY (`cinema_id`) REFERENCES `cinema` (`id`),
+  ADD CONSTRAINT `fk-user_profile-user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

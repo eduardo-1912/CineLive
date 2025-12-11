@@ -9,6 +9,10 @@ class ToastWidget extends Widget
 {
     public function run()
     {
+        if (YII_ENV_TEST) {
+            return '';
+        }
+
         $session = Yii::$app->session;
         $flashes = $session->getAllFlashes();
         $output = '';
