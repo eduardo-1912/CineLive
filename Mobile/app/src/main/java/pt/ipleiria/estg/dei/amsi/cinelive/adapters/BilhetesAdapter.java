@@ -1,5 +1,6 @@
 package pt.ipleiria.estg.dei.amsi.cinelive.adapters;
 
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -10,6 +11,7 @@ import java.util.List;
 
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ItemBilheteBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Bilhete;
+import pt.ipleiria.estg.dei.amsi.cinelive.utils.QRCodeUtils;
 
 public class BilhetesAdapter extends RecyclerView.Adapter<BilhetesAdapter.ViewHolder> {
     private final List<Bilhete> bilhetes;
@@ -33,12 +35,15 @@ public class BilhetesAdapter extends RecyclerView.Adapter<BilhetesAdapter.ViewHo
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Bilhete bilhete = bilhetes.get(position);
 
-        // Preencher campos do layout com os dados do bilhete
+        // Preencher campos com os dados do bilhete
         holder.binding.tvCodigo.setText(bilhete.getCodigo());
         holder.binding.tvLugar.setText(bilhete.getLugar());
         holder.binding.tvPreco.setText(bilhete.getPreco());
         holder.binding.tvEstado.setText(bilhete.getEstado());
 
+        // Criar o QR Code
+        Bitmap qr = QRCodeUtils.generate(bilhete.getCodigo());
+        holder.binding.ivQrCode.setImageBitmap(qr);
     }
 
     @Override

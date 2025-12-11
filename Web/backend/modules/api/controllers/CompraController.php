@@ -169,8 +169,10 @@ class CompraController extends Controller
             $bilhete->estado = $bilhete::ESTADO_PENDENTE;
 
             if (!$bilhete->save()) {
-                // Eliminar compra e bilhetes anteriores
+                // Eliminar bilhetes anteriores
                 Bilhete::deleteAll(['compra_id' => $compra->id]);
+
+                // Eliminar compra
                 $compra->delete();
 
                 return [

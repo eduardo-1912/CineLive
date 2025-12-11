@@ -84,9 +84,8 @@ class Compra extends \yii\db\ActiveRecord
     {
         parent::afterSave($insert, $changedAttributes);
 
-        // Notificar quando uma nova compra é criada
         if ($insert) {
-
+            // Notificar quando uma nova compra é criada
             $sessao = $this->sessao;
             $cinema = $sessao->cinema;
             $cliente = $this->cliente;
@@ -110,7 +109,8 @@ class Compra extends \yii\db\ActiveRecord
 
             try {
                 MqttService::publish($topic, $message);
-            } catch (\Throwable $e) {
+            }
+            catch (\Throwable $e) {
                 Yii::error("MQTT Error: " . $e->getMessage());
             }
         }
@@ -129,7 +129,8 @@ class Compra extends \yii\db\ActiveRecord
 
     public function getLugares(): string
     {
-        return implode(', ', array_column($this->bilhetes, 'lugar'));
+        $bilhetes = $this->getBilhetes()->asArray()->all();
+        return implode(', ', array_column($bilhetes, 'lugar'));
     }
 
     public function getTotal(): float

@@ -114,10 +114,8 @@ class Filme extends \yii\db\ActiveRecord
     {
         parent::afterSave($insert, $changedAttributes);
 
-        // Notificar quando o filme é criado ou o estado muda para terminado
-        if ($insert || ($this->estado === self::ESTADO_TERMINADO
-            && array_key_exists('estado', $changedAttributes))) {
-
+        if ($insert || ($this->estado === self::ESTADO_TERMINADO && array_key_exists('estado', $changedAttributes))) {
+            // Notificar quando o filme é criado ou o estado muda para terminado
             $messageText = $insert
                 ? "Um novo filme foi adicionado: {$this->titulo}."
                 : "O filme '{$this->titulo}' foi marcado como terminado.";
@@ -134,7 +132,8 @@ class Filme extends \yii\db\ActiveRecord
 
             try {
                 MqttService::publish($topic, $message);
-            } catch (\Throwable $e) {
+            }
+            catch (\Throwable $e) {
                 Yii::error("MQTT Error: " . $e->getMessage());
             }
         }

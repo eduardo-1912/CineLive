@@ -72,7 +72,12 @@ public class ComprarBilhetesActivity extends AppCompatActivity {
         // Swipe refresh
         binding.swipeRefresh.setOnRefreshListener(() -> {
             binding.swipeRefresh.setRefreshing(false);
-            if (ConnectionUtils.hasInternet(this)) loadSessao();
+            if (!ConnectionUtils.hasInternet(this)) {
+                ErrorUtils.showToast(this, ErrorUtils.Type.NO_INTERNET);
+                return;
+            }
+
+            loadSessao();
         });
     }
 
@@ -122,9 +127,9 @@ public class ComprarBilhetesActivity extends AppCompatActivity {
             String[] options = {
                 getString(R.string.label_cartao),
                 getString(R.string.label_mbway),
-                getString(R.string.label_paypal)
+                getString(R.string.label_multibanco)
             };
-            String[] metodos = {"cartao", "mbway", "paypal"};
+            String[] metodos = {"cartao", "mbway", "multibanco"};
 
             // Modal de pagamento
             new MaterialAlertDialogBuilder(this).setTitle(R.string.title_escolha_pagamento)

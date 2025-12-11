@@ -64,19 +64,6 @@ public class ComprasManager {
         return !bilhetesDB.getBilhetesByCompraId(compraId).isEmpty();
     }
 
-    private void updateCache(Compra updatedCompra) {
-        for (int i = 0; i < cache.size(); i++) {
-            if (cache.get(i).getId() == updatedCompra.getId()) {
-                // Substituir a compra antiga pela atualizada
-                cache.set(i, updatedCompra);
-                return;
-            }
-        }
-
-        // Adicionar se não existir
-        cache.add(updatedCompra);
-    }
-
     // region Requests
     public void createCompra(Context context, Compra compra, StandardListener listener) {
         // Obter URL
@@ -98,7 +85,15 @@ public class ComprasManager {
         // Enviar pedido à API
         JsonObjectRequest request = new JsonObjectRequest(
             Request.Method.POST, url, body,
-            response -> listener.onSuccess(),
+            response -> {
+                // Verificar se os lugares são válidos
+                if (response.optString("status").equals("error")) {
+                    listener.onError();
+                    return;
+                }
+
+                listener.onSuccess();
+            },
             error -> listener.onError()
         );
 
@@ -244,9 +239,6 @@ public class ComprasManager {
 
                         bilhetes.add(bilhete);
                     }
-
-                    // Atualizar cache
-                    updateCache(compra);
 
                     // Guardar localmente
                     comprasDB.saveCompra(compra);

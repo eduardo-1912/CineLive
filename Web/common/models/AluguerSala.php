@@ -91,8 +91,8 @@ class AluguerSala extends \yii\db\ActiveRecord
     {
         parent::afterSave($insert, $changedAttributes);
 
-        // Notificar o cliente quando um pedido de aluguer é confirmado ou cancelado
         if (!$insert && array_key_exists('estado', $changedAttributes)) {
+            // Notificar o cliente quando um pedido de aluguer é confirmado ou cancelado
             $messageText = match(strtolower($this->estado)) {
                 self::ESTADO_CONFIRMADO => "O seu pedido de aluguer #{$this->id} foi confirmado.",
                 self::ESTADO_CANCELADO  => "O seu pedido de aluguer #{$this->id} foi cancelado.",
@@ -112,7 +112,8 @@ class AluguerSala extends \yii\db\ActiveRecord
 
             try {
                 MqttService::publish($topic, $message);
-            } catch (\Throwable $e) {
+            }
+            catch (\Throwable $e) {
                 Yii::error("MQTT Error: " . $e->getMessage());
             }
         }

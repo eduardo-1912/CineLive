@@ -31,15 +31,24 @@
 
     <Space style="@style/VerticalSpace.4" />
 
-    <!-- Código -->
     <LinearLayout style="@style/VerticalLayout"
         android:paddingVertical="16dp"
         android:background="@drawable/container_shape_medium">
 
+        <!-- Código -->
         <TextView android:id="@+id/tvCodigo"
             style="@style/Title.Bold"
             android:layout_width="match_parent"
             android:textAlignment="center" />
+
+        <Space style="@style/VerticalSpace.8" />
+
+        <!-- QR Code -->
+        <ImageView
+            android:id="@+id/ivQrCode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
     </LinearLayout>
 
 </LinearLayout>

@@ -56,4 +56,6 @@ dependencies {
     implementation(libs.glide)
     implementation (libs.volley)
 
+    implementation(libs.zxing.android.embedded)
+
 }

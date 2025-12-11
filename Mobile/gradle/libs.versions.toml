@@ -15,6 +15,7 @@ navigationFragment = "2.9.5"
 navigationUi = "2.9.5"
 swiperefreshlayout = "1.2.0"
 volley = "1.2.1"
+zxingAndroidEmbedded = "4.3.0"
 
 [libraries]
 androidx-navigation-ui = { module = "androidx.navigation:navigation-ui", version.ref = "navigationUi" }
@@ -32,6 +33,7 @@ lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-lived
 lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
 navigation-fragment = { module = "androidx.navigation:navigation-fragment", version.ref = "navigationFragment" }
 volley = { module = "com.android.volley:volley", version.ref = "volley" }
+zxing-android-embedded = { module = "com.journeyapps:zxing-android-embedded", version.ref = "zxingAndroidEmbedded" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

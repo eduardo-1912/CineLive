@@ -106,7 +106,7 @@ public class DetalhesCompraActivity extends AppCompatActivity {
         binding.tvHoraInicioSessao.setText(compra.getHoraInicioSessao());
         binding.tvHoraFimSessao.setText(compra.getHoraFimSessao());
 
-        // Configurar adapter
+        // Configurar adapter de bilhetes
         adapter = new BilhetesAdapter(bilhetes);
         binding.rvBilhetes.setAdapter(adapter);
     }

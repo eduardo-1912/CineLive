@@ -57,7 +57,7 @@
     <string name="title_escolha_pagamento">Escolha o método de pagamento</string>
     <string name="label_cartao">Cartão</string>
     <string name="label_mbway">MB WAY</string>
-    <string name="label_paypal">PayPal</string>
+    <string name="label_multibanco">Multibanco</string>
 
     <!-- Fragment Cinemas -->
     <string name="label_morada">Morada</string>

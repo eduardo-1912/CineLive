@@ -170,6 +170,12 @@ class BilheteController extends Controller
     {
         $currentUser = Yii::$app->user;
         $codigo = Yii::$app->request->post('codigo');
+
+        if (empty($codigo)) {
+            Yii::$app->session->setFlash('error', 'Por favor, insira um código de bilhete.');
+            return $this->redirect(Yii::$app->request->referrer ?: ['compra/index']);
+        }
+
         $bilhete = Bilhete::findOne(['codigo' => $codigo]);
 
         $confirmarBilhetes = $currentUser->can('confirmarBilhetes');
