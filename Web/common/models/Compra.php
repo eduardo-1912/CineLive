@@ -107,6 +107,7 @@ class Compra extends \yii\db\ActiveRecord
                 'mensagem' => $messageText,
             ]);
 
+            // Mensagem MQTT
             try {
                 MqttService::publish($topic, $message);
             }
@@ -115,7 +116,6 @@ class Compra extends \yii\db\ActiveRecord
             }
         }
     }
-
 
     public function getNome(): string
     {

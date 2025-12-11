@@ -110,11 +110,25 @@ class AluguerSala extends \yii\db\ActiveRecord
                 'hora_fim' => $this->hora_fim,
             ]);
 
+            // Mensagem MQTT
             try {
                 MqttService::publish($topic, $message);
             }
             catch (\Throwable $e) {
                 Yii::error("MQTT Error: " . $e->getMessage());
+            }
+
+            // Enviar email ao cliente
+            try {
+                Yii::$app->mailer->compose('aluguerAtualizado-html', [
+                    'aluguer' => $this, 'mensagem' => $messageText,])
+                    ->setTo($this->cliente->email)
+                    ->setFrom(['noreply@cinelive.pt' => 'CineLive'])
+                    ->setSubject("Atualização do aluguer #{$this->id}")
+                    ->send();
+            }
+            catch (\Throwable $e) {
+                Yii::error("MAIL Error: " . $e->getMessage());
             }
         }
     }
