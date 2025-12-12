@@ -2,33 +2,15 @@
 
 namespace common\tests\unit\models;
 
+use Codeception\Test\Unit;
+use common\models\User;
 use Yii;
 use common\models\LoginForm;
 use common\fixtures\UserFixture;
 
-/**
- * Login form test
- */
-class LoginFormTest extends \Codeception\Test\Unit
+class LoginFormTest extends Unit
 {
-    /**
-     * @var \common\tests\UnitTester
-     */
     protected $tester;
-
-
-    /**
-     * @return array
-     */
-    public function _fixtures()
-    {
-        return [
-            'user' => [
-                'class' => UserFixture::class,
-                'dataFile' => codecept_data_dir() . 'user.php'
-            ]
-        ];
-    }
 
     public function testLoginNoUser()
     {
@@ -56,8 +38,8 @@ class LoginFormTest extends \Codeception\Test\Unit
     public function testLoginValidate()
     {
         $model = new LoginForm([
-            'username' => 'testuser',
-            'password' => 'password_0',
+            'username' => 'cliente1',
+            'password' => '12345678',
         ]);
 
         verify($model->validate())->true();

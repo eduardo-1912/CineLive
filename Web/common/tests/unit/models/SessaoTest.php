@@ -1,29 +1,34 @@
 <?php
 
-
 namespace common\tests\unit\models;
 
+use Codeception\Test\Unit;
 use common\models\Cinema;
 use common\models\Sessao;
 use common\tests\UnitTester;
 
-class SessaoTest extends \Codeception\Test\Unit
+class SessaoTest extends Unit
 {
-
     protected UnitTester $tester;
 
-    public function testCRUD()
+    private function createSessao(array $data = []): Sessao
     {
-        // Create
-        $sessao = new Sessao([
+        $defaults = [
             'data' => '2025-05-01',
             'hora_inicio' => '14:00',
             'hora_fim' => '16:00',
             'filme_id' => 1,
             'cinema_id' => 1,
             'sala_id' => 1,
-        ]);
+        ];
 
+        return new Sessao(array_merge($data, $defaults));
+    }
+
+    public function testCRUD()
+    {
+        // Create
+        $sessao = $this->createSessao();
         $this->assertTrue($sessao->validate());
 
         // Read
@@ -34,22 +39,12 @@ class SessaoTest extends \Codeception\Test\Unit
         // Update
         $sessao->hora_inicio = '15:00';
         $sessao->hora_fim = '17:00';
-
         $this->assertEquals('15:00', $sessao->hora_inicio);
         $this->assertEquals('17:00', $sessao->hora_fim);
 
         // Delete
         unset($sessao);
-
-        $this->assertTrue(true); // apenas confirma que o objeto foi removido sem erro
-    }
-
-    private function createCinema()
-    {
-        $cinema = new Cinema();
-        $cinema->horario_abertura = '10:00';
-        $cinema->horario_fecho = '23:00';
-        return $cinema;
+        $this->assertTrue(true);
     }
 
     public function testSessaoInvalida()

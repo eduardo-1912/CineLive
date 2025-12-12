@@ -3,41 +3,75 @@
 namespace backend\tests\functional;
 
 use backend\tests\FunctionalTester;
-use common\fixtures\UserFixture;
 
 /**
  * Class LoginCest
  */
 class LoginCest
 {
-    /**
-     * Load fixtures before db transaction begin
-     * Called in _before()
-     * @see \Codeception\Module\Yii2::_before()
-     * @see \Codeception\Module\Yii2::loadFixtures()
-     * @return array
-     */
-    public function _fixtures()
-    {
-        return [
-            'user' => [
-                'class' => UserFixture::class,
-                'dataFile' => codecept_data_dir() . 'login_data.php'
-            ]
-        ];
-    }
-    
-    /**
-     * @param FunctionalTester $I
-     */
-    public function loginUser(FunctionalTester $I)
+    public function loginAsAdmin(FunctionalTester $I)
     {
         $I->amOnRoute('/site/login');
         $I->fillField('Username', 'admin');
         $I->fillField('Password', 'admin123');
         $I->click('login-button');
-        $I->dontSeeLink('Login');
-        $I->dontSeeLink('Signup');
-        $I->seeLink('Área Pública');
+        $I->see('Dashboard');
+        $I->see('CineLive (Administrador)');
+    }
+
+    public function loginAsGerente(FunctionalTester $I)
+    {
+        $I->amOnRoute('/site/login');
+        $I->fillField('Username', 'gerente_leiria');
+        $I->fillField('Password', '12345678');
+        $I->click('login-button');
+        $I->see('Dashboard');
+        $I->see('CineLive Leiria (Gerente)');
+    }
+
+    public function loginAsGerenteSemCinema(FunctionalTester $I)
+    {
+        $I->amOnRoute('/site/login');
+        $I->fillField('Username', 'gerente_porto');
+        $I->fillField('Password', '12345678');
+        $I->click('login-button');
+        $I->dontSee('Dashboard');
+    }
+
+    public function loginAsFuncionario(FunctionalTester $I)
+    {
+        $I->amOnRoute('/site/login');
+        $I->fillField('Username', 'funcionario1_leiria');
+        $I->fillField('Password', '12345678');
+        $I->click('login-button');
+        $I->see('Dashboard');
+        $I->see('CineLive Leiria (Funcionário)');
+    }
+
+    public function loginAsFuncionarioSemCinema(FunctionalTester $I)
+    {
+        $I->amOnRoute('/site/login');
+        $I->fillField('Username', 'funcionario1_porto');
+        $I->fillField('Password', '12345678');
+        $I->click('login-button');
+        $I->dontSee('Dashboard');
+    }
+
+    public function loginAsCliente(FunctionalTester $I)
+    {
+        $I->amOnRoute('/site/login');
+        $I->fillField('Username', 'cliente1');
+        $I->fillField('Password', '12345678');
+        $I->click('login-button');
+        $I->dontSee('Dashboard');
+    }
+
+    public function loginSemRole(FunctionalTester $I)
+    {
+        $I->amOnRoute('/site/login');
+        $I->fillField('Username', 'cliente2');
+        $I->fillField('Password', '12345678');
+        $I->click('login-button');
+        $I->dontSee('Dashboard');
     }
 }

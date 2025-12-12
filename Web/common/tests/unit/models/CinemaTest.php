@@ -1,20 +1,18 @@
 <?php
 
-
 namespace common\tests\unit\models;
 
+use Codeception\Test\Unit;
 use common\models\Cinema;
 use common\tests\UnitTester;
 
-class CinemaTest extends \Codeception\Test\Unit
+class CinemaTest extends Unit
 {
-
     protected UnitTester $tester;
 
-    public function testCRUD()
+    private function createCinema(array $data = []): Cinema
     {
-        // Create
-        $cinema = new Cinema([
+        $defaults = [
             'nome' => 'CineLive Leiria',
             'rua' => 'Rua Dr. Francisco Sá Carneiro Nº25',
             'codigo_postal' => '2400-149',
@@ -26,7 +24,15 @@ class CinemaTest extends \Codeception\Test\Unit
             'horario_abertura' => '10:00',
             'horario_fecho' => '23:30',
             'estado' => Cinema::ESTADO_ATIVO,
-        ]);
+        ];
+
+        return new Cinema(array_merge($defaults, $data));
+    }
+
+    public function testCRUD()
+    {
+        // Create
+        $cinema = $this->createCinema();
         $this->assertTrue($cinema->save());
 
         // Read
@@ -42,39 +48,15 @@ class CinemaTest extends \Codeception\Test\Unit
         $this->assertNull(Cinema::findOne($cinema->id));
     }
 
-    public function testCinemaValido()
-    {
-        $cinema = new Cinema([
-            'nome' => 'CineLive Leiria',
-            'rua' => 'Rua Dr. Francisco Sá Carneiro Nº25',
-            'codigo_postal' => '2400-149',
-            'cidade' => 'Leiria',
-            'latitude' => 39.743620,
-            'longitude' => -8.807049,
-            'email' => 'leiria@cinelive.pt',
-            'telefone' => '244123456',
-            'horario_abertura' => '10:00',
-            'horario_fecho' => '23:30',
-            'estado' => Cinema::ESTADO_ATIVO,
-        ]);
-
-        $this->assertTrue($cinema->validate());
-    }
-
     public function testGetMorada()
     {
-        $cinema = new Cinema([
-            'rua' => 'Rua Dr. Francisco Sá Carneiro Nº25',
-            'codigo_postal' => '2400-149',
-            'cidade' => 'Leiria',
-        ]);
-
+        $cinema = $this->createCinema();
         $this->assertEquals('Rua Dr. Francisco Sá Carneiro Nº25, 2400-149 Leiria', $cinema->morada);
     }
 
     public function testIsEstadoAtivo()
     {
-        $cinema = new Cinema(['estado' => Cinema::ESTADO_ATIVO]);
+        $cinema = $this->createCinema();
         $this->assertTrue($cinema->isEstadoAtivo());
 
         $cinema->estado = Cinema::ESTADO_ENCERRADO;
@@ -83,7 +65,7 @@ class CinemaTest extends \Codeception\Test\Unit
 
     public function testSetEstadoToEncerrado()
     {
-        $cinema = new Cinema();
+        $cinema = $this->createCinema();
         $cinema->setEstadoToEncerrado();
 
         $this->assertEquals(Cinema::ESTADO_ENCERRADO, $cinema->estado);

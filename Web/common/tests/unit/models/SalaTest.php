@@ -2,29 +2,30 @@
 
 namespace common\tests\unit\models;
 
+use Codeception\Test\Unit;
 use common\models\Sala;
 use common\models\Cinema;
+use common\models\Sessao;
 use common\tests\UnitTester;
 
-class SalaTest extends \Codeception\Test\Unit
+class SalaTest extends Unit
 {
     protected UnitTester $tester;
 
-    private function createCinemaAtivo()
+    private function createCinema(): Cinema
     {
         $cinema = new Cinema([
-
-            'nome' => 'Cinema Teste',
-            'rua' => 'Rua Teste',
+            'nome' => 'CineLive Leiria',
+            'rua' => 'Rua Dr. Francisco Sá Carneiro Nº25',
             'codigo_postal' => '2400-149',
-            'cidade' => 'Cidade Teste',
-            'latitude' => '38.7169',
-            'longitude' => '-9.1391',
-            'email' => 'contato@cinemateste.com',
-            'telefone' => '912345678',
-            'horario_abertura' => '10:00:00',
-            'horario_fecho' => '23:00:00',
-            'estado' => Sala::ESTADO_ATIVA,
+            'cidade' => 'Leiria',
+            'latitude' => 39.743620,
+            'longitude' => -8.807049,
+            'email' => 'leiria@cinelive.pt',
+            'telefone' => '244123456',
+            'horario_abertura' => '10:00',
+            'horario_fecho' => '23:30',
+            'estado' => Cinema::ESTADO_ATIVO,
         ]);
 
         $cinema->save(false);
@@ -33,7 +34,7 @@ class SalaTest extends \Codeception\Test\Unit
 
     private function createSala(array $data = []): Sala
     {
-        $cinema = $this->createCinemaAtivo();
+        $cinema = $this->createCinema();
 
         $defaults = [
             'cinema_id' => $cinema->id,
@@ -88,11 +89,7 @@ class SalaTest extends \Codeception\Test\Unit
     public function testLugaresGerados()
     {
         $sala = $this->createSala(['num_filas' => 2, 'num_colunas' => 3]);
-
-        $this->assertEquals(
-            ['A1', 'A2', 'A3', 'B1', 'B2', 'B3'],
-            $sala->lugares
-        );
+        $this->assertEquals(['A1', 'A2', 'A3', 'B1', 'B2', 'B3'], $sala->lugares);
     }
 
     public function testNomeSala()
@@ -115,10 +112,7 @@ class SalaTest extends \Codeception\Test\Unit
     {
         $sala = $this->createSala(['estado' => Sala::ESTADO_ATIVA]);
 
-        // Cria mock básico
-        $sessao = $this->make(\common\models\Sessao::class, [
-            'isEstadoAtiva' => function () { return true; }
-        ]);
+        $sessao = $this->make(Sessao::class, ['isEstadoAtiva' => true]);
 
         $sala->populateRelation('sessoes', [$sessao]);
         $sala->populateRelation('aluguerSalas', []);
