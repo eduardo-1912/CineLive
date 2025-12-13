@@ -52,7 +52,7 @@ use yii\helpers\Html;
                             }
                             ?>
 
-                            <?= Html::a($lugar['label'], $lugar['url'], ['class' => $classes]) ?>
+                            <?= Html::a($lugar['label'], $lugar['url'], ['class' => $classes, 'name' => $lugar['name']]) ?>
 
                         <?php endforeach; ?>
 

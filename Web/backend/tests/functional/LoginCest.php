@@ -4,14 +4,15 @@ namespace backend\tests\functional;
 
 use backend\tests\FunctionalTester;
 
-/**
- * Class LoginCest
- */
 class LoginCest
 {
+    public function _before(FunctionalTester $I)
+    {
+        $I->amOnRoute('site/login');
+    }
+
     public function loginAsAdmin(FunctionalTester $I)
     {
-        $I->amOnRoute('/site/login');
         $I->fillField('Username', 'admin');
         $I->fillField('Password', 'admin123');
         $I->click('login-button');
@@ -21,7 +22,6 @@ class LoginCest
 
     public function loginAsGerente(FunctionalTester $I)
     {
-        $I->amOnRoute('/site/login');
         $I->fillField('Username', 'gerente_leiria');
         $I->fillField('Password', '12345678');
         $I->click('login-button');
@@ -31,7 +31,6 @@ class LoginCest
 
     public function loginAsGerenteSemCinema(FunctionalTester $I)
     {
-        $I->amOnRoute('/site/login');
         $I->fillField('Username', 'gerente_porto');
         $I->fillField('Password', '12345678');
         $I->click('login-button');
@@ -40,7 +39,6 @@ class LoginCest
 
     public function loginAsFuncionario(FunctionalTester $I)
     {
-        $I->amOnRoute('/site/login');
         $I->fillField('Username', 'funcionario1_leiria');
         $I->fillField('Password', '12345678');
         $I->click('login-button');
@@ -50,7 +48,6 @@ class LoginCest
 
     public function loginAsFuncionarioSemCinema(FunctionalTester $I)
     {
-        $I->amOnRoute('/site/login');
         $I->fillField('Username', 'funcionario1_porto');
         $I->fillField('Password', '12345678');
         $I->click('login-button');
@@ -59,7 +56,6 @@ class LoginCest
 
     public function loginAsCliente(FunctionalTester $I)
     {
-        $I->amOnRoute('/site/login');
         $I->fillField('Username', 'cliente1');
         $I->fillField('Password', '12345678');
         $I->click('login-button');
@@ -68,7 +64,6 @@ class LoginCest
 
     public function loginSemRole(FunctionalTester $I)
     {
-        $I->amOnRoute('/site/login');
         $I->fillField('Username', 'cliente2');
         $I->fillField('Password', '12345678');
         $I->click('login-button');

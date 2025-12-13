@@ -131,6 +131,7 @@ class CompraController extends Controller
                 // URL do lugar
                 $mapaLugares[$fila][$coluna] = [
                     'label' => $coluna,
+                    'name' => $lugar,
                     'url' => Url::to([
                         'compra/create', 'sessao_id' => $sessao->id, 'lugares' => implode(',', $novaSelecao)
                     ]),

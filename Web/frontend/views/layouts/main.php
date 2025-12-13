@@ -44,7 +44,7 @@ $perfilPath = '/perfil/index';
 
         <!-- Logo -->
         <a class="d-flex align-items-center gap-1 text-black text-decoration-none" href="<?= Yii::$app->homeUrl ?>">
-            <?= file_get_contents(Yii::getAlias($iconsPath . 'logo.svg')) ?>
+            <?= @file_get_contents(Yii::getAlias($iconsPath . 'logo.svg')) ?>
             <span class="navbar-brand fw-bold me-0 fs-6 p-0">CineLive</span>
         </a>
 
@@ -87,7 +87,7 @@ $perfilPath = '/perfil/index';
                 ]) ?>
 
                 <button class="btn bg-light border-0 d-inline-flex" type="submit" style="height: 34px">
-                    <?= file_get_contents(Yii::getAlias($iconsPath . 'search.svg')) ?>
+                    <?= @file_get_contents(Yii::getAlias($iconsPath . 'search.svg')) ?>
                 </button>
             </div>
             <?php ActiveForm::end(); ?>
@@ -107,26 +107,26 @@ $perfilPath = '/perfil/index';
             <?php else: ?>
                 <div class="dropdown">
                     <button class="btn d-none d-lg-inline-flex align-items-center icon-link p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <?= file_get_contents(Yii::getAlias($iconsPath . 'user-circle.svg')) ?>
+                        <?= @file_get_contents(Yii::getAlias($iconsPath . 'user-circle.svg')) ?>
                     </button>
 
                     <ul class="fs-15 dropdown-menu dropdown-menu-end mt-2">
                         <?php $dropdownItemClasses = 'dropdown-item d-inline-flex align-items-center gap-1' ?>
                         <li>
                             <a class="<?= $dropdownItemClasses ?>" href="<?= Url::to([$perfilPath]) ?>">
-                                <?= file_get_contents(Yii::getAlias($iconsPath . 'user.svg')) ?>
+                                <?= @file_get_contents(Yii::getAlias($iconsPath . 'user.svg')) ?>
                                 Perfil
                             </a>
                         </li>
                         <li>
                             <a class="<?= $dropdownItemClasses ?>" href="<?= Url::to(['compra/index']) ?>">
-                                <?= file_get_contents(Yii::getAlias($iconsPath . 'ticket.svg')) ?>Compras
+                                <?= @file_get_contents(Yii::getAlias($iconsPath . 'ticket.svg')) ?>Compras
                             </a>
                         </li>
                         <li><hr class="dropdown-divider"></li>
                         <?= Html::beginForm(['/site/logout'], 'post', ['class' => 'p-0 m-0']) ?>
                         <?= Html::submitButton(
-                            file_get_contents(Yii::getAlias($iconsPath . 'logout.svg')) . 'Logout',
+                            @file_get_contents(Yii::getAlias($iconsPath . 'logout.svg')) . 'Logout',
                             ['class' => $dropdownItemClasses, 'encode' => false]
                         ) ?>
                         <?= Html::endForm() ?>
@@ -162,7 +162,7 @@ $perfilPath = '/perfil/index';
 
             <!-- LOGO -->
             <a class="d-flex align-items-center gap-1 text-black text-decoration-none" href="<?= Yii::$app->homeUrl ?>">
-                <?= file_get_contents(Yii::getAlias($iconsPath . 'logo.svg')) ?>
+                <?= @file_get_contents(Yii::getAlias($iconsPath . 'logo.svg')) ?>
                 <span class="navbar-brand fw-bold me-0 fs-6 p-0">CineLive</span>
             </a>
 
@@ -172,7 +172,7 @@ $perfilPath = '/perfil/index';
                     $socialMediaIcons = ['instagram', 'facebook', 'youtube'];
 
                     foreach($socialMediaIcons as $socialMediaIcon) { ?>
-                        <a href="<?= Url::to(['/']) ?>"><?= file_get_contents(Yii::getAlias($iconsPath . $socialMediaIcon . '.svg')); ?></a>
+                        <a href="<?= Url::to(['/']) ?>"><?= @file_get_contents(Yii::getAlias($iconsPath . $socialMediaIcon . '.svg')); ?></a>
                     <?php }
                 ?>
             </div>
