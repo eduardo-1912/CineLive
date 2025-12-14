@@ -32,6 +32,7 @@ public class ComprarBilhetesActivity extends AppCompatActivity {
 
     private ActivityComprarBilhetesBinding binding;
     private SessoesManager sessoesManager;
+    private ComprasManager comprasManager;
     int sessaoId;
     private final List<String> lugaresSelecionados = new ArrayList<>();
     private double precoBilhete, total;
@@ -56,6 +57,9 @@ public class ComprarBilhetesActivity extends AppCompatActivity {
 
         // Obter o sessões manager
         sessoesManager = SessoesManager.getInstance();
+
+        // Obter o compras manager
+        comprasManager = ComprasManager.getInstance();
 
         // Obter Intent
         Intent intent = getIntent();
@@ -201,10 +205,11 @@ public class ComprarBilhetesActivity extends AppCompatActivity {
     }
 
     private void createCompra(Compra compra) {
-        ComprasManager.getInstance().createCompra(this, compra, new StandardListener() {
+        comprasManager.createCompra(this, compra, new StandardListener() {
             @Override
             public void onSuccess() {
                 Toast.makeText(getApplicationContext(), R.string.msg_sucesso_criar_compra, Toast.LENGTH_SHORT).show();
+                comprasManager.clearCache();
                 setResult(RESULT_OK);
                 finish();
             }

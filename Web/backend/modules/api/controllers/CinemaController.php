@@ -10,9 +10,9 @@ use yii\web\NotFoundHttpException;
 class CinemaController extends Controller
 {
     // region CRUD
-    public function actionIndex()
+    public function actionIndex($q = null)
     {
-        $cinemas = Cinema::findAtivos();
+        $cinemas = $q ? Cinema::find()->where(['like', 'nome', $q])->all() : Cinema::findAtivos();
 
         // Ordernar por sessões ativas
         usort($cinemas, function($a, $b) {
@@ -72,29 +72,12 @@ class CinemaController extends Controller
         ], $filmes);
     }
 
-    // Procurar cinema por nome
-    public function actionPorNome($q)
-    {
-        $cinemas = Cinema::find()
-            ->where(['like', 'nome', $q])
-            ->orWhere(['like', 'email', $q])
-            ->orWhere(['like', 'cidade', $q])
-            ->all();
-
-        return array_map(fn($c) => [
-            'id' => $c->id,
-            'nome' => $c->nome,
-            'morada' => $c->morada,
-            'email' => $c->email,
-        ], $cinemas);
-    }
-
     // Contar sessões
     public function actionCountSessoes($id)
     {
         $cinema = Cinema::findOne($id);
 
-        return Sessao::find()->where(['cinema_id' => $id])->count();
+        return count($cinema->getSessoesAtivas());
     }
     // endregion
 }

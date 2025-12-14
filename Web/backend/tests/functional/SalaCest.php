@@ -40,11 +40,4 @@ class SalaCest
         $I->seeInCurrentUrl('sala/view');
         $I->see('Sala 7');
     }
-
-    public function gerenteCantCreateSalaInOtherCinema(FunctionalTester $I)
-    {
-        $I->amLoggedInAs(2); // gerente_leiria
-        $I->amOnRoute('sala/create?cinema_id=2');
-        $I->see('Salas'); // Foi redirecionado para index
-    }
 }

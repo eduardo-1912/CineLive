@@ -85,7 +85,7 @@ class Compra extends \yii\db\ActiveRecord
         parent::afterSave($insert, $changedAttributes);
 
         if ($insert) {
-            // Notificar quando uma nova compra é criada
+            // Notificar quando uma nova compra é criada por cinema
             $sessao = $this->sessao;
             $cinema = $sessao->cinema;
             $cliente = $this->cliente;
