@@ -66,6 +66,12 @@ public class ComprasManager {
 
     // region Requests
     public void createCompra(Context context, Compra compra, StandardListener listener) {
+        // Verificar se a compra tem lugares selecionados
+        if (compra.getLugaresSelecionados() == null || compra.getLugaresSelecionados().isEmpty()) {
+            listener.onError();
+            return;
+        }
+
         // Obter URL
         PreferencesManager preferences = new PreferencesManager(context);
         String url = ApiRoutes.compras(preferences.getApiUrl(), preferences.getToken());

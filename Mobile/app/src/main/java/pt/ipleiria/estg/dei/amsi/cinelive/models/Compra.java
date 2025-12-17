@@ -11,7 +11,7 @@ public class Compra {
     public Compra(int sessaoId, String pagamento, List<String> lugaresSelecionados) {
         this.sessaoId = sessaoId;
         this.pagamento = pagamento;
-        this.lugaresSelecionados = lugaresSelecionados;
+        this.lugaresSelecionados = lugaresSelecionados; // Campo temporário para criar uma compra
     }
 
     // Get
