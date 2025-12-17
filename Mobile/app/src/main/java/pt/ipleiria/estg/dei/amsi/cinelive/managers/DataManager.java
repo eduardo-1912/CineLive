@@ -220,54 +220,6 @@ public class DataManager {
 
         getRequestQueue(context).add(request);
     }
-
-    public boolean validateFormFields(Context context, LayoutUserFormBinding binding, User user, boolean requirePassword) {
-        boolean isValid = true;
-
-        // Validar username
-        if (user.getUsername().length() < MIN_LENGTH_USERNAME) {
-            binding.tilUsername.setError(context.getString(R.string.msg_min_caracteres, MIN_LENGTH_USERNAME));
-            isValid = false;
-        } else binding.tilUsername.setErrorEnabled(false);
-
-        // Validar password
-        if (requirePassword) {
-            // Obrigatória
-            if (user.getPassword().length() < MIN_LENGTH_PASSWORD) {
-                binding.tilPassword.setError(context.getString(R.string.msg_min_caracteres, MIN_LENGTH_PASSWORD));
-                isValid = false;
-            } else binding.tilPassword.setErrorEnabled(false);
-        } else {
-            // Opcional
-            if (!user.getPassword().isEmpty() && user.getPassword().length() < MIN_LENGTH_PASSWORD) {
-                binding.tilPassword.setError(context.getString(R.string.msg_min_caracteres, MIN_LENGTH_PASSWORD));
-                isValid = false;
-            } else binding.tilPassword.setErrorEnabled(false);
-        }
-
-        // Validar email
-        if (user.getEmail().isEmpty()) {
-            binding.tilEmail.setError(context.getString(R.string.msg_campo_obrigatorio));
-            isValid = false;
-        } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(user.getEmail()).matches()) {
-            binding.tilEmail.setError(context.getString(R.string.msg_email_invalido));
-            isValid = false;
-        } else binding.tilEmail.setErrorEnabled(false);
-
-        // Validar nome
-        if (user.getNome().isEmpty()) {
-            binding.tilNome.setError(context.getString(R.string.msg_campo_obrigatorio));
-            isValid = false;
-        } else binding.tilNome.setErrorEnabled(false);
-
-        // Validar telemóvel
-        if (user.getTelemovel().length() < 9) {
-            binding.tilTelemovel.setError(context.getString(R.string.msg_min_caracteres, MIN_LENGTH_TELEMOVEL));
-            isValid = false;
-        } else binding.tilTelemovel.setErrorEnabled(false);
-
-        return isValid;
-    }
     // endregion
 
     // region Filmes

@@ -17,7 +17,6 @@ public class PreferencesManager {
     private static final String CINEMA_ID = "cinemaId";
     private static final String TOKEN = "token";
 
-
     public PreferencesManager(Context context) {
         preferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE);
 

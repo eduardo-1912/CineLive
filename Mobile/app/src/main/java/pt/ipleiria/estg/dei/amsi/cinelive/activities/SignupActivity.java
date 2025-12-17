@@ -12,6 +12,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivitySignupBinding;
+import pt.ipleiria.estg.dei.amsi.cinelive.databinding.LayoutUserFormBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.UserValidationListener;
 import pt.ipleiria.estg.dei.amsi.cinelive.managers.DataManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.User;
@@ -69,7 +70,7 @@ public class SignupActivity extends AppCompatActivity {
 
             // Obter e validar dados
             User user = getUser();
-            if (!manager.validateFormFields(this, binding.form, user, true)) {
+            if (!validateFormFields(binding.form, user)) {
                 return;
             }
 
@@ -112,6 +113,46 @@ public class SignupActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), R.string.msg_erro_signup, Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    public boolean validateFormFields(LayoutUserFormBinding binding, User user) {
+        boolean isValid = true;
+
+        // Validar username
+        if (user.getUsername().length() < DataManager.MIN_LENGTH_USERNAME) {
+            binding.tilUsername.setError(this.getString(R.string.msg_min_caracteres,  DataManager.MIN_LENGTH_USERNAME));
+            isValid = false;
+        } else binding.tilUsername.setErrorEnabled(false);
+
+        // Validar password
+        if (user.getPassword().length() <  DataManager.MIN_LENGTH_PASSWORD) {
+            binding.tilPassword.setError(this.getString(R.string.msg_min_caracteres,  DataManager.MIN_LENGTH_PASSWORD));
+            isValid = false;
+        } else binding.tilPassword.setErrorEnabled(false);
+
+
+        // Validar email
+        if (user.getEmail().isEmpty()) {
+            binding.tilEmail.setError(this.getString(R.string.msg_campo_obrigatorio));
+            isValid = false;
+        } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(user.getEmail()).matches()) {
+            binding.tilEmail.setError(this.getString(R.string.msg_email_invalido));
+            isValid = false;
+        } else binding.tilEmail.setErrorEnabled(false);
+
+        // Validar nome
+        if (user.getNome().isEmpty()) {
+            binding.tilNome.setError(this.getString(R.string.msg_campo_obrigatorio));
+            isValid = false;
+        } else binding.tilNome.setErrorEnabled(false);
+
+        // Validar telemóvel
+        if (user.getTelemovel().length() < 9) {
+            binding.tilTelemovel.setError(this.getString(R.string.msg_min_caracteres,  DataManager.MIN_LENGTH_TELEMOVEL));
+            isValid = false;
+        } else binding.tilTelemovel.setErrorEnabled(false);
+
+        return isValid;
     }
 
     @Override
