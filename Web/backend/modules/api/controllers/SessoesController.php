@@ -3,15 +3,18 @@
 namespace backend\modules\api\controllers;
 
 use common\helpers\Formatter;
+use common\models\Cinema;
 use common\models\Sessao;
 use yii\rest\Controller;
 use yii\web\NotFoundHttpException;
 
 class SessoesController extends Controller
 {
-    public function actionIndex()
+    public function actionIndex($cinema_id = null)
     {
-        $sessoes = array_filter(Sessao::find()->all(), fn($sessao) => $sessao->isEstadoAtiva());
+        $sessoes = $cinema_id
+            ? Cinema::findOne($cinema_id)->getSessoesAtivas()
+            : array_filter(Sessao::find()->all(), fn($sessao) => $sessao->isEstadoAtiva());
 
         return array_map(fn($sessao) => [
             'id' => $sessao->id,

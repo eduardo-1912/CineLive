@@ -84,18 +84,6 @@ class FilmeController extends Controller
             $sessoes);
     }
 
-    // Procurar filme por título
-    public function actionPorTitulo($q)
-    {
-        $filmes = Filme::find()->where(['like', 'titulo', $q])->all();
-
-        return array_map(fn($filme) => [
-            'id' => $filme->id,
-            'titulo' => $filme->titulo,
-            'poster_url' => $filme->posterUrl,
-        ], $filmes);
-    }
-
     // Contar filmes
     public function actionCount()
     {
@@ -139,11 +127,11 @@ class FilmeController extends Controller
     }
 
     // Filmes por género
-    public function actionPorGenero($genero)
+    public function actionPorGenero($q)
     {
         $filmes = Filme::find()
             ->joinWith('generos g')
-            ->where(['like', 'g.nome', $genero])
+            ->where(['like', 'g.nome', $q])
             ->all();
 
         return array_map(fn($f) => [
@@ -154,9 +142,9 @@ class FilmeController extends Controller
     }
 
     // Filmes por idioma
-    public function actionPorIdioma($idioma)
+    public function actionPorIdioma($q)
     {
-        return Filme::find()->where(['idioma' => $idioma])->all();
+        return Filme::find()->where(['idioma' => $q])->all();
     }
     // endregion
 }

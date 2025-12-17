@@ -69,7 +69,6 @@ return [
                     'controller' => ['api/filme'],
                     'extraPatterns' => [
                         'GET {id}/sessoes' => 'sessoes',
-                        'GET por-titulo' => 'por-titulo',
                         'GET count' => 'count',
                         'GET {id}/count-sessoes' => 'count-sessoes',
                         'GET mais-vistos' => 'mais-vistos',
@@ -88,7 +87,6 @@ return [
                     'controller' => ['api/cinema'],
                     'extraPatterns' => [
                         'GET {id}/filmes' => 'filmes',
-                        'GET por-nome' => 'por-nome',
                         'GET {id}/count-sessoes' => 'count-sessoes',
                     ],
                 ],
@@ -108,7 +106,6 @@ return [
                 [
                     'class' => 'yii\rest\UrlRule',
                     'controller' => ['api/aluguer-sala'],
-                    'pluralize' => false,
                 ],
                 [
                     'class' => 'yii\rest\UrlRule',

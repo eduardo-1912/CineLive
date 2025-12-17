@@ -3,7 +3,6 @@
 namespace backend\modules\api\controllers;
 
 use common\models\Cinema;
-use common\models\Sessao;
 use yii\rest\Controller;
 use yii\web\NotFoundHttpException;
 

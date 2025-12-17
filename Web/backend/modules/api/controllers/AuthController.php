@@ -39,7 +39,7 @@ class AuthController extends Controller
         $password = $body['password'] ?? null;
 
         if (!$username || !$password) {
-            throw new BadRequestHttpException('Username e password são obrigatórios.');
+            throw new BadRequestHttpException("Username e password são obrigatórios.");
         }
 
         $user = User::findByUsername($username);

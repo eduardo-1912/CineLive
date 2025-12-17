@@ -14,7 +14,6 @@ use yii\rest\Controller;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
-use yii\web\UnauthorizedHttpException;
 
 class AluguerSalaController extends Controller
 {
