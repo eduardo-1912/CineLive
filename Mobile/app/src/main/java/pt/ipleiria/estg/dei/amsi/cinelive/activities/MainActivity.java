@@ -12,8 +12,7 @@ import androidx.navigation.ui.NavigationUI;
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityMainBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.StandardListener;
-import pt.ipleiria.estg.dei.amsi.cinelive.managers.AuthManager;
-import pt.ipleiria.estg.dei.amsi.cinelive.managers.ComprasManager;
+import pt.ipleiria.estg.dei.amsi.cinelive.managers.DataManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorUtils;
 
@@ -22,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private NavHostFragment navHostFragment;
     private NavController navController;
-    private AuthManager authManager;
+    private DataManager manager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,11 +45,11 @@ public class MainActivity extends AppCompatActivity {
         // BottomNavigation ligado ao NavController
         NavigationUI.setupWithNavController(binding.bottomNav, navController);
 
-        // Obter o auth manager
-        authManager = AuthManager.getInstance();
+        // Obter o manager
+        manager = DataManager.getInstance();
 
         // Iniciar base de dados local
-        ComprasManager.getInstance().init(getApplicationContext());
+        manager.initDB(getApplicationContext());
     }
 
     private void load() {
@@ -58,17 +57,17 @@ public class MainActivity extends AppCompatActivity {
 
         // Verificar ligação à internet
         if (!ConnectionUtils.hasInternet(this)) {
-            updateBottomNav(authManager.isLoggedIn(this));
+            updateBottomNav(manager.isLoggedIn(this));
             return;
         }
 
-        if (!authManager.isLoggedIn(this)) {
+        if (!manager.isLoggedIn(this)) {
             updateBottomNav(false);
             return;
         }
 
         // Validar o token se tiver sessão iniciada
-        if (authManager.isLoggedIn(this)) authManager.validateToken(this, new StandardListener() {
+        if (manager.isLoggedIn(this)) manager.validateToken(this, new StandardListener() {
             @Override
             public void onSuccess() {
                 updateBottomNav(true);
@@ -84,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
     private void setOnNavItemSelectedListener() {
         binding.bottomNav.setOnItemSelectedListener(item -> {
             // Configurações
-            if (item.getItemId() == R.id.navConfiguracoes && !authManager.isLoggedIn(this)) {
+            if (item.getItemId() == R.id.navConfiguracoes && !manager.isLoggedIn(this)) {
                 // Verificar ligação à internet
                 if (!ConnectionUtils.hasInternet(this)) {
                     ErrorUtils.showToast(this, ErrorUtils.Type.NO_INTERNET);
@@ -96,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             // Login
-            if (item.getItemId() == R.id.navEntrar && !authManager.isLoggedIn(this)) {
+            if (item.getItemId() == R.id.navEntrar && !manager.isLoggedIn(this)) {
                 // Verificar ligação à internet
                 if (!ConnectionUtils.hasInternet(this)) {
                     ErrorUtils.showToast(this, ErrorUtils.Type.NO_INTERNET);

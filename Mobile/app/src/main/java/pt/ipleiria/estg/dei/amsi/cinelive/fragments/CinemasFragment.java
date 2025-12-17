@@ -16,8 +16,7 @@ import java.util.List;
 
 import pt.ipleiria.estg.dei.amsi.cinelive.activities.ConfiguracoesActivity;
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.CinemasListener;
-import pt.ipleiria.estg.dei.amsi.cinelive.managers.CinemasManager;
-import pt.ipleiria.estg.dei.amsi.cinelive.managers.FilmesManager;
+import pt.ipleiria.estg.dei.amsi.cinelive.managers.DataManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.managers.PreferencesManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.adapters.CinemasAdapter;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.FragmentCinemasBinding;
@@ -27,15 +26,15 @@ import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorUtils;
 
 public class CinemasFragment extends Fragment {
     private FragmentCinemasBinding binding;
-    private CinemasManager cinemasManager;
+    private DataManager manager;
     private CinemasAdapter adapter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Obter o cinemas manager
-        cinemasManager = CinemasManager.getInstance();
+        // Obter o manager
+        manager = DataManager.getInstance();
     }
 
     @Override
@@ -57,7 +56,7 @@ public class CinemasFragment extends Fragment {
             binding.swipeRefresh.setRefreshing(false);
 
             // Apenas limpar a cache de cinemas se tiver internet
-            if (ConnectionUtils.hasInternet(requireContext())) cinemasManager.clearCache();
+            if (ConnectionUtils.hasInternet(requireContext())) manager.clearCacheCinemas();
 
             // Carregar cinemas
             loadCinemas();
@@ -71,7 +70,7 @@ public class CinemasFragment extends Fragment {
         boolean hasInternet = ConnectionUtils.hasInternet(requireContext());
 
         // Obter cinemas (API ou cache)
-        cinemasManager.getCinemas(requireContext(), new CinemasListener() {
+        manager.getCinemas(requireContext(), new CinemasListener() {
             @Override
             public void onSuccess(List<Cinema> cinemas) {
                 setList(cinemas);
@@ -82,7 +81,7 @@ public class CinemasFragment extends Fragment {
             @Override
             public void onEmpty() {
                 showError(ErrorUtils.Type.EMPTY_CINEMAS);
-                FilmesManager.getInstance().clearCache();
+                manager.clearCacheFilmes();
             }
             @Override
             public void onError() {
@@ -105,7 +104,7 @@ public class CinemasFragment extends Fragment {
             adapter.setCinemaSelecionado(cinema.getId());
 
             // Limpar cache de filmes
-            FilmesManager.getInstance().clearCache();
+            manager.clearCacheFilmes();
         });
 
         binding.rvCinemas.setAdapter(adapter);
@@ -135,7 +134,7 @@ public class CinemasFragment extends Fragment {
         super.onResume();
 
         // Carregar cinemas se não tiver cache
-        if (cinemasManager.getCache().isEmpty()) loadCinemas();
+        if (manager.getCacheCinemas().isEmpty()) loadCinemas();
     }
 
     @Override

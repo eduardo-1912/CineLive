@@ -24,9 +24,8 @@ import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityDetalhesFilmeBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.FilmeListener;
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.SessoesListener;
-import pt.ipleiria.estg.dei.amsi.cinelive.managers.FilmesManager;
+import pt.ipleiria.estg.dei.amsi.cinelive.managers.DataManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.managers.PreferencesManager;
-import pt.ipleiria.estg.dei.amsi.cinelive.managers.SessoesManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Filme;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Sessao;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
@@ -36,8 +35,7 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
 
     ActivityDetalhesFilmeBinding binding;
     PreferencesManager preferences;
-    FilmesManager filmesManager;
-    SessoesManager sessoesManager;
+    DataManager manager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,11 +55,8 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(R.string.title_detalhes_filme);
 
-        // Obter o filmes manager
-        filmesManager = FilmesManager.getInstance();
-
-        // Obter o sessões manager
-        sessoesManager = SessoesManager.getInstance();
+        // Obter o manager
+        manager = DataManager.getInstance();
 
         // Aceder às preferences
         preferences = new PreferencesManager(this);
@@ -91,7 +86,7 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
         }
 
         // Obter o filme à API
-        filmesManager.getFilme(this, getIntent().getIntExtra("filmeId", -1), new FilmeListener() {
+        manager.getFilme(this, getIntent().getIntExtra("filmeId", -1), new FilmeListener() {
             @Override
             public void onSuccess(Filme filme) {
                 setFilme(filme);
@@ -136,7 +131,7 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
         }
 
         // Obter sessões à API
-        sessoesManager.getSessoes(this, filme.getId(), new SessoesListener() {
+        manager.getSessoes(this, filme.getId(), new SessoesListener() {
             @Override
             public void onSuccess(Map<String, List<Sessao>> sessoesPorData) {
                 // Lista de datas

@@ -12,8 +12,7 @@ import androidx.core.view.WindowInsetsCompat;
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityEditarPerfilBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.UserValidationListener;
-import pt.ipleiria.estg.dei.amsi.cinelive.managers.AuthManager;
-import pt.ipleiria.estg.dei.amsi.cinelive.managers.PerfilManager;
+import pt.ipleiria.estg.dei.amsi.cinelive.managers.DataManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.User;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorUtils;
@@ -21,7 +20,7 @@ import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorUtils;
 public class EditarPerfilActivity extends AppCompatActivity {
 
     ActivityEditarPerfilBinding binding;
-    PerfilManager perfilManager;
+    DataManager manager;
     User original;
 
     @Override
@@ -43,11 +42,11 @@ public class EditarPerfilActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(R.string.btn_editar_perfil);
         binding.form.tilPassword.setHint(R.string.form_hint_password_opcional);
 
-        // Obter o perfil manager
-        perfilManager = PerfilManager.getInstance();
+        // Obter o manager
+        manager = DataManager.getInstance();
 
         // Obter dados originais
-        original = perfilManager.getCache();
+        original = manager.getCachePerfil();
 
         // Carregar perfil e configurar listeners
         setFields(original);
@@ -83,7 +82,7 @@ public class EditarPerfilActivity extends AppCompatActivity {
 
             // Obter e validar novos dados
             User edited = getEdited();
-            if (!AuthManager.getInstance().validateFields(this, binding.form, edited, false)) {
+            if (!manager.validateFormFields(this, binding.form, edited, false)) {
                 return;
             }
 
@@ -98,7 +97,7 @@ public class EditarPerfilActivity extends AppCompatActivity {
     }
 
     private void updatePerfil(User edited) {
-        perfilManager.updatePerfil(this, original, edited, new UserValidationListener() {
+        manager.updatePerfil(this, original, edited, new UserValidationListener() {
             @Override
             public void onSuccess() {
                 Toast.makeText(getApplicationContext(), R.string.msg_sucesso_editar_perfil, Toast.LENGTH_SHORT).show();

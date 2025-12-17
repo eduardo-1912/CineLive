@@ -21,22 +21,22 @@ import pt.ipleiria.estg.dei.amsi.cinelive.activities.MainActivity;
 import pt.ipleiria.estg.dei.amsi.cinelive.adapters.ComprasAdapter;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.FragmentComprasBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.ComprasListener;
-import pt.ipleiria.estg.dei.amsi.cinelive.managers.ComprasManager;
+import pt.ipleiria.estg.dei.amsi.cinelive.managers.DataManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Compra;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorUtils;
 
 public class ComprasFragment extends Fragment {
     private FragmentComprasBinding binding;
-    private ComprasManager comprasManager;
+    private DataManager manager;
     private ComprasAdapter adapter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Obter o compras manager
-        comprasManager = ComprasManager.getInstance();
+        // Obter o manager
+        manager = DataManager.getInstance();
     }
 
     @Override
@@ -58,7 +58,7 @@ public class ComprasFragment extends Fragment {
             binding.swipeRefresh.setRefreshing(false);
 
             // Apenas limpar a cache de compras se tiver internet
-            if (ConnectionUtils.hasInternet(requireContext())) comprasManager.clearCache();
+            if (ConnectionUtils.hasInternet(requireContext())) manager.clearCacheCompras();
 
             // Carregar compras
             loadCompras();
@@ -73,7 +73,7 @@ public class ComprasFragment extends Fragment {
         boolean hasInternet = ConnectionUtils.hasInternet(requireContext());
 
         // Obter compras (API ou cache)
-        comprasManager.getCompras(requireContext(), new ComprasListener() {
+        manager.getCompras(requireContext(), new ComprasListener() {
             @Override
             public void onSuccess(List<Compra> compras) {
                 setList(compras, false);

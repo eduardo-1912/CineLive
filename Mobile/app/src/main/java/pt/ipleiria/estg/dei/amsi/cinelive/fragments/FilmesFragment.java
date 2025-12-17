@@ -25,8 +25,7 @@ import pt.ipleiria.estg.dei.amsi.cinelive.activities.MainActivity;
 import pt.ipleiria.estg.dei.amsi.cinelive.adapters.FilmesAdapter;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.FragmentFilmesBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.FilmesListener;
-import pt.ipleiria.estg.dei.amsi.cinelive.managers.FilmesManager;
-import pt.ipleiria.estg.dei.amsi.cinelive.managers.FilmesManager.Filter;
+import pt.ipleiria.estg.dei.amsi.cinelive.managers.DataManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.managers.PreferencesManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Filme;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
@@ -34,10 +33,10 @@ import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorUtils;
 
 public class FilmesFragment extends Fragment {
     private FragmentFilmesBinding binding;
-    private FilmesManager filmesManager;
+    private DataManager manager;
     private FilmesAdapter adapter;
     private SearchView searchView;
-    private Filter filter = Filter.EM_EXIBICAO;
+    private DataManager.FilterFilmes filter = DataManager.FilterFilmes.EM_EXIBICAO;
     private boolean hasFilmes = false;
 
     @Override
@@ -45,8 +44,8 @@ public class FilmesFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        // Obter o filmes manager
-        filmesManager = FilmesManager.getInstance();
+        // Obter o manager
+        manager = DataManager.getInstance();
     }
 
     @Override
@@ -103,14 +102,14 @@ public class FilmesFragment extends Fragment {
             binding.swipeRefresh.setRefreshing(false);
 
             // Apenas limpar a cache de filmes se tiver internet
-            if (ConnectionUtils.hasInternet(requireContext())) filmesManager.clearCache();
+            if (ConnectionUtils.hasInternet(requireContext())) manager.clearCacheFilmes();
 
             // Carregar filmes
             loadFilmes(filter);
         });
     }
 
-    private void loadFilmes(Filter filter) {
+    private void loadFilmes(DataManager.FilterFilmes filter) {
         binding.filmesFlipper.setDisplayedChild(0); // Filmes Loading
 
         // Obter estado da ligação à internet
@@ -122,7 +121,7 @@ public class FilmesFragment extends Fragment {
         }
 
         // Obter filmes da API
-        filmesManager.getFilmes(requireContext(), filter, new FilmesListener() {
+        manager.getFilmes(requireContext(), filter, new FilmesListener() {
             @Override
             public void onSuccess(List<Filme> filmes) {
                 setList(filmes);
@@ -133,12 +132,12 @@ public class FilmesFragment extends Fragment {
             @Override
             public void onInvalidCinema() {
                 showError(ErrorUtils.Type.INVALID_CINEMA);
-                filmesManager.clearCache();
+                manager.clearCacheFilmes();
             }
             @Override
             public void onError() {
                 showError(hasInternet ? ErrorUtils.Type.API_ERROR : ErrorUtils.Type.NO_INTERNET);
-                filmesManager.clearCache();
+                manager.clearCacheFilmes();
             }
         });
     }
@@ -185,9 +184,9 @@ public class FilmesFragment extends Fragment {
             binding.btnKids.setChecked(v.getId() == R.id.btnKids);
             binding.btnBrevemente.setChecked(v.getId() == R.id.btnBrevemente);
 
-            if (v.getId() == R.id.btnEmExibicao) filter = Filter.EM_EXIBICAO;
-            else if (v.getId() == R.id.btnKids) filter = Filter.KIDS;
-            else if (v.getId() == R.id.btnBrevemente) filter = Filter.BREVEMENTE;
+            if (v.getId() == R.id.btnEmExibicao) filter = DataManager.FilterFilmes.EM_EXIBICAO;
+            else if (v.getId() == R.id.btnKids) filter = DataManager.FilterFilmes.KIDS;
+            else if (v.getId() == R.id.btnBrevemente) filter = DataManager.FilterFilmes.BREVEMENTE;
 
             // Carregar filmes
             loadFilmes(filter);
@@ -247,7 +246,7 @@ public class FilmesFragment extends Fragment {
         super.onResume();
 
         // Carregar filmes se não tiver cache
-        if (filmesManager.getCache(filter).isEmpty()) loadFilmes(filter);
+        if (manager.getCacheFilmes(filter).isEmpty()) loadFilmes(filter);
         clearSearch();
     }
 

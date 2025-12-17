@@ -14,7 +14,7 @@ import androidx.core.view.WindowInsetsCompat;
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityLoginBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.LoginListener;
-import pt.ipleiria.estg.dei.amsi.cinelive.managers.AuthManager;
+import pt.ipleiria.estg.dei.amsi.cinelive.managers.DataManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.User;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorUtils;
@@ -22,7 +22,7 @@ import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorUtils;
 public class LoginActivity extends AppCompatActivity {
 
     private ActivityLoginBinding binding;
-    private AuthManager authManager;
+    private DataManager manager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,8 +46,8 @@ public class LoginActivity extends AppCompatActivity {
         binding.form.tilNome.setVisibility(View.GONE);
         binding.form.tilTelemovel.setVisibility(View.GONE);
 
-        // Obter o auth manager
-        authManager = AuthManager.getInstance();
+        // Obter o manager
+        manager = DataManager.getInstance();
 
         // Configurar os listeners
         setOnClickListeners();
@@ -71,7 +71,7 @@ public class LoginActivity extends AppCompatActivity {
 
             // Obter e validar dados
             User user = getUser();
-            if (!validateFields(user)) return;
+            if (!validateFormFields(user)) return;
 
             // Login
             login(user);
@@ -85,7 +85,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void login(User user) {
-        authManager.login(this, user, new LoginListener() {
+        manager.login(this, user, new LoginListener() {
             @Override
             public void onSuccess() {
                 Toast.makeText(getApplicationContext(), R.string.msg_sucesso_login, Toast.LENGTH_SHORT).show();
@@ -102,7 +102,7 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private boolean validateFields(User user) {
+    private boolean validateFormFields(User user) {
         boolean isValid = true;
 
         // Validar username

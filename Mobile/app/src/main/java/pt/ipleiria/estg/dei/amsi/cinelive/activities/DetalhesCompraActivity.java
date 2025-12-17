@@ -16,7 +16,7 @@ import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.adapters.BilhetesAdapter;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityDetalhesCompraBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.CompraListener;
-import pt.ipleiria.estg.dei.amsi.cinelive.managers.ComprasManager;
+import pt.ipleiria.estg.dei.amsi.cinelive.managers.DataManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Bilhete;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Compra;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
@@ -24,7 +24,7 @@ import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
 public class DetalhesCompraActivity extends AppCompatActivity {
 
     ActivityDetalhesCompraBinding binding;
-    ComprasManager comprasManager;
+    DataManager manager;
     private BilhetesAdapter adapter;
     int compraId;
 
@@ -49,8 +49,8 @@ public class DetalhesCompraActivity extends AppCompatActivity {
         // Configurar layout da recycler-view (bilhetes)
         binding.rvBilhetes.setLayoutManager(new LinearLayoutManager(DetalhesCompraActivity.this));
 
-        // Obter o compras manager
-        comprasManager = ComprasManager.getInstance();
+        // Obter o manager
+        manager = DataManager.getInstance();
 
         // Obter ID da compra
         compraId = getIntent().getIntExtra("compraId", -1);
@@ -72,7 +72,7 @@ public class DetalhesCompraActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(R.string.title_detalhes_compra);
 
         // Obter compra
-        comprasManager.getCompra(this, compraId, useCache, new CompraListener() {
+        manager.getCompra(this, compraId, useCache, new CompraListener() {
             @Override
             public void onSuccess(Compra compra, List<Bilhete> bilhetes) {
                 setCompra(compra, bilhetes);

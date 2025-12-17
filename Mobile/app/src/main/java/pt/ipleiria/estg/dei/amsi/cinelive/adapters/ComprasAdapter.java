@@ -10,7 +10,7 @@ import java.util.List;
 
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ItemCompraBinding;
-import pt.ipleiria.estg.dei.amsi.cinelive.managers.ComprasManager;
+import pt.ipleiria.estg.dei.amsi.cinelive.managers.DataManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Compra;
 
 public class ComprasAdapter extends RecyclerView.Adapter<ComprasAdapter.ViewHolder> {
@@ -53,7 +53,7 @@ public class ComprasAdapter extends RecyclerView.Adapter<ComprasAdapter.ViewHold
         holder.binding.tvLugares.setText(compra.getLugares());
 
         // Verificar se tem bilhete se as compras forem locais
-        if (isLocal && !ComprasManager.getInstance().hasBilhetesStored(compra.getId())) {
+        if (isLocal && !DataManager.getInstance().hasBilhetesStored(compra.getId())) {
             holder.binding.btnDetalhes.setEnabled(false);
             holder.binding.btnDetalhes.setText(R.string.btn_indisponivel);
             return;

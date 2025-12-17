@@ -21,21 +21,18 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import pt.ipleiria.estg.dei.amsi.cinelive.activities.ConfiguracoesActivity;
 import pt.ipleiria.estg.dei.amsi.cinelive.activities.EditarPerfilActivity;
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
-import pt.ipleiria.estg.dei.amsi.cinelive.activities.LoginActivity;
 import pt.ipleiria.estg.dei.amsi.cinelive.activities.MainActivity;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.FragmentPerfilBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.PerfilListener;
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.StandardListener;
-import pt.ipleiria.estg.dei.amsi.cinelive.managers.AuthManager;
-import pt.ipleiria.estg.dei.amsi.cinelive.managers.PerfilManager;
+import pt.ipleiria.estg.dei.amsi.cinelive.managers.DataManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.User;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorUtils;
 
 public class PerfilFragment extends Fragment {
     private FragmentPerfilBinding binding;
-    private AuthManager authManager;
-    private PerfilManager perfilManager;
+    private DataManager manager;
 
 
     @Override
@@ -43,11 +40,8 @@ public class PerfilFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        // Obter o auth manager
-        authManager = AuthManager.getInstance();
-
-        // Obter o perfil manager
-        perfilManager = PerfilManager.getInstance();
+        // Obter o  manager
+        manager = DataManager.getInstance();
     }
 
     @Override
@@ -93,7 +87,7 @@ public class PerfilFragment extends Fragment {
         binding.mainFlipper.setDisplayedChild(0); // Main Loading
         boolean hasInternet = ConnectionUtils.hasInternet(requireContext());
 
-        perfilManager.getPerfil(requireContext(), new PerfilListener() {
+        manager.getPerfil(requireContext(), new PerfilListener() {
             @Override
             public void onSuccess(User perfil) {
                 // Tem cache mas não tem internet
@@ -125,7 +119,7 @@ public class PerfilFragment extends Fragment {
             binding.swipeRefresh.setRefreshing(false);
 
             // Apenas limpar a cache se tiver internet
-            if (ConnectionUtils.hasInternet(requireContext())) perfilManager.clearCache();
+            if (ConnectionUtils.hasInternet(requireContext())) manager.clearCachePerfil();
 
             // Carregar perfil
             loadPerfil();
@@ -145,7 +139,7 @@ public class PerfilFragment extends Fragment {
 
         // Botão logout
         binding.btnLogout.setOnClickListener(v -> {
-            authManager.logout(requireContext());
+            manager.logout(requireContext());
             resetActivity();
         });
 
@@ -167,7 +161,7 @@ public class PerfilFragment extends Fragment {
     }
 
     private void deletePerfil() {
-        perfilManager.deletePerfil(requireContext(), new StandardListener() {
+        manager.deletePerfil(requireContext(), new StandardListener() {
             @Override
             public void onSuccess() {
                 Toast.makeText(requireContext(), R.string.msg_sucesso_eliminar_conta, Toast.LENGTH_SHORT).show();
@@ -195,7 +189,7 @@ public class PerfilFragment extends Fragment {
                     loadPerfil();
                     break;
                 case INVALID_TOKEN:
-                    authManager.logout(requireContext());
+                    manager.logout(requireContext());
                     resetActivity();
                     break;
             }
@@ -226,7 +220,7 @@ public class PerfilFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (perfilManager.getCache() == null) loadPerfil();
+        if (manager.getCachePerfil() == null) loadPerfil();
     }
 
     @Override

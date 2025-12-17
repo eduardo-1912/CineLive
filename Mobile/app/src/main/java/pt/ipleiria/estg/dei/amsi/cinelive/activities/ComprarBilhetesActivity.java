@@ -21,8 +21,7 @@ import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivityComprarBilhetesBin
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ItemLugarBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.SessaoListener;
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.StandardListener;
-import pt.ipleiria.estg.dei.amsi.cinelive.managers.ComprasManager;
-import pt.ipleiria.estg.dei.amsi.cinelive.managers.SessoesManager;
+import pt.ipleiria.estg.dei.amsi.cinelive.managers.DataManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Compra;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Sessao;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
@@ -31,8 +30,7 @@ import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorUtils;
 public class ComprarBilhetesActivity extends AppCompatActivity {
 
     private ActivityComprarBilhetesBinding binding;
-    private SessoesManager sessoesManager;
-    private ComprasManager comprasManager;
+    private DataManager manager;
     int sessaoId;
     private final List<String> lugaresSelecionados = new ArrayList<>();
     private double precoBilhete, total;
@@ -55,11 +53,8 @@ public class ComprarBilhetesActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(R.string.title_comprar_bilhetes);
 
-        // Obter o sessões manager
-        sessoesManager = SessoesManager.getInstance();
-
-        // Obter o compras manager
-        comprasManager = ComprasManager.getInstance();
+        // Obter o manager
+        manager = DataManager.getInstance();
 
         // Obter Intent
         Intent intent = getIntent();
@@ -95,7 +90,7 @@ public class ComprarBilhetesActivity extends AppCompatActivity {
         }
 
         // Obter sessão da API
-        sessoesManager.getSessao(this, sessaoId, new SessaoListener() {
+        manager.getSessao(this, sessaoId, new SessaoListener() {
             @Override
             public void onSuccess(Sessao sessao) {
                 setSessao(sessao);
@@ -205,11 +200,11 @@ public class ComprarBilhetesActivity extends AppCompatActivity {
     }
 
     private void createCompra(Compra compra) {
-        comprasManager.createCompra(this, compra, new StandardListener() {
+        manager.createCompra(this, compra, new StandardListener() {
             @Override
             public void onSuccess() {
                 Toast.makeText(getApplicationContext(), R.string.msg_sucesso_criar_compra, Toast.LENGTH_SHORT).show();
-                comprasManager.clearCache();
+                manager.clearCacheCompras();
                 setResult(RESULT_OK);
                 finish();
             }

@@ -13,7 +13,7 @@ import androidx.core.view.WindowInsetsCompat;
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.ActivitySignupBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.UserValidationListener;
-import pt.ipleiria.estg.dei.amsi.cinelive.managers.AuthManager;
+import pt.ipleiria.estg.dei.amsi.cinelive.managers.DataManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.User;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorUtils;
@@ -21,7 +21,7 @@ import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorUtils;
 public class SignupActivity extends AppCompatActivity {
 
     ActivitySignupBinding binding;
-    AuthManager authManager;
+    DataManager manager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +40,8 @@ public class SignupActivity extends AppCompatActivity {
         setSupportActionBar(binding.toolbar.topAppBar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        // Obter o auth manager
-        authManager = AuthManager.getInstance();
+        // Obter o manager
+        manager = DataManager.getInstance();
 
         // Configurar os listeners
         setOnClickListeners();
@@ -69,7 +69,7 @@ public class SignupActivity extends AppCompatActivity {
 
             // Obter e validar dados
             User user = getUser();
-            if (!authManager.validateFields(this, binding.form, user, true)) {
+            if (!manager.validateFormFields(this, binding.form, user, true)) {
                 return;
             }
 
@@ -85,7 +85,7 @@ public class SignupActivity extends AppCompatActivity {
     }
 
     private void signup(User user) {
-        authManager.signup(this, user, new UserValidationListener() {
+        manager.signup(this, user, new UserValidationListener() {
             @Override
             public void onSuccess() {
                 Toast.makeText(getApplicationContext(), R.string.msg_sucesso_signup, Toast.LENGTH_SHORT).show();
