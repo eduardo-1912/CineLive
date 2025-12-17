@@ -12,7 +12,12 @@ class CinemaController extends Controller
     // region CRUD
     public function actionIndex($q = null)
     {
-        $cinemas = $q ? Cinema::find()->where(['like', 'nome', $q])->all() : Cinema::findAtivos();
+        $cinemas = $q
+            ? Cinema::find()
+            ->where(['estado' => Cinema::ESTADO_ATIVO])
+            ->andWhere(['like', 'nome', $q])
+            ->all()
+            : Cinema::findAtivos();
 
         // Ordernar por sessões ativas
         usort($cinemas, function($a, $b) {
