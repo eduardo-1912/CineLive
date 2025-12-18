@@ -134,7 +134,7 @@ class AluguerSalaController extends Controller
         }
 
         // Verificar se o estado é válido
-        if (!in_array($estado, array_keys(AluguerSala::optsEstadoBD()))) {
+        if ($estado && !in_array($estado, array_keys(AluguerSala::optsEstadoBD()))) {
             throw new BadRequestHttpException("O estado inserido não é válido.");
         }
 
