@@ -51,7 +51,7 @@ class AuthController extends Controller
         // Gerar access-token se não tiver
         if (!$user->auth_key) {
             $user->generateAuthKey();
-            $user->save(false);
+            $user->save();
         }
 
         return [

@@ -56,7 +56,7 @@ class PerfilController extends Controller
                 Yii::$app->session->setFlash('error', 'Não tem permissão para editar este perfil.');
             }
 
-            if ($model->save(false) && $model->profile->save()) {
+            if ($model->save() && $model->profile->save()) {
                 Yii::$app->session->setFlash('success', 'Dados atualizados com sucesso.');
                 return $this->redirect(['index']);
             }

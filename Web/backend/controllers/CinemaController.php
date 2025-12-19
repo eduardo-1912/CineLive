@@ -157,7 +157,7 @@ class CinemaController extends Controller
                     Yii::$app->session->setFlash('error', 'Não é possível encerrar o cinema pois existem sessões ou alugueres ativos.');
 
                     $model->estado = $estadoAntigo;
-                    $model->save(false, ['estado']);
+                    $model->save(['estado']);
 
                     return $this->redirect(['update', 'id' => $model->id]);
                 }
@@ -199,7 +199,7 @@ class CinemaController extends Controller
         // Alterar o estado
         $model->estado = $estado;
 
-        if ($model->save(false, ['estado'])) {
+        if ($model->save(['estado'])) {
             $this->atualizarStaffSalas($model);
             $msg = $model->isEstadoAtivo() ? 'Cinema ativado com sucesso.' : 'Cinema encerrado com sucesso.';
             Yii::$app->session->setFlash('success', $msg);

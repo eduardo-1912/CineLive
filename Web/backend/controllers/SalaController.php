@@ -233,7 +233,7 @@ class SalaController extends Controller
         // Alterar o estado
         $model->estado = $estado;
 
-        if ($model->save(false, ['estado'])) {
+        if ($model->save(['estado'])) {
             $msg = $model->isEstadoAtiva() ? 'Sala ativada com sucesso.' : 'Sala encerrada com sucesso.';
             Yii::$app->session->setFlash('success', $msg);
         }

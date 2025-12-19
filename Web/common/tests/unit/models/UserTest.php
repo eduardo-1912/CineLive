@@ -25,7 +25,7 @@ class UserTest extends Unit
         ]);
         $user->setPassword('12345678');
         $user->generateAuthKey();
-        $user->save(false);
+        $user->save();
 
         Yii::$app->authManager->assign(Yii::$app->authManager->getRole($role), $user->id);
 

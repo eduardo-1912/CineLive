@@ -135,7 +135,7 @@ class CompraController extends Controller
         foreach ($bilhetes as $bilhete) {
             if ($bilhete->estado === $bilhete::ESTADO_PENDENTE) {
                 $bilhete->estado = $bilhete::ESTADO_CONFIRMADO;
-                $bilhete->save(false, ['estado']);
+                $bilhete->save(['estado']);
                 $confirmados++;
             }
         }

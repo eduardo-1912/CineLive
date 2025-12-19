@@ -100,7 +100,7 @@ class FilmeController extends Controller
             if ($model->validate()) {
                 $this->guardarPoster($model);
 
-                if ($model->save(false)) {
+                if ($model->save()) {
                     $generos = Yii::$app->request->post('Filme')['generosSelecionados'] ?? [];
                     $model->guardarGeneros($generos);
 
@@ -136,7 +136,7 @@ class FilmeController extends Controller
             if ($model->validate()) {
                 $this->guardarPoster($model, $oldPoster);
 
-                if ($model->save(false)) {
+                if ($model->save()) {
                     $generos = Yii::$app->request->post('Filme')['generosSelecionados'] ?? [];
                     $model->guardarGeneros($generos);
 
@@ -191,7 +191,7 @@ class FilmeController extends Controller
 
         $estadoAntigo = $model->estado;
         $model->estado = $estado;
-        $model->save(false);
+        $model->save();
 
         if ($estadoAntigo === $model::ESTADO_EM_EXIBICAO && $estadoAntigo !== $model->estado && count($model->getSessoesAtivas()) > 0) {
             Yii::$app->session->setFlash('warning', "O estado foi alterado, as sessões agendadas continuarão visíveis.");

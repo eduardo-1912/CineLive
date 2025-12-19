@@ -129,7 +129,7 @@ class UserController extends Controller
             if ($model->save()) {
                 // Atribuir user_profile
                 $profile->user_id = $model->id;
-                $profile->save(false);
+                $profile->save();
 
                 $auth = Yii::$app->authManager;
                 $model->role = $gerirUtilizadores ? $model->role : 'funcionario';
@@ -185,7 +185,7 @@ class UserController extends Controller
             if ($model->save()) {
 
                 $profile->user_id = $model->id;
-                $profile->save(false);
+                $profile->save();
 
                 // Se o role mudou
                 if ($gerirUtilizadores && $model->role) {
@@ -252,7 +252,7 @@ class UserController extends Controller
             return $this->redirect(['index']);
         }
 
-        if ($estado == $model::STATUS_ACTIVE && $model->profile->cinema->isEstadoEncerrado()) {
+        if ($estado == $model::STATUS_ACTIVE && $model->profile->cinema && $model->profile->cinema->isEstadoEncerrado()) {
             Yii::$app->session->setFlash('error', 'Não pode ativar funcionários com cinema encerrado.');
             return $this->redirect(['index']);
         }
@@ -260,7 +260,7 @@ class UserController extends Controller
         // Atualizar estado
         $model->status = $estado;
 
-        if ($model->save(false, ['status'])) {
+        if ($model->save(['status'])) {
             Yii::$app->session->setFlash('success', "Estado do utilizador alterado com sucesso.");
         }
         else {
@@ -286,7 +286,7 @@ class UserController extends Controller
 
         // Associar o gerente ao novo cinema
         $novoCinema->gerente_id = $model->id;
-        $novoCinema->save(false);
+        $novoCinema->save();
     }
 
     protected function findModel($id)

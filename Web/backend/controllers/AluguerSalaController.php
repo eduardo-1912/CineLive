@@ -100,7 +100,7 @@ class AluguerSalaController extends Controller
         $salaOptions = ArrayHelper::map($salas, 'id', 'nome');
 
         if ($model->load(Yii::$app->request->post())) {
-            if ($model->save(false)) {
+            if ($model->save()) {
                 Yii::$app->session->setFlash('success', 'Pedido de aluguer atualizado com sucesso.');
             }
             else {

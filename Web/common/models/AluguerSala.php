@@ -159,7 +159,7 @@ class AluguerSala extends \yii\db\ActiveRecord
         // Se estava pendente e já tiver passado --> cancelar
         if ($this->isEstadoPendente() && $now > $inicio) {
             $this->estado = self::ESTADO_CANCELADO;
-            $this->save(false, ['estado']);
+            $this->save(['estado']);
         }
 
         if ($this->isEstadoConfirmado()) {

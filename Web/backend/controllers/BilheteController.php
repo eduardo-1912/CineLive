@@ -85,7 +85,7 @@ class BilheteController extends Controller
 
             $model->lugar = $novoLugar;
 
-            if ($model->save(false)) {
+            if ($model->save()) {
                 Yii::$app->session->setFlash('success', 'Lugar atualizado com sucesso.');
             }
             else {
@@ -156,7 +156,7 @@ class BilheteController extends Controller
         // Alterar o estado
         $model->estado = $estado;
 
-        if ($model->save(false, ['estado', 'lugar'])) {
+        if ($model->save(['estado', 'lugar'])) {
             Yii::$app->session->setFlash('success', 'Estado do bilhete atualizado com sucesso.');
         }
         else {
@@ -210,13 +210,13 @@ class BilheteController extends Controller
         if ($confirmarTodos && $bilhete->compra_id) {
             foreach ($bilhete->compra->bilhetes as $bilhete) {
                 $bilhete->estado = $bilhete::ESTADO_CONFIRMADO;
-                $bilhete->save(false, ['estado']);
+                $bilhete->save(['estado']);
             }
         }
 
         // Apenas confirmar o bilhete inserido
         $bilhete->estado = $bilhete::ESTADO_CONFIRMADO;
-        $bilhete->save(false, ['estado']);
+        $bilhete->save(['estado']);
 
         Yii::$app->session->setFlash('success', "Bilhete(s) confirmado(s) com sucesso!");
         return $this->redirect(Yii::$app->request->referrer ?: ['compra/index']);

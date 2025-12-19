@@ -2,7 +2,6 @@
 
 namespace console\controllers;
 
-use common\models\User;
 use console\rbac\ClienteRule;
 use console\rbac\MatchCinemaRule;
 use console\rbac\OwnPerfilRule;
@@ -166,7 +165,6 @@ class RbacController extends Controller
         $auth->addChild($admin, $confirmarBilhetes);
         $auth->addChild($admin, $gerirAlugueres);
         $auth->addChild($admin, $verEstatisticas);
-
 
         echo "RBAC inicializado com sucesso!\n";
     }

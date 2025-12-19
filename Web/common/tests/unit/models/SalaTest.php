@@ -28,7 +28,7 @@ class SalaTest extends Unit
             'estado' => Cinema::ESTADO_ATIVO,
         ]);
 
-        $cinema->save(false);
+        $cinema->save();
         return $cinema;
     }
 

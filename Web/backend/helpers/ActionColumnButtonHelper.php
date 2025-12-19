@@ -17,7 +17,7 @@ class ActionColumnButtonHelper
         $items = '';
         foreach (User::optsStatus() as $estado => $label) {
 
-            if ($estado === $model->status || ($estado == $model::STATUS_ACTIVE && $model->cinema->isEstadoEncerrado())) {
+            if ($estado === $model->status || ($estado == $model::STATUS_ACTIVE && $model->cinema && $model->cinema->isEstadoEncerrado())) {
                 continue;
             }
 
