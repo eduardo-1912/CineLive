@@ -18,8 +18,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import pt.ipleiria.estg.dei.amsi.cinelive.R;
-import pt.ipleiria.estg.dei.amsi.cinelive.databinding.LayoutUserFormBinding;
 import pt.ipleiria.estg.dei.amsi.cinelive.helpers.BilheteDBHelper;
 import pt.ipleiria.estg.dei.amsi.cinelive.helpers.CompraDBHelper;
 import pt.ipleiria.estg.dei.amsi.cinelive.listeners.BilhetesListener;
@@ -52,7 +50,7 @@ public class DataManager {
         return instance;
     }
 
-    private static RequestQueue getRequestQueue(Context context) {
+    public RequestQueue getRequestQueue(Context context) {
         if (queue == null) queue = Volley.newRequestQueue(context.getApplicationContext());
         return queue;
     }
@@ -454,7 +452,7 @@ public class DataManager {
         String url = ApiRoutes.cinemas(new PreferencesManager(context).getApiUrl());
 
         JsonArrayRequest request = new JsonArrayRequest(
-                Request.Method.GET, url, null, response -> {
+            Request.Method.GET, url, null, response -> {
             // Limpar cacheCinemas
             cacheCinemas.clear();
 
@@ -470,20 +468,20 @@ public class DataManager {
                 if (obj == null) continue;
 
                 cacheCinemas.add(new Cinema(
-                        obj.optInt("id"),
-                        obj.optString("nome"),
-                        obj.optString("morada"),
-                        obj.optString("telefone"),
-                        obj.optString("email"),
-                        obj.optString("horario"),
-                        obj.optString("capacidade"),
-                        obj.optBoolean("has_sessoes")
+                    obj.optInt("id"),
+                    obj.optString("nome"),
+                    obj.optString("morada"),
+                    obj.optString("telefone"),
+                    obj.optString("email"),
+                    obj.optString("horario"),
+                    obj.optString("capacidade"),
+                    obj.optBoolean("has_sessoes")
                 ));
             }
 
             listener.onSuccess(cacheCinemas);
         },
-            error -> listener.onError()
+        error -> listener.onError()
         );
 
         getRequestQueue(context).add(request);
