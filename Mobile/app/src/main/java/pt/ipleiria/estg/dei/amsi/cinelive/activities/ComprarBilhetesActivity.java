@@ -56,6 +56,12 @@ public class ComprarBilhetesActivity extends AppCompatActivity {
         // Obter o manager
         manager = DataManager.getInstance();
 
+        // Verificar se tem sessão iniciada
+        if (!manager.isLoggedIn(this)) {
+            ErrorUtils.showToast(this, ErrorUtils.Type.INVALID_LOGIN);
+            finish();
+        }
+
         // Obter Intent
         Intent intent = getIntent();
         sessaoId = intent.getIntExtra("sessaoId", -1);

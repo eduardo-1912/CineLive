@@ -51,6 +51,7 @@
     <string name="label_total">Total</string>
     <string name="btn_selecione_lugares">Selecione lugares</string>
     <string name="btn_pagar">Proceder ao pagamento</string>
+    <string name="msg_erro_sessao">Não tem sessão iniciada</string>
     <string name="msg_erro_carregar_sessao">Erro ao carregar a sessão</string>
     <string name="msg_sucesso_criar_compra">Compra criada com sucesso</string>
     <string name="msg_erro_criar_compra">Erro ao criar a compra</string>

@@ -91,7 +91,7 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
             public void onSuccess(Filme filme) {
                 setFilme(filme);
 
-                // Carregar sessões se estiver em exibição
+                // Carregar sessões se filme estiver em exibição
                 if (filme.hasSessoes()) loadSessoes(filme);
                 else binding.mainFlipper.setDisplayedChild(1); // Main Content
             }
@@ -172,7 +172,7 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
                 binding.lvHoras.setAdapter(new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1, horas));
 
                 // Se clicou numa hora --> ir para a sessão da hora
-                setOnHoraSelectedListener(filme, sessoes);
+               setOnHoraSelectedListener(filme, sessoes);
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
@@ -185,6 +185,11 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
             if (!ConnectionUtils.hasInternet(getApplicationContext())) {
                 ErrorUtils.showToast(getApplicationContext(), ErrorUtils.Type.NO_INTERNET);
                 return;
+            }
+
+            // Verificar se tem sessão iniciada
+            if (!manager.isLoggedIn(this)) {
+                ErrorUtils.showToast(this, ErrorUtils.Type.INVALID_LOGIN);
             }
 
             // Obter a sessão correspondente

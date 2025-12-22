@@ -8,7 +8,7 @@ import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.LayoutErrorBinding;
 
 public class ErrorUtils {
-    public enum Type {NO_INTERNET, API_ERROR, NO_FILME_FOUND, INVALID_CINEMA, EMPTY_CINEMAS, EMPTY_COMPRAS, INVALID_TOKEN}
+    public enum Type {NO_INTERNET, API_ERROR, NO_FILME_FOUND, INVALID_CINEMA, EMPTY_CINEMAS, EMPTY_COMPRAS, INVALID_TOKEN, INVALID_LOGIN}
 
     public static void showToast(Context context, Type type) {
         int stringRes;
@@ -19,6 +19,9 @@ public class ErrorUtils {
                 break;
             case API_ERROR:
                 stringRes = R.string.title_erro_api;
+                break;
+            case INVALID_LOGIN:
+                stringRes = R.string.msg_erro_sessao;
                 break;
             default:
                 stringRes = R.string.title_erro_generico;
