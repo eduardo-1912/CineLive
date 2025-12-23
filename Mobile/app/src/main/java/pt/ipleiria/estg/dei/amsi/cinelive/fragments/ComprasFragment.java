@@ -17,6 +17,7 @@ import java.util.List;
 import pt.ipleiria.estg.dei.amsi.cinelive.R;
 import pt.ipleiria.estg.dei.amsi.cinelive.activities.ConfiguracoesActivity;
 import pt.ipleiria.estg.dei.amsi.cinelive.activities.DetalhesCompraActivity;
+import pt.ipleiria.estg.dei.amsi.cinelive.activities.LoginActivity;
 import pt.ipleiria.estg.dei.amsi.cinelive.activities.MainActivity;
 import pt.ipleiria.estg.dei.amsi.cinelive.adapters.ComprasAdapter;
 import pt.ipleiria.estg.dei.amsi.cinelive.databinding.FragmentComprasBinding;
@@ -47,6 +48,13 @@ public class ComprasFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        // Verificar se tem sessão iniciada
+        if (!manager.isLoggedIn(getContext())) {
+            manager.clearCacheCompras();
+            ((MainActivity)requireActivity()).navigateToFragment(R.id.navFilmes);
+            return;
+        }
+
         // Configurar layout da recycler-view
         binding.rvCompras.setLayoutManager(new LinearLayoutManager(getContext()));
 

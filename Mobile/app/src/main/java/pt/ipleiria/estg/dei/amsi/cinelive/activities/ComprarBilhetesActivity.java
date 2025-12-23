@@ -40,6 +40,15 @@ public class ComprarBilhetesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
 
+        // Obter o manager
+        manager = DataManager.getInstance();
+
+        // Verificar se tem sessão iniciada
+        if (!manager.isLoggedIn(this)) {
+            ErrorUtils.showToast(this, ErrorUtils.Type.INVALID_LOGIN);
+            finish();
+        }
+
         binding = ActivityComprarBilhetesBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -52,15 +61,6 @@ public class ComprarBilhetesActivity extends AppCompatActivity {
         setSupportActionBar(binding.toolbar.topAppBar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(R.string.title_comprar_bilhetes);
-
-        // Obter o manager
-        manager = DataManager.getInstance();
-
-        // Verificar se tem sessão iniciada
-        if (!manager.isLoggedIn(this)) {
-            ErrorUtils.showToast(this, ErrorUtils.Type.INVALID_LOGIN);
-            finish();
-        }
 
         // Obter Intent
         Intent intent = getIntent();

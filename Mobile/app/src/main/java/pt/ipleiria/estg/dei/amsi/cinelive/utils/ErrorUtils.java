@@ -48,7 +48,7 @@ public class ErrorUtils {
             case NO_FILME_FOUND:
                 binding.tvTitulo.setText(R.string.title_erro_nenhum_filme);
                 binding.tvSubtitulo.setText(R.string.subtitle_erro_nenhum_filme);
-                binding.btnAction.setVisibility(View.INVISIBLE);
+                binding.btnAction.setText(R.string.btn_limpar);
                 break;
             case INVALID_CINEMA:
                 binding.ivIcon.setImageResource(R.drawable.ic_cinemas);

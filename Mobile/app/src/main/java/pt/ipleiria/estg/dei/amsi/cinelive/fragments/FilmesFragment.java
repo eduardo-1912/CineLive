@@ -224,8 +224,11 @@ public class FilmesFragment extends Fragment {
     }
 
     private void showErrorFilmes(ErrorUtils.Type type) {
-        binding.filmesFlipper.setDisplayedChild(1);
-        ErrorUtils.showLayout(binding.errorFilmes, type);
+        binding.filmesFlipper.setDisplayedChild(1); // Error
+        ErrorUtils.showLayout(binding.filmesError, type);
+
+        // Limpar pesquisa
+        binding.filmesError.btnAction.setOnClickListener(v-> clearSearch());
     }
 
     private void showItemPesquisa(boolean show) {

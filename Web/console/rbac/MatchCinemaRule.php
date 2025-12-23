@@ -39,7 +39,7 @@ class MatchCinemaRule extends Rule
             return $model->sala->cinema_id == $userCinemaId;
         }
 
-        // Bilhete
+        // Compra
         if (isset($model->compra->sessao->cinema_id)) {
             return $model->compra->sessao->cinema_id == $userCinemaId;
         }

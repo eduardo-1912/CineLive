@@ -49,13 +49,7 @@ class ContactForm extends Model
      */
     public function sendEmail($email)
     {
-
-            $mailer = Yii::$app->mailer;
-
-            // DEBUG ABSOLUTO
-            Yii::error($mailer->viewPath, 'MAILER_VIEW_PATH');
-
-            return $mailer
+        return Yii::$app->mailer
             ->compose('@common/mail/contactForm-html', ['model' => $this,])
             ->setTo($email)
             ->setFrom([Yii::$app->params['senderEmail'] => Yii::$app->params['senderName']])

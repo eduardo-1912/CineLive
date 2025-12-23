@@ -189,7 +189,8 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
 
             // Verificar se tem sessão iniciada
             if (!manager.isLoggedIn(this)) {
-                ErrorUtils.showToast(this, ErrorUtils.Type.INVALID_LOGIN);
+                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                return;
             }
 
             // Obter a sessão correspondente

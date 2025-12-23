@@ -59,7 +59,7 @@
                             android:layout_marginVertical="200dp" />
 
                         <!-- Filmes Error -->
-                        <include android:id="@+id/errorFilmes" layout="@layout/layout_error" />
+                        <include android:id="@+id/filmesError" layout="@layout/layout_error" />
 
                         <!-- Filmes Content -->
                         <androidx.recyclerview.widget.RecyclerView

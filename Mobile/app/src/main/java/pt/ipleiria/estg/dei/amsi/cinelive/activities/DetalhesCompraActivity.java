@@ -20,6 +20,7 @@ import pt.ipleiria.estg.dei.amsi.cinelive.managers.DataManager;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Bilhete;
 import pt.ipleiria.estg.dei.amsi.cinelive.models.Compra;
 import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
+import pt.ipleiria.estg.dei.amsi.cinelive.utils.ErrorUtils;
 
 public class DetalhesCompraActivity extends AppCompatActivity {
 
@@ -32,6 +33,15 @@ public class DetalhesCompraActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
+
+        // Obter o manager
+        manager = DataManager.getInstance();
+
+        // Verificar se tem sessão iniciada
+        if (!manager.isLoggedIn(this)) {
+            ErrorUtils.showToast(this, ErrorUtils.Type.INVALID_LOGIN);
+            finish();
+        }
 
         binding = ActivityDetalhesCompraBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -46,11 +56,9 @@ public class DetalhesCompraActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(R.string.title_detalhes_compra);
 
+
         // Configurar layout da recycler-view (bilhetes)
         binding.rvBilhetes.setLayoutManager(new LinearLayoutManager(DetalhesCompraActivity.this));
-
-        // Obter o manager
-        manager = DataManager.getInstance();
 
         // Obter ID da compra
         compraId = getIntent().getIntExtra("compraId", -1);
