@@ -1,6 +1,5 @@
 <?php
 return [
-    'adminEmail' => 'admin@cinelive.pt',
     'supportEmail' => 'suporte@cinelive.pt',
     'senderEmail' => 'noreply@cinelive.pt',
     'senderName' => 'CineLive',

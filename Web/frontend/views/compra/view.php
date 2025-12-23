@@ -73,29 +73,40 @@ $this->title = $model->nome;
         <div class="box-white rounded-4 shadow-sm p-4">
             <h5 class="page-title mb-3"><?= $model->getAttributeLabel('bilhetes') ?></h5>
 
-            <div class="table-responsive">
-                <table class="table bg-white table-striped align-middle">
-                    <thead>
-                    <tr>
-                        <th class="text-start"><?= $model->getAttributeLabel('bilhetes.codigo') ?></th>
-                        <th class="text-start"><?= $model->getAttributeLabel('bilhetes.lugar') ?></th>
-                        <th class="text-start"><?= $model->getAttributeLabel('bilhetes.preco') ?></th>
-                        <th class="text-start"><?= $model->getAttributeLabel('bilhetes.estado') ?></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <?php foreach ($model->bilhetes as $bilhete): ?>
-                        <tr>
-                            <td><?= $bilhete->codigo ?></td>
-                            <td><?= $bilhete->lugar ?></td>
-                            <td><?= Formatter::preco($bilhete->preco) ?></td>
-                            <td><?= $bilhete->estadoHtml ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                    </tbody>
-                </table>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 gy-4">
+
+                <?php foreach ($model->bilhetes as $bilhete): ?>
+                <div>
+                    <div class="box-white bg-light rounded-4 d-flex justify-content-between mb-2">
+                        <div class="d-flex flex-column text-start">
+                            <span class="fw-medium fs-14 fw-semibold"><?= $model->getAttributeLabel('bilhetes.lugar') ?></span>
+                            <span class="text-muted"><?= $bilhete->lugar ?></span>
+                        </div>
+
+                        <div class="d-flex flex-column text-center">
+                            <span class="fw-medium fs-14 fw-semibold"><?= $model->getAttributeLabel('bilhetes.estado') ?></span>
+                            <span class="text-muted"><?= $bilhete->estadoHtml ?></span>
+                        </div>
+
+                        <div class="d-flex flex-column text-end">
+                            <span class="fw-medium fs-14 fw-semibold"><?= $model->getAttributeLabel('bilhetes.preco') ?></span>
+                            <span class="text-muted"><?= Formatter::preco($bilhete->preco) ?></span>
+                        </div>
+                    </div>
+
+                    <div class="box-gray d-flex flex-column align-items-center rounded-4">
+                        <h3><?= $bilhete->codigo ?></h3>
+                        <?= Html::img(
+                            'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=' . urlencode($bilhete->codigo),
+                            ['alt' => 'QR Code do bilhete', 'class' => 'img-fluid bg-white p-3 rounded-3']
+                        ) ?>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+
             </div>
 
         </div>
+
     </div>
 </div>
