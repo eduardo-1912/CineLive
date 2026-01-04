@@ -44,6 +44,13 @@ php init
 ```
 {localhost}/CineLive/Web/frontend/web
 ```
+
+**Nota Importante:** 
+É recomendado copiar diretamente a pasta `CineLive/Web/` para o localhost, pois o upload de imagens de filmes utiliza o caminho aqui mencionado por default.
+
+Caso o projeto seja instalado noutro diretório, este caminho deverá ser ajustado em `common/config/params.php`, nomeadamente no parâmetro *posterUrl*, caso contrário as imagens dos filmes não serão carregadas corretamente.
+
+
 **MOBILE**
 1. Fazer download do repositório Git `CineLive` e extrair a pasta zipada.
 2. Abrir a pasta `Mobile` no Android Studio.
