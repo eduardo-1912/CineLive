@@ -45,6 +45,8 @@ public class DataManager {
     private static DataManager instance = null;
     private static RequestQueue queue;
 
+    private DataManager() {}
+
     public static synchronized DataManager getInstance() {
         if (instance == null) instance = new DataManager();
         return instance;
