@@ -42,7 +42,7 @@ public class SignupActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // Obter o manager
-        manager = DataManager.getInstance();
+        manager = DataManager.getInstance(getApplicationContext());
 
         // Configurar os listeners
         setOnClickListeners();

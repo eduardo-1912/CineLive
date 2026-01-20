@@ -40,8 +40,8 @@ public class PerfilFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        // Obter o  manager
-        manager = DataManager.getInstance();
+        // Obter o manager
+        manager = DataManager.getInstance(getContext());
     }
 
     @Override

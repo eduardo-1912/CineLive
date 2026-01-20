@@ -43,23 +43,27 @@ import pt.ipleiria.estg.dei.amsi.cinelive.utils.ConnectionUtils;
 
 public class DataManager {
     private static DataManager instance = null;
-    private static RequestQueue queue;
 
-    private DataManager() {}
+    private RequestQueue queue;
+    private CompraDBHelper comprasDB;
+    private BilheteDBHelper bilhetesDB;
 
-    public static synchronized DataManager getInstance() {
-        if (instance == null) instance = new DataManager();
+    private DataManager(Context context) {
+        // Queue
+        queue = Volley.newRequestQueue(context.getApplicationContext());
+
+        // DB
+        comprasDB = new CompraDBHelper(context.getApplicationContext());
+        bilhetesDB = new BilheteDBHelper(context.getApplicationContext());
+    }
+
+    public static synchronized DataManager getInstance(Context context) {
+        if (instance == null) instance = new DataManager(context);
         return instance;
     }
 
-    public RequestQueue getRequestQueue(Context context) {
-        if (queue == null) queue = Volley.newRequestQueue(context.getApplicationContext());
+    public RequestQueue getRequestQueue() {
         return queue;
-    }
-
-    public void initDB(Context context) {
-        if (comprasDB == null) comprasDB = new CompraDBHelper(context);
-        if (bilhetesDB == null) bilhetesDB = new BilheteDBHelper(context);
     }
 
     // region Auth
@@ -86,7 +90,7 @@ public class DataManager {
         comprasDB.delete();
 
         // Cancelar requests
-        RequestQueue queue = getRequestQueue(context);
+        RequestQueue queue = getRequestQueue();
         queue.cancelAll(request -> true);
     }
 
@@ -135,7 +139,7 @@ public class DataManager {
                 }
         );
 
-        getRequestQueue(context).add(request);
+        getRequestQueue().add(request);
     }
 
     public void signup(Context context, User user, UserValidationListener listener) {
@@ -187,7 +191,7 @@ public class DataManager {
                 error -> listener.onError()
         );
 
-        getRequestQueue(context).add(request);
+        getRequestQueue().add(request);
     }
 
     public void validateToken(Context context, StandardListener listener) {
@@ -218,7 +222,7 @@ public class DataManager {
             listener.onError();
         });
 
-        getRequestQueue(context).add(request);
+        getRequestQueue().add(request);
     }
     // endregion
 
@@ -301,7 +305,7 @@ public class DataManager {
                 }
         );
 
-        getRequestQueue(context).add(request);
+        getRequestQueue().add(request);
     }
 
     public void getFilme(Context context, int id, FilmeListener listener) {
@@ -335,7 +339,7 @@ public class DataManager {
                 error -> listener.onError()
         );
 
-        getRequestQueue(context).add(request);
+        getRequestQueue().add(request);
     }
     // endregion
 
@@ -378,7 +382,7 @@ public class DataManager {
                 error -> listener.onError()
         );
 
-        getRequestQueue(context).add(request);
+        getRequestQueue().add(request);
     }
 
     public void getSessao(Context context, int id, SessaoListener listener) {
@@ -428,7 +432,7 @@ public class DataManager {
                 error -> listener.onError()
         );
 
-        getRequestQueue(context).add(request);
+        getRequestQueue().add(request);
     }
     // endregion
 
@@ -486,14 +490,12 @@ public class DataManager {
         error -> listener.onError()
         );
 
-        getRequestQueue(context).add(request);
+        getRequestQueue().add(request);
     }
     // endregion
 
     // region Compras
     private List<Compra> cacheCompras = new ArrayList<>();
-    private CompraDBHelper comprasDB;
-    private BilheteDBHelper bilhetesDB;
 
     public List<Compra> getCacheCompras() {
         return cacheCompras;
@@ -550,7 +552,7 @@ public class DataManager {
             error -> listener.onError()
         );
 
-        getRequestQueue(context).add(request);
+        getRequestQueue().add(request);
     }
 
     public void getCompras(Context context, ComprasListener listener) {
@@ -612,7 +614,7 @@ public class DataManager {
         error -> listener.onError()
         );
 
-        getRequestQueue(context).add(request);
+        getRequestQueue().add(request);
     }
 
     public void getCompra(Context context, int compraId, boolean useCache, CompraListener listener) {
@@ -709,7 +711,7 @@ public class DataManager {
         error -> listener.onError()
         );
 
-        getRequestQueue(context).add(request);
+        getRequestQueue().add(request);
     }
 
     public void getBilhetesByCompraId(Context context, int compraId, BilhetesListener listener) {
@@ -745,7 +747,7 @@ public class DataManager {
         error -> listener.onError()
         );
 
-        getRequestQueue(context).add(request);
+        getRequestQueue().add(request);
     }
     // endregion
 
@@ -791,7 +793,7 @@ public class DataManager {
         error -> listener.onError()
         );
 
-        getRequestQueue(context).add(request);
+        getRequestQueue().add(request);
     }
 
     public void updatePerfil(Context context, User original, User edited, UserValidationListener listener) {
@@ -825,7 +827,7 @@ public class DataManager {
         error -> listener.onError()
         );
 
-        getRequestQueue(context).add(request);
+        getRequestQueue().add(request);
     }
 
     public void deletePerfil(Context context, StandardListener listener) {
@@ -851,7 +853,7 @@ public class DataManager {
             listener.onError();
         });
 
-        getRequestQueue(context).add(request);
+        getRequestQueue().add(request);
     }
 
     private Map<String, String> getFormEditedFields(User original, User edited) {

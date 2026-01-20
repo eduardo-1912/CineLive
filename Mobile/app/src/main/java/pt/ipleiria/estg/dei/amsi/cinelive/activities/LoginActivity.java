@@ -47,7 +47,7 @@ public class LoginActivity extends AppCompatActivity {
         binding.form.tilTelemovel.setVisibility(View.GONE);
 
         // Obter o manager
-        manager = DataManager.getInstance();
+        manager = DataManager.getInstance(getApplicationContext());
 
         // Configurar os listeners
         setOnClickListeners();

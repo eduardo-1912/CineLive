@@ -45,7 +45,7 @@ public class EditarPerfilActivity extends AppCompatActivity {
         binding.form.tilPassword.setHint(R.string.form_hint_password_opcional);
 
         // Obter o manager
-        manager = DataManager.getInstance();
+        manager = DataManager.getInstance(getApplicationContext());
 
         // Obter dados originais
         original = manager.getCachePerfil();

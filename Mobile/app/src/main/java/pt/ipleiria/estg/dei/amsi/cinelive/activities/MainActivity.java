@@ -46,10 +46,7 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(binding.bottomNav, navController);
 
         // Obter o manager
-        manager = DataManager.getInstance();
-
-        // Iniciar base de dados local
-        manager.initDB(getApplicationContext());
+        manager = DataManager.getInstance(getApplicationContext());
     }
 
     private void load() {

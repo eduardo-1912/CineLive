@@ -34,7 +34,7 @@ public class CinemasFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         // Obter o manager
-        manager = DataManager.getInstance();
+        manager = DataManager.getInstance(getContext());
     }
 
     @Override

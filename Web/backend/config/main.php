@@ -66,6 +66,14 @@ return [
                 ],
                 [
                     'class' => 'yii\rest\UrlRule',
+                    'controller' => ['api/matematica'],
+                    'extraPatterns' => [
+                        'GET /raizdois' => 'raizdois',
+                    ],
+                    'pluralize' => false,
+                ],
+                [
+                    'class' => 'yii\rest\UrlRule',
                     'controller' => ['api/filme'],
                     'extraPatterns' => [
                         'GET {id}/sessoes' => 'sessoes',

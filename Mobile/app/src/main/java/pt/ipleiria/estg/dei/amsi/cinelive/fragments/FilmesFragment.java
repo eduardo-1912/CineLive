@@ -45,7 +45,7 @@ public class FilmesFragment extends Fragment {
         setHasOptionsMenu(true);
 
         // Obter o manager
-        manager = DataManager.getInstance();
+        manager = DataManager.getInstance(getContext());
     }
 
     @Override

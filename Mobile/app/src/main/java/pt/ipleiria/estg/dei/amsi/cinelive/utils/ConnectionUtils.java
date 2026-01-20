@@ -25,11 +25,11 @@ public class ConnectionUtils {
             timeout, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
         ));
 
-        DataManager.getInstance().getRequestQueue(context).add(request);
+        DataManager.getInstance(context).getRequestQueue().add(request);
     }
 
     public static boolean hasInternet(Context context) {
-        ConnectivityManager cm =(ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager cm = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
 
         return netInfo != null && netInfo.isConnected();

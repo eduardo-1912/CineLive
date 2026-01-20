@@ -56,7 +56,7 @@ public class DetalhesFilmeActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(R.string.title_detalhes_filme);
 
         // Obter o manager
-        manager = DataManager.getInstance();
+        manager = DataManager.getInstance(getApplicationContext());
 
         // Aceder às preferences
         preferences = new PreferencesManager(this);

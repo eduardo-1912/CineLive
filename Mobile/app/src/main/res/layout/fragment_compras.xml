@@ -2,27 +2,33 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/VerticalLayout.Full"
+    android:orientation="vertical"
     tools:context=".fragments.ComprasFragment">
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swipeRefresh" style="@style/VerticalLayout.Full">
+        android:id="@+id/swipeRefresh"
+        style="@style/VerticalLayout.Full">
 
-        <ViewFlipper android:id="@+id/mainFlipper" style="@style/VerticalLayout.Full">
+        <ViewFlipper
+            android:id="@+id/mainFlipper"
+            style="@style/VerticalLayout.Full">
 
             <!-- Main Loading -->
             <include layout="@layout/layout_loading" />
 
             <!-- Main Error -->
-            <include android:id="@+id/mainError" layout="@layout/layout_error" />
+            <include
+                android:id="@+id/mainError"
+                layout="@layout/layout_error" />
 
             <!-- Main Content -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvCompras"
-                tools:listitem="@layout/item_compra"
                 style="@style/Container.ForList"
+                android:clipToPadding="false"
                 android:scrollbarStyle="outsideOverlay"
                 android:scrollbars="vertical"
-                android:clipToPadding="false" />
+                tools:listitem="@layout/item_compra" />
 
         </ViewFlipper>
 

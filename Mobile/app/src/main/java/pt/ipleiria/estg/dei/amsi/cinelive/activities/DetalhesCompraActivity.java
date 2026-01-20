@@ -35,7 +35,7 @@ public class DetalhesCompraActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
 
         // Obter o manager
-        manager = DataManager.getInstance();
+        manager = DataManager.getInstance(getApplicationContext());
 
         // Verificar se tem sessão iniciada
         if (!manager.isLoggedIn(this)) {

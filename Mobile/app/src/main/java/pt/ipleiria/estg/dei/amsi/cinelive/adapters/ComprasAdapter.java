@@ -53,7 +53,7 @@ public class ComprasAdapter extends RecyclerView.Adapter<ComprasAdapter.ViewHold
         holder.binding.tvLugares.setText(compra.getLugares());
 
         // Verificar se tem bilhete se as compras forem locais
-        if (isLocal && !DataManager.getInstance().hasBilhetesStored(compra.getId())) {
+        if (isLocal && !DataManager.getInstance(holder.itemView.getContext()).hasBilhetesStored(compra.getId())) {
             holder.binding.btnDetalhes.setEnabled(false);
             holder.binding.btnDetalhes.setText(R.string.btn_indisponivel);
             return;
